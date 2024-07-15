@@ -8,6 +8,8 @@
     <dimen name="padding_extra_extra_large">48dp</dimen>
 
     <dimen name="dialog_padding_medium">40dp</dimen>
+    <dimen name="live_padding">150dp</dimen>
+
 
     <!-- EditText -->
     <dimen name="ti_height">60dp</dimen>

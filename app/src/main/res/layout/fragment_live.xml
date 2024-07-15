@@ -9,38 +9,59 @@
 
     <ImageButton
         android:id="@+id/ibtn_mic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:background="@drawable/round_button_background"
+        android:scaleType="fitCenter"
         android:src="@drawable/baseline_mic_24"
+        android:layout_marginBottom="@dimen/padding_large"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/ibtn_video"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="651dp" />
 
     <ImageButton
         android:id="@+id/ibtn_cam_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:background="@drawable/round_button_background"
+        android:scaleType="fitCenter"
         android:src="@drawable/baseline_cameraswitch_24"
+        android:layout_marginBottom="@dimen/padding_large"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ibtn_cancel" />
+        app:layout_constraintEnd_toStartOf="@+id/ibtn_cancel"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/ibtn_video"
+        tools:layout_editor_absoluteY="651dp" />
 
     <ImageButton
         android:id="@+id/ibtn_video"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:background="@drawable/round_button_background"
+        android:scaleType="fitCenter"
         android:src="@drawable/baseline_videocam_24"
+        android:layout_marginBottom="@dimen/padding_large"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ibtn_mic" />
+        app:layout_constraintEnd_toStartOf="@+id/ibtn_cam_switch"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/ibtn_mic"
+        tools:layout_editor_absoluteY="651dp" />
 
     <ImageButton
         android:id="@+id/ibtn_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:background="@drawable/round_button_background"
+        android:scaleType="fitCenter"
         android:src="@drawable/baseline_cancel_24"
+        android:layout_marginEnd="@dimen/live_padding"
+        android:backgroundTint="@color/primary"
+        android:layout_marginBottom="@dimen/padding_large"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ibtn_video" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/ibtn_cam_switch" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
