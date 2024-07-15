@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/home"
+        android:icon="@drawable/home"
+        android:title="@string/home" />
+
+    <item
+        android:id="@+id/teacher"
+        android:icon="@drawable/video"
+        android:title="@string/teacher" />
+
+    <item
+        android:id="@+id/lecture"
+        android:icon="@drawable/cinematic_blur"
+        android:title="@string/lecture" />
+
+    <item
+        android:id="@+id/my_page"
+        android:icon="@drawable/account"
+        android:title="@string/my_page" />
+</menu>

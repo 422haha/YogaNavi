@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:padding="@dimen/padding_medium">
+
+    <!-- 4-1 -->
+
+    <VideoView
+        android:id="@+id/vv_lecture"
+        android:layout_width="160dp"
+        android:layout_height="110dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_video_title"
+        style="@style/SingleLineText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_medium"
+        android:layout_marginBottom="@dimen/padding_small"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/tv_video_length"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/vv_lecture"
+        app:layout_constraintTop_toTopOf="@id/vv_lecture"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Chapter 1. 뒷다리 늘리기" />
+
+    <TextView
+        android:id="@+id/tv_video_length"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/tv_video_content"
+        app:layout_constraintStart_toStartOf="@id/tv_video_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_video_title"
+        tools:text="2분" />
+
+    <TextView
+        android:id="@+id/tv_video_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:breakStrategy="balanced"
+        android:ellipsize="end"
+        android:maxLines="2"
+        app:layout_constraintBottom_toBottomOf="@id/vv_lecture"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tv_video_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_video_length"
+        tools:text="앞다리 근육을 단력시켜 더 좋은 선택을 하는 근육강아지가 될 수 있습니다다근육강아지가 될 수 있습니다다근육강아지가 될 수 있습니다다근육강아지가 될 수 있습니다다" />
+</androidx.constraintlayout.widget.ConstraintLayout>

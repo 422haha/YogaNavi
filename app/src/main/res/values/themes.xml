@@ -1,0 +1,14 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.YogaNavi" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/primary</item>
+    </style>
+
+    <style name="Theme.YogaNavi" parent="Base.Theme.YogaNavi" />
+    
+    <style name="Circle">
+        <item name="cornerSize">50%</item>
+    </style>
+</resources>
