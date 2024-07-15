@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 간격 -->
+    <dimen name="padding_extra_small">4dp</dimen>
     <dimen name="padding_small">8dp</dimen>
     <dimen name="padding_medium">16dp</dimen>
     <dimen name="padding_large">20dp</dimen>
@@ -15,6 +16,8 @@
     <dimen name="ti_height">60dp</dimen>
 
     <!-- Icon -->
+    <dimen name="icon_mini">32dp</dimen>
+    <dimen name="icon_extra_small">24dp</dimen>
     <dimen name="icon_small">30dp</dimen>
     <dimen name="icon_medium">48dp</dimen>
     <dimen name="icon_large">100dp</dimen>
