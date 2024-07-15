@@ -27,8 +27,10 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
     @Override
     public Authentication authenticate(Authentication authentication)
         throws AuthenticationException {
+        System.out.println();
         String username = authentication.getName();
         String pwd = authentication.getCredentials().toString();
+        System.out.println("username: " + username + " pwd: " + pwd);
         List<UsersEntity> customer = usersRepository.findByEmail(username);
         if (customer.size() > 0) {
             if (passwordEncoder.matches(pwd, customer.get(0).getPwd())) {

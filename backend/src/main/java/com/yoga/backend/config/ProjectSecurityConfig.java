@@ -57,7 +57,7 @@ public class ProjectSecurityConfig {
 //            .csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/공용 api","/공용 api")
 //            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 // CSRF 쿠키 필터 추가
-                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+//                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 // JWT 토큰 생성 필터 추가
                 .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
                 // JWT 토큰 유효성 검사 필터 추가
