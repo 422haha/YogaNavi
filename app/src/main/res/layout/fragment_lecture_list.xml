@@ -50,17 +50,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/popular"
-            android:layout_marginEnd="@dimen/padding_medium"
-            tools:layout_editor_absoluteX="20dp"
-            tools:layout_editor_absoluteY="61dp" />
+            android:layout_marginEnd="@dimen/padding_medium" />
 
         <RadioButton
             android:id="@+id/radioButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/recent"
-            tools:layout_editor_absoluteX="171dp"
-            tools:layout_editor_absoluteY="72dp" />
+            android:text="@string/recent"/>
 
     </RadioGroup>
 
