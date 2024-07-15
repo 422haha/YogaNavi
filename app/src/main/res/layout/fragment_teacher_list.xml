@@ -16,10 +16,10 @@
         android:backgroundTint="@color/white"
         app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
+        app:layout_constraintBottom_toTopOf="@id/iv_filter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/iv_filter"
         app:strokeColor="@color/primary"
         app:strokeWidth="1dp">
 
@@ -50,6 +50,7 @@
         android:id="@+id/rv_teacher_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

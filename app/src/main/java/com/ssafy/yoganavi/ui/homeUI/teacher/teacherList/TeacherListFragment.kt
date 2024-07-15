@@ -17,8 +17,6 @@ class TeacherListFragment :
         super.onViewCreated(view, savedInstanceState)
 
         with(binding.rvTeacherList){
-            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-
             // 구분선
             val dividerItemDecoration = DividerItemDecoration(context, LinearLayoutManager.VERTICAL)
             addItemDecoration(dividerItemDecoration)
