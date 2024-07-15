@@ -55,7 +55,7 @@
 
         <ToggleButton
             android:id="@+id/tb_mon"
-            style="@style/week_button"
+            style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/monday"
             android:textOff="@string/monday"
@@ -67,7 +67,7 @@
 
         <ToggleButton
             android:id="@+id/tb_two"
-            style="@style/week_button"
+            style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/tuesday"
             android:textOff="@string/tuesday"
@@ -79,7 +79,7 @@
 
         <ToggleButton
             android:id="@+id/tb_wed"
-            style="@style/week_button"
+            style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/wednesday"
             android:textOff="@string/wednesday"
@@ -91,7 +91,7 @@
 
         <ToggleButton
             android:id="@+id/tb_thu"
-            style="@style/week_button"
+            style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/thursday"
             android:textOff="@string/thursday"
@@ -103,7 +103,7 @@
 
         <ToggleButton
             android:id="@+id/tb_fri"
-            style="@style/week_button"
+            style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/friday"
             android:textOff="@string/friday"
@@ -115,7 +115,7 @@
 
         <ToggleButton
             android:id="@+id/tb_sat"
-            style="@style/week_button"
+            style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/saturday"
             android:textOff="@string/saturday"
@@ -127,7 +127,7 @@
 
         <ToggleButton
             android:id="@+id/tb_sun"
-            style="@style/week_button"
+            style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/sunday"
             android:textOff="@string/sunday"
@@ -217,7 +217,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/padding_extra_extra_large"
-            android:text="@string/default_time"
+            android:text="@string/init_time"
             android:textColor="@color/black"
             app:layout_constraintEnd_toStartOf="@id/tv_tilde"
             app:layout_constraintStart_toStartOf="parent"
@@ -228,7 +228,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_large"
-            android:text="@string/tilde"
+            android:text="@string/from"
             app:layout_constraintBottom_toBottomOf="@id/btn_end"
             app:layout_constraintEnd_toStartOf="@id/btn_end"
             app:layout_constraintStart_toEndOf="@id/btn_start"
@@ -239,7 +239,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/padding_extra_extra_large"
-            android:text="@string/default_time"
+            android:text="@string/init_time"
             android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tv_tilde"
