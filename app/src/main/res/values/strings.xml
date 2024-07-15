@@ -34,4 +34,26 @@
     <string name="content">내용</string>
     <string name="chapter">순서</string>
 
+    <!-- 필터 시작 -->
+    <string name="align">정렬</string>
+    <string name="time">시간</string>
+    <string name="init_time">00:00</string>
+    <string name="from">~</string>
+    <string name="monday">월</string>
+    <string name="tuesday">화</string>
+    <string name="wednesday">수</string>
+    <string name="thursday">목</string>
+    <string name="friday">금</string>
+    <string name="saturday">토</string>
+    <string name="sunday">일</string>
+    <string name="select_term">기간 선택</string>
+    <string name="week">일주일</string>
+    <string name="month">한 달</string>
+    <string name="three_months">세 달</string>
+    <string name="year">일 년</string>
+    <string name="one_to_one">1:1</string>
+    <string name="one_to_multiple">1:多</string>
+    <string name="class_method">수업 방식</string>
+    <!-- 필터 끝 -->
+
 </resources>
