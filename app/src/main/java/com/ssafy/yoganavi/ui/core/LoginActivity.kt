@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.ssafy.yoganavi.R
+import com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail.LectureDetailFragment
 import com.ssafy.yoganavi.ui.loginUI.login.LoginFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,7 +23,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         supportFragmentManager.beginTransaction()
-            .add(R.id.fl, LoginFragment())
+            .add(R.id.fl, LectureDetailFragment())
             .commit()
     }
 }
