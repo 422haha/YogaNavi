@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/iv_logo"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/icon_extra_extra_large"
         android:layout_marginTop="@dimen/padding_large"
         android:src="@drawable/logo"
         app:layout_constraintBottom_toTopOf="@id/til_id"

@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.ui.configuration
+package com.ssafy.yoganavi.ui.core
 
 import android.os.Bundle
 import android.view.LayoutInflater
