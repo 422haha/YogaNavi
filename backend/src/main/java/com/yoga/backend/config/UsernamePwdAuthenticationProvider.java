@@ -27,7 +27,7 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
     @Override
     public Authentication authenticate(Authentication authentication)
         throws AuthenticationException {
-        System.out.println();
+        System.out.println(authentication.getPrincipal());
         String username = authentication.getName();
         String pwd = authentication.getCredentials().toString();
         System.out.println("username: " + username + " pwd: " + pwd);

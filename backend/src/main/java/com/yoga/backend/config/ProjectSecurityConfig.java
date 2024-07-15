@@ -37,9 +37,9 @@ public class ProjectSecurityConfig {
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration config = new CorsConfiguration();
                         // 허용되는 오리진들 설정
-                        config.setAllowedOrigins(Arrays.asList("http://example1.com", "http://example2.com", "http://example3.com"));
+//                        config.setAllowedOrigins(Arrays.asList("http://example1.com", "http://example2.com", "http://example3.com"));
                         // 모든 HTTP 메서드 허용
-//                        config.setAllowedMethods(Collections.singletonList("*"));
+                        config.setAllowedMethods(Collections.singletonList("*"));
                         // 자격 증명(쿠키, 헤더 등) 허용
                         config.setAllowCredentials(true);
                         // 모든 헤더 허용
