@@ -30,5 +30,9 @@
     <string name="delete">삭제</string>
     <string name="popular">인기순</string>
     <string name="recent">최신순</string>
+    <string name="lecture_title">강의 제목</string>
+    <string name="input_content">강의 내용을 입력하세요.</string>
+    <string name="choose_week">가능 요일 선택</string>
+    <string name="monday">월</string>
 
 </resources>

@@ -1,14 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.homeUI.myPage.registerLive.RegisterLiveFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <EditText
+        android:id="@+id/et_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_large"
+        android:layout_marginTop="@dimen/padding_extra_large"
+        android:hint="@string/lecture_title"
+        android:inputType="text"
+        android:lines="1"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/et_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</FrameLayout>
+    <EditText
+        android:id="@+id/et_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_large"
+        android:layout_marginTop="@dimen/padding_medium"
+        android:gravity="top"
+        android:hint="@string/input_content"
+        android:lines="5"
+        app:layout_constraintBottom_toTopOf="@id/tv_choose_week"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_title" />
+
+    <TextView
+        android:id="@+id/tv_choose_week"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_medium"
+        android:text="@string/choose_week"
+        android:textSize="@dimen/text_medium_large"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_content" />
+
+    <Button
+        android:id="@+id/ibtn_mon"
+        style="@style/week_button"
+        android:layout_width="0dp"
+        android:text="@string/monday"
+        app:layout_constraintBottom_toBottomOf="@id/ibtn_two"
+        app:layout_constraintEnd_toStartOf="@id/ibtn_two"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_choose_week" />
+
+    <Button
+        android:id="@+id/ibtn_two"
+        style="@style/week_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="화"
+        app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
+        app:layout_constraintEnd_toStartOf="@id/ibtn_wed"
+        app:layout_constraintStart_toEndOf="@id/ibtn_mon"
+        app:layout_constraintTop_toTopOf="@id/ibtn_mon" />
+
+    <Button
+        android:id="@+id/ibtn_wed"
+        style="@style/week_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="수"
+        app:layout_constraintBottom_toBottomOf="@id/ibtn_two"
+        app:layout_constraintEnd_toStartOf="@id/ibtn_thr"
+        app:layout_constraintStart_toEndOf="@id/ibtn_two"
+        app:layout_constraintTop_toTopOf="@id/ibtn_two" />
+
+    <Button
+        android:id="@+id/ibtn_thr"
+        style="@style/week_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="목"
+        app:layout_constraintBottom_toBottomOf="@id/ibtn_wed"
+        app:layout_constraintEnd_toStartOf="@id/ibtn_fri"
+        app:layout_constraintStart_toEndOf="@id/ibtn_wed"
+        app:layout_constraintTop_toTopOf="@id/ibtn_wed" />
+
+    <Button
+        android:id="@+id/ibtn_fri"
+        style="@style/week_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="금"
+        app:layout_constraintBottom_toBottomOf="@id/ibtn_thr"
+        app:layout_constraintEnd_toStartOf="@id/ibtn_sat"
+        app:layout_constraintStart_toEndOf="@id/ibtn_thr"
+        app:layout_constraintTop_toTopOf="@id/ibtn_thr" />
+
+    <Button
+        android:id="@+id/ibtn_sat"
+        style="@style/week_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="토"
+        app:layout_constraintBottom_toBottomOf="@id/ibtn_fri"
+        app:layout_constraintEnd_toStartOf="@id/ibtn_sun"
+        app:layout_constraintStart_toEndOf="@id/ibtn_fri"
+        app:layout_constraintTop_toTopOf="@id/ibtn_fri" />
+
+    <Button
+        android:id="@+id/ibtn_sun"
+        style="@style/week_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="일"
+        app:layout_constraintBottom_toBottomOf="@id/ibtn_sat"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ibtn_sat"
+        app:layout_constraintTop_toTopOf="@id/ibtn_sat" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
