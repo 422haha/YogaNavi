@@ -2,59 +2,68 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white">
 
     <!-- 3-4(?), 4, 5-2, 5-11 -->
 
-    <ImageView
-        android:id="@+id/iv_thumbnail"
-        android:layout_width="150dp"
-        android:layout_height="200dp"
-        android:layout_margin="@dimen/padding_small"
-        android:scaleType="fitXY"
-        app:layout_constraintBottom_toBottomOf="parent"
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cv_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         app:layout_constraintDimensionRatio="3:4"
+        android:layout_margin="@dimen/padding_extra_small"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@color/gray_10" />
+        app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:id="@+id/iv_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            tools:src="@color/gray_10" />
 
-    <!-- TODO 상황에 따라 흰색, 검은색 설정하기 -->
-    <ImageView
-        android:id="@+id/iv_favorite"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginTop="@dimen/padding_small"
-        android:layout_marginEnd="@dimen/padding_small"
-        android:src="@drawable/favorite"
-        app:layout_constraintEnd_toEndOf="@id/iv_thumbnail"
-        app:layout_constraintTop_toTopOf="@id/iv_thumbnail" />
+    </com.google.android.material.card.MaterialCardView>
 
-    <!-- TODO 만약 999보다 크면 999+ 이런식으로 해야할듯 -->
-    <TextView
-        android:id="@+id/tv_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:maxLength="4"
-        android:text="0"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@id/iv_favorite"
-        app:layout_constraintStart_toStartOf="@id/iv_favorite"
-        app:layout_constraintTop_toBottomOf="@id/iv_favorite" />
+        <!-- TODO 상황에 따라 흰색, 검은색 설정하기 -->
+        <ImageView
+            android:id="@+id/iv_favorite"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="@dimen/padding_small"
+            android:layout_marginEnd="@dimen/padding_small"
+            android:src="@drawable/favorite"
+            app:layout_constraintEnd_toEndOf="@id/cv_content"
+            app:layout_constraintTop_toTopOf="@id/cv_content" />
 
-    <TextView
-        android:id="@+id/tv_title"
-        style="@style/SingleLineText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/padding_small"
-        android:gravity="center"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@id/iv_thumbnail"
-        app:layout_constraintEnd_toEndOf="@id/iv_thumbnail"
-        app:layout_constraintStart_toStartOf="@id/iv_thumbnail"
-        tools:text="SO EZ 요가" />
+        <!-- TODO 만약 999보다 크면 999+ 이런식으로 해야할듯 -->
+        <TextView
+            android:id="@+id/tv_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLength="4"
+            android:text="0"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@id/iv_favorite"
+            app:layout_constraintStart_toStartOf="@id/iv_favorite"
+            app:layout_constraintTop_toBottomOf="@id/iv_favorite" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/SingleLineText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/padding_small"
+            android:gravity="center"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@id/cv_content"
+            app:layout_constraintEnd_toEndOf="@id/cv_content"
+            app:layout_constraintStart_toStartOf="@id/cv_content"
+            tools:text="SO EZ 요가" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
