@@ -34,10 +34,10 @@
         android:layout_marginStart="@dimen/padding_large"
         android:layout_marginEnd="@dimen/padding_large"
         android:foreground="@color/gray_10"
+        app:layout_constraintBottom_toTopOf="@id/fl"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tb"
-        app:layout_constraintBottom_toTopOf="@id/fl"/>
+        app:layout_constraintTop_toBottomOf="@id/tb" />
 
     <FrameLayout
         android:id="@+id/fl"
@@ -50,14 +50,15 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bnv"
+        style="@style/BottomNavigationViewNoRipple"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:itemActiveIndicatorStyle="@null"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fl"
         app:menu="@menu/bottom" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
