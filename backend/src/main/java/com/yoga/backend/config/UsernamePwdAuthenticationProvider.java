@@ -27,15 +27,16 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
     @Override
     public Authentication authenticate(Authentication authentication)
         throws AuthenticationException {
-        System.out.println(authentication.getPrincipal());
+        System.out.println("authenticate in");
         String username = authentication.getName();
         String pwd = authentication.getCredentials().toString();
         System.out.println("username: " + username + " pwd: " + pwd);
-        List<UsersEntity> customer = usersRepository.findByEmail(username);
-        if (customer.size() > 0) {
-            if (passwordEncoder.matches(pwd, customer.get(0).getPwd())) {
+        List<UsersEntity> users = usersRepository.findByEmail(username);
+        System.out.println("size  : " + users.size());
+        if (users.size() > 0) {
+            if (passwordEncoder.matches(pwd, users.get(0).getPwd())) {
                 return new UsernamePasswordAuthenticationToken(username, pwd,
-                    getGrantedAuthorities(customer.get(0).getRole()));
+                    getGrantedAuthorities(users.get(0).getRole()));
             } else {
                 throw new BadCredentialsException("Invalid password!");
             }
