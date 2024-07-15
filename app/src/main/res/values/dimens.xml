@@ -15,7 +15,8 @@
     <dimen name="ti_height">60dp</dimen>
 
     <!-- Icon -->
-    <dimen name="icon_small">48dp</dimen>
+    <dimen name="icon_small">30dp</dimen>
+    <dimen name="icon_medium">48dp</dimen>
     <dimen name="icon_large">100dp</dimen>
     <dimen name="icon_extra_large">150dp</dimen>
     <dimen name="icon_extra_extra_large">300dp</dimen>
