@@ -1,14 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.homeUI.myPage.registerNotice.RegisterNoticeFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
 
-</FrameLayout>
+    <EditText
+        android:id="@+id/et_notice"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@null"
+        android:hint="글을 작성하는 공간입니다."
+        android:inputType="text"
+        style="@style/LargeText"
+        android:padding="@dimen/padding_large"
+        android:gravity="top"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/divider4"
+        />
+
+    <View
+        android:id="@+id/divider4"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_notice"
+        app:layout_constraintBottom_toTopOf="@id/cv_add_photo"
+        />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cv_add_photo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/divider4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Space
+            android:id="@+id/s1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/iv_camera"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+        <ImageView
+            android:id="@+id/iv_camera"
+            android:layout_width="@dimen/icon_small"
+            android:layout_height="@dimen/icon_small"
+            android:src="@drawable/photo_camera"
+            android:layout_marginVertical="@dimen/padding_medium"
+            android:layout_marginEnd="@dimen/padding_small"
+            app:layout_constraintStart_toEndOf="@id/s1"
+            app:layout_constraintEnd_toStartOf="@id/tv_add_photo"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/tv_add_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="사진 추가하기"
+            style="@style/LargeText"
+            app:layout_constraintStart_toEndOf="@id/iv_camera"
+            app:layout_constraintEnd_toEndOf="@id/s2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+        <Space
+            android:id="@+id/s2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toEndOf="@id/tv_add_photo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <ImageView
+            android:id="@+id/iv_photo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/padding_medium"
+            android:scaleType="fitCenter"
+            android:src="@drawable/sample"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
