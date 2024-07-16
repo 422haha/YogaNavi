@@ -15,12 +15,14 @@ class UserDataSourceImpl @Inject constructor(private val userAPI: UserAPI) : Use
     private val mutex = Mutex()
 
     override suspend fun logIn(logInRequest: LogInRequest): Response<LogInResponse> =
-        mutex.withLock {
-            userAPI.login(logInRequest)
-        }
+        mutex.withLock { userAPI.login(logInRequest.username, logInRequest.password) }
 
     override suspend fun signUp(signUpRequest: SignUpRequest): Response<SignUpResponse> =
-        mutex.withLock {
-            userAPI.signUp(signUpRequest)
-        }
+        mutex.withLock { userAPI.signUp(signUpRequest) }
+
+    override suspend fun registerEmail(signUpRequest: SignUpRequest): Response<SignUpResponse> =
+        mutex.withLock { userAPI.registerEmail(signUpRequest) }
+
+    override suspend fun checkAuthEmail(signUpRequest: SignUpRequest): Response<SignUpResponse> =
+        mutex.withLock { userAPI.checkAuthEmail(signUpRequest) }
 }
