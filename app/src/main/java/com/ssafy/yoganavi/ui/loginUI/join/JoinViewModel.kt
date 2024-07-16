@@ -6,7 +6,9 @@ import com.ssafy.yoganavi.data.ApiResponse
 import com.ssafy.yoganavi.data.repository.UserRepository
 import com.ssafy.yoganavi.data.source.signup.SignUpRequest
 import com.ssafy.yoganavi.data.source.signup.SignUpResponse
-import com.ssafy.yoganavi.ui.loginUI.login.LoginViewModel.Companion.NO_RESPONSE
+import com.ssafy.yoganavi.ui.utils.IS_BLANK
+import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
+import com.ssafy.yoganavi.ui.utils.isBlank
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -34,7 +36,13 @@ class JoinViewModel @Inject constructor(
         _signUpEvent.asSharedFlow()
 
     fun registerEmail(email: String) = viewModelScope.launch {
+        if (arrayOf(email).isBlank()) {
+            _registerEmailEvent.emit(ApiResponse.Error(IS_BLANK))
+            return@launch
+        }
+
         val signUpRequest = SignUpRequest(email = email)
+
         runCatching { userRepository.registerEmail(signUpRequest) }
             .onSuccess { _registerEmailEvent.emit(it) }
             .onFailure { _registerEmailEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
@@ -43,6 +51,7 @@ class JoinViewModel @Inject constructor(
     fun checkAuthEmail(checkNumber: Int?) = viewModelScope.launch {
         checkNumber?.let {
             val signUpRequest = SignUpRequest(authnumber = checkNumber)
+
             runCatching { userRepository.checkAuthEmail(signUpRequest) }
                 .onSuccess { _checkEmailEvent.emit(it) }
                 .onFailure { _checkEmailEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
@@ -51,6 +60,11 @@ class JoinViewModel @Inject constructor(
 
     fun signUp(email: String, password: String, nickname: String, isTeacher: Boolean) =
         viewModelScope.launch {
+            if (arrayOf(email, password, nickname).isBlank()) {
+                _signUpEvent.emit(ApiResponse.Error(IS_BLANK))
+                return@launch
+            }
+
             val signUpRequest = SignUpRequest(
                 email = email,
                 password = password,
