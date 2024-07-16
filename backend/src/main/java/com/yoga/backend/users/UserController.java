@@ -64,7 +64,7 @@ public class UserController {
             response.put("data", null);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } else {
-            response.put("message", "member exists");
+            response.put("message", "이미 존재하는 회원");
             response.put("data", null);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
@@ -85,7 +85,5 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
-
-
 
 }
