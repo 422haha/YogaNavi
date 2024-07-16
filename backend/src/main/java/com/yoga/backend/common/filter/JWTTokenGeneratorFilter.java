@@ -1,6 +1,6 @@
-package com.yoga.backend.filter;
+package com.yoga.backend.common.filter;
 
-import com.yoga.backend.constants.SecurityConstants;
+import com.yoga.backend.common.constants.SecurityConstants;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;

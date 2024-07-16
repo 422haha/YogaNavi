@@ -1,15 +1,14 @@
-package com.yoga.backend.users;
+package com.yoga.backend.common.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "Users")
-public class UsersEntity {
+public class Users {
 
 //    @Version
 //    private Long version; // 여러 사용자나 프로세스가 동시에 같은 회원 정보를 수정하려고 할 때 발생할 수 있는 충돌을 방지하기 위함.
