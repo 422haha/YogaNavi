@@ -19,35 +19,40 @@ import org.springframework.stereotype.Component;
 public class UsernamePwdAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
-    private UsersRepository usersRepository;
+    private UsersRepository usersRepository; // 사용자 정보를 가져오는 리포지토리
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder; // 비밀번호 인코딩/매칭을 위한 유틸리티 클래스
 
     @Override
     public Authentication authenticate(Authentication authentication)
         throws AuthenticationException {
+        // 사용자 이름과 비밀번호 추출
         String username = authentication.getName();
         String pwd = authentication.getCredentials().toString();
-        System.out.println("======= username: " + username + " pwd: " + pwd);
+        System.out.println("========================username : " + username + " password : " + pwd);
+
+        // 사용자 정보 조회
         List<Users> users = usersRepository.findByEmail(username);
-        System.out.println("======= size  : " + users.size());
         if (users.size() > 0) {
+            // 비밀번호 매칭 확인
             if (passwordEncoder.matches(pwd, users.get(0).getPwd())) {
                 System.out.println(
-                    "=====================sdfaf:" + new UsernamePasswordAuthenticationToken(
-                        username, pwd,
-                        getGrantedAuthorities(users.get(0).getRole())));
+                    "=======================member exists role : " + users.get(0).getRole());
+                // 인증 성공 시 새로운 인증 객체 반환
                 return new UsernamePasswordAuthenticationToken(username, pwd,
                     getGrantedAuthorities(users.get(0).getRole()));
             } else {
+                // 비밀번호가 일치하지 않는 경우 예외 발생
                 throw new BadCredentialsException("Invalid password!");
             }
         } else {
+            // 사용자가 존재하지 않는 경우 예외 발생
             throw new BadCredentialsException("No user registered with this details!");
         }
     }
 
+    // 사용자 권한 목록 생성
     private List<GrantedAuthority> getGrantedAuthorities(String role) {
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
@@ -57,6 +62,7 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
 
     @Override
     public boolean supports(Class<?> authentication) {
+        // 이 인증 제공자가 지원하는 인증 유형 확인
         return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
     }
 }
