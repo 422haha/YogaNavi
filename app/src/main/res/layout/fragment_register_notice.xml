@@ -13,7 +13,7 @@
         android:layout_height="0dp"
         android:background="@null"
         android:hint="@string/write_info"
-        android:inputType="text"
+        android:inputType="textMultiLine"
         style="@style/LargeText"
         android:padding="@dimen/padding_large"
         android:gravity="top"
