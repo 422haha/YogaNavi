@@ -186,6 +186,7 @@
         android:layout_marginBottom="@dimen/padding_large"
         android:height="@dimen/ti_height"
         android:text="@string/signup"
+        android:enabled="false"
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

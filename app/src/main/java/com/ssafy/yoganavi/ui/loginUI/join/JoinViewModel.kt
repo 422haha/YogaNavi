@@ -8,6 +8,7 @@ import com.ssafy.yoganavi.data.source.signup.SignUpRequest
 import com.ssafy.yoganavi.data.source.signup.SignUpResponse
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
+import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
 import com.ssafy.yoganavi.ui.utils.isBlank
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -58,22 +59,32 @@ class JoinViewModel @Inject constructor(
         }
     }
 
-    fun signUp(email: String, password: String, nickname: String, isTeacher: Boolean) =
-        viewModelScope.launch {
-            if (arrayOf(email, password, nickname).isBlank()) {
-                _signUpEvent.emit(ApiResponse.Error(IS_BLANK))
-                return@launch
-            }
-
-            val signUpRequest = SignUpRequest(
-                email = email,
-                password = password,
-                nickname = nickname,
-                teacher = isTeacher
-            )
-
-            runCatching { userRepository.signUp(signUpRequest) }
-                .onSuccess { _signUpEvent.emit(it) }
-                .onFailure { _signUpEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
+    fun signUp(
+        email: String,
+        password: String,
+        passwordAgain: String,
+        nickname: String,
+        isTeacher: Boolean
+    ) = viewModelScope.launch {
+        if (arrayOf(email, password, nickname).isBlank()) {
+            _signUpEvent.emit(ApiResponse.Error(IS_BLANK))
+            return@launch
         }
+
+        if (password != passwordAgain) {
+            _signUpEvent.emit(ApiResponse.Error(PASSWORD_DIFF))
+            return@launch
+        }
+
+        val signUpRequest = SignUpRequest(
+            email = email,
+            password = password,
+            nickname = nickname,
+            teacher = isTeacher
+        )
+
+        runCatching { userRepository.signUp(signUpRequest) }
+            .onSuccess { _signUpEvent.emit(it) }
+            .onFailure { _signUpEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
+    }
 }

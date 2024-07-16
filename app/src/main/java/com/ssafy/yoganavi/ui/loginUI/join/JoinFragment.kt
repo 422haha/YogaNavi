@@ -10,6 +10,8 @@ import com.ssafy.yoganavi.data.ApiResponse
 import com.ssafy.yoganavi.data.source.signup.SignUpResponse
 import com.ssafy.yoganavi.databinding.FragmentJoinBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
+import com.ssafy.yoganavi.ui.utils.CERTIFICATION
+import com.ssafy.yoganavi.ui.utils.CHECK
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -47,16 +49,17 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
             val number = binding.tieCn.text.toString().toIntOrNull()
             val btn = binding.btnCheck.text.toString()
 
-            if (btn == "확인") viewModel.registerEmail(email)
-            else if (btn == "인증") viewModel.checkAuthEmail(number)
+            if (btn == CHECK) viewModel.registerEmail(email)
+            else if (btn == CERTIFICATION) viewModel.checkAuthEmail(number)
         }
 
         binding.btnSignup.setOnClickListener {
             val email = binding.tieId.text.toString()
             val password = binding.tiePw.text.toString()
+            val passwordAgain = binding.tiePwAgain.text.toString()
             val nickname = binding.tieNn.text.toString()
             val isTeacher = binding.tvTeacher.isChecked
-            viewModel.signUp(email, password, nickname, isTeacher)
+            viewModel.signUp(email, password, passwordAgain, nickname, isTeacher)
         }
     }
 
@@ -73,8 +76,13 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
             launch {
                 viewModel.checkEmailEvent.collectLatest {
                     setLogic(it, binding.btnCheck.text.toString())
-                    if (it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
-                    else showSnackBar(it.message.toString())
+                    if (it is ApiResponse.Success) {
+                        showSnackBar(it.data?.message.toString())
+                        binding.btnCheck.isEnabled = false
+                        binding.btnSignup.isEnabled = true
+                    } else {
+                        showSnackBar(it.message.toString())
+                    }
                 }
             }
 
@@ -89,12 +97,8 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
 
     private suspend fun setLogic(response: ApiResponse<SignUpResponse>, logic: String) =
         withContext(Dispatchers.Main) {
-            if (response is ApiResponse.Success) {
-                binding.btnCheck.text = if (logic == "확인") {
-                    "인증"
-                } else {
-                    "확인"
-                }
+            if (response is ApiResponse.Success && logic == CHECK) {
+                binding.btnCheck.text = CERTIFICATION
             }
         }
 }
