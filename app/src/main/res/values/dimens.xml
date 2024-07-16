@@ -15,6 +15,8 @@
     <!-- EditText -->
     <dimen name="ti_height">60dp</dimen>
 
+    <dimen name="text_size_semi_large">22sp</dimen>
+
     <!-- Icon -->
     <dimen name="icon_mini">32dp</dimen>
     <dimen name="icon_extra_small">24dp</dimen>

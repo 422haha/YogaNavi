@@ -33,6 +33,9 @@
     <string name="title">제목</string>
     <string name="content">내용</string>
     <string name="chapter">순서</string>
+    <string name="add_photo"> 사진 추가하기</string>
+    <string name="write_info">글을 작성하는 공간입니다.</string>
+
 
     <!-- 필터 시작 -->
     <string name="align">정렬</string>
