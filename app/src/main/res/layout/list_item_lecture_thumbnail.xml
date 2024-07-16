@@ -6,8 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@color/white">
 
-    <!-- 3-4(?), 4, 5-2, 5-11 -->
-
+    <!-- 4, 5-2, 5-11 -->
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cv_content"
