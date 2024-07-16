@@ -64,14 +64,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_profile" />
 
-        <CalendarView
+        <com.prolificinteractive.materialcalendarview.MaterialCalendarView
             android:id="@+id/calendar"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/tv_select_class_method"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_select_term" />
+            app:layout_constraintTop_toBottomOf="@id/tv_select_term"
+            app:mcv_firstDayOfWeek="sunday"
+            app:mcv_selectionColor="@color/primary"
+            app:mcv_selectionMode="range" />
 
         <TextView
             android:id="@+id/tv_select_class_method"
