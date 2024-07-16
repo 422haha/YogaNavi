@@ -3,6 +3,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#FEC3BB</color>
+    <color name="surface_container">#FCD5CE</color>
+    <color name="second_primary">#F8EDEB</color>
     <color name="gray_10">#dcdcdc</color>
     <color name="gray_20">#999999</color>
     <color name="gray_30">#808080</color>

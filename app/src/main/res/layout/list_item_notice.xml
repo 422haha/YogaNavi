@@ -5,7 +5,6 @@
     android:id="@+id/cv_notice"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/padding_small"
     android:background="@color/white"
     app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
@@ -14,6 +13,8 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
     app:strokeColor="@color/gray_20"
+    android:layout_marginHorizontal="@dimen/padding_small"
+    android:layout_marginTop="@dimen/padding_small"
     app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,8 +26,8 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_profile"
-            android:layout_width="@dimen/icon_small"
-            android:layout_height="@dimen/icon_small"
+            android:layout_width="@dimen/icon_medium"
+            android:layout_height="@dimen/icon_medium"
             android:layout_gravity="center"
             android:background="@color/black"
             app:layout_constraintEnd_toStartOf="@id/tv_teacher_nickname"
@@ -68,7 +69,6 @@
             android:paddingBottom="@dimen/padding_medium"
             android:text="@string/edit"
             android:textSize="16sp"
-            android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/tv_deleteBtn"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -82,7 +82,6 @@
             android:paddingBottom="@dimen/padding_medium"
             android:text="@string/delete"
             android:textSize="16sp"
-            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tv_editBtn" />
 
@@ -92,7 +91,6 @@
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/padding_medium"
             android:textSize="16sp"
-            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
