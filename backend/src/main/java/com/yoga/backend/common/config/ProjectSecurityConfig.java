@@ -1,8 +1,8 @@
-package com.yoga.backend.config;
+package com.yoga.backend.common.config;
 
-import com.yoga.backend.filter.CsrfCookieFilter;
-import com.yoga.backend.filter.JWTTokenGeneratorFilter;
-import com.yoga.backend.filter.JWTTokenValidatorFilter;
+import com.yoga.backend.common.filter.CsrfCookieFilter;
+import com.yoga.backend.common.filter.JWTTokenGeneratorFilter;
+import com.yoga.backend.common.filter.JWTTokenValidatorFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,22 +23,16 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @Configuration
 public class ProjectSecurityConfig {
 
-    // 기본 보안 필터 체인을 구성하는 메서드
-
-
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
-        http.sessionManagement(
-                session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .cors(
-                corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration config = new CorsConfiguration();
-                        config.setAllowedOrigins(
-                            Collections.singletonList("http://localhost:8080"));
+                        config.setAllowedOrigins(Collections.singletonList("*"));//ip 주소 지정
                         config.setAllowedMethods(Collections.singletonList("*"));
                         config.setAllowCredentials(true);
                         config.setAllowedHeaders(Collections.singletonList("*"));
@@ -46,17 +40,22 @@ public class ProjectSecurityConfig {
                         config.setMaxAge(3600L);
                         return config;
                     }
-                })).csrf((csrf) -> csrf.csrfTokenRequestHandler(requestHandler)
-                .ignoringRequestMatchers("/contact", "/users/register", "/login")
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-            .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-            .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
-            .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
-            .authorizeHttpRequests((requests) -> requests
+                })).csrf((csrf) -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contact","/members/register","/login")
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
+                .authorizeHttpRequests((requests)->requests
+                        .requestMatchers("/teacher_only").hasRole("TEACHER")
+//                        .requestMatchers("/선생학생경로").hasAnyRole("USER","TEACHER")
+                        .requestMatchers("/user").authenticated() // 인증 객체만 있다면 접근 가능
+                        .requestMatchers("/경로","/경로","/members/register").permitAll()
+                                // Swagger 관련 경로에 대한 설정 추가
+                                .requestMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
 
-                .anyRequest().permitAll())
-            .formLogin(Customizer.withDefaults())
-            .httpBasic(Customizer.withDefaults());
+                )
+                .formLogin(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults());
         return http.build();
     }
 

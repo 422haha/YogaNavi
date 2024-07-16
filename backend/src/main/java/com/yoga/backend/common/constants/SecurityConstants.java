@@ -1,4 +1,4 @@
-package com.yoga.backend.constants;
+package com.yoga.backend.common.constants;
 
 public class SecurityConstants {
     public static final String JWT_KEY = "jxgEQeXHuPq8VdbyYFNkANdudQ53YUn4";

@@ -1,14 +1,14 @@
 package com.yoga.backend.users;
 
+import com.yoga.backend.common.entity.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/members")
 public class UserController {
     @Autowired
     private UsersRepository usersRepository;
@@ -17,8 +17,8 @@ public class UserController {
     PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UsersEntity users) {
-        UsersEntity savedUsers = null;
+    public ResponseEntity<String> registerUser(@RequestBody Users users) {
+        Users savedUsers = null;
         ResponseEntity response = null;
         try {
             String hashPwd = passwordEncoder.encode(users.getPwd());

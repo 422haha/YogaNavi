@@ -1,6 +1,6 @@
-package com.yoga.backend.config;
+package com.yoga.backend.common.config;
 
-import com.yoga.backend.users.UsersEntity;
+import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.users.UsersRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
         String username = authentication.getName();
         String pwd = authentication.getCredentials().toString();
         System.out.println("username: " + username + " pwd: " + pwd);
-        List<UsersEntity> users = usersRepository.findByEmail(username);
+        List<Users> users = usersRepository.findByEmail(username);
         System.out.println("size  : " + users.size());
         if (users.size() > 0) {
             if (passwordEncoder.matches(pwd, users.get(0).getPwd())) {

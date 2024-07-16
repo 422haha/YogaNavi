@@ -1,4 +1,4 @@
-package com.yoga.backend.filter;
+package com.yoga.backend.common.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
