@@ -140,7 +140,7 @@
         style="@style/WeeklyButton"
         android:layout_marginStart="@dimen/padding_small"
         android:layout_marginTop="@dimen/padding_medium"
-        android:background="@drawable/weekly_toggle_selector"
+        android:background="@drawable/toggle_button_background"
         android:text="@string/monday"
         app:layout_constraintEnd_toStartOf="@id/ibtn_tue"
         app:layout_constraintStart_toStartOf="parent"
@@ -149,7 +149,7 @@
     <CheckBox
         android:id="@+id/ibtn_tue"
         style="@style/WeeklyButton"
-        android:background="@drawable/weekly_toggle_selector"
+        android:background="@drawable/toggle_button_background"
         android:text="@string/tuesday"
         app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
         app:layout_constraintEnd_toStartOf="@id/ibtn_wed"
@@ -159,7 +159,7 @@
     <CheckBox
         android:id="@+id/ibtn_wed"
         style="@style/WeeklyButton"
-        android:background="@drawable/weekly_toggle_selector"
+        android:background="@drawable/toggle_button_background"
         android:text="@string/wednesday"
         app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
         app:layout_constraintEnd_toStartOf="@id/ibtn_thu"
@@ -169,7 +169,7 @@
     <CheckBox
         android:id="@+id/ibtn_thu"
         style="@style/WeeklyButton"
-        android:background="@drawable/weekly_toggle_selector"
+        android:background="@drawable/toggle_button_background"
         android:text="@string/thursday"
         app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
         app:layout_constraintEnd_toStartOf="@id/ibtn_fri"
@@ -179,7 +179,7 @@
     <CheckBox
         android:id="@+id/ibtn_fri"
         style="@style/WeeklyButton"
-        android:background="@drawable/weekly_toggle_selector"
+        android:background="@drawable/toggle_button_background"
         android:text="@string/friday"
         app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
         app:layout_constraintEnd_toStartOf="@id/ibtn_sat"
@@ -189,7 +189,7 @@
     <CheckBox
         android:id="@+id/ibtn_sat"
         style="@style/WeeklyButton"
-        android:background="@drawable/weekly_toggle_selector"
+        android:background="@drawable/toggle_button_background"
         android:text="@string/saturday"
         app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
         app:layout_constraintEnd_toStartOf="@id/ibtn_sun"
@@ -200,7 +200,7 @@
         android:id="@+id/ibtn_sun"
         style="@style/WeeklyButton"
         android:layout_marginEnd="@dimen/padding_small"
-        android:background="@drawable/weekly_toggle_selector"
+        android:background="@drawable/toggle_button_background"
         android:text="@string/sunday"
         app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
         app:layout_constraintEnd_toEndOf="parent"
