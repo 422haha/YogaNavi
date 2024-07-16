@@ -18,6 +18,15 @@ class AuthInterceptor @Inject constructor(
             .addHeader("Authorization", token)
             .build()
 
-        return chain.proceed(request)
+        val response = chain.proceed(request)
+
+        response.header("Authorization")?.let { newToken ->
+            runBlocking { dataStoreRepository.setToken(newToken) }
+        }
+        response.header("refresh")?.let { newRefreshToken ->
+            runBlocking { dataStoreRepository.setRefreshToken(newRefreshToken) }
+        }
+
+        return response
     }
 }
