@@ -11,8 +11,8 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/iv_profile"
-        android:layout_width="@dimen/icon_small"
-        android:layout_height="@dimen/icon_small"
+        android:layout_width="@dimen/icon_mini"
+        android:layout_height="@dimen/icon_mini"
         android:layout_gravity="center"
         android:background="@color/black"
         app:layout_constraintEnd_toStartOf="@id/tv_teacher_nickname"
@@ -47,7 +47,7 @@
     <View
         android:id="@+id/v_connect"
         android:layout_width="1dp"
-        android:layout_height="@dimen/padding_small"
+        android:layout_height="@dimen/padding_medium"
         android:background="@color/gray_20"
         app:layout_constraintBottom_toTopOf="@id/cv_content"
         app:layout_constraintEnd_toEndOf="@id/iv_profile"
@@ -63,7 +63,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/v_connect"
+        app:layout_constraintTop_toBottomOf="@id/tv_date"
         app:strokeColor="@color/gray_20"
         app:strokeWidth="1dp">
 
