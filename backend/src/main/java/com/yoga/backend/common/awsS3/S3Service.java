@@ -1,5 +1,6 @@
-package com.yoga.backend.common.service;
+package com.yoga.backend.common.awsS3;
 
+import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class S3Service {
         this.s3Client = s3Client;
     }
 
-    public void uploadFile(String key, InputStream inputStream) {
+    public void uploadFile(String key, InputStream inputStream) throws IOException {
         s3Client.putObject(PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(key)

@@ -27,14 +27,17 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
     @Override
     public Authentication authenticate(Authentication authentication)
         throws AuthenticationException {
-        System.out.println("authenticate in");
         String username = authentication.getName();
         String pwd = authentication.getCredentials().toString();
-        System.out.println("username: " + username + " pwd: " + pwd);
+        System.out.println("======= username: " + username + " pwd: " + pwd);
         List<Users> users = usersRepository.findByEmail(username);
-        System.out.println("size  : " + users.size());
+        System.out.println("======= size  : " + users.size());
         if (users.size() > 0) {
             if (passwordEncoder.matches(pwd, users.get(0).getPwd())) {
+                System.out.println(
+                    "=====================sdfaf:" + new UsernamePasswordAuthenticationToken(
+                        username, pwd,
+                        getGrantedAuthorities(users.get(0).getRole())));
                 return new UsernamePasswordAuthenticationToken(username, pwd,
                     getGrantedAuthorities(users.get(0).getRole()));
             } else {
@@ -48,6 +51,7 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
     private List<GrantedAuthority> getGrantedAuthorities(String role) {
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
+        System.out.println("grantedAuthorities : " + grantedAuthorities);
         return grantedAuthorities;
     }
 

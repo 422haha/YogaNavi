@@ -1,4 +1,4 @@
-package com.yoga.backend.common.config;
+package com.yoga.backend.common.awsS3;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,8 +23,9 @@ public class AwsConfig {
     @Bean
     public S3Client s3Client() {
         return S3Client.builder()
-                .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
-                .build();
+            .region(Region.of(region))
+            .credentialsProvider(
+                StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
+            .build();
     }
 }

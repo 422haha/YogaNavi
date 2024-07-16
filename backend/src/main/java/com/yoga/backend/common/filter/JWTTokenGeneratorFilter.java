@@ -16,45 +16,60 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+
 public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (null != authentication) {
-            SecretKey key = Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
 
-            // Access Token 생성
-            String accessToken = Jwts.builder()
-                .issuer("Yoga Navi")
-                .subject("JWT Token")
-                .claim("username", authentication.getName())
-                .claim("role", populateRole(authentication))
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + SecurityConstants.ACCESS_TOKEN_EXPIRATION))
-                .signWith(key)
-                .compact();
+            System.out.println("JWTTokenGeneratorFilter --------- equals login : "+SecurityContextHolder.getContext().getAuthentication());
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (null != authentication && authentication.isAuthenticated()) {
+                SecretKey key = Keys.hmacShaKeyFor(
+                    SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
 
-            // Refresh Token 생성
-            String refreshToken = Jwts.builder()
-                .issuer("Yoga Navi")
-                .subject("Refresh Token")
-                .claim("username", authentication.getName())
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + SecurityConstants.REFRESH_TOKEN_EXPIRATION))
-                .signWith(key)
-                .compact();
+                // Access Token 생성
+                String accessToken = Jwts.builder()
+                    .issuer("Yoga Navi")
+                    .subject("JWT Token")
+                    .claim("username", authentication.getName())
+                    .claim("role", populateRole(authentication))
+                    .issuedAt(new Date())
+                    .expiration(new Date(
+                        System.currentTimeMillis() + SecurityConstants.ACCESS_TOKEN_EXPIRATION))
+                    .signWith(key)
+                    .compact();
 
-            // 생성된 토큰들을 응답 헤더에 추가
-            response.setHeader(SecurityConstants.JWT_HEADER, accessToken);
-            response.setHeader(SecurityConstants.REFRESH_TOKEN_HEADER, refreshToken);
-        }
+                // Refresh Token 생성
+                String refreshToken = Jwts.builder()
+                    .issuer("Yoga Navi")
+                    .subject("Refresh Token")
+                    .claim("username", authentication.getName())
+                    .claim("role", populateRole(authentication))
+                    .issuedAt(new Date())
+                    .expiration(new Date(
+                        System.currentTimeMillis() + SecurityConstants.REFRESH_TOKEN_EXPIRATION))
+                    .signWith(key)
+                    .compact();
 
-        filterChain.doFilter(request, response);
+                System.out.println("accessToken: " + accessToken);
+                System.out.println("refreshToken: " + refreshToken);
+                // 생성된 토큰들을 응답 헤더에 추가
+                response.setHeader(SecurityConstants.JWT_HEADER, accessToken);
+                response.setHeader(SecurityConstants.REFRESH_TOKEN_HEADER, refreshToken);
+            }
+
+            filterChain.doFilter(request, response);
+
     }
 
     private String populateRole(Authentication authentication) {
+        System.out.println("=================populateRole"+authentication+","+authentication.getAuthorities().stream()
+            .findFirst()
+            .map(GrantedAuthority::getAuthority)
+            .orElse(""));
+
         return authentication.getAuthorities().stream()
             .findFirst()
             .map(GrantedAuthority::getAuthority)

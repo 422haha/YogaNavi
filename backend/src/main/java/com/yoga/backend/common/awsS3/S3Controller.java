@@ -1,6 +1,6 @@
-package com.yoga.backend.common.controller;
+package com.yoga.backend.common.awsS3;
 
-import com.yoga.backend.service.S3Service;
+import com.yoga.backend.common.awsS3.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
