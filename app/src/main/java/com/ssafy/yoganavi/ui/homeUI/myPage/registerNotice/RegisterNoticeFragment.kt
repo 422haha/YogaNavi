@@ -11,14 +11,4 @@ import kotlinx.coroutines.launch
 class RegisterNoticeFragment :
     BaseFragment<FragmentRegisterNoticeBinding>(FragmentRegisterNoticeBinding::inflate) {
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            delay(2000)
-            binding.ivPhoto.visibility = View.VISIBLE
-            binding.ivCancel2.visibility = View.VISIBLE
-        }
-    }
 }
