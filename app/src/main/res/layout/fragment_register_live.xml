@@ -1,14 +1,257 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.homeUI.myPage.registerLive.RegisterLiveFragment">
+    android:layout_height="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        tools:context=".ui.homeUI.myPage.registerLive.RegisterLiveFragment">
 
-</FrameLayout>
+        <EditText
+            android:id="@+id/et_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/padding_large"
+            android:layout_marginTop="@dimen/padding_extra_large"
+            android:hint="@string/lecture_title"
+            android:inputType="text"
+            android:lines="1"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/et_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/et_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/padding_large"
+            android:layout_marginTop="@dimen/padding_medium"
+            android:gravity="top"
+            android:hint="@string/input_content"
+            android:lines="5"
+            app:layout_constraintBottom_toTopOf="@id/tv_choose_week"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_title" />
+
+        <TextView
+            android:id="@+id/tv_choose_week"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_medium"
+            android:paddingBottom="@dimen/padding_medium"
+            android:text="@string/choose_week"
+            android:textSize="@dimen/text_medium_large"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/tb_mon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_content" />
+
+        <ToggleButton
+            android:id="@+id/tb_mon"
+            style="@style/WeeklyButton"
+            android:background="@drawable/toggle_button_background"
+            android:text="@string/monday"
+            android:textOff="@string/monday"
+            android:textOn="@string/monday"
+            app:layout_constraintBottom_toTopOf="@id/tv_choose_date"
+            app:layout_constraintEnd_toStartOf="@id/tb_two"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_choose_week" />
+
+        <ToggleButton
+            android:id="@+id/tb_two"
+            style="@style/WeeklyButton"
+            android:background="@drawable/toggle_button_background"
+            android:text="@string/tuesday"
+            android:textOff="@string/tuesday"
+            android:textOn="@string/tuesday"
+            app:layout_constraintBottom_toBottomOf="@id/tb_mon"
+            app:layout_constraintEnd_toStartOf="@id/tb_wed"
+            app:layout_constraintStart_toEndOf="@id/tb_mon"
+            app:layout_constraintTop_toTopOf="@id/tb_mon" />
+
+        <ToggleButton
+            android:id="@+id/tb_wed"
+            style="@style/WeeklyButton"
+            android:background="@drawable/toggle_button_background"
+            android:text="@string/wednesday"
+            android:textOff="@string/wednesday"
+            android:textOn="@string/wednesday"
+            app:layout_constraintBottom_toBottomOf="@id/tb_two"
+            app:layout_constraintEnd_toStartOf="@id/tb_thu"
+            app:layout_constraintStart_toEndOf="@id/tb_two"
+            app:layout_constraintTop_toTopOf="@id/tb_two" />
+
+        <ToggleButton
+            android:id="@+id/tb_thu"
+            style="@style/WeeklyButton"
+            android:background="@drawable/toggle_button_background"
+            android:text="@string/thursday"
+            android:textOff="@string/thursday"
+            android:textOn="@string/thursday"
+            app:layout_constraintBottom_toBottomOf="@id/tb_wed"
+            app:layout_constraintEnd_toStartOf="@id/tb_fri"
+            app:layout_constraintStart_toEndOf="@id/tb_wed"
+            app:layout_constraintTop_toTopOf="@id/tb_wed" />
+
+        <ToggleButton
+            android:id="@+id/tb_fri"
+            style="@style/WeeklyButton"
+            android:background="@drawable/toggle_button_background"
+            android:text="@string/friday"
+            android:textOff="@string/friday"
+            android:textOn="@string/friday"
+            app:layout_constraintBottom_toBottomOf="@id/tb_thu"
+            app:layout_constraintEnd_toStartOf="@id/tb_sat"
+            app:layout_constraintStart_toEndOf="@id/tb_thu"
+            app:layout_constraintTop_toTopOf="@id/tb_thu" />
+
+        <ToggleButton
+            android:id="@+id/tb_sat"
+            style="@style/WeeklyButton"
+            android:background="@drawable/toggle_button_background"
+            android:text="@string/saturday"
+            android:textOff="@string/saturday"
+            android:textOn="@string/saturday"
+            app:layout_constraintBottom_toBottomOf="@id/tb_fri"
+            app:layout_constraintEnd_toStartOf="@id/tb_sun"
+            app:layout_constraintStart_toEndOf="@id/tb_fri"
+            app:layout_constraintTop_toTopOf="@id/tb_fri" />
+
+        <ToggleButton
+            android:id="@+id/tb_sun"
+            style="@style/WeeklyButton"
+            android:background="@drawable/toggle_button_background"
+            android:text="@string/sunday"
+            android:textOff="@string/sunday"
+            android:textOn="@string/sunday"
+            app:layout_constraintBottom_toBottomOf="@id/tb_sat"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tb_sat"
+            app:layout_constraintTop_toTopOf="@id/tb_sat" />
+
+        <TextView
+            android:id="@+id/tv_choose_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_large"
+            android:paddingBottom="@dimen/padding_medium"
+            android:text="@string/choose_date"
+            android:textSize="@dimen/text_medium_large"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/til_start"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tb_mon" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_start"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/padding_extra_extra_large"
+            app:helperText="MM/DD/YYYY"
+            app:layout_constraintBottom_toTopOf="@id/til_end"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_choose_date">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tie_start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableEnd="@drawable/calendar"
+                android:enabled="false"
+                android:hint="@string/start"
+                android:inputType="text"
+                android:lines="1"
+                tools:ignore="RtlSymmetry" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_end"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/padding_extra_extra_large"
+            android:layout_marginTop="@dimen/padding_medium"
+            app:helperText="MM/DD/YYYY"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/til_start">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tie_end"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableEnd="@drawable/calendar"
+                android:enabled="false"
+                android:hint="@string/end"
+                android:inputType="text"
+                android:lines="1"
+                tools:ignore="RtlSymmetry" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_large"
+            android:paddingBottom="@dimen/padding_medium"
+            android:text="@string/time"
+            android:textSize="@dimen/text_medium_large"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/til_end" />
+
+        <Button
+            android:id="@+id/btn_start"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_extra_extra_large"
+            android:text="@string/init_time"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toStartOf="@id/tv_tilde"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_time" />
+
+        <TextView
+            android:id="@+id/tv_tilde"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/padding_large"
+            android:text="@string/from"
+            app:layout_constraintBottom_toBottomOf="@id/btn_end"
+            app:layout_constraintEnd_toStartOf="@id/btn_end"
+            app:layout_constraintStart_toEndOf="@id/btn_start"
+            app:layout_constraintTop_toTopOf="@id/btn_start" />
+
+        <Button
+            android:id="@+id/btn_end"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_extra_extra_large"
+            android:text="@string/init_time"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_tilde"
+            app:layout_constraintTop_toTopOf="@id/btn_start" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/padding_extra_extra_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_end"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
