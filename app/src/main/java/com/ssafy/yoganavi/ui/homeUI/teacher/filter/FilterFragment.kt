@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentFilterBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.core.MainActivity
@@ -26,6 +27,7 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
             .setTitleText("시작 시간")
             .setNegativeButtonText("취소")
             .setPositiveButtonText("확인")
+            .setTheme(R.style.CustomMaterialTimePickerTheme)
             .build()
 
         materialTimePicker.addOnPositiveButtonClickListener {

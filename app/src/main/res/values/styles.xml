@@ -53,4 +53,16 @@
         <item name="android:paddingTop">@dimen/padding_medium</item>
         <item name="android:paddingBottom">@dimen/padding_medium</item>
     </style>
+
+    <!-- Custom TimePicker theme -->
+    <style name="CustomMaterialTimePickerTheme" parent="ThemeOverlay.MaterialComponents.TimePicker">
+        <item name="materialTimePickerTitleStyle">@style/CustomTimePickerTextAppearance</item>
+    </style>
+
+    <!-- Custom TimePicker text appearance -->
+    <style name="CustomTimePickerTextAppearance" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>
