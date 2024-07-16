@@ -1,14 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fillViewport="true"
+    android:padding="@dimen/padding_medium"
     tools:context=".ui.homeUI.teacher.teacherReservation.TeacherReservationFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="match_parent">
 
-</FrameLayout>
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/iv_profile"
+            android:layout_width="84dp"
+            android:layout_height="84dp"
+            android:background="@color/gray_20"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toTopOf="@id/tv_select_term"
+            app:layout_constraintEnd_toStartOf="@id/tv_teacher_nickname"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/Circle" />
+
+        <TextView
+            android:id="@+id/tv_teacher_nickname"
+            style="@style/SingleLineText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/padding_large"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/tv_hashtag"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/iv_profile"
+            app:layout_constraintTop_toTopOf="@id/iv_profile"
+            app:layout_constraintVertical_chainStyle="spread"
+            tools:text="요구르드" />
+
+        <TextView
+            android:id="@+id/tv_hashtag"
+            style="@style/SingleLineText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/iv_profile"
+            app:layout_constraintEnd_toEndOf="@id/tv_teacher_nickname"
+            app:layout_constraintStart_toStartOf="@id/tv_teacher_nickname"
+            app:layout_constraintTop_toBottomOf="@id/tv_teacher_nickname"
+            tools:text="#힐링 요가 #요가 마스터 #유연성" />
+
+        <TextView
+            android:id="@+id/tv_select_term"
+            style="@style/BoldMediumText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/padding_small"
+            android:gravity="center"
+            android:text="@string/select_term"
+            app:layout_constraintBottom_toTopOf="@id/calendar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_profile" />
+
+        <CalendarView
+            android:id="@+id/calendar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/tv_select_class_method"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_select_term" />
+
+        <TextView
+            android:id="@+id/tv_select_class_method"
+            style="@style/BoldMediumText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/padding_small"
+            android:gravity="center"
+            android:text="@string/class_method"
+            app:layout_constraintBottom_toTopOf="@id/rg_class"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/calendar" />
+
+        <RadioGroup
+            android:id="@+id/rg_class"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@id/tv_available_class"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_select_class_method">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <RadioButton
+                android:id="@+id/rb_one_to_one"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/padding_medium"
+                android:layout_weight="2"
+                android:background="@drawable/custom_radio_selector"
+                android:button="@android:color/transparent"
+                android:gravity="center"
+                android:text="@string/one_to_one"
+                android:textSize="16sp" />
+
+            <RadioButton
+                android:id="@+id/rb_one_to_multi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:background="@drawable/custom_radio_selector"
+                android:button="@android:color/transparent"
+                android:gravity="center"
+                android:text="@string/one_to_multiple"
+                android:textSize="16sp" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/tv_available_class"
+            style="@style/BoldMediumText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/padding_small"
+            android:gravity="center"
+            android:text="@string/available_class"
+            app:layout_constraintBottom_toTopOf="@id/rv_available_class"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rg_class" />
+
+        <!-- TODO 여러개 선택 가능하므로 adapter에서 단일 선택 기능 구현하세요. -->
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_available_class"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_available_class"
+            tools:listitem="@layout/list_item_available_class" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>
