@@ -26,6 +26,13 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @Configuration
 public class ProjectSecurityConfig {
 
+    /**
+     * 기본 보안 필터 체인을 구성
+     *
+     * @param http HttpSecurity 객체
+     * @return SecurityFilterChain
+     * @throws Exception 예외 처리
+     */
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         // 세션 관리 설정: stateless
@@ -65,7 +72,7 @@ public class ProjectSecurityConfig {
             .requestMatchers("/notices", "/contact", "/register")
             .permitAll()); // 일반 사용자도 접근 가능한 URL
 
-        // 인증 성공 핸들러 구성
+        // 인증 성공 시 JWT 발급
         http.formLogin(form -> form
             .successHandler(new CustomAuthenticationSuccessHandler()));
 
@@ -75,6 +82,10 @@ public class ProjectSecurityConfig {
         return http.build();
     }
 
+    /**
+     * BCryptPasswordEncoder 를 반환
+     * @return PasswordEncoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

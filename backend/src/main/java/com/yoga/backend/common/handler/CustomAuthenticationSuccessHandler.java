@@ -14,6 +14,14 @@ import java.util.Date;
 
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
+    /**
+     * 인증 성공 시 호출되는 메서드.
+     * JWT 액세스 토큰과 리프레시 토큰을 생성, 응답 헤더에 추가
+     *
+     * @param request        HttpServletRequest 객체
+     * @param response       HttpServletResponse 객체
+     * @param authentication 인증 정보
+     */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) {
