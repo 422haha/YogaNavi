@@ -16,4 +16,10 @@ interface UserDataSource {
 
     suspend fun checkAuthEmail(signUpRequest: SignUpRequest): Response<SignUpResponse>
 
+    suspend fun findPasswordEmail(signUpRequest: SignUpRequest): Response<SignUpResponse>
+
+    suspend fun checkAuthPassword(signUpRequest: SignUpRequest): Response<SignUpResponse>
+
+    suspend fun registerPassword(signUpRequest: SignUpRequest): Response<SignUpResponse>
+
 }

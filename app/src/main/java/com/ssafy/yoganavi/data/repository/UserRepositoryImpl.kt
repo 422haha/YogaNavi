@@ -11,6 +11,7 @@ import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,39 +23,46 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun logIn(logInRequest: LogInRequest): ApiResponse<LogInResponse> {
         val response = withContext(ioDispatcher) { userDataSource.logIn(logInRequest) }
-        val errorJson = response.errorBody()?.let { JSONObject(it.string()) }
-        val error = errorJson?.get("message").toString()
-
-        response.body()?.let {
-            if (response.isSuccessful) return ApiResponse.Success(it)
-            else return ApiResponse.Error(it.message)
-        }
-
-        return if (error.isBlank()) ApiResponse.Error(NO_RESPONSE)
-        else ApiResponse.Error(error)
+        return response.toApiResponse()
     }
 
     override suspend fun signUp(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse> {
         val response = withContext(ioDispatcher) { userDataSource.signUp(signUpRequest) }
-        val errorJson = response.errorBody()?.let { JSONObject(it.string()) }
-        val error = errorJson?.get("message").toString()
-
-        response.body()?.let {
-            if (response.isSuccessful) return ApiResponse.Success(it)
-            else return ApiResponse.Error(it.message)
-        }
-
-        return if (error.isBlank()) ApiResponse.Error(NO_RESPONSE)
-        else ApiResponse.Error(error)
+        return response.toApiResponse()
     }
 
     override suspend fun registerEmail(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse> {
         val response = withContext(ioDispatcher) { userDataSource.registerEmail(signUpRequest) }
-        val errorJson = response.errorBody()?.let { JSONObject(it.string()) }
+        return response.toApiResponse()
+    }
+
+    override suspend fun checkAuthEmail(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse> {
+        val response = withContext(ioDispatcher) { userDataSource.checkAuthEmail(signUpRequest) }
+        return response.toApiResponse()
+    }
+
+    override suspend fun findPasswordEmail(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse> {
+        val response = withContext(ioDispatcher) { userDataSource.findPasswordEmail(signUpRequest) }
+        return response.toApiResponse()
+    }
+
+    override suspend fun checkAuthPassword(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse> {
+        val response = withContext(ioDispatcher) { userDataSource.checkAuthPassword(signUpRequest) }
+        return response.toApiResponse()
+    }
+
+    override suspend fun registerPassword(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse> {
+        val response = withContext(ioDispatcher) { userDataSource.registerPassword(signUpRequest) }
+        return response.toApiResponse()
+    }
+
+    @JvmName("LogIn")
+    private fun Response<LogInResponse>.toApiResponse(): ApiResponse<LogInResponse> {
+        val errorJson = errorBody()?.let { JSONObject(it.string()) }
         val error = errorJson?.get("message").toString()
 
-        response.body()?.let {
-            if (response.isSuccessful) return ApiResponse.Success(it)
+        body()?.let {
+            if (isSuccessful) return ApiResponse.Success(it)
             else return ApiResponse.Error(it.message)
         }
 
@@ -62,13 +70,13 @@ class UserRepositoryImpl @Inject constructor(
         else ApiResponse.Error(error)
     }
 
-    override suspend fun checkAuthEmail(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse> {
-        val response = withContext(ioDispatcher) { userDataSource.checkAuthEmail(signUpRequest) }
-        val errorJson = response.errorBody()?.let { JSONObject(it.string()) }
+    @JvmName("SignUp")
+    private fun Response<SignUpResponse>.toApiResponse(): ApiResponse<SignUpResponse> {
+        val errorJson = errorBody()?.let { JSONObject(it.string()) }
         val error = errorJson?.get("message").toString()
 
-        response.body()?.let {
-            if (response.isSuccessful) return ApiResponse.Success(it)
+        body()?.let {
+            if (isSuccessful) return ApiResponse.Success(it)
             else return ApiResponse.Error(it.message)
         }
 

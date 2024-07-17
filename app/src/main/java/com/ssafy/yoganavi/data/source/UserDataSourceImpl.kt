@@ -23,4 +23,12 @@ class UserDataSourceImpl @Inject constructor(private val userAPI: UserAPI) : Use
     override suspend fun checkAuthEmail(signUpRequest: SignUpRequest): Response<SignUpResponse> =
         userAPI.checkAuthEmail(signUpRequest)
 
+    override suspend fun findPasswordEmail(signUpRequest: SignUpRequest): Response<SignUpResponse> =
+        userAPI.findPasswordEmail(signUpRequest)
+
+    override suspend fun checkAuthPassword(signUpRequest: SignUpRequest): Response<SignUpResponse> =
+        userAPI.checkAuthPassword(signUpRequest)
+
+    override suspend fun registerPassword(signUpRequest: SignUpRequest): Response<SignUpResponse> =
+        userAPI.registerPassword(signUpRequest)
 }
