@@ -2,8 +2,10 @@ package com.yoga.backend.common.config;
 
 import com.yoga.backend.common.handler.CustomAuthenticationSuccessHandler;
 import com.yoga.backend.common.filter.JWTTokenValidatorFilter;
+import com.yoga.backend.common.handler.CustomLoginFailureHandler;
 import jakarta.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -35,6 +37,7 @@ public class ProjectSecurityConfig {
      */
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
         // 세션 관리 설정: stateless
         http.sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -63,18 +66,32 @@ public class ProjectSecurityConfig {
 
         // URL 기반 권한 부여 설정
         http.authorizeHttpRequests((requests) -> requests
-            .requestMatchers("/myAccount").hasRole("USER") // /myAccount 는 USER 역할 필요
-            .requestMatchers("/myBalance")
-            .hasAnyRole("USER", "ADMIN") // /myBalance 는 USER 또는 ADMIN 역할 필요
-            .requestMatchers("/myLoans").authenticated() // /myLoans 는 인증된 사용자만 접근 가능
-            .requestMatchers("/myCards").hasRole("USER") // /myCards 는 USER 역할 필요
-            .requestMatchers("/user").authenticated() // /user 는 인증된 사용자만 접근 가능
-            .requestMatchers("/notices", "/contact", "/register")
-            .permitAll()); // 일반 사용자도 접근 가능한 URL
+            .requestMatchers("/myAccount").hasRole("USER")
+            .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
+            .requestMatchers("/myLoans").authenticated()
+            .requestMatchers("/myCards").hasRole("USER")
+            .requestMatchers("/user").authenticated()
+            .requestMatchers("/members/**","/fffff/ff") // 추가된 부분
+            .permitAll()); // /members/register/** 엔드포인트에 대한 인증 제거
 
         // 인증 성공 시 JWT 발급
         http.formLogin(form -> form
-            .successHandler(new CustomAuthenticationSuccessHandler()));
+                .successHandler(new CustomAuthenticationSuccessHandler())
+                .failureHandler(new CustomLoginFailureHandler())
+//            .loginPage("/login")
+//            .failureUrl("/login-fail")
+        );
+
+//        http.sessionManagement(session -> session
+//            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+//            .maximumSessions(1)
+//            .maxSessionsPreventsLogin(false)
+//            .expiredSessionStrategy(event -> {
+//                HttpServletResponse response = event.getResponse();
+//                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//                response.getWriter().print("다른 사용자가 로그인 하여 이 세션은 만료됩니다.");
+//                response.flushBuffer();
+//            }));
 
         // HTTP 기본 인증 구성
         http.httpBasic(Customizer.withDefaults());
@@ -84,6 +101,7 @@ public class ProjectSecurityConfig {
 
     /**
      * BCryptPasswordEncoder 를 반환
+     *
      * @return PasswordEncoder
      */
     @Bean

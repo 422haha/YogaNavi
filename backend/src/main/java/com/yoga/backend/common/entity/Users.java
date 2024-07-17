@@ -25,6 +25,7 @@ public class Users {
     @Column(unique = true)
     private String email;
 
+    @Column(unique = true)
     private String nickname;
 
     private String profile_image_url;

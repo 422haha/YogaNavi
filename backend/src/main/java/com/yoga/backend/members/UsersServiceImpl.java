@@ -1,4 +1,4 @@
-package com.yoga.backend.users;
+package com.yoga.backend.members;
 
 import com.yoga.backend.common.entity.Users;
 import java.util.List;
@@ -49,6 +49,20 @@ public class UsersServiceImpl implements UsersService {
 
     /**
      * 이메일 중복 확인 서비스
+     * @param nickname 확인할 이메일
+     * @return 이메일 중복 여부
+     */
+    @Override
+    public boolean checkNickname(String nickname) {
+        List<Users> users = usersRepository.findByNickname(nickname);
+        if (users.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 이메일 중복 확인 서비스
      * @param email 확인할 이메일
      * @return 이메일 중복 여부
      */
@@ -74,5 +88,23 @@ public class UsersServiceImpl implements UsersService {
         message.setSubject(subject);
         message.setText(text);
         emailSender.send(message);
+    }
+
+
+    /**
+     * 비밀번호 재설정 서비스
+     * @param registerDto 회원 정보
+     * @return 저장된 사용자 정보
+     */
+    @Override
+    public Users setPassword(RegisterDto registerDto) {
+        String hashPwd = passwordEncoder.encode(registerDto.getPassword());
+        registerDto.setPassword(hashPwd);
+
+        // 비밀번호 재설정
+        Users users = new Users();
+        users.setPwd(registerDto.getPassword());
+
+        return usersRepository.save(users);
     }
 }
