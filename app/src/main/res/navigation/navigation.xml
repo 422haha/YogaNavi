@@ -22,15 +22,142 @@
         android:id="@+id/teacherListFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.teacher.teacherList.TeacherListFragment"
         android:label="fragment_teacher_list"
-        tools:layout="@layout/fragment_teacher_list" />
+        tools:layout="@layout/fragment_teacher_list" >
+        <action
+            android:id="@+id/action_teacherListFragment_to_filterFragment"
+            app:destination="@id/filterFragment" />
+        <action
+            android:id="@+id/action_teacherListFragment_to_teacherDetailFragment"
+            app:destination="@id/teacherDetailFragment" />
+    </fragment>
     <fragment
         android:id="@+id/lectureListFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.lecture.lectureList.LectureListFragment"
         android:label="fragment_lecture_list"
-        tools:layout="@layout/fragment_lecture_list" />
+        tools:layout="@layout/fragment_lecture_list" >
+        <action
+            android:id="@+id/action_lectureListFragment_to_lectureDetailFragment"
+            app:destination="@id/lectureDetailFragment" />
+    </fragment>
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.profile.ProfileFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_likeTeacherFragment"
+            app:destination="@id/likeTeacherFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_likeLectureFragment"
+            app:destination="@id/likeLectureFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_myListFragment"
+            app:destination="@id/myListFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_modifyFragment"
+            app:destination="@id/modifyFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_managementLiveFragment"
+            app:destination="@id/managementLiveFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_managementVideoFragment"
+            app:destination="@id/managementLiveFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_noticeFragment"
+            app:destination="@id/noticeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/filterFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.teacher.filter.FilterFragment"
+        android:label="fragment_filter"
+        tools:layout="@layout/fragment_filter" />
+    <fragment
+        android:id="@+id/teacherDetailFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.teacher.teacherDetail.TeacherDetailFragment"
+        android:label="fragment_teacher_detail"
+        tools:layout="@layout/fragment_teacher_detail" >
+        <action
+            android:id="@+id/action_teacherDetailFragment_to_teacherReservationFragment"
+            app:destination="@id/teacherReservationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/teacherReservationFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.teacher.teacherReservation.TeacherReservationFragment"
+        android:label="fragment_teacher_reservation"
+        tools:layout="@layout/fragment_teacher_reservation" />
+    <fragment
+        android:id="@+id/lectureDetailFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail.LectureDetailFragment"
+        android:label="fragment_lecture_detail"
+        tools:layout="@layout/fragment_lecture_detail" >
+        <action
+            android:id="@+id/action_lectureDetailFragment_to_lectureVideoFragment"
+            app:destination="@id/lectureVideoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/lectureVideoFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.lecture.lectureVideo.LectureVideoFragment"
+        android:label="fragment_lecture_video"
+        tools:layout="@layout/fragment_lecture_video" />
+    <fragment
+        android:id="@+id/likeTeacherFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.likeTeacher.LikeTeacherFragment"
+        android:label="fragment_like_teacher"
+        tools:layout="@layout/fragment_like_teacher" />
+    <fragment
+        android:id="@+id/likeLectureFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.likeLecture.LikeLectureFragment"
+        android:label="fragment_like_lecture"
+        tools:layout="@layout/fragment_like_lecture" />
+    <fragment
+        android:id="@+id/myListFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.myList.MyListFragment"
+        android:label="fragment_my_list"
+        tools:layout="@layout/fragment_my_list" />
+    <fragment
+        android:id="@+id/modifyFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.modify.ModifyFragment"
+        android:label="fragment_modify"
+        tools:layout="@layout/fragment_modify" />
+    <fragment
+        android:id="@+id/managementLiveFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.managementLive.ManagementLiveFragment"
+        android:label="fragment_management_live"
+        tools:layout="@layout/fragment_management_live" >
+        <action
+            android:id="@+id/action_managementLiveFragment_to_registerLiveFragment"
+            app:destination="@id/registerLiveFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/managementVideoFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.ManagementVideoFragment"
+        android:label="fragment_management_video"
+        tools:layout="@layout/fragment_management_video" >
+        <action
+            android:id="@+id/action_managementVideoFragment_to_registerVideoFragment"
+            app:destination="@id/registerVideoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/registerLiveFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.registerLive.RegisterLiveFragment"
+        android:label="RegisterLiveFragment" />
+    <fragment
+        android:id="@+id/noticeFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.notice.NoticeFragment"
+        android:label="fragment_notice"
+        tools:layout="@layout/fragment_notice" >
+        <action
+            android:id="@+id/action_noticeFragment_to_registerNoticeFragment"
+            app:destination="@id/registerNoticeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/registerNoticeFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.registerNotice.RegisterNoticeFragment"
+        android:label="fragment_register_notice"
+        tools:layout="@layout/fragment_register_notice" />
+    <fragment
+        android:id="@+id/registerVideoFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.RegisterVideoFragment"
+        android:label="fragment_register_video"
+        tools:layout="@layout/fragment_register_video" />
 </navigation>

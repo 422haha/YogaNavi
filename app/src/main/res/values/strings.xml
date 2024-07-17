@@ -23,7 +23,7 @@
     <string name="my_list">수강 내역</string>
     <string name="modify">내 정보 수정</string>
     <string name="management_video">녹화 강의 관리</string>
-    <string name="management_record">화상 강의 관리</string>
+    <string name="management_live">화상 강의 관리</string>
     <string name="register_notice">공지 관리</string>
     <string name="enter">입장하기</string>
     <string name="edit">수정</string>
@@ -75,6 +75,7 @@
     <string name="send">전송</string>
     <string name="notice">공지사항</string>
     <string name="available_class">수강 가능한 수업</string>
+    <string name="proceeding_live">진행중인 강의</string>
     <!-- 필터 끝 -->
 
 </resources>

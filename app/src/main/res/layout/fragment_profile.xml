@@ -83,16 +83,16 @@
         android:text="@string/management_video"
         android:textSize="16sp"
         app:drawableStartCompat="@drawable/play_arrow"
-        app:layout_constraintBottom_toTopOf="@id/tv_management_record"
+        app:layout_constraintBottom_toTopOf="@id/tv_management_live"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_modify"
         tools:ignore="RtlSymmetry" />
 
     <TextView
-        android:id="@+id/tv_management_record"
+        android:id="@+id/tv_management_live"
         style="@style/profile"
-        android:text="@string/management_record"
+        android:text="@string/management_live"
         android:textSize="16sp"
         app:drawableStartCompat="@drawable/photo_camera"
         app:layout_constraintBottom_toTopOf="@id/tv_register_notice"
@@ -109,7 +109,7 @@
         app:drawableStartCompat="@drawable/edit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_management_record"
+        app:layout_constraintTop_toBottomOf="@id/tv_management_live"
         tools:ignore="RtlSymmetry" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
