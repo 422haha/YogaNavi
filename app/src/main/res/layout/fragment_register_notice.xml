@@ -29,7 +29,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintHeight_default="spread"
-                android:minHeight="400dp"/> <!-- 최소 높이 설정 -->
+                android:minHeight="400dp" /> <!-- 최소 높이 설정 -->
 
             <View
                 android:id="@+id/divider5"
@@ -39,7 +39,7 @@
                 android:background="?android:attr/listDivider"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/et_notice"/>
+                app:layout_constraintTop_toBottomOf="@id/et_notice" />
 
             <ImageView
                 android:id="@+id/iv_photo"
@@ -60,11 +60,12 @@
                 android:src="@drawable/baseline_cancel_red"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider5"/>
+                app:layout_constraintTop_toBottomOf="@id/divider5" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
+
     <View
         android:id="@+id/divider4"
         android:layout_width="0dp"
@@ -83,8 +84,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/divider4"
-        >
+        app:layout_constraintTop_toTopOf="@id/divider4">
 
         <TextView
             android:id="@+id/tv_add_photo"
