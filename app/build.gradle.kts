@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -42,7 +43,6 @@ android {
 }
 
 dependencies {
-
     // HTTP Client
     implementation (libs.gson)
     implementation (libs.retrofit)
@@ -69,6 +69,10 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     // CalendarView
-    implementation ("com.github.prolificinteractive:material-calendarview:2.0.1")
-    implementation ("com.jakewharton.threetenabp:threetenabp:1.2.1") // github pull
+    implementation (libs.material.calendarview)
+    implementation (libs.threetenabp) // github pull
+
+    // Navigation
+    implementation (libs.androidx.navigation.fragment.ktx)
+    implementation (libs.androidx.navigation.ui.ktx)
 }
