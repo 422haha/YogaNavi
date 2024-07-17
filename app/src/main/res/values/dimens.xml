@@ -31,6 +31,7 @@
     <dimen name="icon_extra_extra_large">300dp</dimen>
 
     <!-- TextSize -->
+    <dimen name="text_small">14sp</dimen>
     <dimen name="text_medium">16sp</dimen>
     <dimen name="text_medium_large">18sp</dimen>
     <dimen name="text_medium_large20">20sp</dimen>
