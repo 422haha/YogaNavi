@@ -6,6 +6,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.ssafy.yoganavi.data.ApiResponse
 import com.ssafy.yoganavi.databinding.FragmentLoginBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,14 +20,8 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        test()
         initCollect()
         initListener()
-    }
-
-    private fun test() {
-        binding.tieId.setText("ssafy")
-        binding.tiePassword.setText("ssafy")
     }
 
     private fun initListener() {
@@ -40,7 +35,8 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.loginEvent.collectLatest {
-                showSnackBar(it.message.toString())
+                if(it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
+                else showSnackBar(it.message.toString())
             }
         }
     }
