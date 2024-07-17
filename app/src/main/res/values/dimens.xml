@@ -33,6 +33,7 @@
     <!-- TextSize -->
     <dimen name="text_medium">16sp</dimen>
     <dimen name="text_medium_large">18sp</dimen>
+    <dimen name="text_medium_large20">20sp</dimen>
     <dimen name="text_large">24sp</dimen>
     <dimen name="text_extra_large">36sp</dimen>
 </resources>

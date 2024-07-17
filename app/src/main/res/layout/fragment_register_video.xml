@@ -96,15 +96,12 @@
 
     <TextView
         android:id="@+id/btn_add_chapter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/primary"
-        android:gravity="center"
-        android:padding="@dimen/text_large"
-        android:text="@string/click_info"
-        android:textSize="@dimen/text_large"
-        app:layout_constraintTop_toBottomOf="@id/sv"
-        app:layout_constraintStart_toStartOf="parent"
+        style="@style/RegisterButton"
+        android:text="@string/add_chapter"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sv" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
