@@ -22,8 +22,15 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
     private UsersRepository usersRepository; // 사용자 정보를 가져오는 리포지토리
 
     @Autowired
-    private PasswordEncoder passwordEncoder; // 비밀번호 인코딩/매칭을 위한 유틸리티 클래스
+    private PasswordEncoder passwordEncoder; // BCryptPasswordEncoder
 
+    /**
+     * 사용자 인증을 수행하는 메서드
+     *
+     * @param authentication 인증 정보
+     * @return 인증 성공 시 새로운 인증 객체
+     * @throws AuthenticationException 인증 실패 시 예외 발생
+     */
     @Override
     public Authentication authenticate(Authentication authentication)
         throws AuthenticationException {
@@ -52,7 +59,12 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
         }
     }
 
-    // 사용자 권한 목록 생성
+    /**
+     * 사용자 권한 목록 생성
+     *
+     * @param role 사용자 역할
+     * @return 사용자 권한
+     */
     private List<GrantedAuthority> getGrantedAuthorities(String role) {
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
@@ -60,9 +72,14 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
         return grantedAuthorities;
     }
 
+    /**
+     * 이 인증 제공자가 지원하는 인증 유형 확인
+     *
+     * @param authentication 인증 유형
+     * @return 지원 여부
+     */
     @Override
     public boolean supports(Class<?> authentication) {
-        // 이 인증 제공자가 지원하는 인증 유형 확인
         return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
     }
 }

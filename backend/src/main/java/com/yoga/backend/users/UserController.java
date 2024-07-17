@@ -9,10 +9,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+/*
+ * 회원가입, 내 정보 수정, 회원 탈퇴, 비밀번호 재설정
+ * 내 정보 조회를 위한 컨트롤러
+ */
 @RestController
 @RequestMapping("/members")
 public class UserController {
 
+    // 인증번호 저장용 변수
     static int rNum;
 
     @Autowired
@@ -25,7 +30,12 @@ public class UserController {
     }
 
 
-    //회원 가입 컨트롤러
+    /**
+     * 회원 가입 컨트롤러
+     *
+     * @param registerDto 회원 가입 정보
+     * @return 회원 가입 결과
+     */
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> registerUser(@RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
@@ -48,7 +58,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
-    // 인증번호 전송 컨트롤러
+    /**
+     * 인증번호 전송 컨트롤러
+     *
+     * @param registerDto 회원 가입 정보
+     * @return 인증번호 전송 결과
+     */
     @PostMapping("/register/email")
     public ResponseEntity<Map<String, Object>> registerUserEmail(
         @RequestBody RegisterDto registerDto) {
@@ -70,7 +85,12 @@ public class UserController {
         }
     }
 
-    //인증번호 확인 컨트롤러
+    /**
+     * 인증번호 확인 컨트롤러
+     *
+     * @param registerDto 회원 가입 정보
+     * @return 인증번호 확인 결과
+     */
     @PostMapping("/register/authnumber")
     public ResponseEntity<Map<String, Object>> checkAuthNumber(
         @RequestBody RegisterDto registerDto) {
@@ -85,5 +105,8 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
+
+
+
 
 }

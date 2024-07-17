@@ -22,12 +22,18 @@ public class UsersServiceImpl implements UsersService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // 회원가입 서비스
+    /**
+     * 회원가입 서비스
+     * @param registerDto 회원가입 정보
+     * @return 저장된 사용자 정보
+     */
     @Override
     public Users registerUser(RegisterDto registerDto) {
+        // 비밀번호 해시화
         String hashPwd = passwordEncoder.encode(registerDto.getPassword());
         registerDto.setPassword(hashPwd);
 
+        // 사용자 정보 생성
         Users users = new Users();
         users.setPwd(registerDto.getPassword());
         users.setEmail(registerDto.getEmail());
@@ -41,7 +47,11 @@ public class UsersServiceImpl implements UsersService {
         return usersRepository.save(users);
     }
 
-    // 이메일 중복 확인 서비스
+    /**
+     * 이메일 중복 확인 서비스
+     * @param email 확인할 이메일
+     * @return 이메일 중복 여부
+     */
     @Override
     public boolean checkUser(String email) {
         List<Users> users = usersRepository.findByEmail(email);
@@ -51,7 +61,12 @@ public class UsersServiceImpl implements UsersService {
         return false;
     }
 
-    // 인증번호 전송 서비스
+    /**
+     * 인증번호 전송 서비스
+     * @param to 수신자 이메일
+     * @param subject 메일 제목
+     * @param text 메일 내용
+     */
     @Override
     public void sendSimpleMessage(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();

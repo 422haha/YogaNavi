@@ -40,7 +40,7 @@ public class S3Controller {
     @GetMapping("/download")
     public ResponseEntity<byte[]> downloadFile(@RequestParam("key") String key) {
         try (InputStream s3Object = s3Service.getObject(key);
-             ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
             byte[] tmp = new byte[4096];
             int bytesRead;
             while ((bytesRead = s3Object.read(tmp)) != -1) {

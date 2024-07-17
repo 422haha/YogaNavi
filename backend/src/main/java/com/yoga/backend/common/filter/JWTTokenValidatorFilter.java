@@ -24,7 +24,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 public class JWTTokenValidatorFilter extends OncePerRequestFilter {
 
-    // 요청 내에서 한 번만 실행되는 필터 메서드
+    /**
+     * 요청 내에서 한 번만 실행되는 필터 메서드
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
@@ -74,7 +76,9 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
         }
     }
 
-    // 리프레시 토큰 처리 메서드
+    /**
+     * 리프레시 토큰 처리 메서드
+     */
     private void handleRefreshToken(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain, String refreshToken) throws IOException, ServletException {
         // 리프레시 토큰이 존재하는 경우
