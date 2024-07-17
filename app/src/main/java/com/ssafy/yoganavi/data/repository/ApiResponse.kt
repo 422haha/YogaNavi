@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.data
+package com.ssafy.yoganavi.data.repository
 
 sealed class ApiResponse<T>(
     val data: T? = null,

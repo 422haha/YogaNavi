@@ -2,8 +2,8 @@ package com.ssafy.yoganavi.di
 
 import com.ssafy.yoganavi.data.repository.UserRepository
 import com.ssafy.yoganavi.data.repository.UserRepositoryImpl
-import com.ssafy.yoganavi.data.source.UserDataSource
-import com.ssafy.yoganavi.data.source.UserDataSourceImpl
+import com.ssafy.yoganavi.data.source.user.UserDataSource
+import com.ssafy.yoganavi.data.source.user.UserDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

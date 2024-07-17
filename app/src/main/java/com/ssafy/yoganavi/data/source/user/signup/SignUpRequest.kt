@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.data.source.signup
+package com.ssafy.yoganavi.data.source.user.signup
 
 data class SignUpRequest(
     val email: String? = null,
