@@ -73,6 +73,7 @@
     <string name="one_to_multiple">1:多</string>
     <string name="class_method">수업 방식</string>
     <string name="notice">공지사항</string>
+    <string name="available_class">수강 가능한 수업</string>
     <!-- 필터 끝 -->
 
 </resources>
