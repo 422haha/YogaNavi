@@ -43,11 +43,15 @@ android {
 
 dependencies {
 
+    //Data Store
+    implementation (libs.androidx.datastore.preferences)
+
     // HTTP Client
     implementation (libs.gson)
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
     implementation (libs.okhttp)
+    implementation (libs.squareup.logging.interceptor)
 
     // Hilt
     implementation(libs.hilt.android)

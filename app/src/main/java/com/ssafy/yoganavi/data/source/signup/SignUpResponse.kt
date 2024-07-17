@@ -1,6 +1,6 @@
 package com.ssafy.yoganavi.data.source.signup
 
 data class SignUpResponse(
-    val message: String,
-    val status: String
+    val data: List<Void>,
+    val message: String
 )
