@@ -5,3 +5,15 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.hilt.android) apply false
 }
+
+buildscript {
+    repositories {
+        google()
+    }
+    dependencies {
+        val nav_version = "2.7.7"
+        classpath(libs.androidx.navigation.safe.args.gradle.plugin)
+    }
+}
+
+

@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:padding="@dimen/padding_medium">
 
     <!-- 2 -->
@@ -51,8 +50,10 @@
         android:background="@color/gray_20"
         app:layout_constraintBottom_toTopOf="@id/cv_content"
         app:layout_constraintEnd_toEndOf="@id/iv_profile"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@id/iv_profile"
-        app:layout_constraintTop_toBottomOf="@id/iv_profile" />
+        app:layout_constraintTop_toBottomOf="@id/iv_profile"
+        app:layout_constraintVertical_bias="0.0" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cv_content"
@@ -71,7 +72,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="2dp"
-            android:background="@color/white"
             android:padding="@dimen/padding_medium">
 
             <TextView

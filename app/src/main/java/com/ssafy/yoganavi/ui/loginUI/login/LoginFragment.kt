@@ -3,6 +3,8 @@ package com.ssafy.yoganavi.ui.loginUI.login
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.ssafy.yoganavi.R
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -38,6 +40,14 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
                 if(it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
                 else showSnackBar(it.message.toString())
             }
+        }
+
+        binding.tvForgetPassword.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_findFragment)
+        }
+
+        binding.tvJoin.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_joinFragment)
         }
     }
 }
