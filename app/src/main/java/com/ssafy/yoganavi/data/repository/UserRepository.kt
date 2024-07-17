@@ -7,8 +7,19 @@ import com.ssafy.yoganavi.data.source.signup.SignUpRequest
 import com.ssafy.yoganavi.data.source.signup.SignUpResponse
 
 interface UserRepository {
+
     suspend fun logIn(logInRequest: LogInRequest): ApiResponse<LogInResponse>
+
     suspend fun signUp(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse>
+
     suspend fun registerEmail(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse>
+
     suspend fun checkAuthEmail(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse>
+
+    suspend fun findPasswordEmail(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse>
+
+    suspend fun checkAuthPassword(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse>
+
+    suspend fun registerPassword(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse>
+
 }

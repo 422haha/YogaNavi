@@ -37,9 +37,6 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
 
         binding.btnSend.setOnClickListener {
             hideKeyboard()
-            binding.btnCheck.isEnabled = true
-            binding.btnCheck.isEnabled = true
-            binding.btnSignup.isEnabled = false
 
             val email = binding.tieId.text.toString()
             viewModel.registerEmail(email)
@@ -72,8 +69,13 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
 
     private fun CoroutineScope.collectRegisterEmailEvent() = launch {
         viewModel.registerEmailEvent.collectLatest {
-            if (it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
-            else showSnackBar(it.message.toString())
+            if (it is ApiResponse.Success) {
+                showSnackBar(it.data?.message.toString())
+                binding.btnCheck.isEnabled = true
+                binding.btnSignup.isEnabled = false
+            } else {
+                showSnackBar(it.message.toString())
+            }
         }
     }
 
@@ -83,7 +85,6 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
                 showSnackBar(it.data?.message.toString())
                 binding.btnCheck.isEnabled = false
                 binding.btnSignup.isEnabled = true
-
             } else {
                 showSnackBar(it.message.toString())
             }

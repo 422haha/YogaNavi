@@ -26,4 +26,14 @@ interface UserAPI {
 
     @POST("members/register/authnumber")
     suspend fun checkAuthEmail(@Body signUpRequest: SignUpRequest): Response<SignUpResponse>
+
+    @POST("members/find-password/email")
+    suspend fun findPasswordEmail(@Body signUpRequest: SignUpRequest): Response<SignUpResponse>
+
+    @POST("members/find-password/authnumber")
+    suspend fun checkAuthPassword(@Body signUpRequest: SignUpRequest): Response<SignUpResponse>
+
+    @POST("members/find-password")
+    suspend fun registerPassword(@Body signUpRequest: SignUpRequest): Response<SignUpResponse>
+
 }
