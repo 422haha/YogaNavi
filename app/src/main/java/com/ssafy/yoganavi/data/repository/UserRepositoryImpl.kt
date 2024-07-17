@@ -7,6 +7,7 @@ import com.ssafy.yoganavi.data.source.login.LogInResponse
 import com.ssafy.yoganavi.data.source.signup.SignUpRequest
 import com.ssafy.yoganavi.data.source.signup.SignUpResponse
 import com.ssafy.yoganavi.di.IoDispatcher
+import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -73,9 +74,5 @@ class UserRepositoryImpl @Inject constructor(
 
         return if (error.isBlank()) ApiResponse.Error(NO_RESPONSE)
         else ApiResponse.Error(error)
-    }
-
-    companion object {
-        const val NO_RESPONSE = "응답이 없습니다."
     }
 }

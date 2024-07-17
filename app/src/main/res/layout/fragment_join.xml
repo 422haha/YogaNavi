@@ -29,9 +29,10 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_id"
         style="@style/boxCornerRadiusStyle"
+        android:layout_marginEnd="@dimen/padding_medium"
         app:errorEnabled="true"
         app:layout_constraintBottom_toTopOf="@id/tv_cn"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_send"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_email">
 
@@ -42,6 +43,18 @@
             android:inputType="textEmailAddress"
             android:lines="1" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/btn_send"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/ti_height"
+        android:layout_marginEnd="@dimen/padding_extra_extra_large"
+        android:text="@string/send"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/til_id"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/til_id"
+        app:layout_constraintTop_toTopOf="@+id/til_id" />
 
     <TextView
         android:id="@+id/tv_cn"
@@ -75,6 +88,7 @@
         android:layout_width="wrap_content"
         android:layout_height="@dimen/ti_height"
         android:layout_marginEnd="@dimen/padding_extra_extra_large"
+        android:enabled="false"
         android:text="@string/check"
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="@+id/til_cn"
@@ -125,8 +139,7 @@
         app:layout_constraintBottom_toTopOf="@id/tv_nn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_pw_again"
-        app:passwordToggleEnabled="true">
+        app:layout_constraintTop_toBottomOf="@id/tv_pw_again">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/tie_pw_again"
@@ -185,8 +198,8 @@
         android:layout_marginEnd="@dimen/padding_extra_extra_large"
         android:layout_marginBottom="@dimen/padding_large"
         android:height="@dimen/ti_height"
-        android:text="@string/signup"
         android:enabled="false"
+        android:text="@string/signup"
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
