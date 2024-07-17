@@ -14,6 +14,7 @@ import com.ssafy.yoganavi.databinding.FragmentJoinBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -63,32 +64,36 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            launch {
-                viewModel.registerEmailEvent.collectLatest {
-                    if (it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
-                    else showSnackBar(it.message.toString())
-                }
-            }
+            collectRegisterEmailEvent()
+            collectCheckEmailEvent()
+            collectSignUpEvent()
+        }
+    }
 
-            launch {
-                viewModel.checkEmailEvent.collectLatest {
-                    if (it is ApiResponse.Success) {
-                        showSnackBar(it.data?.message.toString())
-                        binding.btnCheck.isEnabled = false
-                        binding.btnSignup.isEnabled = true
+    private fun CoroutineScope.collectRegisterEmailEvent() = launch {
+        viewModel.registerEmailEvent.collectLatest {
+            if (it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
+            else showSnackBar(it.message.toString())
+        }
+    }
 
-                    } else {
-                        showSnackBar(it.message.toString())
-                    }
-                }
-            }
+    private fun CoroutineScope.collectCheckEmailEvent() = launch {
+        viewModel.checkEmailEvent.collectLatest {
+            if (it is ApiResponse.Success) {
+                showSnackBar(it.data?.message.toString())
+                binding.btnCheck.isEnabled = false
+                binding.btnSignup.isEnabled = true
 
-            launch {
-                viewModel.signUpEvent.collectLatest {
-                    if (it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
-                    else showSnackBar(it.message.toString())
-                }
+            } else {
+                showSnackBar(it.message.toString())
             }
+        }
+    }
+
+    private fun CoroutineScope.collectSignUpEvent() = launch {
+        viewModel.signUpEvent.collectLatest {
+            if (it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
+            else showSnackBar(it.message.toString())
         }
     }
 
