@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/homeFragment">
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.schedule.home.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_liveFragment"
+            app:destination="@id/liveFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/liveFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.schedule.live.LiveFragment"
+        android:label="fragment_live"
+        tools:layout="@layout/fragment_live" />
+    <fragment
+        android:id="@+id/teacherListFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.teacher.teacherList.TeacherListFragment"
+        android:label="fragment_teacher_list"
+        tools:layout="@layout/fragment_teacher_list" />
+    <fragment
+        android:id="@+id/lectureListFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.lecture.lectureList.LectureListFragment"
+        android:label="fragment_lecture_list"
+        tools:layout="@layout/fragment_lecture_list" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.profile.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
+</navigation>
