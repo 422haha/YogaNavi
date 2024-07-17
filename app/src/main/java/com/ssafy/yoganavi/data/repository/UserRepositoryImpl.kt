@@ -1,5 +1,6 @@
 package com.ssafy.yoganavi.data.repository
 
+import com.google.gson.Gson
 import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.data.source.user.UserDataSource
 import com.ssafy.yoganavi.data.source.user.login.LogInRequest
@@ -8,7 +9,6 @@ import com.ssafy.yoganavi.di.IoDispatcher
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -55,15 +55,14 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     private fun Response<YogaResponse<Unit>>.toApiResponse(): ApiResponse<Unit> {
-        val errorJson = errorBody()?.let { JSONObject(it.string()) }
-        val error = errorJson?.get("message").toString()
-
         body()?.let {
             if (isSuccessful) return ApiResponse.Success(it.data, it.message)
             else return ApiResponse.Error(it.data, it.message)
         }
 
-        return if (error.isBlank()) ApiResponse.Error(message = NO_RESPONSE)
-        else ApiResponse.Error(message = error)
+        val gson = errorBody()?.let { Gson().fromJson(it.charStream(), YogaResponse::class.java) }
+        val errorMessage = gson?.message
+        return if (errorMessage.isNullOrBlank()) ApiResponse.Error(message = NO_RESPONSE)
+        else ApiResponse.Error(message = errorMessage)
     }
 }
