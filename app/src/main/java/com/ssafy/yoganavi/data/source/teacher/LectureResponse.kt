@@ -6,6 +6,7 @@ data class LectureListResponse(
     val data : List<TeacherData>,
     val message : String
 )
+
 data class TeacherData(
     @SerializedName("강사_이름") val teacherName : String,
     @SerializedName("강사_프로필") val teacherProfile : String,

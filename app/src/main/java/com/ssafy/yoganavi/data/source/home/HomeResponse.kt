@@ -6,6 +6,7 @@ data class HomeResponse (
     val data: List<ScheduleData>,
     val message: String
 )
+
 data class ScheduleData(
     @SerializedName("강사_이름") val lecturerName: String,
     @SerializedName("강사_이미지") val lecturerImage: String,
