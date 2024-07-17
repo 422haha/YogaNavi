@@ -11,6 +11,7 @@ import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
 import com.ssafy.yoganavi.ui.utils.isBlank
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -36,7 +37,7 @@ class JoinViewModel @Inject constructor(
     val signUpEvent: SharedFlow<ApiResponse<SignUpResponse>> =
         _signUpEvent.asSharedFlow()
 
-    fun registerEmail(email: String) = viewModelScope.launch {
+    fun registerEmail(email: String) = viewModelScope.launch(Dispatchers.IO) {
         if (arrayOf(email).isBlank()) {
             _registerEmailEvent.emit(ApiResponse.Error(IS_BLANK))
             return@launch
@@ -49,7 +50,7 @@ class JoinViewModel @Inject constructor(
             .onFailure { _registerEmailEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
     }
 
-    fun checkAuthEmail(checkNumber: Int?) = viewModelScope.launch {
+    fun checkAuthEmail(checkNumber: Int?) = viewModelScope.launch(Dispatchers.IO) {
         checkNumber?.let {
             val signUpRequest = SignUpRequest(authnumber = checkNumber)
 
@@ -65,7 +66,7 @@ class JoinViewModel @Inject constructor(
         passwordAgain: String,
         nickname: String,
         isTeacher: Boolean
-    ) = viewModelScope.launch {
+    ) = viewModelScope.launch(Dispatchers.IO) {
         if (arrayOf(email, password, nickname).isBlank()) {
             _signUpEvent.emit(ApiResponse.Error(IS_BLANK))
             return@launch
