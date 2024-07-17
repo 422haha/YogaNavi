@@ -123,22 +123,10 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> passwordUserEmail(
         @RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
-        System.out.println("in email : " + registerDto.getEmail());
-        boolean check = usersService.checkUser(registerDto.getEmail());
-        if (!check) {
-            int randNum = (int) (Math.random() * 899999) + 100000;
-            rNum = randNum;
-            usersService.sendSimpleMessage(registerDto.getEmail(), "Yoga Navi 비밀번호 재설정 인증번호",
-                "비밀번호 재설정 인증번호 : " + rNum);
-
-            response.put("message", "인증 번호 전송");
-            response.put("data", new Object[]{});
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } else {
-            response.put("message", "존재하지 않는 회원입니다.");
-            response.put("data", new Object[]{});
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-        }
+        String result = usersService.sendPasswordResetToken(registerDto.getEmail());
+        response.put("message", result);
+        response.put("data", new Object[]{});
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -151,7 +139,8 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> passwordCheckAuthNumber(
         @RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
-        if (registerDto.getAuthnumber() == rNum) {
+        boolean isValid = usersService.validateResetToken(registerDto.getEmail(), String.valueOf(registerDto.getAuthnumber()));
+        if (isValid) {
             response.put("message", "인증 완료");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -171,23 +160,9 @@ public class UserController {
     @PostMapping("/find-password")
     public ResponseEntity<Map<String, Object>> setPassword(@RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
-        try {
-            Users savedUsers = usersService.setPassword(registerDto);
-            if (savedUsers.getId() > 0) {
-                response.put("message", "비밀번호 재설정 성공");
-                response.put("data", new Object[]{});
-                return ResponseEntity.status(HttpStatus.CREATED).body(response);
-            } else {
-                response.put("message", "비밀번호 재설정 불가");
-                response.put("data", new Object[]{});
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-            }
-        } catch (Exception ex) {
-            response.put("message", "비밀번호 재설정 불가");
-            response.put("data", new Object[]{});
-
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(response);
-        }
+        String result = usersService.resetPassword(registerDto.getEmail(), registerDto.getPassword());
+        response.put("message", result);
+        response.put("data", new Object[]{});
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
