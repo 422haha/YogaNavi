@@ -1,7 +1,7 @@
 package com.yoga.backend.common.config;
 
 import com.yoga.backend.common.entity.Users;
-import com.yoga.backend.users.UsersRepository;
+import com.yoga.backend.members.UsersRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,11 +51,11 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
                     getGrantedAuthorities(users.get(0).getRole()));
             } else {
                 // 비밀번호가 일치하지 않는 경우 예외 발생
-                throw new BadCredentialsException("Invalid password!");
+                throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
             }
         } else {
             // 사용자가 존재하지 않는 경우 예외 발생
-            throw new BadCredentialsException("No user registered with this details!");
+            throw new BadCredentialsException("사용자가 존재하지 않습니다.");
         }
     }
 

@@ -1,4 +1,4 @@
-package com.yoga.backend.users;
+package com.yoga.backend.members;
 
 public class RegisterDto {
 

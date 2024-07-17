@@ -1,4 +1,4 @@
-package com.yoga.backend.users;
+package com.yoga.backend.members;
 
 import java.util.List;
 
@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface UsersRepository extends CrudRepository<Users, Long> {
 
     List<Users> findByEmail(String email);
+    List<Users> findByNickname(String nickname);
 }
