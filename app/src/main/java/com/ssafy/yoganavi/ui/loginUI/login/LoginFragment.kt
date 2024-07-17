@@ -27,6 +27,14 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
     }
 
     private fun initListener() {
+        binding.tvForgetPassword.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_findFragment)
+        }
+
+        binding.tvJoin.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_joinFragment)
+        }
+
         binding.btnLogin.setOnClickListener {
             val email = binding.tieId.text.toString()
             val password = binding.tiePassword.text.toString()
@@ -40,14 +48,6 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
                 if(it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
                 else showSnackBar(it.message.toString())
             }
-        }
-
-        binding.tvForgetPassword.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_findFragment)
-        }
-
-        binding.tvJoin.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_joinFragment)
         }
     }
 }
