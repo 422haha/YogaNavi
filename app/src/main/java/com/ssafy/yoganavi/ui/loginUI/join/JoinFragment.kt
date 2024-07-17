@@ -9,7 +9,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.databinding.FragmentJoinBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
@@ -62,29 +61,29 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.joinEvent.collectLatest {
                 when (it) {
-                    is JoinEvent.RegisterEmailSuccess -> registerEmailSuccess(it.data)
-                    is JoinEvent.CheckEmailSuccess -> checkEmailSuccess(it.data)
-                    is JoinEvent.SignUpSuccess -> signUpSuccess(it.data)
+                    is JoinEvent.RegisterEmailSuccess -> registerEmailSuccess(it)
+                    is JoinEvent.CheckEmailSuccess -> checkEmailSuccess(it)
+                    is JoinEvent.SignUpSuccess -> signUpSuccess(it)
                     is JoinEvent.Error -> error(it.message)
                 }
             }
         }
     }
 
-    private fun registerEmailSuccess(data: YogaResponse<Unit>?) = data?.let {
+    private fun registerEmailSuccess(data: JoinEvent<Unit>) {
         binding.btnCheck.isEnabled = true
         binding.btnSignup.isEnabled = false
-        showSnackBar(it.message)
+        showSnackBar(data.message)
     }
 
-    private fun checkEmailSuccess(data: YogaResponse<Unit>?) = data?.let {
+    private fun checkEmailSuccess(data: JoinEvent<Unit>) {
         binding.btnCheck.isEnabled = false
         binding.btnSignup.isEnabled = true
-        showSnackBar(it.message)
+        showSnackBar(data.message)
     }
 
-    private fun signUpSuccess(data: YogaResponse<Unit>?) = data?.let {
-        showSnackBar(it.message)
+    private fun signUpSuccess(data: JoinEvent<Unit>) {
+        showSnackBar(data.message)
     }
 
     private fun error(message: String?) = message?.let {

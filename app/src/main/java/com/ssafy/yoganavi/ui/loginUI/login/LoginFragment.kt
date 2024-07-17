@@ -8,7 +8,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
-import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.databinding.FragmentLoginBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,18 +45,13 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.loginEvent.collectLatest {
                 when (it) {
-                    is LogInEvent.LoginSuccess -> loginSuccess(it.data)
+                    is LogInEvent.LoginSuccess -> loginSuccess(it)
                     is LogInEvent.LoginError -> loginError(it.message)
                 }
             }
         }
     }
 
-    private fun loginSuccess(data: YogaResponse<Unit>?) = data?.let {
-        showSnackBar(it.message)
-    }
-
-    private fun loginError(message: String?) = message?.let {
-        showSnackBar(it)
-    }
+    private fun loginSuccess(data: LogInEvent<Unit>) = showSnackBar(data.message)
+    private fun loginError(message: String) = showSnackBar(message)
 }

@@ -19,51 +19,51 @@ class UserRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : UserRepository {
 
-    override suspend fun logIn(logInRequest: LogInRequest): ApiResponse<YogaResponse<Unit>> {
+    override suspend fun logIn(logInRequest: LogInRequest): ApiResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.logIn(logInRequest) }
         return response.toApiResponse()
     }
 
-    override suspend fun signUp(signUpRequest: SignUpRequest): ApiResponse<YogaResponse<Unit>> {
+    override suspend fun signUp(signUpRequest: SignUpRequest): ApiResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.signUp(signUpRequest) }
         return response.toApiResponse()
     }
 
-    override suspend fun registerEmail(signUpRequest: SignUpRequest): ApiResponse<YogaResponse<Unit>> {
+    override suspend fun registerEmail(signUpRequest: SignUpRequest): ApiResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.registerEmail(signUpRequest) }
         return response.toApiResponse()
     }
 
-    override suspend fun checkAuthEmail(signUpRequest: SignUpRequest): ApiResponse<YogaResponse<Unit>> {
+    override suspend fun checkAuthEmail(signUpRequest: SignUpRequest): ApiResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.checkAuthEmail(signUpRequest) }
         return response.toApiResponse()
     }
 
-    override suspend fun findPasswordEmail(signUpRequest: SignUpRequest): ApiResponse<YogaResponse<Unit>> {
+    override suspend fun findPasswordEmail(signUpRequest: SignUpRequest): ApiResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.findPasswordEmail(signUpRequest) }
         return response.toApiResponse()
     }
 
-    override suspend fun checkAuthPassword(signUpRequest: SignUpRequest): ApiResponse<YogaResponse<Unit>> {
+    override suspend fun checkAuthPassword(signUpRequest: SignUpRequest): ApiResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.checkAuthPassword(signUpRequest) }
         return response.toApiResponse()
     }
 
-    override suspend fun registerPassword(signUpRequest: SignUpRequest): ApiResponse<YogaResponse<Unit>> {
+    override suspend fun registerPassword(signUpRequest: SignUpRequest): ApiResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.registerPassword(signUpRequest) }
         return response.toApiResponse()
     }
 
-    private fun Response<YogaResponse<Unit>>.toApiResponse(): ApiResponse<YogaResponse<Unit>> {
+    private fun Response<YogaResponse<Unit>>.toApiResponse(): ApiResponse<Unit> {
         val errorJson = errorBody()?.let { JSONObject(it.string()) }
         val error = errorJson?.get("message").toString()
 
         body()?.let {
-            if (isSuccessful) return ApiResponse.Success(it)
-            else return ApiResponse.Error(it.message)
+            if (isSuccessful) return ApiResponse.Success(it.data, it.message)
+            else return ApiResponse.Error(it.data, it.message)
         }
 
-        return if (error.isBlank()) ApiResponse.Error(NO_RESPONSE)
-        else ApiResponse.Error(error)
+        return if (error.isBlank()) ApiResponse.Error(message = NO_RESPONSE)
+        else ApiResponse.Error(message = error)
     }
 }

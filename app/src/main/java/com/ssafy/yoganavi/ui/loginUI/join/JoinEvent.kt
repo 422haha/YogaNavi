@@ -1,11 +1,11 @@
 package com.ssafy.yoganavi.ui.loginUI.join
 
 sealed class JoinEvent<T>(
-    val data: T? = null,
-    val message: String? = null
+    val data: List<T>,
+    val message: String
 ) {
-    class RegisterEmailSuccess<T>(data: T) : JoinEvent<T>(data)
-    class CheckEmailSuccess<T>(data: T) : JoinEvent<T>(data)
-    class SignUpSuccess<T>(data: T) : JoinEvent<T>(data)
-    class Error<T>(message: String, data: T? = null) : JoinEvent<T>(data, message)
+    class RegisterEmailSuccess<T>(data: List<T>, message: String) : JoinEvent<T>(data, message)
+    class CheckEmailSuccess<T>(data: List<T>, message: String) : JoinEvent<T>(data, message)
+    class SignUpSuccess<T>(data: List<T>, message: String) : JoinEvent<T>(data, message)
+    class Error<T>(data: List<T> = mutableListOf(), message: String) : JoinEvent<T>(data, message)
 }

@@ -9,7 +9,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.databinding.FragmentFindBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
@@ -56,29 +55,29 @@ class FindFragment : BaseFragment<FragmentFindBinding>(FragmentFindBinding::infl
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.findPasswordEvent.collectLatest {
                 when (it) {
-                    is FindEvent.SendEmailSuccess -> sendEmailSuccess(it.data)
-                    is FindEvent.CheckEmailSuccess -> checkEmailSuccess(it.data)
-                    is FindEvent.RegisterPasswordSuccess -> registerPasswordSuccess(it.data)
+                    is FindEvent.SendEmailSuccess -> sendEmailSuccess(it)
+                    is FindEvent.CheckEmailSuccess -> checkEmailSuccess(it)
+                    is FindEvent.RegisterPasswordSuccess -> registerPasswordSuccess(it)
                     is FindEvent.Error -> error(it.message)
                 }
             }
         }
     }
 
-    private fun sendEmailSuccess(data: YogaResponse<Unit>?) = data?.let {
+    private fun sendEmailSuccess(data: FindEvent<Unit>) {
         binding.btnCheck.isEnabled = true
         binding.btnSignup.isEnabled = false
-        showSnackBar(it.message)
+        showSnackBar(data.message)
     }
 
-    private fun checkEmailSuccess(data: YogaResponse<Unit>?) = data?.let {
+    private fun checkEmailSuccess(data: FindEvent<Unit>) {
         binding.btnCheck.isEnabled = false
         binding.btnSignup.isEnabled = true
-        showSnackBar(it.message)
+        showSnackBar(data.message)
     }
 
-    private fun registerPasswordSuccess(data: YogaResponse<Unit>?) = data?.let {
-        showSnackBar(it.message)
+    private fun registerPasswordSuccess(data: FindEvent<Unit>) {
+        showSnackBar(data.message)
     }
 
     private fun error(message: String?) = message?.let {

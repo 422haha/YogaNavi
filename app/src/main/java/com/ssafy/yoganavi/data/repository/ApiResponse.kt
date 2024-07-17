@@ -1,9 +1,9 @@
 package com.ssafy.yoganavi.data.repository
 
 sealed class ApiResponse<T>(
-    val data: T? = null,
-    val message: String? = null
+    val data: List<T>,
+    val message: String
 ) {
-    class Success<T>(data: T) : ApiResponse<T>(data)
-    class Error<T>(message: String, data: T? = null) : ApiResponse<T>(data, message)
+    class Success<T>(data: List<T>, message: String) : ApiResponse<T>(data, message)
+    class Error<T>(data: List<T> = mutableListOf(), message: String) : ApiResponse<T>(data, message)
 }
