@@ -2,10 +2,10 @@ package com.ssafy.yoganavi.ui.loginUI.find
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.yoganavi.data.ApiResponse
+import com.ssafy.yoganavi.data.repository.ApiResponse
 import com.ssafy.yoganavi.data.repository.UserRepository
-import com.ssafy.yoganavi.data.source.signup.SignUpRequest
-import com.ssafy.yoganavi.data.source.signup.SignUpResponse
+import com.ssafy.yoganavi.data.source.YogaResponse
+import com.ssafy.yoganavi.data.source.user.signup.SignUpRequest
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
@@ -19,46 +19,33 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FindViewModel @Inject constructor(
-    private val userRepository: UserRepository
-) : ViewModel() {
+class FindViewModel @Inject constructor(private val userRepository: UserRepository) : ViewModel() {
 
-    private val _findPasswordEvent: MutableSharedFlow<ApiResponse<SignUpResponse>> =
-        MutableSharedFlow()
-    private val _checkPasswordEvent: MutableSharedFlow<ApiResponse<SignUpResponse>> =
-        MutableSharedFlow()
-    private val _registerPasswordEvent: MutableSharedFlow<ApiResponse<SignUpResponse>> =
+    private val _findPasswordEvent: MutableSharedFlow<FindEvent<YogaResponse<Unit>>> =
         MutableSharedFlow()
 
-    val findPasswordEvent: SharedFlow<ApiResponse<SignUpResponse>> =
+    val findPasswordEvent: SharedFlow<FindEvent<YogaResponse<Unit>>> =
         _findPasswordEvent.asSharedFlow()
-    val checkPasswordEvent: SharedFlow<ApiResponse<SignUpResponse>> =
-        _checkPasswordEvent.asSharedFlow()
-    val registerPasswordEvent: SharedFlow<ApiResponse<SignUpResponse>> =
-        _registerPasswordEvent.asSharedFlow()
 
-    fun findPassword(email: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun sendEmail(email: String) = viewModelScope.launch(Dispatchers.IO) {
         if (arrayOf(email).isBlank()) {
-            _findPasswordEvent.emit(ApiResponse.Error(IS_BLANK))
+            emitError(IS_BLANK)
             return@launch
         }
 
         val signUpRequest = SignUpRequest(email = email)
-
         runCatching { userRepository.findPasswordEmail(signUpRequest) }
-            .onSuccess { _findPasswordEvent.emit(it) }
-            .onFailure { _findPasswordEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
+            .onSuccess { emitResponse(it, FindEvent.SendEmailSuccess::class.java) }
+            .onFailure { emitError(NO_RESPONSE) }
     }
 
     fun checkAuthEmail(checkNumber: Int?) = viewModelScope.launch(Dispatchers.IO) {
         checkNumber?.let {
             val signUpRequest = SignUpRequest(authnumber = checkNumber)
-
             runCatching { userRepository.checkAuthPassword(signUpRequest) }
-                .onSuccess { _checkPasswordEvent.emit(it) }
-                .onFailure { _checkPasswordEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
-
-        } ?: _checkPasswordEvent.emit(ApiResponse.Error(IS_BLANK))
+                .onSuccess { emitResponse(it, FindEvent.CheckEmailSuccess::class.java) }
+                .onFailure { emitError(NO_RESPONSE) }
+        } ?: emitError(IS_BLANK)
     }
 
     fun registerNewPassword(
@@ -67,12 +54,12 @@ class FindViewModel @Inject constructor(
         passwordAgain: String
     ) = viewModelScope.launch(Dispatchers.IO) {
         if (arrayOf(email, password).isBlank()) {
-            _registerPasswordEvent.emit(ApiResponse.Error(IS_BLANK))
+            emitError(IS_BLANK)
             return@launch
         }
 
         if (password != passwordAgain) {
-            _registerPasswordEvent.emit(ApiResponse.Error(PASSWORD_DIFF))
+            emitError(PASSWORD_DIFF)
             return@launch
         }
 
@@ -82,7 +69,38 @@ class FindViewModel @Inject constructor(
         )
 
         runCatching { userRepository.registerPassword(signUpRequest) }
-            .onSuccess { _registerPasswordEvent.emit(it) }
-            .onFailure { _registerPasswordEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
+            .onSuccess { emitResponse(it, FindEvent.RegisterPasswordSuccess::class.java) }
+            .onFailure { emitError(NO_RESPONSE) }
     }
+
+    private suspend fun emitResponse(
+        response: ApiResponse<YogaResponse<Unit>>,
+        type: Class<out FindEvent<*>>
+    ) = when (response) {
+        is ApiResponse.Success -> response.data?.let { emitSuccess(it, type) }
+        is ApiResponse.Error -> emitError(response.message.toString())
+    }
+
+    private suspend fun emitSuccess(data: YogaResponse<Unit>, type: Class<out FindEvent<*>>) =
+        when (type) {
+
+            FindEvent.SendEmailSuccess::class.java -> {
+                _findPasswordEvent.emit(FindEvent.SendEmailSuccess(data))
+            }
+
+            FindEvent.CheckEmailSuccess::class.java -> {
+                _findPasswordEvent.emit(FindEvent.CheckEmailSuccess(data))
+            }
+
+            FindEvent.RegisterPasswordSuccess::class.java -> {
+                _findPasswordEvent.emit(FindEvent.RegisterPasswordSuccess(data))
+            }
+
+            else -> {
+                emitError(NO_RESPONSE)
+            }
+        }
+
+    private suspend fun emitError(message: String) =
+        _findPasswordEvent.emit(FindEvent.Error(message))
 }

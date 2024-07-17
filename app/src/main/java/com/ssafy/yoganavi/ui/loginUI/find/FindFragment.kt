@@ -9,12 +9,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.ssafy.yoganavi.data.ApiResponse
+import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.databinding.FragmentFindBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -35,7 +34,7 @@ class FindFragment : BaseFragment<FragmentFindBinding>(FragmentFindBinding::infl
             hideKeyboard()
 
             val email = binding.tieId.text.toString()
-            viewModel.findPassword(email)
+            viewModel.sendEmail(email)
         }
 
         binding.btnCheck.setOnClickListener {
@@ -55,42 +54,35 @@ class FindFragment : BaseFragment<FragmentFindBinding>(FragmentFindBinding::infl
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            collectFindPasswordEvent()
-            collectCheckPasswordEvent()
-            collectRegisterPasswordEvent()
-        }
-    }
-
-    private fun CoroutineScope.collectFindPasswordEvent() = launch {
-        viewModel.findPasswordEvent.collectLatest {
-            if (it is ApiResponse.Success) {
-                showSnackBar(it.data?.message.toString())
-                binding.btnCheck.isEnabled = true
-                binding.btnSignup.isEnabled = false
-            } else {
-                showSnackBar(it.message.toString())
+            viewModel.findPasswordEvent.collectLatest {
+                when (it) {
+                    is FindEvent.SendEmailSuccess -> sendEmailSuccess(it.data)
+                    is FindEvent.CheckEmailSuccess -> checkEmailSuccess(it.data)
+                    is FindEvent.RegisterPasswordSuccess -> registerPasswordSuccess(it.data)
+                    is FindEvent.Error -> error(it.message)
+                }
             }
         }
     }
 
-    private fun CoroutineScope.collectCheckPasswordEvent() = launch {
-        viewModel.checkPasswordEvent.collectLatest {
-            if (it is ApiResponse.Success) {
-                showSnackBar(it.data?.message.toString())
-                binding.btnCheck.isEnabled = false
-                binding.btnSignup.isEnabled = true
-
-            } else {
-                showSnackBar(it.message.toString())
-            }
-        }
+    private fun sendEmailSuccess(data: YogaResponse<Unit>?) = data?.let {
+        binding.btnCheck.isEnabled = true
+        binding.btnSignup.isEnabled = false
+        showSnackBar(it.message)
     }
 
-    private fun CoroutineScope.collectRegisterPasswordEvent() = launch {
-        viewModel.registerPasswordEvent.collectLatest {
-            if (it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
-            else showSnackBar(it.message.toString())
-        }
+    private fun checkEmailSuccess(data: YogaResponse<Unit>?) = data?.let {
+        binding.btnCheck.isEnabled = false
+        binding.btnSignup.isEnabled = true
+        showSnackBar(it.message)
+    }
+
+    private fun registerPasswordSuccess(data: YogaResponse<Unit>?) = data?.let {
+        showSnackBar(it.message)
+    }
+
+    private fun error(message: String?) = message?.let {
+        showSnackBar(it)
     }
 
     private fun initPasswordWatcher() = binding.tiePwAgain.addTextChangedListener {
