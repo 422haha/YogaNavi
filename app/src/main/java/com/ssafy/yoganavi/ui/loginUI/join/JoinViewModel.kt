@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.ApiResponse
 import com.ssafy.yoganavi.data.repository.UserRepository
-import com.ssafy.yoganavi.data.source.user.signup.SignUpRequest
+import com.ssafy.yoganavi.data.source.user.UserRequest
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
@@ -31,16 +31,16 @@ class JoinViewModel @Inject constructor(
             return@launch
         }
 
-        val signUpRequest = SignUpRequest(email = email)
-        runCatching { userRepository.registerEmail(signUpRequest) }
+        val userRequest = UserRequest(email = email)
+        runCatching { userRepository.registerEmail(userRequest) }
             .onSuccess { emitResponse(it, JoinEvent.RegisterEmailSuccess::class.java) }
             .onFailure { emitError(NO_RESPONSE) }
     }
 
     fun checkAuthEmail(checkNumber: Int?) = viewModelScope.launch(Dispatchers.IO) {
         checkNumber?.let {
-            val signUpRequest = SignUpRequest(authnumber = checkNumber)
-            runCatching { userRepository.checkAuthEmail(signUpRequest) }
+            val userRequest = UserRequest(authnumber = checkNumber)
+            runCatching { userRepository.checkAuthEmail(userRequest) }
                 .onSuccess { emitResponse(it, JoinEvent.CheckEmailSuccess::class.java) }
                 .onFailure { emitError(NO_RESPONSE) }
         } ?: emitError(IS_BLANK)
@@ -63,14 +63,14 @@ class JoinViewModel @Inject constructor(
             return@launch
         }
 
-        val signUpRequest = SignUpRequest(
+        val userRequest = UserRequest(
             email = email,
             password = password,
             nickname = nickname,
             teacher = isTeacher
         )
 
-        runCatching { userRepository.signUp(signUpRequest) }
+        runCatching { userRepository.signUp(userRequest) }
             .onSuccess { emitResponse(it, JoinEvent.SignUpSuccess::class.java) }
             .onFailure { emitError(NO_RESPONSE) }
     }

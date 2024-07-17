@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.ApiResponse
 import com.ssafy.yoganavi.data.repository.UserRepository
-import com.ssafy.yoganavi.data.source.user.login.LogInRequest
+import com.ssafy.yoganavi.data.source.user.UserRequest
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.isBlank
@@ -30,7 +30,7 @@ class LoginViewModel @Inject constructor(
             return@launch
         }
 
-        val request = LogInRequest(email, password)
+        val request = UserRequest(email = email, password = password)
         runCatching { userRepository.logIn(request) }
             .onSuccess { emitResponse(it) }
             .onFailure { emitError(NO_RESPONSE) }

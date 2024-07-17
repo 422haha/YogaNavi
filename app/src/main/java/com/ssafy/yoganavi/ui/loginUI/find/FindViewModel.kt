@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.ApiResponse
 import com.ssafy.yoganavi.data.repository.UserRepository
-import com.ssafy.yoganavi.data.source.user.signup.SignUpRequest
+import com.ssafy.yoganavi.data.source.user.UserRequest
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
@@ -29,16 +29,16 @@ class FindViewModel @Inject constructor(private val userRepository: UserReposito
             return@launch
         }
 
-        val signUpRequest = SignUpRequest(email = email)
-        runCatching { userRepository.findPasswordEmail(signUpRequest) }
+        val userRequest = UserRequest(email = email)
+        runCatching { userRepository.findPasswordEmail(userRequest) }
             .onSuccess { emitResponse(it, FindEvent.SendEmailSuccess::class.java) }
             .onFailure { emitError(NO_RESPONSE) }
     }
 
     fun checkAuthEmail(checkNumber: Int?) = viewModelScope.launch(Dispatchers.IO) {
         checkNumber?.let {
-            val signUpRequest = SignUpRequest(authnumber = checkNumber)
-            runCatching { userRepository.checkAuthPassword(signUpRequest) }
+            val userRequest = UserRequest(authnumber = checkNumber)
+            runCatching { userRepository.checkAuthPassword(userRequest) }
                 .onSuccess { emitResponse(it, FindEvent.CheckEmailSuccess::class.java) }
                 .onFailure { emitError(NO_RESPONSE) }
         } ?: emitError(IS_BLANK)
@@ -56,12 +56,8 @@ class FindViewModel @Inject constructor(private val userRepository: UserReposito
                 return@launch
             }
 
-            val signUpRequest = SignUpRequest(
-                email = email,
-                password = password
-            )
-
-            runCatching { userRepository.registerPassword(signUpRequest) }
+            val userRequest = UserRequest(email = email, password = password)
+            runCatching { userRepository.registerPassword(userRequest) }
                 .onSuccess { emitResponse(it, FindEvent.RegisterPasswordSuccess::class.java) }
                 .onFailure { emitError(NO_RESPONSE) }
         }

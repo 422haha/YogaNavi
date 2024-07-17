@@ -3,8 +3,7 @@ package com.ssafy.yoganavi.data.repository
 import com.google.gson.Gson
 import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.data.source.user.UserDataSource
-import com.ssafy.yoganavi.data.source.user.login.LogInRequest
-import com.ssafy.yoganavi.data.source.user.signup.SignUpRequest
+import com.ssafy.yoganavi.data.source.user.UserRequest
 import com.ssafy.yoganavi.di.IoDispatcher
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,38 +18,38 @@ class UserRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : UserRepository {
 
-    override suspend fun logIn(logInRequest: LogInRequest): ApiResponse<Unit> {
-        val response = withContext(ioDispatcher) { userDataSource.logIn(logInRequest) }
+    override suspend fun logIn(userRequest: UserRequest): ApiResponse<Unit> {
+        val response = withContext(ioDispatcher) { userDataSource.logIn(userRequest) }
         return response.toApiResponse()
     }
 
-    override suspend fun signUp(signUpRequest: SignUpRequest): ApiResponse<Unit> {
-        val response = withContext(ioDispatcher) { userDataSource.signUp(signUpRequest) }
+    override suspend fun signUp(userRequest: UserRequest): ApiResponse<Unit> {
+        val response = withContext(ioDispatcher) { userDataSource.signUp(userRequest) }
         return response.toApiResponse()
     }
 
-    override suspend fun registerEmail(signUpRequest: SignUpRequest): ApiResponse<Unit> {
-        val response = withContext(ioDispatcher) { userDataSource.registerEmail(signUpRequest) }
+    override suspend fun registerEmail(userRequest: UserRequest): ApiResponse<Unit> {
+        val response = withContext(ioDispatcher) { userDataSource.registerEmail(userRequest) }
         return response.toApiResponse()
     }
 
-    override suspend fun checkAuthEmail(signUpRequest: SignUpRequest): ApiResponse<Unit> {
-        val response = withContext(ioDispatcher) { userDataSource.checkAuthEmail(signUpRequest) }
+    override suspend fun checkAuthEmail(userRequest: UserRequest): ApiResponse<Unit> {
+        val response = withContext(ioDispatcher) { userDataSource.checkAuthEmail(userRequest) }
         return response.toApiResponse()
     }
 
-    override suspend fun findPasswordEmail(signUpRequest: SignUpRequest): ApiResponse<Unit> {
-        val response = withContext(ioDispatcher) { userDataSource.findPasswordEmail(signUpRequest) }
+    override suspend fun findPasswordEmail(userRequest: UserRequest): ApiResponse<Unit> {
+        val response = withContext(ioDispatcher) { userDataSource.findPasswordEmail(userRequest) }
         return response.toApiResponse()
     }
 
-    override suspend fun checkAuthPassword(signUpRequest: SignUpRequest): ApiResponse<Unit> {
-        val response = withContext(ioDispatcher) { userDataSource.checkAuthPassword(signUpRequest) }
+    override suspend fun checkAuthPassword(userRequest: UserRequest): ApiResponse<Unit> {
+        val response = withContext(ioDispatcher) { userDataSource.checkAuthPassword(userRequest) }
         return response.toApiResponse()
     }
 
-    override suspend fun registerPassword(signUpRequest: SignUpRequest): ApiResponse<Unit> {
-        val response = withContext(ioDispatcher) { userDataSource.registerPassword(signUpRequest) }
+    override suspend fun registerPassword(userRequest: UserRequest): ApiResponse<Unit> {
+        val response = withContext(ioDispatcher) { userDataSource.registerPassword(userRequest) }
         return response.toApiResponse()
     }
 
