@@ -1,6 +1,7 @@
 package com.ssafy.yoganavi.data.auth
 
 import com.ssafy.yoganavi.data.repository.DataStoreRepository
+import com.ssafy.yoganavi.ui.utils.MEMBER
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -13,17 +14,17 @@ class AuthInterceptor @Inject constructor(
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val token = runBlocking { dataStoreRepository.token.firstOrNull() } ?: ""
-        val request = chain.request()
-            .newBuilder()
-            .addHeader("Authorization", token)
-            .build()
+        val url = chain.request().url.pathSegments.firstOrNull()
+        val requestBuilder = chain.request().newBuilder()
 
+        if (url != MEMBER) requestBuilder.addHeader("Authorization", "Bearer $token")
+        val request = requestBuilder.build()
         val response = chain.proceed(request)
 
         response.header("Authorization")?.let { newToken ->
             runBlocking { dataStoreRepository.setToken(newToken) }
         }
-        response.header("refresh")?.let { newRefreshToken ->
+        response.header("Refresh-Token")?.let { newRefreshToken ->
             runBlocking { dataStoreRepository.setRefreshToken(newRefreshToken) }
         }
 

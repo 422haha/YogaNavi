@@ -6,22 +6,65 @@
     android:layout_height="match_parent"
     tools:context=".ui.homeUI.myPage.registerNotice.RegisterNoticeFragment">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/et_notice"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@null"
-        android:hint="@string/write_info"
-        android:inputType="textMultiLine"
-        style="@style/LargeText"
-        android:padding="@dimen/padding_large"
-        android:gravity="top"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/divider4"
-        />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/et_notice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="@string/write_info"
+                android:inputType="textMultiLine"
+                android:scrollHorizontally="false"
+                style="@style/LargeText"
+                android:padding="@dimen/padding_large"
+                android:gravity="top"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHeight_default="spread"
+                android:minHeight="400dp" /> <!-- 최소 높이 설정 -->
+
+            <View
+                android:id="@+id/divider5"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="@dimen/padding_large"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_notice" />
+
+            <ImageView
+                android:id="@+id/iv_photo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/padding_medium"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/sample2"
+                app:layout_constraintTop_toBottomOf="@id/divider5"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" /> <!-- 가로 세로 비율 1:1 설정 -->
+
+            <ImageView
+                android:id="@+id/iv_cancel2"
+                android:layout_width="@dimen/icon_mini"
+                android:layout_height="@dimen/icon_mini"
+                android:src="@drawable/baseline_cancel_red"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider5" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
 
     <View
         android:id="@+id/divider4"
@@ -31,44 +74,32 @@
         android:background="?android:attr/listDivider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/et_notice" />
+        app:layout_constraintBottom_toTopOf="@id/cv_add_camera_text" />
 
-
-    <TextView
-        android:id="@+id/tv_add_photo"
-        style="@style/LargeText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingVertical="@dimen/padding_medium"
-        android:text="@string/add_photo"
-        app:drawableStartCompat="@drawable/photo_camera"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/divider4" />
-
-    <ImageView
-        android:id="@+id/iv_photo"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cv_add_camera_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/padding_medium"
-        android:adjustViewBounds="true"
-        android:scaleType="centerInside"
-        android:src="@drawable/sample"
-        android:visibility="gone"
+        app:strokeColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/divider4" />
+        app:layout_constraintTop_toTopOf="@id/divider4">
 
-    <ImageView
-        android:id="@+id/iv_cancel2"
-        android:layout_width="@dimen/icon_mini"
-        android:layout_height="@dimen/icon_mini"
-        android:src="@drawable/baseline_cancel_red"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/divider4" />
+        <TextView
+            android:id="@+id/tv_add_photo"
+            style="@style/LargeText"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/padding_large"
+            android:text="@string/add_photo"
+            app:drawableStartCompat="@drawable/photo_camera"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

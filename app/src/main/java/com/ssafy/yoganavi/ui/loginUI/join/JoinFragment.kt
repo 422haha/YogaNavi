@@ -1,22 +1,22 @@
 package com.ssafy.yoganavi.ui.loginUI.join
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.ssafy.yoganavi.data.ApiResponse
-import com.ssafy.yoganavi.data.source.signup.SignUpResponse
 import com.ssafy.yoganavi.databinding.FragmentJoinBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
-import com.ssafy.yoganavi.ui.utils.CERTIFICATION
-import com.ssafy.yoganavi.ui.utils.CHECK
+import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::inflate) {
@@ -25,18 +25,9 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        test()
+        initPasswordWatcher()
         initCollect()
         initListener()
-    }
-
-    private fun test() {
-        with(binding) {
-            tieId.setText("csjune99@naver.com")
-            tiePw.setText("1234")
-            tiePwAgain.setText("1234")
-            tieNn.setText("닉네임")
-        }
     }
 
     private fun initListener() {
@@ -44,13 +35,21 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
             binding.tvTeacher.toggle()
         }
 
-        binding.btnCheck.setOnClickListener {
-            val email = binding.tieId.text.toString()
-            val number = binding.tieCn.text.toString().toIntOrNull()
-            val btn = binding.btnCheck.text.toString()
+        binding.btnSend.setOnClickListener {
+            hideKeyboard()
+            binding.btnCheck.isEnabled = true
+            binding.btnCheck.isEnabled = true
+            binding.btnSignup.isEnabled = false
 
-            if (btn == CHECK) viewModel.registerEmail(email)
-            else if (btn == CERTIFICATION) viewModel.checkAuthEmail(number)
+            val email = binding.tieId.text.toString()
+            viewModel.registerEmail(email)
+        }
+
+        binding.btnCheck.setOnClickListener {
+            hideKeyboard()
+
+            val number = binding.tieCn.text.toString().toIntOrNull()
+            viewModel.checkAuthEmail(number)
         }
 
         binding.btnSignup.setOnClickListener {
@@ -65,40 +64,56 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            launch {
-                viewModel.registerEmailEvent.collectLatest {
-                    setLogic(it, binding.btnCheck.text.toString())
-                    if (it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
-                    else showSnackBar(it.message.toString())
-                }
-            }
+            collectRegisterEmailEvent()
+            collectCheckEmailEvent()
+            collectSignUpEvent()
+        }
+    }
 
-            launch {
-                viewModel.checkEmailEvent.collectLatest {
-                    setLogic(it, binding.btnCheck.text.toString())
-                    if (it is ApiResponse.Success) {
-                        showSnackBar(it.data?.message.toString())
-                        binding.btnCheck.isEnabled = false
-                        binding.btnSignup.isEnabled = true
-                    } else {
-                        showSnackBar(it.message.toString())
-                    }
-                }
-            }
+    private fun CoroutineScope.collectRegisterEmailEvent() = launch {
+        viewModel.registerEmailEvent.collectLatest {
+            if (it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
+            else showSnackBar(it.message.toString())
+        }
+    }
 
-            launch {
-                viewModel.signUpEvent.collectLatest {
-                    if (it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
-                    else showSnackBar(it.message.toString())
-                }
+    private fun CoroutineScope.collectCheckEmailEvent() = launch {
+        viewModel.checkEmailEvent.collectLatest {
+            if (it is ApiResponse.Success) {
+                showSnackBar(it.data?.message.toString())
+                binding.btnCheck.isEnabled = false
+                binding.btnSignup.isEnabled = true
+
+            } else {
+                showSnackBar(it.message.toString())
             }
         }
     }
 
-    private suspend fun setLogic(response: ApiResponse<SignUpResponse>, logic: String) =
-        withContext(Dispatchers.Main) {
-            if (response is ApiResponse.Success && logic == CHECK) {
-                binding.btnCheck.text = CERTIFICATION
-            }
+    private fun CoroutineScope.collectSignUpEvent() = launch {
+        viewModel.signUpEvent.collectLatest {
+            if (it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
+            else showSnackBar(it.message.toString())
         }
+    }
+
+    private fun initPasswordWatcher() = binding.tiePwAgain.addTextChangedListener {
+        if (it.toString() != binding.tiePw.text.toString()) {
+            binding.tiePwAgain.error = PASSWORD_DIFF
+        } else {
+            binding.tiePwAgain.error = null
+        }
+    }
+
+    private fun hideKeyboard() {
+        if (activity != null && requireActivity().currentFocus != null) {
+            val inputManager: InputMethodManager =
+                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+            inputManager.hideSoftInputFromWindow(
+                requireActivity().currentFocus?.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS
+            )
+        }
+    }
 }
