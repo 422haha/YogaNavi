@@ -17,15 +17,24 @@ import java.io.InputStream;
 @RequestMapping("/s3")
 public class S3Controller {
 
+    // 로거 객체
     private static final Logger logger = LoggerFactory.getLogger(S3Controller.class);
 
+    // S3 서비스 객체
     private final S3Service s3Service;
 
+    // S3 서비스 객체 주입
     @Autowired
     public S3Controller(S3Service s3Service) {
         this.s3Service = s3Service;
     }
 
+    /**
+     * S3 버킷에 파일을 업로드
+     *
+     * @param file  업로드할 파일
+     * @return      파일 업로드 성공 메시지 또는 실패 메시지
+     */
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
@@ -37,6 +46,12 @@ public class S3Controller {
         }
     }
 
+    /**
+     * S3 버킷에서 파일을 다운로드
+     *
+     * @param key   다운로드할 파일의 키(파일 이름)
+     * @return      파일 데이터를 포함하는 응답 엔티티
+     */
     @GetMapping("/download")
     public ResponseEntity<byte[]> downloadFile(@RequestParam("key") String key) {
         try (InputStream s3Object = s3Service.getObject(key);
