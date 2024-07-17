@@ -6,7 +6,11 @@ import com.ssafy.yoganavi.data.ApiResponse
 import com.ssafy.yoganavi.data.repository.UserRepository
 import com.ssafy.yoganavi.data.source.login.LogInRequest
 import com.ssafy.yoganavi.data.source.login.LogInResponse
+import com.ssafy.yoganavi.ui.utils.IS_BLANK
+import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
+import com.ssafy.yoganavi.ui.utils.isBlank
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -21,14 +25,15 @@ class LoginViewModel @Inject constructor(
     private val _loginEvent: MutableSharedFlow<ApiResponse<LogInResponse>> = MutableSharedFlow()
     val loginEvent: SharedFlow<ApiResponse<LogInResponse>> = _loginEvent.asSharedFlow()
 
-    fun login(email: String, password: String) = viewModelScope.launch {
+    fun login(email: String, password: String) = viewModelScope.launch(Dispatchers.IO) {
+        if (arrayOf(email, password).isBlank()) {
+            _loginEvent.emit(ApiResponse.Error(IS_BLANK))
+            return@launch
+        }
+
         val request = LogInRequest(email, password)
         runCatching { userRepository.logIn(request) }
             .onSuccess { _loginEvent.emit(it) }
             .onFailure { _loginEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
-    }
-
-    companion object {
-        const val NO_RESPONSE = "에러 발생"
     }
 }
