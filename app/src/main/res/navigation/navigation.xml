@@ -9,15 +9,7 @@
         android:name="com.ssafy.yoganavi.ui.homeUI.schedule.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_homeFragment_to_liveFragment"
-            app:destination="@id/liveFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/liveFragment"
-        android:name="com.ssafy.yoganavi.ui.homeUI.schedule.live.LiveFragment"
-        android:label="fragment_live"
-        tools:layout="@layout/fragment_live" />
     <fragment
         android:id="@+id/teacherListFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.teacher.teacherList.TeacherListFragment"
@@ -57,20 +49,24 @@
             android:id="@+id/action_profileFragment_to_modifyFragment"
             app:destination="@id/modifyFragment" />
         <action
-            android:id="@+id/action_profileFragment_to_managementLiveFragment"
-            app:destination="@id/managementLiveFragment" />
-        <action
-            android:id="@+id/action_profileFragment_to_managementVideoFragment"
-            app:destination="@id/managementLiveFragment" />
-        <action
             android:id="@+id/action_profileFragment_to_noticeFragment"
             app:destination="@id/noticeFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_managementVideoFragment"
+            app:destination="@id/managementVideoFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_managementLiveFragment"
+            app:destination="@id/managementLiveFragment" />
     </fragment>
     <fragment
         android:id="@+id/filterFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.teacher.filter.FilterFragment"
         android:label="fragment_filter"
-        tools:layout="@layout/fragment_filter" />
+        tools:layout="@layout/fragment_filter" >
+        <action
+            android:id="@+id/action_filterFragment_to_liveFragment"
+            app:destination="@id/liveFragment" />
+    </fragment>
     <fragment
         android:id="@+id/teacherDetailFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.teacher.teacherDetail.TeacherDetailFragment"
@@ -119,15 +115,7 @@
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.modify.ModifyFragment"
         android:label="fragment_modify"
         tools:layout="@layout/fragment_modify" />
-    <fragment
-        android:id="@+id/managementLiveFragment"
-        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.managementLive.ManagementLiveFragment"
-        android:label="fragment_management_live"
-        tools:layout="@layout/fragment_management_live" >
-        <action
-            android:id="@+id/action_managementLiveFragment_to_registerLiveFragment"
-            app:destination="@id/registerLiveFragment" />
-    </fragment>
+
     <fragment
         android:id="@+id/managementVideoFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.ManagementVideoFragment"
@@ -137,10 +125,6 @@
             android:id="@+id/action_managementVideoFragment_to_registerVideoFragment"
             app:destination="@id/registerVideoFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/registerLiveFragment"
-        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.registerLive.RegisterLiveFragment"
-        android:label="RegisterLiveFragment" />
     <fragment
         android:id="@+id/noticeFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.notice.NoticeFragment"
@@ -160,4 +144,22 @@
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.RegisterVideoFragment"
         android:label="fragment_register_video"
         tools:layout="@layout/fragment_register_video" />
+    <fragment
+        android:id="@+id/liveFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.schedule.live.LiveFragment"
+        android:label="fragment_live"
+        tools:layout="@layout/fragment_live" />
+    <fragment
+        android:id="@+id/managementLiveFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.managementLive.ManagementLiveFragment"
+        android:label="fragment_management_live"
+        tools:layout="@layout/fragment_management_live" >
+        <action
+            android:id="@+id/action_managementLiveFragment_to_registerLiveFragment"
+            app:destination="@id/registerLiveFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/registerLiveFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.registerLive.RegisterLiveFragment"
+        android:label="RegisterLiveFragment" />
 </navigation>
