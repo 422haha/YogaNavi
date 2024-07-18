@@ -7,18 +7,18 @@ import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
-import timber.log.Timber
 import javax.inject.Inject
 
 class TokenAuthenticator @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) : Authenticator {
 
-    override fun authenticate(route: Route?, response: Response): Request? {
+    override fun authenticate(route: Route?, response: Response): Request {
         val refreshToken = runBlocking { dataStoreRepository.refreshToken.firstOrNull() } ?: ""
+        val newRequest = response.request.newBuilder()
+            .header("Refresh-Token", refreshToken)
+            .build()
 
-        Timber.d("refresh!! ${response.code}, $refreshToken")
-        return null
+        return newRequest
     }
-
 }

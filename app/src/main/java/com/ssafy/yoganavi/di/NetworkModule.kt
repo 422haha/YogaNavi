@@ -6,6 +6,7 @@ import com.google.gson.Strictness
 import com.ssafy.yoganavi.data.auth.AuthInterceptor
 import com.ssafy.yoganavi.data.auth.TokenAuthenticator
 import com.ssafy.yoganavi.data.repository.DataStoreRepository
+import com.ssafy.yoganavi.data.source.TestAPI
 import com.ssafy.yoganavi.data.source.user.UserAPI
 import com.ssafy.yoganavi.ui.utils.TIME_OUT
 import dagger.Module
@@ -16,6 +17,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -30,7 +32,7 @@ object NetworkModule {
             .authenticator(TokenAuthenticator(dataStoreRepository))
             .addInterceptor(AuthInterceptor(dataStoreRepository))
             .addInterceptor(HttpLoggingInterceptor().apply {
-                setLevel(HttpLoggingInterceptor.Level.BODY)
+                setLevel(HttpLoggingInterceptor.Level.HEADERS)
             })
             .readTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
             .connectTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
@@ -54,4 +56,8 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideUserAPI(retrofit: Retrofit): UserAPI = retrofit.create(UserAPI::class.java)
+
+    @Singleton
+    @Provides
+    fun provideTestAPI(retrofit: Retrofit): TestAPI = retrofit.create()
 }
