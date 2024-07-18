@@ -4,34 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingTop="@dimen/padding_medium"
     tools:context=".ui.homeUI.lecture.lectureList.LectureListFragment">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cv_content"
-        android:layout_width="0dp"
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/sv_search"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/padding_medium"
-        android:backgroundTint="@color/white"
-        app:cardCornerRadius="20dp"
+        android:background="@drawable/background_stroke"
+        android:focusable="true"
+        android:iconifiedByDefault="false"
+        android:queryHint="찾으시는 강사님이 있으신가요?"
+        app:iconifiedByDefault="false"
+        app:layout_constraintBottom_toTopOf="@id/radioGroup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/radioGroup"
-        app:strokeColor="@color/gray_20"
-        app:strokeWidth="1dp">
-
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/sv_search"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:focusable="true"
-            android:iconifiedByDefault="false"
-            android:queryHint="찾으시는 강사님이 있으신가요?"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </com.google.android.material.card.MaterialCardView>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <RadioGroup
         android:id="@+id/radioGroup"
@@ -40,23 +30,23 @@
         android:layout_marginStart="@dimen/padding_medium"
         android:gravity="start"
         android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/rv_lecture"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cv_content"
-        app:layout_constraintBottom_toTopOf="@id/rv_lecture">
+        app:layout_constraintTop_toBottomOf="@id/sv_search">
 
         <RadioButton
             android:id="@+id/radioButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/popular"
-            android:layout_marginEnd="@dimen/padding_medium" />
+            android:layout_marginEnd="@dimen/padding_medium"
+            android:text="@string/popular" />
 
         <RadioButton
             android:id="@+id/radioButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/recent"/>
+            android:text="@string/recent" />
 
     </RadioGroup>
 
@@ -64,13 +54,13 @@
         android:id="@+id/rv_lecture"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:spanCount="3"
         android:padding="@dimen/padding_small"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/radioGroup"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:listitem="@layout/list_item_lecture_thumbnail"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/radioGroup"
+        app:spanCount="3"
+        tools:listitem="@layout/list_item_lecture_thumbnail" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
