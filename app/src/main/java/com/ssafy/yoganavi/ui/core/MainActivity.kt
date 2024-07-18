@@ -27,9 +27,6 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        initGestureBarColor()
-
         connectBottomNav()
     }
 
@@ -37,18 +34,5 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fl) as NavHostFragment
         val navController = navHostFragment.navController
         binding.bnv.setupWithNavController(navController)
-    }
-
-
-    private fun initGestureBarColor() {
-        // 시스템 제스처 바 색상 설정
-        window.navigationBarColor = resources.getColor(R.color.bottomnav)
-
-        // Edge-to-Edge 설정
-        window.decorView.systemUiVisibility = (
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                )
     }
 }
