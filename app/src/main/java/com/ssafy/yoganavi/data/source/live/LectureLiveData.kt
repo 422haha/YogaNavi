@@ -1,6 +1,6 @@
 package com.ssafy.yoganavi.data.source.live
 
-data class anjsLectureLiveData(
+data class LectureLiveData(
     val lectureTitle: String,
     val lecturerName: String,
     val lectureContent: String,
