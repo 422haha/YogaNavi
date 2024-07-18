@@ -1,5 +1,6 @@
 package com.ssafy.yoganavi.ui.loginUI.login
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -10,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentLoginBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
+import com.ssafy.yoganavi.ui.core.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -52,6 +54,16 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
         }
     }
 
-    private fun loginSuccess(data: LogInEvent<Unit>) = showSnackBar(data.message)
+    private fun loginSuccess(data: LogInEvent<Unit>) {
+        showSnackBar(data.message)
+        moveMainActivity()
+    }
+
     private fun loginError(message: String) = showSnackBar(message)
+
+    private fun moveMainActivity() {
+        val intent = Intent(requireActivity(), MainActivity::class.java)
+        startActivity(intent)
+        requireActivity().finish()
+    }
 }
