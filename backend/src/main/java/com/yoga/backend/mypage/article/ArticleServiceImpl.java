@@ -1,4 +1,4 @@
-package com.yoga.backend.article;
+package com.yoga.backend.mypage.article;
 
 import com.yoga.backend.common.entity.Article;
 import org.springframework.beans.factory.annotation.Autowired;

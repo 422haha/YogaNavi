@@ -37,15 +37,12 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
         // 사용자 이름과 비밀번호 추출
         String username = authentication.getName();
         String pwd = authentication.getCredentials().toString();
-        System.out.println("========================username : " + username + " password : " + pwd);
 
         // 사용자 정보 조회
         List<Users> users = usersRepository.findByEmail(username);
         if (users.size() > 0) {
             // 비밀번호 매칭 확인
             if (passwordEncoder.matches(pwd, users.get(0).getPwd())) {
-                System.out.println(
-                    "=======================member exists role : " + users.get(0).getRole());
                 // 인증 성공 시 새로운 인증 객체 반환
                 return new UsernamePasswordAuthenticationToken(username, pwd,
                     getGrantedAuthorities(users.get(0).getRole()));
@@ -68,7 +65,6 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
     private List<GrantedAuthority> getGrantedAuthorities(String role) {
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
-        System.out.println("grantedAuthorities : " + grantedAuthorities);
         return grantedAuthorities;
     }
 
