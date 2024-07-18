@@ -4,5 +4,6 @@ data class LectureData(
     val recordedId: String,
     val recordedTitle: String,
     val recordedThumbnail: String,
-    val likes: Int
+    val likes: Int,
+    val likedByUser : Boolean
 )
