@@ -12,5 +12,9 @@ public interface UsersService {
 
     void sendSimpleMessage(String registerDto, String message, String s);
 
-    Users setPassword(RegisterDto registerDto);
+    String sendPasswordResetToken(String email);
+
+    boolean validateResetToken(String email, String token);
+
+    String resetPassword(String email, String newPassword);
 }

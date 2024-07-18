@@ -8,10 +8,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "Users")
-public class Users {
-
-    @Version
-    private Long version; // 여러 사용자나 프로세스가 동시에 같은 회원 정보를 수정하려고 할 때 발생할 수 있는 충돌을 방지하기 위함.
+public class Users {// 여러 사용자나 프로세스가 동시에 같은 회원 정보를 수정하려고 할 때 발생할 수 있는 충돌을 방지하기 위함.
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
@@ -32,16 +29,18 @@ public class Users {
 
     private String role;
 
-//    public Long getVersion() {
-//        return version;
-//    }
+    private String resetToken;
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getPwd() {
