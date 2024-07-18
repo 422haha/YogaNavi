@@ -43,9 +43,9 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
     }
 
     private fun navigateToRegisterVideoFragment(recordedId: String? = null) {
-        val navigate = ManagementVideoFragmentDirections
+        val directions = ManagementVideoFragmentDirections
             .actionManagementVideoFragmentToRegisterVideoFragment(recordedId)
 
-        findNavController().navigate(navigate)
+        findNavController().navigate(directions)
     }
 }
