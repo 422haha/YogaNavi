@@ -4,6 +4,6 @@ data class SignUpRequest(
     val email: String? = null,
     val password: String? = null,
     val nickname: String? = null,
-    val authnumber: Int = 0,
+    val authNumber: Int = 0,
     val teacher: Boolean = false
 )
