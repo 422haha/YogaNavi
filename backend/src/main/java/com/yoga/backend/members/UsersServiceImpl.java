@@ -2,11 +2,15 @@ package com.yoga.backend.members;
 
 import com.yoga.backend.common.entity.Users;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.transaction.reactive.TransactionalOperator;
+import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 public class UsersServiceImpl implements UsersService {
@@ -24,6 +28,7 @@ public class UsersServiceImpl implements UsersService {
 
     /**
      * 회원가입 서비스
+     *
      * @param registerDto 회원가입 정보
      * @return 저장된 사용자 정보
      */
@@ -49,6 +54,7 @@ public class UsersServiceImpl implements UsersService {
 
     /**
      * 이메일 중복 확인 서비스
+     *
      * @param nickname 확인할 이메일
      * @return 이메일 중복 여부
      */
@@ -63,6 +69,7 @@ public class UsersServiceImpl implements UsersService {
 
     /**
      * 이메일 중복 확인 서비스
+     *
      * @param email 확인할 이메일
      * @return 이메일 중복 여부
      */
@@ -90,21 +97,65 @@ public class UsersServiceImpl implements UsersService {
         emailSender.send(message);
     }
 
+    /**
+     * 인증번호 전송 서비스
+     *
+     * @param email 수신자 이메일
+     *
+     */
+    @Transactional
+    public String sendPasswordResetToken(String email) {
+        Optional<Users> userOpt = usersRepository.findByEmailWithLock(email);
+        if (userOpt.isPresent()) {
+            Users user = userOpt.get();
+            int randNum = (int) (Math.random() * 899999) + 100000;
+            user.setResetToken(String.valueOf(randNum));
+            usersRepository.save(user);
+
+            sendSimpleMessage(email, "Yoga Navi 비밀번호 재설정 인증번호",
+                "비밀번호 재설정 인증번호 : " + randNum);
+
+            return "인증 번호 전송";
+        } else {
+            return "존재하지 않는 회원입니다.";
+        }
+    }
+
+    /**
+     * 인증번호 전송 서비스
+     *
+     * @param email 수신자 이메일
+     * @param token 토큰값
+     * @return 토큰값 일치 여부
+     */
+    @Transactional
+    public boolean validateResetToken(String email, String token) {
+        Optional<Users> userOpt = usersRepository.findByEmailWithLock(email);
+        if (userOpt.isPresent()) {
+            Users user = userOpt.get();
+            return token.equals(user.getResetToken());
+        }
+        return false;
+    }
+
 
     /**
      * 비밀번호 재설정 서비스
-     * @param registerDto 회원 정보
-     * @return 저장된 사용자 정보
+     *
+     * @param newPassword 회원 정보
+     *
      */
-    @Override
-    public Users setPassword(RegisterDto registerDto) {
-        String hashPwd = passwordEncoder.encode(registerDto.getPassword());
-        registerDto.setPassword(hashPwd);
-
-        // 비밀번호 재설정
-        Users users = new Users();
-        users.setPwd(registerDto.getPassword());
-
-        return usersRepository.save(users);
+    @Transactional
+    public String resetPassword(String email, String newPassword) {
+        Optional<Users> userOpt = usersRepository.findByEmailWithLock(email);
+        if (userOpt.isPresent()) {
+            Users user = userOpt.get();
+            String hashPwd = passwordEncoder.encode(newPassword);
+            user.setPwd(hashPwd);
+            user.setResetToken(null);
+            usersRepository.save(user);
+            return "비밀번호 재설정 성공";
+        }
+        return "비밀번호 재설정 실패";
     }
 }

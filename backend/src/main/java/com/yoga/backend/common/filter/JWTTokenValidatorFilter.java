@@ -1,5 +1,6 @@
 package com.yoga.backend.common.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yoga.backend.common.constants.SecurityConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -13,6 +14,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import javax.crypto.SecretKey;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,13 +27,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 public class JWTTokenValidatorFilter extends OncePerRequestFilter {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    Map<String, Object> data = new HashMap<>();
+
     /**
      * 요청 내에서 한 번만 실행되는 필터 메서드
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
-        // 요청 헤더에서 JWT 토큰과 리프레시 토큰을 가져옴
+        // 요청 헤더에서 액세스 토큰과 리프레시 토큰을 가져옴
         String jwt = request.getHeader(SecurityConstants.JWT_HEADER);
         String refreshToken = request.getHeader(SecurityConstants.REFRESH_TOKEN_HEADER);
 
@@ -41,7 +47,7 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                 SecretKey key = Keys.hmacShaKeyFor(
                     SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
 
-                // JWT 토큰을 검증하고 클레임을 파싱
+                // 액세스 토큰을 검증하고 클레임을 파싱
                 Claims claims = Jwts.parser()
                     .verifyWith(key)
                     .build()
@@ -60,18 +66,25 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                 // 다음 필터 체인 실행
                 filterChain.doFilter(request, response);
             } catch (ExpiredJwtException e) {
-                // JWT 토큰이 만료된 경우 리프레시 토큰 처리
-                System.out.println("Access token expired. Attempting to use refresh token.");
-                handleRefreshToken(request, response, filterChain, refreshToken);
+                // 액세스 토큰이 만료된 경우 리프레시 토큰 처리
+                if (null == refreshToken) {
+                    System.out.println("리프레시 토큰 요청 " + e.getMessage());
+                    data.put("message", "리프레시 토큰 요청");
+                    data.put("data", new Object[]{});
+                    response.getWriter().write(objectMapper.writeValueAsString(data));
+                } else {
+                    handleRefreshToken(request, response, filterChain, refreshToken);
+                }
             } catch (JwtException e) {
-                // JWT 처리 실패 시 401 Unauthorized 응답 반환
-                System.out.println("JWT processing failed: " + e.getMessage());
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("JWT processing failed: " + e.getMessage());
+                // 액세스 토큰 처리 실패 시 401 Unauthorized 응답 반환
+                System.out.println("액세스 토큰 처리 불가: " + e.getMessage());
+                data.put("message", "액세스 토큰 처리 불가");
+                data.put("data", new Object[]{});
+                response.getWriter().write(objectMapper.writeValueAsString(data));
             }
         } else {
-            // JWT 토큰이 존재하지 않는 경우 다음 필터 체인 실행
-            System.out.println("No JWT token found in request headers.");
+            // 액세스 토큰이 존재하지 않는 경우 다음 필터 체인 실행
+            System.out.println("헤더에서 액세스 토큰 찾을 수 없음");
             filterChain.doFilter(request, response);
         }
     }
@@ -111,16 +124,19 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             } catch (JwtException e) {
                 // 리프레시 토큰 처리 실패 시 401 Unauthorized 응답 반환
-                System.out.println("Refresh token processing failed: " + e.getMessage());
+                System.out.println("리프레시 토큰 처리 실패: " + e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter()
-                    .write("Both Access Token and Refresh Token are invalid. Please log in again.");
+                data.put("message", "리프레시 토큰 처리 실패");
+                data.put("data", new Object[]{});
+                response.getWriter().write(objectMapper.writeValueAsString(data));
             }
         } else {
             // 리프레시 토큰이 존재하지 않는 경우 401 Unauthorized 응답 반환
-            System.out.println("No refresh token provided.");
+            System.out.println("리프레시 토큰 없음");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Access Token has expired and no Refresh Token provided.");
+            data.put("message", "리프레시 토큰 없음");
+            data.put("data", new Object[]{});
+            response.getWriter().write(objectMapper.writeValueAsString(data));
         }
     }
 }
