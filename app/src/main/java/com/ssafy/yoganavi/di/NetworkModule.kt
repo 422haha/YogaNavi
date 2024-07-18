@@ -4,9 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.Strictness
 import com.ssafy.yoganavi.data.auth.AuthInterceptor
-import com.ssafy.yoganavi.data.auth.TokenAuthenticator
 import com.ssafy.yoganavi.data.repository.DataStoreRepository
-import com.ssafy.yoganavi.data.source.TestAPI
 import com.ssafy.yoganavi.data.source.user.UserAPI
 import com.ssafy.yoganavi.ui.utils.TIME_OUT
 import dagger.Module
@@ -17,7 +15,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -29,7 +26,6 @@ object NetworkModule {
     @Provides
     fun provideOkHttpClient(dataStoreRepository: DataStoreRepository): OkHttpClient =
         OkHttpClient.Builder()
-            .authenticator(TokenAuthenticator(dataStoreRepository))
             .addInterceptor(AuthInterceptor(dataStoreRepository))
             .addInterceptor(HttpLoggingInterceptor().apply {
                 setLevel(HttpLoggingInterceptor.Level.HEADERS)
@@ -57,7 +53,4 @@ object NetworkModule {
     @Provides
     fun provideUserAPI(retrofit: Retrofit): UserAPI = retrofit.create(UserAPI::class.java)
 
-    @Singleton
-    @Provides
-    fun provideTestAPI(retrofit: Retrofit): TestAPI = retrofit.create()
 }

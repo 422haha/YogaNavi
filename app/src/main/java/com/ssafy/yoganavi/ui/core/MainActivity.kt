@@ -30,14 +30,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initGestureBarColor() {
-        // 시스템 제스처 바 색상 설정
-        window.navigationBarColor = resources.getColor(R.color.bottomnav, null)
-
-        // 상단 상태바 색상 변경
         window.apply {
+            navigationBarColor = resources.getColor(R.color.bottomnav, null)
             statusBarColor = Color.WHITE
-            //상태바 아이콘(true: 검정 / false: 흰색)
-            WindowInsetsControllerCompat(this, this.decorView).isAppearanceLightStatusBars = true
         }
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
     }
 }
