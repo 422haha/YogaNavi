@@ -76,6 +76,7 @@
     <string name="notice">공지사항</string>
     <string name="available_class">수강 가능한 수업</string>
     <string name="proceeding_live">진행중인 강의</string>
+    <string name="emptyMessage">리스트가 비어있습니다 :)</string>
     <!-- 필터 끝 -->
 
 </resources>

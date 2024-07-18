@@ -14,10 +14,13 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val binding = ActivityMainBinding.inflate(layoutInflater)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -25,8 +28,27 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        initGestureBarColor()
+
+        connectBottomNav()
+    }
+
+    private fun connectBottomNav() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fl) as NavHostFragment
         val navController = navHostFragment.navController
         binding.bnv.setupWithNavController(navController)
+    }
+
+
+    private fun initGestureBarColor() {
+        // 시스템 제스처 바 색상 설정
+        window.navigationBarColor = resources.getColor(R.color.bottomnav)
+
+        // Edge-to-Edge 설정
+        window.decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                )
     }
 }
