@@ -8,73 +8,120 @@
         android:id="@+id/homeFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.schedule.home.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" >
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_liveFragment"
+            app:destination="@id/liveFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/teacherListFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.teacher.teacherList.TeacherListFragment"
         android:label="fragment_teacher_list"
-        tools:layout="@layout/fragment_teacher_list" >
+        tools:layout="@layout/fragment_teacher_list">
         <action
             android:id="@+id/action_teacherListFragment_to_filterFragment"
-            app:destination="@id/filterFragment" />
+            app:destination="@id/filterFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/action_teacherListFragment_to_teacherDetailFragment"
-            app:destination="@id/teacherDetailFragment" />
+            app:destination="@id/teacherDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/lectureListFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.lecture.lectureList.LectureListFragment"
         android:label="fragment_lecture_list"
-        tools:layout="@layout/fragment_lecture_list" >
+        tools:layout="@layout/fragment_lecture_list">
         <action
             android:id="@+id/action_lectureListFragment_to_lectureDetailFragment"
-            app:destination="@id/lectureDetailFragment" />
+            app:destination="@id/lectureDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.profile.ProfileFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" >
+        tools:layout="@layout/fragment_profile">
         <action
             android:id="@+id/action_profileFragment_to_likeTeacherFragment"
-            app:destination="@id/likeTeacherFragment" />
+            app:destination="@id/likeTeacherFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/action_profileFragment_to_likeLectureFragment"
-            app:destination="@id/likeLectureFragment" />
+            app:destination="@id/likeLectureFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/action_profileFragment_to_myListFragment"
-            app:destination="@id/myListFragment" />
+            app:destination="@id/myListFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/action_profileFragment_to_modifyFragment"
-            app:destination="@id/modifyFragment" />
+            app:destination="@id/modifyFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/action_profileFragment_to_noticeFragment"
-            app:destination="@id/noticeFragment" />
+            app:destination="@id/noticeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/action_profileFragment_to_managementVideoFragment"
-            app:destination="@id/managementVideoFragment" />
+            app:destination="@id/managementVideoFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/action_profileFragment_to_managementLiveFragment"
-            app:destination="@id/managementLiveFragment" />
+            app:destination="@id/managementLiveFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/filterFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.teacher.filter.FilterFragment"
         android:label="fragment_filter"
-        tools:layout="@layout/fragment_filter" >
-        <action
-            android:id="@+id/action_filterFragment_to_liveFragment"
-            app:destination="@id/liveFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_filter" />
     <fragment
         android:id="@+id/teacherDetailFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.teacher.teacherDetail.TeacherDetailFragment"
         android:label="fragment_teacher_detail"
-        tools:layout="@layout/fragment_teacher_detail" >
+        tools:layout="@layout/fragment_teacher_detail">
         <action
             android:id="@+id/action_teacherDetailFragment_to_teacherReservationFragment"
-            app:destination="@id/teacherReservationFragment" />
+            app:destination="@id/teacherReservationFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/teacherReservationFragment"
@@ -85,10 +132,14 @@
         android:id="@+id/lectureDetailFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail.LectureDetailFragment"
         android:label="fragment_lecture_detail"
-        tools:layout="@layout/fragment_lecture_detail" >
+        tools:layout="@layout/fragment_lecture_detail">
         <action
             android:id="@+id/action_lectureDetailFragment_to_lectureVideoFragment"
-            app:destination="@id/lectureVideoFragment" />
+            app:destination="@id/lectureVideoFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/lectureVideoFragment"
@@ -120,19 +171,27 @@
         android:id="@+id/managementVideoFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.ManagementVideoFragment"
         android:label="fragment_management_video"
-        tools:layout="@layout/fragment_management_video" >
+        tools:layout="@layout/fragment_management_video">
         <action
             android:id="@+id/action_managementVideoFragment_to_registerVideoFragment"
-            app:destination="@id/registerVideoFragment" />
+            app:destination="@id/registerVideoFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/noticeFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.notice.NoticeFragment"
         android:label="fragment_notice"
-        tools:layout="@layout/fragment_notice" >
+        tools:layout="@layout/fragment_notice">
         <action
             android:id="@+id/action_noticeFragment_to_registerNoticeFragment"
-            app:destination="@id/registerNoticeFragment" />
+            app:destination="@id/registerNoticeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/registerNoticeFragment"
@@ -153,10 +212,14 @@
         android:id="@+id/managementLiveFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.managementLive.ManagementLiveFragment"
         android:label="fragment_management_live"
-        tools:layout="@layout/fragment_management_live" >
+        tools:layout="@layout/fragment_management_live">
         <action
             android:id="@+id/action_managementLiveFragment_to_registerLiveFragment"
-            app:destination="@id/registerLiveFragment" />
+            app:destination="@id/registerLiveFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/registerLiveFragment"
