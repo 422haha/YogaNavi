@@ -109,7 +109,7 @@ public class UserController {
         } else {
             response.put("message", "틀린 번호");
             response.put("data", new Object[]{});
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
@@ -147,7 +147,7 @@ public class UserController {
         } else {
             response.put("message", "틀린 번호");
             response.put("data", new Object[]{});
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
@@ -155,7 +155,7 @@ public class UserController {
      * 비밀번호 변경 컨트롤러
      *
      * @param registerDto 회원 가입 정보
-     * @return 회원 가입 결과
+     * @return 변경 결과
      */
     @PostMapping("/find-password")
     public ResponseEntity<Map<String, Object>> setPassword(@RequestBody RegisterDto registerDto) {

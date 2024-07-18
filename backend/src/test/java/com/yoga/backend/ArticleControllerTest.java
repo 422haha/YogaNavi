@@ -3,7 +3,7 @@ package com.yoga.backend;
 import com.yoga.backend.common.entity.Article;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.UsersRepository;
-import com.yoga.backend.article.ArticleRepository;
+import com.yoga.backend.mypage.article.ArticleRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

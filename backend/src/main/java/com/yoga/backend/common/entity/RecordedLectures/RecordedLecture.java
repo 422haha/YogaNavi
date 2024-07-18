@@ -1,11 +1,10 @@
 package com.yoga.backend.common.entity.RecordedLectures;
 
+/*
 import jakarta.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "RecordedLecture")
 public class RecordedLecture {
 
     @Id
@@ -18,73 +17,15 @@ public class RecordedLecture {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+    @Column(nullable = false)
+    private String content;
 
-    private String thumbnailUrl;
+    @Column(nullable = false)
+    private String thumbnail;
 
-    @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("chapterOrder ASC")
-    private List<RecordedLectureChapter> chapters = new ArrayList<>();
+    @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL)
+    private List<RecordedLectureChapter> chapters;
 
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getThumbnailUrl() {
-        return thumbnailUrl;
-    }
-
-    public void setThumbnailUrl(String thumbnailUrl) {
-        this.thumbnailUrl = thumbnailUrl;
-    }
-
-    public List<RecordedLectureChapter> getChapters() {
-        return chapters;
-    }
-
-    public void setChapters(List<RecordedLectureChapter> chapters) {
-        this.chapters = chapters;
-    }
-
-    // Helper method to add a chapter
-    public void addChapter(RecordedLectureChapter chapter) {
-        chapters.add(chapter);
-        chapter.setLecture(this);
-    }
-
-    // Helper method to remove a chapter
-    public void removeChapter(RecordedLectureChapter chapter) {
-        chapters.remove(chapter);
-        chapter.setLecture(null);
-    }
-}
+}*/

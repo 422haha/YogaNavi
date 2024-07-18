@@ -41,7 +41,8 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
         String refreshToken = request.getHeader(SecurityConstants.REFRESH_TOKEN_HEADER);
 
         // JWT 토큰이 존재하는 경우
-        if (null != jwt) {
+        if (null != jwt && jwt.startsWith("Bearer ")) {
+            jwt = jwt.substring(7);
             try {
                 // JWT 키로 HMAC-SHA 키를 생성
                 SecretKey key = Keys.hmacShaKeyFor(
@@ -62,29 +63,29 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                 Authentication auth = new UsernamePasswordAuthenticationToken(username, null,
                     AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
                 SecurityContextHolder.getContext().setAuthentication(auth);
-
                 // 다음 필터 체인 실행
                 filterChain.doFilter(request, response);
             } catch (ExpiredJwtException e) {
                 // 액세스 토큰이 만료된 경우 리프레시 토큰 처리
                 if (null == refreshToken) {
-                    System.out.println("리프레시 토큰 요청 " + e.getMessage());
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setHeader("refresh_token_required","token_required");
                     data.put("message", "리프레시 토큰 요청");
                     data.put("data", new Object[]{});
                     response.getWriter().write(objectMapper.writeValueAsString(data));
+                    response.getWriter().flush();
                 } else {
                     handleRefreshToken(request, response, filterChain, refreshToken);
                 }
             } catch (JwtException e) {
                 // 액세스 토큰 처리 실패 시 401 Unauthorized 응답 반환
-                System.out.println("액세스 토큰 처리 불가: " + e.getMessage());
                 data.put("message", "액세스 토큰 처리 불가");
                 data.put("data", new Object[]{});
                 response.getWriter().write(objectMapper.writeValueAsString(data));
+                response.getWriter().flush();
             }
         } else {
             // 액세스 토큰이 존재하지 않는 경우 다음 필터 체인 실행
-            System.out.println("헤더에서 액세스 토큰 찾을 수 없음");
             filterChain.doFilter(request, response);
         }
     }
@@ -120,23 +121,30 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                     .compact();
 
                 // 새로운 액세스 토큰을 응답 헤더에 설정하고 다음 필터 체인 실행
+                response.setStatus(HttpServletResponse.SC_CREATED);
                 response.setHeader(SecurityConstants.JWT_HEADER, newAccessToken);
                 filterChain.doFilter(request, response);
+            } catch (ExpiredJwtException e) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                data.put("message", "리프레시 토큰 만료. 재로그인 필요");
+                data.put("data", new Object[]{});
+                response.getWriter().write(objectMapper.writeValueAsString(data));
+                response.getWriter().flush();
             } catch (JwtException e) {
                 // 리프레시 토큰 처리 실패 시 401 Unauthorized 응답 반환
-                System.out.println("리프레시 토큰 처리 실패: " + e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 data.put("message", "리프레시 토큰 처리 실패");
                 data.put("data", new Object[]{});
                 response.getWriter().write(objectMapper.writeValueAsString(data));
+                response.getWriter().flush();
             }
         } else {
             // 리프레시 토큰이 존재하지 않는 경우 401 Unauthorized 응답 반환
-            System.out.println("리프레시 토큰 없음");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             data.put("message", "리프레시 토큰 없음");
             data.put("data", new Object[]{});
             response.getWriter().write(objectMapper.writeValueAsString(data));
+            response.getWriter().flush();
         }
     }
 }
