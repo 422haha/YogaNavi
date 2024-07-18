@@ -1,6 +1,7 @@
 package com.ssafy.yoganavi.ui.utils
 
 fun Array<String>.isBlank() = any { it.isBlank() }
+fun Int.toK() = if (this < 1000) toString() else "${this / 1000}K+"
 
 // 통신부
 const val TIME_OUT = 5000L
