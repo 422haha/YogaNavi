@@ -43,10 +43,6 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getPwd() {
         return pwd;
     }

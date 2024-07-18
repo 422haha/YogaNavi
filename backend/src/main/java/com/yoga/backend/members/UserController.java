@@ -48,7 +48,7 @@ public class UserController {
                     return ResponseEntity.status(HttpStatus.CREATED).body(response);
                 }
             } catch (Exception ex) {
-                response.put("message", "회원가입 불가");
+                response.put("message", "회원가입 불가"+ex.getMessage());
                 response.put("data", new Object[]{});
 
                 return ResponseEntity.status(HttpStatus.CONFLICT)

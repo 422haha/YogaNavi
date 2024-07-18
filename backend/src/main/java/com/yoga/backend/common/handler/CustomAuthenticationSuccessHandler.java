@@ -40,7 +40,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         String accessToken = Jwts.builder()
             .issuer("Yoga Navi")
             .subject("JWT Token")
-            .claim("username", authentication.getName())
+            .claim("email", authentication.getName())
             .claim("role", authentication.getAuthorities().stream()
                 .findFirst()
                 .map(a -> a.getAuthority().replace("ROLE_", ""))
