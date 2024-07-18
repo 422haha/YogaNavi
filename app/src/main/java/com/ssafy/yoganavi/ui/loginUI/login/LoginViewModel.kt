@@ -2,10 +2,9 @@ package com.ssafy.yoganavi.ui.loginUI.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.yoganavi.data.ApiResponse
+import com.ssafy.yoganavi.data.repository.ApiResponse
 import com.ssafy.yoganavi.data.repository.UserRepository
-import com.ssafy.yoganavi.data.source.login.LogInRequest
-import com.ssafy.yoganavi.data.source.login.LogInResponse
+import com.ssafy.yoganavi.data.source.user.UserRequest
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.isBlank
@@ -22,18 +21,29 @@ class LoginViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val _loginEvent: MutableSharedFlow<ApiResponse<LogInResponse>> = MutableSharedFlow()
-    val loginEvent: SharedFlow<ApiResponse<LogInResponse>> = _loginEvent.asSharedFlow()
+    private val _loginEvent: MutableSharedFlow<LogInEvent<Unit>> = MutableSharedFlow()
+    val loginEvent: SharedFlow<LogInEvent<Unit>> = _loginEvent.asSharedFlow()
 
     fun login(email: String, password: String) = viewModelScope.launch(Dispatchers.IO) {
         if (arrayOf(email, password).isBlank()) {
-            _loginEvent.emit(ApiResponse.Error(IS_BLANK))
+            emitError(IS_BLANK)
             return@launch
         }
 
-        val request = LogInRequest(email, password)
+        val request = UserRequest(email = email, password = password)
         runCatching { userRepository.logIn(request) }
-            .onSuccess { _loginEvent.emit(it) }
-            .onFailure { _loginEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
+            .onSuccess { emitResponse(it) }
+            .onFailure { emitError(NO_RESPONSE) }
     }
+
+    private suspend fun emitResponse(response: ApiResponse<Unit>) = when (response) {
+        is ApiResponse.Success -> emitSuccess(response)
+        is ApiResponse.Error -> emitError(response.message)
+    }
+
+    private suspend fun emitSuccess(response: ApiResponse.Success<Unit>) =
+        _loginEvent.emit(LogInEvent.LoginSuccess(response.data, response.message))
+
+    private suspend fun emitError(message: String) =
+        _loginEvent.emit(LogInEvent.LoginError(message = message))
 }

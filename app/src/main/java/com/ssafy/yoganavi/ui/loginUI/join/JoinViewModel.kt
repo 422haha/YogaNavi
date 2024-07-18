@@ -2,10 +2,9 @@ package com.ssafy.yoganavi.ui.loginUI.join
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.yoganavi.data.ApiResponse
+import com.ssafy.yoganavi.data.repository.ApiResponse
 import com.ssafy.yoganavi.data.repository.UserRepository
-import com.ssafy.yoganavi.data.source.signup.SignUpRequest
-import com.ssafy.yoganavi.data.source.signup.SignUpResponse
+import com.ssafy.yoganavi.data.source.user.UserRequest
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
@@ -23,41 +22,28 @@ class JoinViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val _registerEmailEvent: MutableSharedFlow<ApiResponse<SignUpResponse>> =
-        MutableSharedFlow()
-    private val _checkEmailEvent: MutableSharedFlow<ApiResponse<SignUpResponse>> =
-        MutableSharedFlow()
-    private val _signUpEvent: MutableSharedFlow<ApiResponse<SignUpResponse>> =
-        MutableSharedFlow()
-
-    val registerEmailEvent: SharedFlow<ApiResponse<SignUpResponse>> =
-        _registerEmailEvent.asSharedFlow()
-    val checkEmailEvent: SharedFlow<ApiResponse<SignUpResponse>> =
-        _checkEmailEvent.asSharedFlow()
-    val signUpEvent: SharedFlow<ApiResponse<SignUpResponse>> =
-        _signUpEvent.asSharedFlow()
+    private val _joinEvent: MutableSharedFlow<JoinEvent<Unit>> = MutableSharedFlow()
+    val joinEvent: SharedFlow<JoinEvent<Unit>> = _joinEvent.asSharedFlow()
 
     fun registerEmail(email: String) = viewModelScope.launch(Dispatchers.IO) {
         if (arrayOf(email).isBlank()) {
-            _registerEmailEvent.emit(ApiResponse.Error(IS_BLANK))
+            emitError(IS_BLANK)
             return@launch
         }
 
-        val signUpRequest = SignUpRequest(email = email)
-
-        runCatching { userRepository.registerEmail(signUpRequest) }
-            .onSuccess { _registerEmailEvent.emit(it) }
-            .onFailure { _registerEmailEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
+        val userRequest = UserRequest(email = email)
+        runCatching { userRepository.registerEmail(userRequest) }
+            .onSuccess { emitResponse(it, JoinEvent.RegisterEmailSuccess::class.java) }
+            .onFailure { emitError(NO_RESPONSE) }
     }
 
-    fun checkAuthEmail(checkNumber: Int?) = viewModelScope.launch(Dispatchers.IO) {
+    fun checkAuthEmail(email: String, checkNumber: Int?) = viewModelScope.launch(Dispatchers.IO) {
         checkNumber?.let {
-            val signUpRequest = SignUpRequest(authnumber = checkNumber)
-
-            runCatching { userRepository.checkAuthEmail(signUpRequest) }
-                .onSuccess { _checkEmailEvent.emit(it) }
-                .onFailure { _checkEmailEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
-        }
+            val userRequest = UserRequest(email = email, authnumber = checkNumber)
+            runCatching { userRepository.checkAuthEmail(userRequest) }
+                .onSuccess { emitResponse(it, JoinEvent.CheckEmailSuccess::class.java) }
+                .onFailure { emitError(NO_RESPONSE) }
+        } ?: emitError(IS_BLANK)
     }
 
     fun signUp(
@@ -68,24 +54,55 @@ class JoinViewModel @Inject constructor(
         isTeacher: Boolean
     ) = viewModelScope.launch(Dispatchers.IO) {
         if (arrayOf(email, password, nickname).isBlank()) {
-            _signUpEvent.emit(ApiResponse.Error(IS_BLANK))
+            emitError(IS_BLANK)
             return@launch
         }
 
         if (password != passwordAgain) {
-            _signUpEvent.emit(ApiResponse.Error(PASSWORD_DIFF))
+            emitError(PASSWORD_DIFF)
             return@launch
         }
 
-        val signUpRequest = SignUpRequest(
+        val userRequest = UserRequest(
             email = email,
             password = password,
             nickname = nickname,
             teacher = isTeacher
         )
 
-        runCatching { userRepository.signUp(signUpRequest) }
-            .onSuccess { _signUpEvent.emit(it) }
-            .onFailure { _signUpEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
+        runCatching { userRepository.signUp(userRequest) }
+            .onSuccess { emitResponse(it, JoinEvent.SignUpSuccess::class.java) }
+            .onFailure { emitError(NO_RESPONSE) }
     }
+
+    private suspend fun emitResponse(
+        response: ApiResponse<Unit>,
+        type: Class<out JoinEvent<*>>
+    ) = when (response) {
+        is ApiResponse.Success -> emitSuccess(response, type)
+        is ApiResponse.Error -> emitError(response.message)
+    }
+
+    private suspend fun emitSuccess(response: ApiResponse<Unit>, type: Class<out JoinEvent<*>>) =
+        when (type) {
+            JoinEvent.RegisterEmailSuccess::class.java -> {
+                _joinEvent.emit(JoinEvent.RegisterEmailSuccess(response.data, response.message))
+            }
+
+            JoinEvent.CheckEmailSuccess::class.java -> {
+                _joinEvent.emit(JoinEvent.CheckEmailSuccess(response.data, response.message))
+            }
+
+            JoinEvent.SignUpSuccess::class.java -> {
+                _joinEvent.emit(JoinEvent.SignUpSuccess(response.data, response.message))
+            }
+
+            else -> {
+                emitError(NO_RESPONSE)
+            }
+        }
+
+    private suspend fun emitError(message: String) =
+        _joinEvent.emit(JoinEvent.Error(message = message))
+
 }

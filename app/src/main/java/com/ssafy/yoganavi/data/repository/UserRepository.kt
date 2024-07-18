@@ -1,25 +1,21 @@
 package com.ssafy.yoganavi.data.repository
 
-import com.ssafy.yoganavi.data.ApiResponse
-import com.ssafy.yoganavi.data.source.login.LogInRequest
-import com.ssafy.yoganavi.data.source.login.LogInResponse
-import com.ssafy.yoganavi.data.source.signup.SignUpRequest
-import com.ssafy.yoganavi.data.source.signup.SignUpResponse
+import com.ssafy.yoganavi.data.source.user.UserRequest
 
 interface UserRepository {
 
-    suspend fun logIn(logInRequest: LogInRequest): ApiResponse<LogInResponse>
+    suspend fun logIn(userRequest: UserRequest): ApiResponse<Unit>
 
-    suspend fun signUp(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse>
+    suspend fun signUp(userRequest: UserRequest): ApiResponse<Unit>
 
-    suspend fun registerEmail(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse>
+    suspend fun registerEmail(userRequest: UserRequest): ApiResponse<Unit>
 
-    suspend fun checkAuthEmail(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse>
+    suspend fun checkAuthEmail(userRequest: UserRequest): ApiResponse<Unit>
 
-    suspend fun findPasswordEmail(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse>
+    suspend fun findPasswordEmail(userRequest: UserRequest): ApiResponse<Unit>
 
-    suspend fun checkAuthPassword(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse>
+    suspend fun checkAuthPassword(userRequest: UserRequest): ApiResponse<Unit>
 
-    suspend fun registerPassword(signUpRequest: SignUpRequest): ApiResponse<SignUpResponse>
+    suspend fun registerPassword(userRequest: UserRequest): ApiResponse<Unit>
 
 }

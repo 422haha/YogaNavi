@@ -9,12 +9,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.ssafy.yoganavi.data.ApiResponse
+import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.databinding.FragmentJoinBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -45,8 +44,9 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
         binding.btnCheck.setOnClickListener {
             hideKeyboard()
 
+            val email = binding.tieId.text.toString()
             val number = binding.tieCn.text.toString().toIntOrNull()
-            viewModel.checkAuthEmail(number)
+            viewModel.checkAuthEmail(email, number)
         }
 
         binding.btnSignup.setOnClickListener {
@@ -61,41 +61,36 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            collectRegisterEmailEvent()
-            collectCheckEmailEvent()
-            collectSignUpEvent()
-        }
-    }
-
-    private fun CoroutineScope.collectRegisterEmailEvent() = launch {
-        viewModel.registerEmailEvent.collectLatest {
-            if (it is ApiResponse.Success) {
-                showSnackBar(it.data?.message.toString())
-                binding.btnCheck.isEnabled = true
-                binding.btnSignup.isEnabled = false
-            } else {
-                showSnackBar(it.message.toString())
+            viewModel.joinEvent.collectLatest {
+                when (it) {
+                    is JoinEvent.RegisterEmailSuccess -> registerEmailSuccess(it)
+                    is JoinEvent.CheckEmailSuccess -> checkEmailSuccess(it)
+                    is JoinEvent.SignUpSuccess -> signUpSuccess(it)
+                    is JoinEvent.Error -> error(it.message)
+                }
             }
         }
     }
 
-    private fun CoroutineScope.collectCheckEmailEvent() = launch {
-        viewModel.checkEmailEvent.collectLatest {
-            if (it is ApiResponse.Success) {
-                showSnackBar(it.data?.message.toString())
-                binding.btnCheck.isEnabled = false
-                binding.btnSignup.isEnabled = true
-            } else {
-                showSnackBar(it.message.toString())
-            }
-        }
+    private fun registerEmailSuccess(data: JoinEvent<Unit>) {
+        binding.btnCheck.isEnabled = true
+        binding.btnSignup.isEnabled = false
+        showSnackBar(data.message)
     }
 
-    private fun CoroutineScope.collectSignUpEvent() = launch {
-        viewModel.signUpEvent.collectLatest {
-            if (it is ApiResponse.Success) showSnackBar(it.data?.message.toString())
-            else showSnackBar(it.message.toString())
-        }
+    private fun checkEmailSuccess(data: JoinEvent<Unit>) {
+        binding.btnCheck.isEnabled = false
+        binding.btnSignup.isEnabled = true
+        showSnackBar(data.message)
+    }
+
+    private fun signUpSuccess(data: JoinEvent<Unit>) {
+        showSnackBar(data.message)
+        findNavController().popBackStack()
+    }
+
+    private fun error(message: String?) = message?.let {
+        showSnackBar(it)
     }
 
     private fun initPasswordWatcher() = binding.tiePwAgain.addTextChangedListener {

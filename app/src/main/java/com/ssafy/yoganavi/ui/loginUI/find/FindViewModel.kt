@@ -2,10 +2,9 @@ package com.ssafy.yoganavi.ui.loginUI.find
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.yoganavi.data.ApiResponse
+import com.ssafy.yoganavi.data.repository.ApiResponse
 import com.ssafy.yoganavi.data.repository.UserRepository
-import com.ssafy.yoganavi.data.source.signup.SignUpRequest
-import com.ssafy.yoganavi.data.source.signup.SignUpResponse
+import com.ssafy.yoganavi.data.source.user.UserRequest
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
@@ -19,70 +18,81 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FindViewModel @Inject constructor(
-    private val userRepository: UserRepository
-) : ViewModel() {
+class FindViewModel @Inject constructor(private val userRepository: UserRepository) : ViewModel() {
 
-    private val _findPasswordEvent: MutableSharedFlow<ApiResponse<SignUpResponse>> =
-        MutableSharedFlow()
-    private val _checkPasswordEvent: MutableSharedFlow<ApiResponse<SignUpResponse>> =
-        MutableSharedFlow()
-    private val _registerPasswordEvent: MutableSharedFlow<ApiResponse<SignUpResponse>> =
-        MutableSharedFlow()
+    private val _findPasswordEvent: MutableSharedFlow<FindEvent<Unit>> = MutableSharedFlow()
+    val findPasswordEvent: SharedFlow<FindEvent<Unit>> = _findPasswordEvent.asSharedFlow()
 
-    val findPasswordEvent: SharedFlow<ApiResponse<SignUpResponse>> =
-        _findPasswordEvent.asSharedFlow()
-    val checkPasswordEvent: SharedFlow<ApiResponse<SignUpResponse>> =
-        _checkPasswordEvent.asSharedFlow()
-    val registerPasswordEvent: SharedFlow<ApiResponse<SignUpResponse>> =
-        _registerPasswordEvent.asSharedFlow()
-
-    fun findPassword(email: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun sendEmail(email: String) = viewModelScope.launch(Dispatchers.IO) {
         if (arrayOf(email).isBlank()) {
-            _findPasswordEvent.emit(ApiResponse.Error(IS_BLANK))
+            emitError(IS_BLANK)
             return@launch
         }
 
-        val signUpRequest = SignUpRequest(email = email)
-
-        runCatching { userRepository.findPasswordEmail(signUpRequest) }
-            .onSuccess { _findPasswordEvent.emit(it) }
-            .onFailure { _findPasswordEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
+        val userRequest = UserRequest(email = email)
+        runCatching { userRepository.findPasswordEmail(userRequest) }
+            .onSuccess { emitResponse(it, FindEvent.SendEmailSuccess::class.java) }
+            .onFailure { emitError(NO_RESPONSE) }
     }
 
-    fun checkAuthEmail(checkNumber: Int?) = viewModelScope.launch(Dispatchers.IO) {
+    fun checkAuthEmail(email: String, checkNumber: Int?) = viewModelScope.launch(Dispatchers.IO) {
         checkNumber?.let {
-            val signUpRequest = SignUpRequest(authnumber = checkNumber)
-
-            runCatching { userRepository.checkAuthPassword(signUpRequest) }
-                .onSuccess { _checkPasswordEvent.emit(it) }
-                .onFailure { _checkPasswordEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
-
-        } ?: _checkPasswordEvent.emit(ApiResponse.Error(IS_BLANK))
+            val userRequest = UserRequest(email = email, authnumber = checkNumber)
+            runCatching { userRepository.checkAuthPassword(userRequest) }
+                .onSuccess { emitResponse(it, FindEvent.CheckEmailSuccess::class.java) }
+                .onFailure { emitError(NO_RESPONSE) }
+        } ?: emitError(IS_BLANK)
     }
 
-    fun registerNewPassword(
-        email: String,
-        password: String,
-        passwordAgain: String
-    ) = viewModelScope.launch(Dispatchers.IO) {
-        if (arrayOf(email, password).isBlank()) {
-            _registerPasswordEvent.emit(ApiResponse.Error(IS_BLANK))
-            return@launch
+    fun registerNewPassword(email: String, password: String, passwordAgain: String) =
+        viewModelScope.launch(Dispatchers.IO) {
+            if (arrayOf(email, password).isBlank()) {
+                emitError(IS_BLANK)
+                return@launch
+            }
+
+            if (password != passwordAgain) {
+                emitError(PASSWORD_DIFF)
+                return@launch
+            }
+
+            val userRequest = UserRequest(email = email, password = password)
+            runCatching { userRepository.registerPassword(userRequest) }
+                .onSuccess { emitResponse(it, FindEvent.RegisterPasswordSuccess::class.java) }
+                .onFailure { emitError(NO_RESPONSE) }
         }
 
-        if (password != passwordAgain) {
-            _registerPasswordEvent.emit(ApiResponse.Error(PASSWORD_DIFF))
-            return@launch
+    private suspend fun emitResponse(response: ApiResponse<Unit>, type: Class<out FindEvent<*>>) =
+        when (response) {
+            is ApiResponse.Success -> emitSuccess(response, type)
+            is ApiResponse.Error -> emitError(response.message)
         }
 
-        val signUpRequest = SignUpRequest(
-            email = email,
-            password = password
-        )
+    private suspend fun emitSuccess(response: ApiResponse<Unit>, type: Class<out FindEvent<*>>) =
+        when (type) {
+            FindEvent.SendEmailSuccess::class.java -> {
+                _findPasswordEvent.emit(
+                    FindEvent.SendEmailSuccess(response.data, response.message)
+                )
+            }
 
-        runCatching { userRepository.registerPassword(signUpRequest) }
-            .onSuccess { _registerPasswordEvent.emit(it) }
-            .onFailure { _registerPasswordEvent.emit(ApiResponse.Error(NO_RESPONSE)) }
-    }
+            FindEvent.CheckEmailSuccess::class.java -> {
+                _findPasswordEvent.emit(
+                    FindEvent.CheckEmailSuccess(response.data, response.message)
+                )
+            }
+
+            FindEvent.RegisterPasswordSuccess::class.java -> {
+                _findPasswordEvent.emit(
+                    FindEvent.RegisterPasswordSuccess(response.data, response.message)
+                )
+            }
+
+            else -> {
+                emitError(NO_RESPONSE)
+            }
+        }
+
+    private suspend fun emitError(message: String) =
+        _findPasswordEvent.emit(FindEvent.Error(message = message))
 }

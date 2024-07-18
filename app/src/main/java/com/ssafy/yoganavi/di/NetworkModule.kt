@@ -6,7 +6,7 @@ import com.google.gson.Strictness
 import com.ssafy.yoganavi.data.auth.AuthInterceptor
 import com.ssafy.yoganavi.data.auth.TokenAuthenticator
 import com.ssafy.yoganavi.data.repository.DataStoreRepository
-import com.ssafy.yoganavi.data.source.UserAPI
+import com.ssafy.yoganavi.data.source.user.UserAPI
 import com.ssafy.yoganavi.ui.utils.TIME_OUT
 import dagger.Module
 import dagger.Provides

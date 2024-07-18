@@ -17,7 +17,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".ui.core.MainActivity"
+            android:name=".ui.core.LoginActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,8 +26,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.core.LoginActivity"
-            android:exported="true">
+            android:name=".ui.core.MainActivity"
+            android:exported="false">
         </activity>
     </application>
 
