@@ -35,9 +35,9 @@ class FindViewModel @Inject constructor(private val userRepository: UserReposito
             .onFailure { emitError(NO_RESPONSE) }
     }
 
-    fun checkAuthEmail(checkNumber: Int?) = viewModelScope.launch(Dispatchers.IO) {
+    fun checkAuthEmail(email: String, checkNumber: Int?) = viewModelScope.launch(Dispatchers.IO) {
         checkNumber?.let {
-            val userRequest = UserRequest(authnumber = checkNumber)
+            val userRequest = UserRequest(email = email, authnumber = checkNumber)
             runCatching { userRepository.checkAuthPassword(userRequest) }
                 .onSuccess { emitResponse(it, FindEvent.CheckEmailSuccess::class.java) }
                 .onFailure { emitError(NO_RESPONSE) }

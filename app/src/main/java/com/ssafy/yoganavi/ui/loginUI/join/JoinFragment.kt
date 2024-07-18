@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.databinding.FragmentJoinBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
@@ -43,8 +44,9 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
         binding.btnCheck.setOnClickListener {
             hideKeyboard()
 
+            val email = binding.tieId.text.toString()
             val number = binding.tieCn.text.toString().toIntOrNull()
-            viewModel.checkAuthEmail(number)
+            viewModel.checkAuthEmail(email, number)
         }
 
         binding.btnSignup.setOnClickListener {
@@ -84,6 +86,7 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
 
     private fun signUpSuccess(data: JoinEvent<Unit>) {
         showSnackBar(data.message)
+        findNavController().popBackStack()
     }
 
     private fun error(message: String?) = message?.let {
