@@ -80,4 +80,8 @@ dependencies {
     // Navigation
     implementation (libs.androidx.navigation.fragment.ktx)
     implementation (libs.androidx.navigation.ui.ktx)
+
+    //Glide
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+
 }
