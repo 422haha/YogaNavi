@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "RecordedLectureLike")
 public class RecordedLectureLike {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

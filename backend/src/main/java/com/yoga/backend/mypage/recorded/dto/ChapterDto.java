@@ -7,10 +7,9 @@ import lombok.Setter;
 @Setter
 public class ChapterDto {
 
-    private String chapter_title; // 챕터 제목
-    private String chapter_discription; // 챕터 소개
+    private String chapterTitle;
+    private String chapterDescription;
     private String thumbnailUrl;
-    private String videoUrl; // 영상의 s3 url
-    private int chapter_number; // 챕터 순서
-
+    private String videoUrl;
+    private int chapterNumber;
 }

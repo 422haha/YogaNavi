@@ -1,12 +1,10 @@
 package com.yoga.backend.common.entity.RecordedLectures;
 
-
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
 public class RecordedLecture {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,18 +13,16 @@ public class RecordedLecture {
     private String email;
 
     @Column(nullable = false)
-    private String title;
+    private String title; // Changed from record_title
 
-    @Column(nullable = false)
-    private String content;
+    @Column(name = "record_content", nullable = false)
+    private String content; // Changed from record_content
 
     @Column(nullable = false)
     private String thumbnail;
 
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL)
     private List<RecordedLectureChapter> chapters;
-
-    // Getters and Setters
 
     public Long getId() {
         return id;

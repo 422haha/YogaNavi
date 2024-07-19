@@ -1,6 +1,5 @@
 package com.yoga.backend.common.entity.RecordedLectures;
 
-
 import jakarta.persistence.*;
 
 @Entity
@@ -10,16 +9,23 @@ public class RecordedLectureChapter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
+
     private String description;
+
+    @Column(nullable = false)
     private String thumbnail;
+
+    @Column(nullable = false)
     private String videoUrl;
+
+    @Column(nullable = false)
+    private int chapterNumber;
 
     @ManyToOne
     @JoinColumn(name = "lecture_id")
     private RecordedLecture lecture;
-
-    // Getters and Setters
 
     public Long getId() {
         return id;
@@ -53,6 +59,14 @@ public class RecordedLectureChapter {
         this.thumbnail = thumbnail;
     }
 
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
+    }
+
     public RecordedLecture getLecture() {
         return lecture;
     }
@@ -61,11 +75,11 @@ public class RecordedLectureChapter {
         this.lecture = lecture;
     }
 
-    public String getVideoUrl() {
-        return videoUrl;
+    public int getChapterNumber() {
+        return chapterNumber;
     }
 
-    public void setVideoUrl(String videoUrl) {
-        this.videoUrl = videoUrl;
+    public void setChapterNumber(int chapterNumber) {
+        this.chapterNumber = chapterNumber;
     }
 }

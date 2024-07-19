@@ -14,7 +14,6 @@ import com.yoga.backend.mypage.recorded.dto.LectureDto;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 
-
 @Repository
 public class RecordedLectureListRepository {
 
@@ -30,15 +29,13 @@ public class RecordedLectureListRepository {
 
         return queryFactory
             .select(Projections.constructor(LectureDto.class,
-
-//                lecture.email,
-                as(lecture.id,"recorded_id"),
-                as(lecture.title, "record_title"),
-                as(lecture.thumbnail, "record_thumbnail"),
+                as(lecture.id, "recordedId"),
+                as(lecture.title, "recordTitle"),
+                as(lecture.thumbnail, "recordThumbnail"),
                 as(JPAExpressions.select(count(like.id))
                     .from(like)
-                    .where(like.lecture.eq(lecture)), "like_count"),
-                as(Expressions.constant(false), "my_like")
+                    .where(like.lecture.eq(lecture)), "likeCount"),
+                as(Expressions.constant(false), "myLike")
             ))
             .from(lecture)
             .where(lecture.email.eq(email))

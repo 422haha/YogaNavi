@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
 @Service
 public class RecordedServiceImpl implements RecordedService {
 
@@ -26,7 +25,6 @@ public class RecordedServiceImpl implements RecordedService {
     @Autowired
     private RecordedLectureLikeRepository likeRepository;
 
-
     @Override
     public List<LectureDto> getMyLectures(String email) {
         return recordedLectureListRepository.findAllLectures(email);
@@ -36,18 +34,20 @@ public class RecordedServiceImpl implements RecordedService {
     public LectureDto saveLecture(LectureDto lectureDto) {
         RecordedLecture lecture = new RecordedLecture();
         lecture.setEmail(lectureDto.getEmail());
-        lecture.setTitle(lectureDto.getRecord_title());
-        lecture.setContent(lectureDto.getRecord_content());
-        lecture.setThumbnail(lectureDto.getRecord_thumbnail());
+        lecture.setTitle(lectureDto.getRecordTitle());
+        lecture.setContent(lectureDto.getRecordContent());
+        lecture.setThumbnail(lectureDto.getRecordThumbnail());
 
         List<RecordedLectureChapter> chapters = new ArrayList<>();
-        for (ChapterDto chapterDto : lectureDto.getRecordedLectureChapter()) {
+        int chapterNum = 1;
+        for (ChapterDto chapterDto : lectureDto.getRecordedLectureChapters()) {
             RecordedLectureChapter chapter = new RecordedLectureChapter();
-            chapter.setTitle(chapterDto.getChapter_title());
-            chapter.setDescription(chapterDto.getChapter_discription());
+            chapter.setTitle(chapterDto.getChapterTitle());
+            chapter.setDescription(chapterDto.getChapterDescription());
             chapter.setThumbnail(chapterDto.getThumbnailUrl());
             chapter.setVideoUrl(chapterDto.getVideoUrl());
             chapter.setLecture(lecture);
+            chapter.setChapterNumber(chapterNum++);
             chapters.add(chapter);
         }
         lecture.setChapters(chapters);
@@ -57,8 +57,8 @@ public class RecordedServiceImpl implements RecordedService {
     }
 
     @Override
-    public LectureDto getLectureDetails(Long recorded_id, String email) {
-        RecordedLecture lecture = recordedLectureRepository.findById(recorded_id)
+    public LectureDto getLectureDetails(Long recordedId, String email) {
+        RecordedLecture lecture = recordedLectureRepository.findById(recordedId)
             .orElseThrow(() -> new RuntimeException("Lecture not found"));
 
         return convertToDto(lecture);
@@ -66,49 +66,26 @@ public class RecordedServiceImpl implements RecordedService {
 
     private LectureDto convertToDto(RecordedLecture lecture) {
         LectureDto dto = new LectureDto();
+        dto.setRecordedId(lecture.getId());
         dto.setEmail(lecture.getEmail());
-        dto.setRecord_title(lecture.getTitle());
-        dto.setRecord_content(lecture.getContent());
-        dto.setRecord_thumbnail(lecture.getThumbnail());
-        dto.setLike_count(0); // 새로 생성된 강의이므로 좋아요 수는 0
-        dto.setMy_like(false);
+        dto.setRecordTitle(lecture.getTitle());
+        dto.setRecordContent(lecture.getContent());
+        dto.setRecordThumbnail(lecture.getThumbnail());
+        dto.setLikeCount(0); // 새로 생성된 강의이므로 좋아요 수는 0
+        dto.setMyLike(false);
 
         List<ChapterDto> chapterDtos = new ArrayList<>();
         for (RecordedLectureChapter chapter : lecture.getChapters()) {
             ChapterDto chapterDto = new ChapterDto();
-            chapterDto.setChapter_title(chapter.getTitle());
-            chapterDto.setChapter_discription(chapter.getDescription());
+            chapterDto.setChapterTitle(chapter.getTitle());
+            chapterDto.setChapterDescription(chapter.getDescription());
             chapterDto.setThumbnailUrl(chapter.getThumbnail());
             chapterDto.setVideoUrl(chapter.getVideoUrl());
+            chapterDto.setChapterNumber(chapter.getChapterNumber());
             chapterDtos.add(chapterDto);
         }
-        dto.setRecordedLectureChapter(chapterDtos);
+        dto.setRecordedLectureChapters(chapterDtos);
 
         return dto;
     }
-
-//    private LectureDto convertToDtoLectureDetails(RecordedLecture lecture) {
-//        LectureDto dto = new LectureDto();
-//        dto.setRecorded_id(String.valueOf(lecture.getId()));
-//        dto.setEmail(lecture.getEmail());
-//        dto.setRecord_title(lecture.getTitle());
-//        dto.setRecord_content(lecture.getContent());
-//        dto.setRecord_thumbnail(lecture.getThumbnail());
-//
-//        List<ChapterDto> chapterDtos = new ArrayList<>();
-//        for (RecordedLectureChapter chapter : lecture.getChapters()) {
-//            ChapterDto chapterDto = new ChapterDto();
-//            chapterDto.setChapter_title(chapter.getTitle());
-//            chapterDto.setChapter_discription(chapter.getDescription());
-//            chapterDto.setThumbnailUrl(chapter.getThumbnail());
-//            chapterDto.setVideoUrl(chapter.getVideoUrl());
-//            chapterDto.setChapter_number(
-//                chapter.getId().intValue());
-//            chapterDtos.add(chapterDto);
-//        }
-//        dto.setRecordedLectureChapter(chapterDtos);
-//
-//        return dto;
-//    }
 }
-

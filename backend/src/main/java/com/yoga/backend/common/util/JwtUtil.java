@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import javax.crypto.SecretKey;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,9 @@ import org.springframework.stereotype.Component;
 public class JwtUtil {
 
     public String getEmailFromToken(String token) {
+
+        token = token.replace("Bearer ", "");
+
         // JWT 키로 HMAC-SHA 키를 생성
         SecretKey key = Keys.hmacShaKeyFor(
             SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
@@ -22,6 +26,7 @@ public class JwtUtil {
             .parseSignedClaims(token)
             .getPayload();
 
-        return claims.getSubject();
+        return Optional.ofNullable(claims.get("email", String.class))
+            .orElseThrow(() -> new IllegalStateException("Email claim is missing from the token"));
     }
 }
