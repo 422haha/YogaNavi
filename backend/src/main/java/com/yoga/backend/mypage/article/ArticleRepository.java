@@ -11,6 +11,7 @@ import java.util.List;
  */
 @Repository
 public interface ArticleRepository extends JpaRepository<Article, Long> {
+
     /**
      * 특정 사용자가 작성한 게시글 목록을 조회합니다.
      *
@@ -20,10 +21,10 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     List<Article> findByUserId(int userId);
 
     /**
-     * 제목으로 게시글을 조회합니다.
+     * 내용으로 게시글을 조회합니다.
      *
-     * @param title 게시글 제목
+     * @param content 게시글 내용
      * @return 게시글 목록
      */
-    List<Article> findByTitle(String title);  // findByTitle 메소드 추가
+    List<Article> findByContent(String content);  // findByContent 메소드 추가
 }
