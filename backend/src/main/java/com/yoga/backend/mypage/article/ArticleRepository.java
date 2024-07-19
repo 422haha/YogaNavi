@@ -19,5 +19,11 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
      */
     List<Article> findByUserId(int userId);
 
-    List<Article> findByTitle(String title);  // findByTitle 메소드 수정
+    /**
+     * 제목으로 게시글을 조회합니다.
+     *
+     * @param title 게시글 제목
+     * @return 게시글 목록
+     */
+    List<Article> findByTitle(String title);  // findByTitle 메소드 추가
 }
