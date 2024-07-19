@@ -43,6 +43,11 @@ android {
 }
 
 dependencies {
+    // ProgressBar
+    implementation (libs.androidx.swiperefreshlayout)
+
+    //Glide
+    implementation(libs.glide)
 
     //Data Store
     implementation (libs.androidx.datastore.preferences)

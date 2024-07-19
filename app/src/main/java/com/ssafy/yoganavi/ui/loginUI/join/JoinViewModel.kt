@@ -2,7 +2,7 @@ package com.ssafy.yoganavi.ui.loginUI.join
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.yoganavi.data.repository.ApiResponse
+import com.ssafy.yoganavi.data.repository.ListResponse
 import com.ssafy.yoganavi.data.repository.UserRepository
 import com.ssafy.yoganavi.data.source.user.UserRequest
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
@@ -76,14 +76,15 @@ class JoinViewModel @Inject constructor(
     }
 
     private suspend fun emitResponse(
-        response: ApiResponse<Unit>,
+        response: ListResponse<Unit>,
         type: Class<out JoinEvent<*>>
     ) = when (response) {
-        is ApiResponse.Success -> emitSuccess(response, type)
-        is ApiResponse.Error -> emitError(response.message)
+        is ListResponse.Success -> emitSuccess(response, type)
+        is ListResponse.Error -> emitError(response.message)
+        is ListResponse.AuthError -> emitError(response.message)
     }
 
-    private suspend fun emitSuccess(response: ApiResponse<Unit>, type: Class<out JoinEvent<*>>) =
+    private suspend fun emitSuccess(response: ListResponse<Unit>, type: Class<out JoinEvent<*>>) =
         when (type) {
             JoinEvent.RegisterEmailSuccess::class.java -> {
                 _joinEvent.emit(JoinEvent.RegisterEmailSuccess(response.data, response.message))

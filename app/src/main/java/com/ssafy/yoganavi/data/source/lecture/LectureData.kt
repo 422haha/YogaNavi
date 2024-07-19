@@ -1,9 +1,9 @@
 package com.ssafy.yoganavi.data.source.lecture
 
 data class LectureData(
-    val recordedId: String,
-    val recordedTitle: String,
-    val recordedThumbnail: String,
-    val likes: Int,
-    val likedByUser : Boolean
+    val recordedId: Int,
+    val recordTitle: String,
+    val recordThumbnail: String,
+    val likeCount: Int,
+    val myLike: Boolean
 )
