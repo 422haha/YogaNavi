@@ -3,6 +3,7 @@ package com.yoga.backend.mypage.article;
 import com.yoga.backend.common.entity.Article;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.UsersRepository;
+import com.yoga.backend.common.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,32 +23,28 @@ public class ArticleController {
 
     private final ArticleService articleService;
     private final UsersRepository usersRepository;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public ArticleController(ArticleService articleService, UsersRepository usersRepository) {
+    public ArticleController(ArticleService articleService, UsersRepository usersRepository, JwtUtil jwtUtil) {
         this.articleService = articleService;
         this.usersRepository = usersRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     /**
      * 새로운 게시글을 작성합니다.
      *
+     * @param token JWT 토큰
      * @param articleDto 게시글 DTO
      * @return 작성 결과 메시지
      */
     @PostMapping("/write")
-    public ResponseEntity<ApiResponse> createArticle(@RequestBody ArticleDto articleDto) {
+    public ResponseEntity<ApiResponse> createArticle(@RequestHeader("Authorization") String token, @RequestBody ArticleDto articleDto) {
         try {
-            // 현재 인증된 사용자 정보를 가져옴
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            String username;
-            if (principal instanceof UserDetails) {
-                username = ((UserDetails) principal).getUsername();
-            } else {
-                username = principal.toString();
-            }
+            String email = jwtUtil.getEmailFromToken(token);
 
-            Optional<Users> optionalUser = usersRepository.findByEmail(username).stream().findFirst();
+            Optional<Users> optionalUser = usersRepository.findByEmail(email).stream().findFirst();
             if (optionalUser.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("권한이 없습니다", null));
             }
@@ -152,25 +149,25 @@ public class ArticleController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("서버 내부 오류가 발생했습니다", null));
         }
     }
-}
 
-/**
- * API 응답을 위한 클래스
- */
-class ApiResponse {
-    private final String message; // 응답 메시지
-    private final Object data; // 응답 데이터
+    /**
+     * API 응답을 위한 클래스
+     */
+    private static class ApiResponse {
+        private final String message; // 응답 메시지
+        private final Object data; // 응답 데이터
 
-    public ApiResponse(String message, Object data) {
-        this.message = message;
-        this.data = data;
-    }
+        public ApiResponse(String message, Object data) {
+            this.message = message;
+            this.data = data;
+        }
 
-    public String getMessage() {
-        return message;
-    }
+        public String getMessage() {
+            return message;
+        }
 
-    public Object getData() {
-        return data;
+        public Object getData() {
+            return data;
+        }
     }
 }

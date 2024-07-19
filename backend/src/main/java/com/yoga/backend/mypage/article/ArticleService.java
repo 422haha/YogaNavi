@@ -45,4 +45,12 @@ public interface ArticleService {
      * @param id 삭제할 게시글 ID
      */
     void deleteArticle(Long id);
+
+    /**
+     * 제목으로 게시글을 조회합니다.
+     *
+     * @param title 게시글 제목
+     * @return 게시글 목록
+     */
+    List<Article> findByTitle(String title); // 추가된 메서드
 }
