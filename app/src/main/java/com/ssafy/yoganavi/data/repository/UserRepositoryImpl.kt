@@ -20,40 +20,40 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun logIn(userRequest: UserRequest): ListResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.logIn(userRequest) }
-        return response.toApiResponse()
+        return response.toListResponse()
     }
 
     override suspend fun signUp(userRequest: UserRequest): ListResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.signUp(userRequest) }
-        return response.toApiResponse()
+        return response.toListResponse()
     }
 
     override suspend fun registerEmail(userRequest: UserRequest): ListResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.registerEmail(userRequest) }
-        return response.toApiResponse()
+        return response.toListResponse()
     }
 
     override suspend fun checkAuthEmail(userRequest: UserRequest): ListResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.checkAuthEmail(userRequest) }
-        return response.toApiResponse()
+        return response.toListResponse()
     }
 
     override suspend fun findPasswordEmail(userRequest: UserRequest): ListResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.findPasswordEmail(userRequest) }
-        return response.toApiResponse()
+        return response.toListResponse()
     }
 
     override suspend fun checkAuthPassword(userRequest: UserRequest): ListResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.checkAuthPassword(userRequest) }
-        return response.toApiResponse()
+        return response.toListResponse()
     }
 
     override suspend fun registerPassword(userRequest: UserRequest): ListResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.registerPassword(userRequest) }
-        return response.toApiResponse()
+        return response.toListResponse()
     }
 
-    private fun Response<YogaResponse<Unit>>.toApiResponse(): ListResponse<Unit> {
+    private fun Response<YogaResponse<Unit>>.toListResponse(): ListResponse<Unit> {
         body()?.let {
             if (isSuccessful) return ListResponse.Success(it.data, it.message)
             else return ListResponse.Error(it.data, it.message)
