@@ -11,18 +11,21 @@ import com.ssafy.yoganavi.ui.utils.formatDotDate
 import com.ssafy.yoganavi.ui.utils.formatTime
 
 class ManagementLiveAdapter(
-    private val listener: (String) -> Unit,
+    private val navigateToLiveFragment: (Int) -> Unit,
 ) : ListAdapter<LiveLectureData, ManagementLiveAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent)
+        return ViewHolder.from(parent, navigateToLiveFragment)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(currentList[position])
     }
 
-    class ViewHolder(private val binding: ListItemLiveBinding) :
+    class ViewHolder(
+        private val binding: ListItemLiveBinding,
+        private val navigateToLiveFragment: (Int) -> Unit
+    ) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: LiveLectureData) {
             val date = "${formatDotDate(item.startDate)}~${formatDotDate(item.endDate)}"
@@ -32,12 +35,17 @@ class ManagementLiveAdapter(
 
             val time = "${formatTime(item.startTime)}~${formatTime(item.endTime)}"
             binding.tvLectureTime.text = "${item.availableDay} | $time"
+
+            binding.vEnterBtn.setOnClickListener {
+                navigateToLiveFragment(item.liveId)
+            }
         }
 
         companion object {
-            fun from(parent: ViewGroup): ViewHolder {
+            fun from(parent: ViewGroup, navigateToLiveFragment: (Int) -> Unit): ViewHolder {
                 return ViewHolder(
-                    ListItemLiveBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                    ListItemLiveBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                    navigateToLiveFragment = navigateToLiveFragment
                 )
             }
         }

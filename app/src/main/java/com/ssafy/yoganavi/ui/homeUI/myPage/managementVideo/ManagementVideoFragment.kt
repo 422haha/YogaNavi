@@ -24,9 +24,12 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.rvLecture.adapter = lectureAdapter
-        initCollect()
         initListener()
+
+        binding.rvLecture.adapter = lectureAdapter
+
+        initCollect()
+
         viewModel.getLectureList()
     }
 

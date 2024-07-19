@@ -212,7 +212,12 @@
         android:id="@+id/liveFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.schedule.live.LiveFragment"
         android:label="fragment_live"
-        tools:layout="@layout/fragment_live" />
+        tools:layout="@layout/fragment_live" >
+        <argument
+            android:name="getLiveId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
     <fragment
         android:id="@+id/managementLiveFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.managementLive.ManagementLiveFragment"
@@ -225,6 +230,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_managementLiveFragment_to_liveFragment"
+            app:destination="@id/liveFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
     <fragment
         android:id="@+id/registerLiveFragment"
