@@ -1,14 +1,15 @@
 package com.yoga.backend.mypage.recorded.dto;
 
-/*
-import com.yoga.backend.common.entity.RecordedLectures.RecordedLecture;
-import com.yoga.backend.mypage.recorded.repository.LectureLikeRepository;
-import java.util.List;
-import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
 
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class LectureDto {
 
+    private String recorded_id;
     private String email; // 강사 email
     private String record_title; // 강의 제목
     private String record_content; // 강의 소개
@@ -18,4 +19,4 @@ public class LectureDto {
     private boolean my_like;
 
 }
-*/
+
