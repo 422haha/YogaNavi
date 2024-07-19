@@ -9,16 +9,16 @@ import com.ssafy.yoganavi.ui.utils.toK
 
 class LectureViewHolder(
     private val binding: ListItemLectureThumbnailBinding,
-    private val navigateToRegisterVideoFragment: (String) -> Unit
+    private val navigateToRegisterVideoFragment: (Int) -> Unit
 ) : ViewHolder(binding.root) {
 
     private var likeCount = 0
 
     fun bind(data: LectureData) = with(binding) {
-        tvTitle.text = data.recordedTitle
-        tvCount.text = data.likes.toK()
-        ivFavorite.isSelected = data.likedByUser
-        likeCount = data.likes
+        tvTitle.text = data.recordTitle
+        tvCount.text = data.likeCount.toK()
+        ivFavorite.isSelected = data.myLike
+        likeCount = data.likeCount
 
         val circularProgressDrawable = CircularProgressDrawable(binding.root.context).apply {
             strokeWidth = 5f
@@ -27,7 +27,7 @@ class LectureViewHolder(
         circularProgressDrawable.start()
 
         Glide.with(binding.root)
-            .load(data.recordedThumbnail)
+            .load(data.recordThumbnail)
             .placeholder(circularProgressDrawable)
             .into(ivThumbnail)
 

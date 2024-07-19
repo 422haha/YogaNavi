@@ -10,9 +10,11 @@ import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.databinding.FragmentManagementVideoBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.lecture.LectureAdapter
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
     FragmentManagementVideoBinding::inflate
 ) {
@@ -42,7 +44,7 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
         }
     }
 
-    private fun navigateToRegisterVideoFragment(recordedId: String? = null) {
+    private fun navigateToRegisterVideoFragment(recordedId: Int = -1) {
         val directions = ManagementVideoFragmentDirections
             .actionManagementVideoFragmentToRegisterVideoFragment(recordedId)
 

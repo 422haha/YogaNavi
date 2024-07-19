@@ -205,9 +205,8 @@
         tools:layout="@layout/fragment_register_video">
         <argument
             android:name="recordedId"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
+            android:defaultValue="-1"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/liveFragment"

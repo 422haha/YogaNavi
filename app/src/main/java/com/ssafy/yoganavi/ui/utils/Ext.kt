@@ -18,6 +18,8 @@ const val NEED_REFRESH_TOKEN = "refresh_token_required"
 const val TOKEN_REQUIRED = "token_required"
 
 // 수신부
+const val FORBIDDEN = 403
+const val NO_AUTH = "권한이 없습니다."
 const val NO_RESPONSE = "에러가 발생했습니다."
 const val IS_BLANK = "빈칸을 확인해주세요!"
 const val PASSWORD_DIFF = "비밀번호가 일치하지 않습니다."
