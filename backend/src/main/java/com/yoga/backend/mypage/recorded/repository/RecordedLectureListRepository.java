@@ -2,6 +2,7 @@ package com.yoga.backend.mypage.recorded.repository;
 
 import static com.querydsl.core.types.ExpressionUtils.as;
 import static com.querydsl.core.types.ExpressionUtils.count;
+import static com.querydsl.core.types.Projections.constructor;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -28,14 +29,14 @@ public class RecordedLectureListRepository {
         QRecordedLectureLike like = QRecordedLectureLike.recordedLectureLike;
 
         return queryFactory
-            .select(Projections.constructor(LectureDto.class,
-                as(lecture.id, "recordedId"),
-                as(lecture.title, "recordTitle"),
-                as(lecture.thumbnail, "recordThumbnail"),
-                as(JPAExpressions.select(count(like.id))
+            .select(constructor(LectureDto.class,
+                Expressions.as(lecture.id, "recordedId"),
+                Expressions.as(lecture.title, "recordTitle"),
+                Expressions.as(lecture.thumbnail, "recordThumbnail"),
+                Expressions.as(JPAExpressions.select(like.id.count())
                     .from(like)
                     .where(like.lecture.eq(lecture)), "likeCount"),
-                as(Expressions.constant(false), "myLike")
+                Expressions.as(Expressions.constant(false), "myLike")
             ))
             .from(lecture)
             .where(lecture.email.eq(email))
