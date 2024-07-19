@@ -13,15 +13,15 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class RecordedLectureListRepository {
+public class MyLikeLectureListRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public RecordedLectureListRepository(JPAQueryFactory queryFactory) {
+    public MyLikeLectureListRepository(JPAQueryFactory queryFactory) {
         this.queryFactory = queryFactory;
     }
 
-    public List<LectureDto> findAllLectures(String email) {
+    public List<LectureDto> findMyLikedLectures(String email) {
         QRecordedLecture lecture = QRecordedLecture.recordedLecture;
         QRecordedLectureLike like = QRecordedLectureLike.recordedLectureLike;
 
@@ -33,10 +33,10 @@ public class RecordedLectureListRepository {
                 Expressions.as(JPAExpressions.select(like.id.count())
                     .from(like)
                     .where(like.lecture.eq(lecture)), "likeCount"),
-                Expressions.as(Expressions.constant(false), "myLike")
+                Expressions.as(Expressions.constant(true), "myLike")
             ))
             .from(lecture)
-            .where(lecture.email.eq(email))
+            .join(like).on(like.lecture.eq(lecture).and(like.userEmail.eq(email)))
             .fetch();
     }
 }

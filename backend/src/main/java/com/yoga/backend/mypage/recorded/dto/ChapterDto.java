@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class ChapterDto {
 
+    private long id;
     private String chapterTitle;
     private String chapterDescription;
     private String thumbnailUrl;
