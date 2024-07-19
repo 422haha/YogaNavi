@@ -84,7 +84,7 @@ public class RecordedController {
      */
     @GetMapping("/detail/{recorded_id}")
     public ResponseEntity<Map<String, Object>> getLectureDetails(
-        @RequestHeader("Authorization") String token, @PathVariable Long recorded_id) {
+        @RequestHeader("Authorization") String token, @PathVariable long recorded_id) {
         Map<String, Object> response = new HashMap<>();
         String email = jwtUtil.getEmailFromToken(token);
         LectureDto lectureDto = recordedService.getLectureDetails(recorded_id, email);
