@@ -65,13 +65,16 @@ public class ProjectSecurityConfig {
 
         // URL 기반 권한 부여 설정
         http.authorizeHttpRequests((requests) -> requests
-            .requestMatchers("/myAccount").hasRole("USER")
-            .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
-            .requestMatchers("/test").authenticated()
-            .requestMatchers("/myCards").hasRole("USER")
-            .requestMatchers("/user").authenticated()
-            .requestMatchers("/members/**") // 추가된 부분
-            .permitAll()); // /members/register/** 엔드포인트에 대한 인증 제거
+                .anyRequest().permitAll()
+//            .requestMatchers("/myAccount").hasRole("USER")
+//            .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
+//            .requestMatchers("/test").authenticated()
+//            .requestMatchers("/mypage/recorded-lecture/").hasRole("TEACHER")
+//            .requestMatchers("/user").authenticated()
+//            .requestMatchers("/members/**") // 추가된 부분
+//            .permitAll()
+
+        ); // /members/register/** 엔드포인트에 대한 인증 제거
 
         // 인증 성공 시 JWT 발급
         http.formLogin(form -> form
