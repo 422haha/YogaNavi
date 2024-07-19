@@ -93,7 +93,7 @@ public class ArticleController {
                 .map(this::convertArticleToMap)
                 .collect(Collectors.toList());
             response.put("message", "success");
-            response.put("data", Map.of("article_list", articleList));
+            response.put("data", articleList);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error fetching all articles", e);
@@ -123,7 +123,7 @@ public class ArticleController {
                     .map(this::convertArticleToMap)
                     .collect(Collectors.toList());
                 response.put("message", "success");
-                response.put("data", Map.of("article_list", articleList));
+                response.put("data", articleList);
                 return ResponseEntity.ok(response);
             } else {
                 response.put("message", "권한이 없습니다");
