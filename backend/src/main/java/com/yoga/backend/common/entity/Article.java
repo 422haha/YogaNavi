@@ -20,7 +20,6 @@ public class Article {
     @JoinColumn(name = "user_id")
     private Users user; // 작성자 (강사)
 
-    private String title; // 게시글 제목
     private String content; // 게시글 내용
     private LocalDateTime createdAt; // 생성일자
     private LocalDateTime updatedAt; // 수정일자

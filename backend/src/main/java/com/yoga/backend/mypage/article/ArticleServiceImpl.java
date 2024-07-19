@@ -71,4 +71,15 @@ public class ArticleServiceImpl implements ArticleService {
     public void deleteArticle(Long id) {
         articleRepository.deleteById(id);
     }
+
+    /**
+     * 내용으로 게시글을 조회합니다.
+     *
+     * @param content 게시글 내용
+     * @return 게시글 목록
+     */
+    @Override
+    public List<Article> findByContent(String content) {
+        return articleRepository.findByContent(content); // 추가된 메서드 구현
+    }
 }

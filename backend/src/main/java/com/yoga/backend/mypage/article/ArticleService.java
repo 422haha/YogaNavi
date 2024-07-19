@@ -9,6 +9,7 @@ import java.util.Optional;
  * 게시글(공지사항) 서비스 인터페이스
  */
 public interface ArticleService {
+
     /**
      * 게시글을 저장합니다.
      *
@@ -45,4 +46,12 @@ public interface ArticleService {
      * @param id 삭제할 게시글 ID
      */
     void deleteArticle(Long id);
+
+    /**
+     * 내용으로 게시글을 조회합니다.
+     *
+     * @param content 게시글 내용
+     * @return 게시글 목록
+     */
+    List<Article> findByContent(String content); // 추가된 메서드
 }

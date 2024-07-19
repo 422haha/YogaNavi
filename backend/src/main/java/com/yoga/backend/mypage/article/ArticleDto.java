@@ -7,7 +7,7 @@ import lombok.Data;
  */
 @Data
 public class ArticleDto {
-    private String title; // 게시글 제목
+
     private String content; // 게시글 내용
     private String imageUrl; // 이미지 URL
 }
