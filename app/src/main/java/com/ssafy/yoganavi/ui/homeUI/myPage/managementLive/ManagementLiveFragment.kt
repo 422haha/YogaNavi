@@ -14,6 +14,8 @@ class ManagementLiveFragment :
         super.onViewCreated(view, savedInstanceState)
 
         initListener()
+
+        binding.
     }
 
     private fun initListener() {
