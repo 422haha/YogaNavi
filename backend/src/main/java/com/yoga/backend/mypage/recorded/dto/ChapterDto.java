@@ -1,7 +1,10 @@
 package com.yoga.backend.mypage.recorded.dto;
 
-/*import com.yoga.backend.common.entity.RecordedLectures.RecordedLectureChapter;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class ChapterDto {
 
     private String chapter_title; // 챕터 제목
@@ -10,4 +13,4 @@ public class ChapterDto {
     private String videoUrl; // 영상의 s3 url
     private int chapter_number; // 챕터 순서
 
-}*/
+}
