@@ -5,11 +5,13 @@ import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
 import com.ssafy.yoganavi.databinding.CustomChapterViewBinding
 
 class ChapterViewHolder(
-    private val binding: CustomChapterViewBinding
+    private val binding: CustomChapterViewBinding,
+    private val deleteListener: (Int) -> Unit
 ) : ViewHolder(binding.root) {
 
     fun bind(data: VideoChapterData) = with(binding) {
         etTitle.setText(data.chapterTitle)
         etContent.setText(data.chapterDescription)
+        tvDeleteBtn.setOnClickListener { deleteListener(data.chapterNumber) }
     }
 }

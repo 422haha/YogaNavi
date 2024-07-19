@@ -8,7 +8,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
-import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
 import com.ssafy.yoganavi.databinding.FragmentRegisterVideoBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.ChapterAdapter
@@ -22,7 +21,7 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
 ) {
     private val args by navArgs<RegisterVideoFragmentArgs>()
     private val viewModel: RegisterVideoViewModel by viewModels()
-    private val chapterAdapter by lazy { ChapterAdapter() }
+    private val chapterAdapter by lazy { ChapterAdapter(::deleteChapter) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -41,18 +40,20 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
         }
     }
 
-    private fun initListener() = with(binding) {
-        btnAddChapter.setOnClickListener {
-            val list = chapterAdapter.currentList.toMutableList()
-            val number = list.lastOrNull()?.chapterNumber ?: -1
-            list.add(VideoChapterData(chapterNumber = number + 1))
-            chapterAdapter.submitList(list.toMutableList())
-        }
+    private fun initListener() {
+        binding.btnAddChapter.setOnClickListener { addChapter() }
     }
 
     private fun setView(data: LectureDetailData) = with(binding) {
         etContent.setText(data.recordTitle)
         etContent.setText(data.recordContent)
-        chapterAdapter.submitList(data.recordedLectureChapters.toMutableList())
+        chapterAdapter.submitList(data.recordedLectureChapters)
+        rvLecture.post {
+            rvLecture.scrollToPosition(chapterAdapter.itemCount - 1)
+            sv.post { sv.fullScroll(View.FOCUS_DOWN) }
+        }
     }
+
+    private fun addChapter() = viewModel.addChapter()
+    private fun deleteChapter(chapterId: Int) = viewModel.deleteChapter(chapterId)
 }
