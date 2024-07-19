@@ -24,6 +24,18 @@ public class RecordedLecture {
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL)
     private List<RecordedLectureChapter> chapters;
 
+    @Column(nullable = false)
+    private String creationStatus; // 추가: 강의 생성 상태
+
+    // Getter와 Setter 메서드 추가
+    public String getCreationStatus() {
+        return creationStatus;
+    }
+
+    public void setCreationStatus(String creationStatus) {
+        this.creationStatus = creationStatus;
+    }
+
     public Long getId() {
         return id;
     }

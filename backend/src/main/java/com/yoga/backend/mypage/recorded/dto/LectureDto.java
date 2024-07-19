@@ -20,9 +20,11 @@ public class LectureDto {
     private List<ChapterDto> recordedLectureChapters;
     private long likeCount;
     private boolean myLike;
+    private String creationStatus;
 
     // QueryDSL용 생성자 추가
-    public LectureDto(Long recordedId, String recordTitle, String recordThumbnail, long likeCount, Boolean myLike) {
+    public LectureDto(Long recordedId, String recordTitle, String recordThumbnail, long likeCount,
+        Boolean myLike) {
         this.recordedId = recordedId;
         this.recordTitle = recordTitle;
         this.recordThumbnail = recordThumbnail;
@@ -30,4 +32,13 @@ public class LectureDto {
         this.myLike = myLike;
     }
 
+    public LectureDto(Long recordedId, String recordTitle, String recordThumbnail, long likeCount,
+        Boolean myLike, String creationStatus) {
+        this.recordedId = recordedId;
+        this.recordTitle = recordTitle;
+        this.recordThumbnail = recordThumbnail;
+        this.likeCount = likeCount;
+        this.myLike = myLike;
+        this.creationStatus = creationStatus;
+    }
 }
