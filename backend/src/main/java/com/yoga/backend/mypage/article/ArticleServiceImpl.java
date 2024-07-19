@@ -73,13 +73,13 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 제목으로 게시글을 조회합니다.
+     * 내용으로 게시글을 조회합니다.
      *
-     * @param title 게시글 제목
+     * @param content 게시글 내용
      * @return 게시글 목록
      */
     @Override
-    public List<Article> findByTitle(String title) {
-        return articleRepository.findByTitle(title); // 추가된 메서드 구현
+    public List<Article> findByContent(String content) {
+        return articleRepository.findByContent(content); // 추가된 메서드 구현
     }
 }
