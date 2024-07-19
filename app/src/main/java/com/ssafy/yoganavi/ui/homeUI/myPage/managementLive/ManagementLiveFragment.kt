@@ -12,9 +12,11 @@ import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.databinding.FragmentManagementLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ManagementLiveFragment :
     BaseFragment<FragmentManagementLiveBinding>(FragmentManagementLiveBinding::inflate) {
 
