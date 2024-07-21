@@ -6,7 +6,7 @@ import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
 class ChapterDiffUtil : DiffUtil.ItemCallback<VideoChapterData>() {
 
     override fun areItemsTheSame(oldItem: VideoChapterData, newItem: VideoChapterData): Boolean =
-        oldItem.chapterNumber == newItem.chapterNumber
+        oldItem.id == newItem.id
 
     override fun areContentsTheSame(oldItem: VideoChapterData, newItem: VideoChapterData): Boolean =
         oldItem == newItem

@@ -17,6 +17,19 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/tv_registerBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_small"
+        android:background="@android:color/transparent"
+        android:padding="@dimen/text_medium"
+        android:text="@string/register"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@id/tv_chapter"
+        app:layout_constraintEnd_toStartOf="@id/tv_deleteBtn"
+        app:layout_constraintTop_toTopOf="@id/tv_chapter" />
+
+    <TextView
         android:id="@+id/tv_deleteBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,31 +42,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tv_chapter" />
 
-    <ImageView
+    <VideoView
         android:id="@+id/iv_video"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:scaleType="centerCrop"
-        android:src="@drawable/gray"
         app:layout_constraintBottom_toTopOf="@id/et_title"
-        app:layout_constraintDimensionRatio="4:3"
+        app:layout_constraintDimensionRatio="16:9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_chapter" />
-
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/click_video_info"
-        android:textSize="@dimen/text_medium"
-        app:drawableTopCompat="@drawable/video"
-        app:layout_constraintBottom_toBottomOf="@id/iv_video"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/iv_video" />
-
 
     <EditText
         android:id="@+id/et_title"
