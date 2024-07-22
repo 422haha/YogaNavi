@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -16,10 +15,7 @@ import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
 import com.ssafy.yoganavi.databinding.FragmentRegisterVideoBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
-import com.ssafy.yoganavi.ui.core.MainEvent
-import com.ssafy.yoganavi.ui.core.MainViewModel
 import com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.ChapterAdapter
-import com.ssafy.yoganavi.ui.utils.CREATE
 import com.ssafy.yoganavi.ui.utils.REGISTER_VIDEO
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -32,7 +28,6 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
 ) {
     private val args by navArgs<RegisterVideoFragmentArgs>()
     private val viewModel: RegisterVideoViewModel by viewModels()
-    private val activityViewModel: MainViewModel by activityViewModels()
     private val chapterAdapter by lazy { ChapterAdapter(::addVideo, ::deleteChapter) }
     private val imageUriLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -53,23 +48,12 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar()
+        setToolbar(REGISTER_VIDEO)
 
         if (args.recordedId != -1) viewModel.getLecture(args.recordedId)
         binding.rvLecture.adapter = chapterAdapter
         initCollect()
         initListener()
-    }
-
-    private fun setToolbar() {
-        val mainEvent = MainEvent(
-            isBottomNavigationVisible = false,
-            title = REGISTER_VIDEO,
-            canGoBack = true,
-            menuItem = CREATE,
-            menuListener = { Timber.d("생성!!!!!") }
-        )
-        activityViewModel.setMainEvent(mainEvent)
     }
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
