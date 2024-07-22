@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.ui.homeUI.myPage.managementLive
+package com.ssafy.yoganavi.ui.homeUI.myPage.likeTeacher.managementLive
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -12,7 +12,7 @@ import com.ssafy.yoganavi.ui.utils.formatTime
 
 class ManagementLiveAdapter(
     private val navigateToLiveFragment: (Int) -> Unit,
-) : ListAdapter<LiveLectureData, ManagementLiveAdapter.ViewHolder>(DiffCallback()) {
+) : ListAdapter<LiveLectureData, ManagementLiveAdapter.ViewHolder>(LiveDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent, navigateToLiveFragment)
@@ -52,7 +52,7 @@ class ManagementLiveAdapter(
     }
 }
 
-class DiffCallback : DiffUtil.ItemCallback<LiveLectureData>() {
+class LiveDiffCallback : DiffUtil.ItemCallback<LiveLectureData>() {
     override fun areItemsTheSame(oldItem: LiveLectureData, newItem: LiveLectureData): Boolean {
         return oldItem.liveId == newItem.liveId
     }
