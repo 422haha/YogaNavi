@@ -1,7 +1,9 @@
 package com.yoga.backend.members;
 
 import com.yoga.backend.common.entity.Users;
+import com.yoga.backend.common.util.JwtUtil;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,11 +12,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 /*
- * 회원가입, 비밀번호 재설정 컨트롤러
+ * 회원가입, 비밀번호 재설정, 회원정보 수정, 로그아웃 컨트롤러
  */
 @RestController
 @RequestMapping("/members")
 public class UserController {
+
 
     // 인증번호 저장용 변수
     static int rNum;
@@ -22,10 +25,12 @@ public class UserController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    private final JwtUtil jwtUtil;
     private final UsersService usersService;
 
-    public UserController(UsersService usersService) {
+    public UserController(UsersService usersService, JwtUtil jwtUtil) {
         this.usersService = usersService;
+        this.jwtUtil = jwtUtil;
     }
 
     /**
@@ -47,7 +52,7 @@ public class UserController {
                     return ResponseEntity.status(HttpStatus.CREATED).body(response);
                 }
             } catch (Exception ex) {
-                response.put("message", "회원가입 불가"+ex.getMessage());
+                response.put("message", "회원가입 불가" + ex.getMessage());
                 response.put("data", new Object[]{});
 
                 return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -138,7 +143,8 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> passwordCheckAuthNumber(
         @RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
-        boolean isValid = usersService.validateResetToken(registerDto.getEmail(), String.valueOf(registerDto.getAuthnumber()));
+        boolean isValid = usersService.validateResetToken(registerDto.getEmail(),
+            String.valueOf(registerDto.getAuthnumber()));
         if (isValid) {
             response.put("message", "인증 완료");
             response.put("data", new Object[]{});
@@ -159,7 +165,8 @@ public class UserController {
     @PostMapping("/find-password")
     public ResponseEntity<Map<String, Object>> setPassword(@RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
-        String result = usersService.resetPassword(registerDto.getEmail(), registerDto.getPassword());
+        String result = usersService.resetPassword(registerDto.getEmail(),
+            registerDto.getPassword());
         response.put("message", result);
         response.put("data", new Object[]{});
         return ResponseEntity.status(HttpStatus.OK).body(response);
