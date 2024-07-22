@@ -23,3 +23,11 @@ const val NO_AUTH = "권한이 없습니다."
 const val NO_RESPONSE = "에러가 발생했습니다."
 const val IS_BLANK = "빈칸을 확인해주세요!"
 const val PASSWORD_DIFF = "비밀번호가 일치하지 않습니다."
+
+// 타이틀
+const val MY_PAGE = "마이 페이지"
+const val REGISTER_VIDEO = "녹화 강의 생성"
+const val MANAGEMENT_VIDEO = "녹화 강의 관리"
+
+// 이름 
+const val CREATE = "생성"

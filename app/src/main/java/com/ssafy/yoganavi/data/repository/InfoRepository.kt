@@ -3,6 +3,7 @@ package com.ssafy.yoganavi.data.repository
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
+import com.ssafy.yoganavi.data.source.notice.NoticeData
 
 interface InfoRepository {
 
@@ -20,4 +21,6 @@ interface InfoRepository {
     suspend fun updateLive(liveId: Int): DetailResponse<Unit>
 
     suspend fun deleteLive(liveId: Int): DetailResponse<Unit>
+    
+    suspend fun getNoticeList() : ListResponse<NoticeData>
 }

@@ -7,6 +7,7 @@ import com.ssafy.yoganavi.data.source.info.InfoDataSource
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
+import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.di.IoDispatcher
 import com.ssafy.yoganavi.ui.utils.FORBIDDEN
 import com.ssafy.yoganavi.ui.utils.NO_AUTH
@@ -56,6 +57,11 @@ class InfoRepositoryImpl @Inject constructor(
     override suspend fun deleteLive(liveId: Int): DetailResponse<Unit> {
         val response = withContext(ioDispatcher) { infoDataSource.deleteLive(liveId) }
         return response.toDetailResponse()
+    }
+
+    override suspend fun getNoticeList(): ListResponse<NoticeData> {
+        val response = withContext(ioDispatcher){infoDataSource.getNoticeList()}
+        return response.toListResponse()
     }
 
     private inline fun <reified T> Response<YogaResponse<T>>.toListResponse(): ListResponse<T> {
