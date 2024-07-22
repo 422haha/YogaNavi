@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/padding_small" >
+    android:padding="@dimen/padding_small">
 
     <!-- 5-5 -->
     <TextView
@@ -42,7 +42,7 @@
                 android:layout_marginHorizontal="@dimen/padding_medium"
                 android:layout_marginTop="@dimen/padding_medium"
                 android:maxLength="50"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_editBtn"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="초보자도 쉽게 배우는 요가초보자도 쉽게 배우는 " />
@@ -56,6 +56,32 @@
                 app:layout_constraintStart_toStartOf="@id/tv_lecture_title"
                 app:layout_constraintTop_toBottomOf="@id/tv_lecture_title"
                 tools:text="월, 목 | 19:00~20:00" />
+
+            <TextView
+                android:id="@+id/tv_editBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/padding_small"
+                android:background="@android:color/transparent"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingBottom="@dimen/padding_medium"
+                android:text="@string/edit"
+                style="@style/BoldSmallText"
+                app:layout_constraintEnd_toStartOf="@id/tv_deleteBtn"
+                app:layout_constraintTop_toTopOf="@id/tv_lecture_title" />
+
+            <TextView
+                android:id="@+id/tv_deleteBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/padding_small"
+                android:background="@android:color/transparent"
+                android:paddingEnd="@dimen/padding_medium"
+                android:paddingBottom="@dimen/padding_medium"
+                android:text="@string/delete"
+                style="@style/BoldSmallText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_editBtn" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/v_enterBtn"
