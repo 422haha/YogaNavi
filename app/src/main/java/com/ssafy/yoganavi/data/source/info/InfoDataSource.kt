@@ -4,6 +4,7 @@ import com.ssafy.yoganavi.data.source.YogaDetailResponse
 import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
+import com.ssafy.yoganavi.data.source.notice.NoticeData
 import retrofit2.Response
 
 interface InfoDataSource {
@@ -12,4 +13,5 @@ interface InfoDataSource {
 
     suspend fun getLecture(recordedId: Int): Response<YogaDetailResponse<LectureDetailData>>
 
+    suspend fun getNoticeList(): Response<YogaResponse<NoticeData>>
 }
