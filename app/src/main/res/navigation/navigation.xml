@@ -241,5 +241,10 @@
     <fragment
         android:id="@+id/registerLiveFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.registerLive.RegisterLiveFragment"
-        android:label="RegisterLiveFragment" />
+        android:label="RegisterLiveFragment" >
+        <argument
+            android:name="liveId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
 </navigation>
