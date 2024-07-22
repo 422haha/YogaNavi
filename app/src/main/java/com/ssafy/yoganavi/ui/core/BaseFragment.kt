@@ -11,7 +11,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.ssafy.yoganavi.ui.loginUI.find.FindFragment
 import com.ssafy.yoganavi.ui.loginUI.join.JoinFragment
 import com.ssafy.yoganavi.ui.loginUI.login.LoginFragment
-import com.ssafy.yoganavi.ui.utils.MANAGEMENT_NOTICE
 
 typealias Inflate<T> = (LayoutInflater, ViewGroup?, Boolean) -> T
 

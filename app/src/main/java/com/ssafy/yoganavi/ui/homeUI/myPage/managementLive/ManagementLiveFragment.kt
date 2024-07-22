@@ -2,7 +2,6 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.managementLive
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -11,7 +10,9 @@ import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentManagementLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
-import com.ssafy.yoganavi.ui.core.MainViewModel
+import com.ssafy.yoganavi.ui.homeUI.myPage.likeTeacher.managementLive.ManagementLiveAdapter
+import com.ssafy.yoganavi.ui.homeUI.myPage.likeTeacher.managementLive.ManagementLiveFragmentDirections
+import com.ssafy.yoganavi.ui.homeUI.myPage.likeTeacher.managementLive.ManagementLiveViewModel
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_LIVE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -23,16 +24,16 @@ class ManagementLiveFragment :
 
     private val liveAdapter by lazy { ManagementLiveAdapter(::navigateToLiveFragment) }
 
-    private val activityViewModel: MainViewModel by activityViewModels()
-
     private val viewModel: ManagementLiveViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setToolbar(isBottomNavigationVisible = false,
+        setToolbar(
+            isBottomNavigationVisible = false,
             title = MANAGEMENT_LIVE,
-            canGoBack = true,)
+            canGoBack = true,
+        )
 
         initListener()
 
