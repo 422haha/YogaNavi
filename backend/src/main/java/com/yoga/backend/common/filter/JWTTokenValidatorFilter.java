@@ -11,6 +11,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -59,12 +60,11 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                 String username = String.valueOf(claims.get("username"));
                 String authorities = (String) claims.get("role");
 
-                // 사용자 인증 객체 생성 및 SecurityContext에 설정
-                Authentication auth = new UsernamePasswordAuthenticationToken(username, null,
+                Authentication auth = new UsernamePasswordAuthenticationToken(email, null,
                     AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
                 SecurityContextHolder.getContext().setAuthentication(auth);
-                // 다음 필터 체인 실행
                 filterChain.doFilter(request, response);
+
             } catch (ExpiredJwtException e) {
                 // 액세스 토큰이 만료된 경우 리프레시 토큰 처리
                 if (null == refreshToken) {
@@ -98,15 +98,7 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
         // 리프레시 토큰이 존재하는 경우
         if (refreshToken != null) {
             try {
-                // JWT 키로 HMAC-SHA 키를 생성
-                SecretKey key = Keys.hmacShaKeyFor(
-                    SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
-                // 리프레시 토큰 검증 및 클레임 파싱
-                Claims refreshClaims = Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(refreshToken)
-                    .getPayload();
+                Claims refreshClaims = jwtUtil.validateToken(refreshToken);
 
                 // 새로운 액세스 토큰 생성
                 String newAccessToken = Jwts.builder()
@@ -120,10 +112,12 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                     .signWith(key)
                     .compact();
 
-                // 새로운 액세스 토큰을 응답 헤더에 설정하고 다음 필터 체인 실행
+                String newAccessToken = jwtUtil.generateAccessToken(email, role);
+
                 response.setStatus(HttpServletResponse.SC_CREATED);
                 response.setHeader(SecurityConstants.JWT_HEADER, newAccessToken);
                 filterChain.doFilter(request, response);
+
             } catch (ExpiredJwtException e) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 data.put("message", "리프레시 토큰 만료. 재로그인 필요");

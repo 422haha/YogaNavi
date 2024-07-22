@@ -28,7 +28,6 @@ public class UserController {
         this.usersService = usersService;
     }
 
-
     /**
      * 회원 가입 컨트롤러
      *
@@ -165,4 +164,41 @@ public class UserController {
         response.put("data", new Object[]{});
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    /**
+     * 비밀번호 변경 컨트롤러
+     *
+     * @param token 회원 가입 정보
+     * @return 로그아웃 성공
+     */
+
+    /**
+     * 사용자 정보 수정. 정보 가져오기
+     *
+     * @param token 회원 가입 정보
+     * @return 회원 정보
+     */
+    @GetMapping("/update")
+    public ResponseEntity<Map<String, Object>> getMyInfo(@RequestHeader("Authorization") String token) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String email = jwtUtil.getEmailFromToken(token);
+            List<Users> users = usersService.getUserByEmail(email);
+
+            if (!users.isEmpty()) {
+                Users user = users.get(0);
+                response.put("nickname", user.getNickname());
+                response.put("profileImageUrl", user.getProfile_image_url());
+                response.put("role", user.getRole());
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("message", "User not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            response.put("message", "Error retrieving user information: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
 }

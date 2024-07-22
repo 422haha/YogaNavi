@@ -15,8 +15,8 @@ public class RecordedLectureLike {
     @JoinColumn(name = "lecture_id")
     private RecordedLecture lecture;
 
-    @Column
-    private String userEmail;
+    @Column(nullable = false)
+    private int userId;
 
     // getters and setters
 
@@ -36,11 +36,11 @@ public class RecordedLectureLike {
         this.lecture = lecture;
     }
 
-    public String getUserEmail() {
-        return userEmail;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 }

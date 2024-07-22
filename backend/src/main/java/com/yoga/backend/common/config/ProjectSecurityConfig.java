@@ -27,6 +27,23 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @Configuration
 public class ProjectSecurityConfig {
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private UsersRepository userRepository;
+
+
+    @Bean
+    public CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler() {
+        return new CustomAuthenticationSuccessHandler(jwtUtil);
+    }
+
+    @Bean
+    public JWTTokenValidatorFilter jwtTokenValidatorFilter() {
+        return new JWTTokenValidatorFilter(userRepository, jwtUtil);
+    }
+
     /**
      * 기본 보안 필터 체인을 구성
      *
@@ -71,8 +88,8 @@ public class ProjectSecurityConfig {
 //            .requestMatchers("/test").authenticated()
 //            .requestMatchers("/mypage/recorded-lecture/").hasRole("TEACHER")
 //            .requestMatchers("/user").authenticated()
-//            .requestMatchers("/members/**") // 추가된 부분
-//            .permitAll()
+//                .requestMatchers("/members/**").permitAll()
+//                .requestMatchers("/test").authenticated()
 
         ); // /members/register/** 엔드포인트에 대한 인증 제거
 

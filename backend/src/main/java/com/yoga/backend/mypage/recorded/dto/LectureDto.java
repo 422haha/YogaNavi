@@ -11,9 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LectureDto {
-
-    private Long recordedId; // Changed to Long
-    private String email;
+    private Long recordedId;
+    private int userId;
     private String recordTitle;
     private String recordContent;
     private String recordThumbnail;
@@ -22,7 +21,7 @@ public class LectureDto {
     private boolean myLike;
     private String creationStatus;
 
-    // QueryDSL용 생성자 추가
+    // QueryDSL용 생성자 수정
     public LectureDto(Long recordedId, String recordTitle, String recordThumbnail, long likeCount,
         Boolean myLike) {
         this.recordedId = recordedId;

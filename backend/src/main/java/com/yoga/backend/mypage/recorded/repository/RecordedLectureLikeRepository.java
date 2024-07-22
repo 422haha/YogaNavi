@@ -6,10 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RecordedLectureLikeRepository extends JpaRepository<RecordedLectureLike, Long> {
-
-    boolean existsByLectureIdAndUserEmail(Long lectureId, String userEmail);
-
+    boolean existsByLectureIdAndUserId(Long lectureId, int userId);
     int countByLectureId(Long lectureId);
-
-    void deleteByLectureIdAndUserEmail(Long lectureId, String userEmail);
+    void deleteByLectureIdAndUserId(Long lectureId, int userId);
 }

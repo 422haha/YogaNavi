@@ -1,6 +1,7 @@
 package com.yoga.backend.mypage.recorded;
 
 import com.yoga.backend.common.util.JwtUtil;
+import com.yoga.backend.members.UsersRepository;
 import com.yoga.backend.mypage.recorded.dto.LectureCreationStatus;
 import com.yoga.backend.mypage.recorded.dto.LectureDto;
 import java.util.HashMap;
@@ -14,9 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-
-import org.springframework.web.multipart.MultipartFile;
 
 /*
  * TODO: 종아요, 좋아요 취소 구현 (아마 끝)
@@ -34,6 +32,8 @@ public class RecordedController {
 
     @Autowired
     private RecordedService recordedService;
+    @Autowired
+    private UsersRepository usersRepository;
 
 
     /**
@@ -46,8 +46,8 @@ public class RecordedController {
     public ResponseEntity<Map<String, Object>> getMyLectures(
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
-        String email = jwtUtil.getEmailFromToken(token);
-        List<LectureDto> lectureList = recordedService.getMyLectures(email);
+        int userId = jwtUtil.getUserIdFromToken(token);
+        List<LectureDto> lectureList = recordedService.getMyLectures(userId);
 
         if (!lectureList.isEmpty()) {
             response.put("message", "녹화강의 조회 성공");
@@ -72,8 +72,8 @@ public class RecordedController {
     public ResponseEntity<Map<String, Object>> getLikeLectures(
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
-        String email = jwtUtil.getEmailFromToken(token);
-        List<LectureDto> lectureList = recordedService.getLikeLectures(email);
+        int userId = jwtUtil.getUserIdFromToken(token);
+        List<LectureDto> lectureList = recordedService.getLikeLectures(userId);
 
         if (!lectureList.isEmpty()) {
             response.put("message", "녹화강의 조회 성공");
@@ -101,8 +101,8 @@ public class RecordedController {
         @RequestBody LectureDto lectureDto) {
         Map<String, Object> response = new HashMap<>();
         try {
-            String email = jwtUtil.getEmailFromToken(token);
-            lectureDto.setEmail(email);
+            int userId = jwtUtil.getUserIdFromToken(token);
+            lectureDto.setUserId(userId);
 
             String sessionId = UUID.randomUUID().toString();
             CompletableFuture<LectureDto> futureLecture = recordedService.saveLectureAsync(
@@ -120,8 +120,7 @@ public class RecordedController {
 
 
     /**
-     * 강의 생성 상태 확인
-     * 클라이언트는 주기적으로 getLectureCreationStatus를 호출해야함.
+     * 강의 생성 상태 확인 클라이언트는 주기적으로 getLectureCreationStatus를 호출해야함.
      *
      * @param sessionId 강의 생성 세션 ID
      * @return 강의 생성 상태
@@ -151,8 +150,8 @@ public class RecordedController {
     public ResponseEntity<Map<String, Object>> getLectureDetails(
         @RequestHeader("Authorization") String token, @PathVariable long recorded_id) {
         Map<String, Object> response = new HashMap<>();
-        String email = jwtUtil.getEmailFromToken(token);
-        LectureDto lectureDto = recordedService.getLectureDetails(recorded_id, email);
+        int userId = jwtUtil.getUserIdFromToken(token);
+        LectureDto lectureDto = recordedService.getLectureDetails(recorded_id, userId);
         if (lectureDto != null) {
             response.put("message", "녹화강의 조회 성공");
             response.put("data", lectureDto);
@@ -171,8 +170,9 @@ public class RecordedController {
         @RequestBody LectureDto lectureDto) {
         Map<String, Object> response = new HashMap<>();
         try {
-            String email = jwtUtil.getEmailFromToken(token);
-            LectureDto updatedLecture = recordedService.updateLecture(recorded_id, lectureDto, email);
+            int userId = jwtUtil.getUserIdFromToken(token);
+            LectureDto updatedLecture = recordedService.updateLecture(recorded_id, lectureDto,
+                userId);
             response.put("message", "강의가 성공적으로 수정되었습니다.");
             response.put("data", updatedLecture);
             return ResponseEntity.ok(response);
@@ -189,8 +189,8 @@ public class RecordedController {
         @PathVariable Long recorded_id) {
         Map<String, Object> response = new HashMap<>();
         try {
-            String email = jwtUtil.getEmailFromToken(token);
-            recordedService.deleteLecture(recorded_id, email);
+            int userId = jwtUtil.getUserIdFromToken(token);
+            recordedService.deleteLecture(recorded_id, userId);
             response.put("message", "강의가 성공적으로 삭제되었습니다.");
             response.put("data", new Object[]{});
             return ResponseEntity.ok(response);
@@ -212,16 +212,16 @@ public class RecordedController {
     public ResponseEntity<Map<String, Object>> like(@RequestHeader("Authorization") String token,
         @RequestBody LectureDto lectureDto) {
         Map<String, Object> response = new HashMap<>();
-        String email = jwtUtil.getEmailFromToken(token);
+        int userId = jwtUtil.getUserIdFromToken(token);
         try {
 
             LectureDto updatedLecture;
             if (lectureDto.isMyLike()) { //좋아요 취소
-                updatedLecture = recordedService.setLike(lectureDto.getRecordedId(), email);
+                updatedLecture = recordedService.setLike(lectureDto.getRecordedId(), userId);
                 response.put("message", "좋아요 성공");
 
             } else { // 좋아요 하기
-                updatedLecture = recordedService.setDislike(lectureDto.getRecordedId(), email);
+                updatedLecture = recordedService.setDislike(lectureDto.getRecordedId(), userId);
                 response.put("message", "좋아요 취소");
             }
             response.put("data", updatedLecture);
