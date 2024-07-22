@@ -2,7 +2,7 @@ package com.yoga.backend.mypage.livelectures;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull; // 수정했어요 ㅍㅍ 죄송함다
 
 /**
  * 실시간 강의 DTO(Data Transfer Object) 클래스. 강의 생성 및 관리를 위한 데이터 전송 객체
