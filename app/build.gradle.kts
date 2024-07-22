@@ -52,8 +52,14 @@ android {
 }
 
 dependencies {
-    implementation("com.amazonaws:aws-android-sdk-mobile-client:2.73.0")
-    implementation("com.amazonaws:aws-android-sdk-s3:2.73.0")
+    // Exo Player
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.exoplayer.dash)
+    implementation(libs.androidx.media3.ui)
+
+    // S3
+    implementation(libs.aws.android.sdk.mobile.client)
+    implementation(libs.aws.android.sdk.s3)
 
     // ProgressBar
     implementation(libs.androidx.swiperefreshlayout)
@@ -92,13 +98,10 @@ dependencies {
 
     // CalendarView
     implementation(libs.material.calendarview)
-    implementation(libs.threetenabp) // github pull
+    implementation(libs.threetenabp)
 
     // Navigation
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-
-    //Glide
-    implementation("com.github.bumptech.glide:glide:4.12.0")
 
 }
