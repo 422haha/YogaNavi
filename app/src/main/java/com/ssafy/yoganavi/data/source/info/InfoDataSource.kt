@@ -13,7 +13,14 @@ interface InfoDataSource {
 
     suspend fun getLecture(recordedId: Int): Response<YogaDetailResponse<LectureDetailData>>
 
+    // live
     suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>>
 
     suspend fun getLive(liveId: Int): Response<YogaDetailResponse<LiveLectureData>>
+
+    suspend fun createLive(): Response<YogaDetailResponse<Unit>>
+
+    suspend fun updateLive(liveId: Int): Response<YogaDetailResponse<Unit>>
+
+    suspend fun deleteLive(liveId: Int): Response<YogaDetailResponse<Unit>>
 }

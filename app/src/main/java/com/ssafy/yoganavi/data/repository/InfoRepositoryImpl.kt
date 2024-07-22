@@ -43,6 +43,21 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toDetailResponse()
     }
 
+    override suspend fun createLive(): DetailResponse<Unit> {
+        val response = withContext(ioDispatcher) { infoDataSource.createLive() }
+        return response.toDetailResponse()
+    }
+
+    override suspend fun updateLive(liveId: Int): DetailResponse<Unit> {
+        val response = withContext(ioDispatcher) { infoDataSource.updateLive(liveId) }
+        return response.toDetailResponse()
+    }
+
+    override suspend fun deleteLive(liveId: Int): DetailResponse<Unit> {
+        val response = withContext(ioDispatcher) { infoDataSource.deleteLive(liveId) }
+        return response.toDetailResponse()
+    }
+
     private inline fun <reified T> Response<YogaResponse<T>>.toListResponse(): ListResponse<T> {
         if (code() == FORBIDDEN) return ListResponse.AuthError(message = NO_AUTH)
 

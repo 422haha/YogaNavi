@@ -4,6 +4,7 @@ package com.ssafy.yoganavi.data.source.live
 data class LiveLectureData(
     val liveId:Int,
     val teacherId: Int,
+    val teacherName: String,
     val liveTitle: String,
     val liveContent : String,
     val availableDay: String,
