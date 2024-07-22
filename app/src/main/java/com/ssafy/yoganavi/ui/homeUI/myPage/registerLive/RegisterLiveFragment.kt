@@ -1,5 +1,10 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.registerLive
 
+import android.os.Bundle
+import android.view.View
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import com.ssafy.yoganavi.databinding.FragmentRegisterLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.core.MainEvent
