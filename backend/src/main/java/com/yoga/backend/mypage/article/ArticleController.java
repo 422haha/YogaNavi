@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,9 +145,9 @@ public class ArticleController {
      * @param id 게시글 ID
      * @return 게시글 정보
      */
-    @GetMapping("/update/{articleId}")
+    @GetMapping("/update/{article_id}")
     public ResponseEntity<Map<String, Object>> getArticleById(
-        @PathVariable("articleId") Long id) {
+        @PathVariable("article_id") Long id) {
         Map<String, Object> response = new HashMap<>();
         try {
             Optional<Article> article = articleService.getArticleById(id);
@@ -289,19 +290,19 @@ public class ArticleController {
         Map<String, Object> map = new HashMap<>();
         map.put("articleId", article.getArticleId());
 
+        // 작성자 정보가 null인지 확인합니다.
         Users user = article.getUser();
         if (user != null) {
             map.put("userId", user.getId());
-            map.put("userName", user.getEmail());
-            map.put("userProfileImage", user.getProfile_image_url());
+            map.put("userName", user.getEmail()); // assuming userName is the email
         } else {
             map.put("userId", null);
             map.put("userName", null);
-            map.put("userProfileImage", null);
         }
 
         map.put("content", article.getContent());
-        map.put("createdAt", article.getCreatedAt().toString());
+        map.put("createdAt", article.getCreatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
+        map.put("updatedAt", article.getUpdatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
         map.put("imageUrl", article.getImageUrl());
         return map;
     }
