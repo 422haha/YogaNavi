@@ -10,4 +10,6 @@ public interface RecordedLectureLikeRepository extends JpaRepository<RecordedLec
     boolean existsByLectureIdAndUserEmail(Long lectureId, String userEmail);
 
     int countByLectureId(Long lectureId);
+
+    void deleteByLectureIdAndUserEmail(Long lectureId, String userEmail);
 }

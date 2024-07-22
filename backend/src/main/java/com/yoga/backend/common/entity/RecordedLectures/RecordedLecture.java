@@ -1,22 +1,27 @@
 package com.yoga.backend.common.entity.RecordedLectures;
 
 import jakarta.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Entity
 public class RecordedLecture {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Version
+    private Long version;
 
     @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
-    private String title; // Changed from record_title
+    private String title;
 
     @Column(name = "record_content", nullable = false)
-    private String content; // Changed from record_content
+    private String content;
 
     @Column(nullable = false)
     private String thumbnail;
@@ -25,15 +30,22 @@ public class RecordedLecture {
     private List<RecordedLectureChapter> chapters;
 
     @Column(nullable = false)
-    private String creationStatus; // 추가: 강의 생성 상태
+    private String creationStatus;
 
-    // Getter와 Setter 메서드 추가
-    public String getCreationStatus() {
-        return creationStatus;
+    @Column(nullable = false)
+    private long likeCount = 0;
+
+    @Column(nullable = false)
+    private Date dateCreated;
+
+    public void incrementLikeCount() {
+        this.likeCount++;
     }
 
-    public void setCreationStatus(String creationStatus) {
-        this.creationStatus = creationStatus;
+    public void decrementLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
     }
 
     public Long getId() {
@@ -42,6 +54,14 @@ public class RecordedLecture {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public String getEmail() {
@@ -83,5 +103,29 @@ public class RecordedLecture {
     public void setChapters(
         List<RecordedLectureChapter> chapters) {
         this.chapters = chapters;
+    }
+
+    public String getCreationStatus() {
+        return creationStatus;
+    }
+
+    public void setCreationStatus(String creationStatus) {
+        this.creationStatus = creationStatus;
+    }
+
+    public long getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(long likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
     }
 }

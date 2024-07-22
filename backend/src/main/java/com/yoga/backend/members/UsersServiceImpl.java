@@ -1,6 +1,8 @@
 package com.yoga.backend.members;
 
+import com.yoga.backend.common.awsS3.S3Service;
 import com.yoga.backend.common.entity.Users;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +11,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Service
 public class UsersServiceImpl implements UsersService {
+
+    @Autowired
+    private S3Service s3Service;
 
     @Autowired
     private JavaMailSender emailSender;
@@ -157,4 +163,35 @@ public class UsersServiceImpl implements UsersService {
         }
         return "비밀번호 재설정 실패";
     }
+
+    @Transactional(readOnly = true)
+    public List<Users> getUserByEmail(String email) {
+        return usersRepository.findByEmail(email);
+    }
+
+    @Transactional
+    public Users updateUserInfo(String email, String nickname, MultipartFile profileImage)
+        throws IOException {
+        List<Users> users = usersRepository.findByEmail(email);
+        if (!users.isEmpty()) {
+            Users user = users.get(0);
+
+            if (nickname != null && !nickname.isEmpty()) {
+                user.setNickname(nickname);
+            }
+
+            if (profileImage != null && !profileImage.isEmpty()) {
+                String imageUrl = s3Service.uploadFile(profileImage, "profile-images");
+                if (user.getProfile_image_url() != null) {
+                    s3Service.deleteFile(user.getProfile_image_url());
+                }
+                user.setProfile_image_url(imageUrl);
+            }
+
+            return usersRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
 }

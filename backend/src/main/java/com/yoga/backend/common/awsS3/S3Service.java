@@ -1,6 +1,7 @@
 package com.yoga.backend.common.awsS3;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,12 +14,16 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 @Service
 public class S3Service {
 
     // S3 클라이언트
     private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
 
     // S3 버킷 이름
     @Value("${cloud.aws.s3.bucket}")
@@ -26,8 +31,9 @@ public class S3Service {
 
     // S3 클라이언트 주입
     @Autowired
-    public S3Service(S3Client s3Client) {
+    public S3Service(S3Client s3Client, S3Presigner s3Presigner) {
         this.s3Client = s3Client;
+        this.s3Presigner = s3Presigner;
     }
 
     /**
@@ -126,5 +132,21 @@ public class S3Service {
     private String extractKeyFromUrl(String fileUrl) {
         // S3 URL에서 ".com/" 이후의 부분을 키로 추출
         return fileUrl.substring(fileUrl.indexOf(".com/") + 5);
+    }
+
+    public String generatePresignedUrl(String key, long expirationInSeconds) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+            .bucket(bucketName)
+            .key(key)
+            .build();
+
+        GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
+            .signatureDuration(Duration.ofSeconds(expirationInSeconds))
+            .getObjectRequest(getObjectRequest)
+            .build();
+
+        PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(getObjectPresignRequest);
+
+        return presignedGetObjectRequest.url().toString();
     }
 }

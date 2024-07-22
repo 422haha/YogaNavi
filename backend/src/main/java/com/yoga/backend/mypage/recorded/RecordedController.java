@@ -1,9 +1,6 @@
 package com.yoga.backend.mypage.recorded;
 
-
-import com.yoga.backend.common.awsS3.S3Service;
 import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.mypage.recorded.dto.ChapterDto;
 import com.yoga.backend.mypage.recorded.dto.LectureCreationStatus;
 import com.yoga.backend.mypage.recorded.dto.LectureDto;
 import java.util.HashMap;
@@ -11,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,12 +19,12 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 /*
-* TODO: 종아요, 좋아요 취소 구현
-* TODO: 좋아요한 강의 목록 조회( 아마 끝 )
-* TODO: 강의 삭제, 수정 구현
-* FIXME: 업로드한 강의 목록 조회 및 업로드한 강의 상세 보기 s3와 연결
-*
-* */
+ * TODO: 종아요, 좋아요 취소 구현 (아마 끝)
+ * TODO: 좋아요한 강의 목록 조회( 아마 끝 )
+ * TODO: 강의 삭제, 수정 구현 (아마 끝)
+ * FIXME: 업로드한 강의 목록 조회 및 업로드한 강의 상세 보기 s3와 연결 (아마 끝)
+ *
+ * */
 @RestController
 @RequestMapping("/mypage/recorded-lecture")
 public class RecordedController {
@@ -36,6 +34,7 @@ public class RecordedController {
 
     @Autowired
     private RecordedService recordedService;
+
 
     /**
      * 사용자가 업로드한 강의 목록을 조회
@@ -61,6 +60,7 @@ public class RecordedController {
         }
 
     }
+
 
     /**
      * 사용자가 좋아요한 강의 목록을 조회
@@ -89,11 +89,11 @@ public class RecordedController {
 
 
     /**
-     * 새로운 강의를 생성
+     * 새로운 강의를 생성하기를 요청
      *
      * @param token      JWT 토큰
      * @param lectureDto 강의 정보
-     * @return 생성된 강의 정보
+     * @return sessionId
      */
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> createLecture(
@@ -118,8 +118,10 @@ public class RecordedController {
         }
     }
 
+
     /**
      * 강의 생성 상태 확인
+     * 클라이언트는 주기적으로 getLectureCreationStatus를 호출해야함.
      *
      * @param sessionId 강의 생성 세션 ID
      * @return 강의 생성 상태
@@ -162,5 +164,77 @@ public class RecordedController {
         }
     }
 
+    @PutMapping("/update/{recorded_id}")
+    public ResponseEntity<Map<String, Object>> updateLecture(
+        @RequestHeader("Authorization") String token,
+        @PathVariable Long recorded_id,
+        @RequestBody LectureDto lectureDto) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String email = jwtUtil.getEmailFromToken(token);
+            LectureDto updatedLecture = recordedService.updateLecture(recorded_id, lectureDto, email);
+            response.put("message", "강의가 성공적으로 수정되었습니다.");
+            response.put("data", updatedLecture);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("message", "강의 수정 중 오류가 발생했습니다: " + e.getMessage());
+            response.put("data", new Object[]{});
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @DeleteMapping("/delete/{recorded_id}")
+    public ResponseEntity<Map<String, Object>> deleteLecture(
+        @RequestHeader("Authorization") String token,
+        @PathVariable Long recorded_id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String email = jwtUtil.getEmailFromToken(token);
+            recordedService.deleteLecture(recorded_id, email);
+            response.put("message", "강의가 성공적으로 삭제되었습니다.");
+            response.put("data", new Object[]{});
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("message", "강의 삭제 중 오류가 발생했습니다: " + e.getMessage());
+            response.put("data", new Object[]{});
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * 강의 좋아요, 좋아요 취소
+     *
+     * @param token      jwt
+     * @param lectureDto 좋아요 및 강의 관련 정보를 받아올 dto
+     * @return 강의 상세 정보
+     */
+    @PostMapping("/like")
+    public ResponseEntity<Map<String, Object>> like(@RequestHeader("Authorization") String token,
+        @RequestBody LectureDto lectureDto) {
+        Map<String, Object> response = new HashMap<>();
+        String email = jwtUtil.getEmailFromToken(token);
+        try {
+
+            LectureDto updatedLecture;
+            if (lectureDto.isMyLike()) { //좋아요 취소
+                updatedLecture = recordedService.setLike(lectureDto.getRecordedId(), email);
+                response.put("message", "좋아요 성공");
+
+            } else { // 좋아요 하기
+                updatedLecture = recordedService.setDislike(lectureDto.getRecordedId(), email);
+                response.put("message", "좋아요 취소");
+            }
+            response.put("data", updatedLecture);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (OptimisticLockingFailureException e) {
+            response.put("message", "다시 시도해주세요.");
+            response.put("data", new Object[]{});
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        } catch (Exception e) {
+            response.put("message", "오류가 발생했습니다: " + e.getMessage());
+            response.put("data", new Object[]{});
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 
 }
