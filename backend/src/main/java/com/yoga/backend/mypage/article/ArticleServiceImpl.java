@@ -31,17 +31,6 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 게시글 ID로 특정 게시글을 조회합니다.
-     *
-     * @param id 게시글 ID
-     * @return 게시글
-     */
-    @Override
-    public Optional<Article> getArticleById(Long id) {
-        return articleRepository.findById(id);
-    }
-
-    /**
      * 모든 게시글을 조회합니다.
      *
      * @return 게시글 목록
@@ -60,6 +49,17 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<Article> getArticlesByUserId(int userId) {
         return articleRepository.findByUserId(userId);
+    }
+
+    /**
+     * 게시글 ID로 특정 게시글을 조회합니다.
+     *
+     * @param id 게시글 ID
+     * @return 게시글
+     */
+    @Override
+    public Optional<Article> getArticleById(Long id) {
+        return articleRepository.findById(id);
     }
 
     /**
