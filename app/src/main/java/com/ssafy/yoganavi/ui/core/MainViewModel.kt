@@ -12,7 +12,14 @@ class MainViewModel : ViewModel() {
     private val _mainEvent: MutableSharedFlow<MainEvent> = MutableSharedFlow()
     val mainEvent: SharedFlow<MainEvent> = _mainEvent.asSharedFlow()
 
-    fun setMainEvent(event: MainEvent) = viewModelScope.launch {
+    fun setMainEvent(
+        isBottomNavigationVisible: Boolean,
+        title: String,
+        canGoBack: Boolean,
+        menuItem: String? = null,
+        menuListener: (() -> Unit)? = null
+    ) = viewModelScope.launch {
+        val event = MainEvent(isBottomNavigationVisible, title, canGoBack, menuItem, menuListener)
         _mainEvent.emit(event)
     }
 }
