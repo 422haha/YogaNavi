@@ -24,7 +24,7 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(MANAGEMENT_VIDEO)
+        setToolbar(false,MANAGEMENT_VIDEO,true)
 
         binding.rvLecture.adapter = lectureAdapter
         initCollect()

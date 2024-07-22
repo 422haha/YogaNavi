@@ -13,7 +13,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setToolbar(MY_PAGE)
+        setToolbar(true,MY_PAGE,false)
         initListener()
     }
 

@@ -48,7 +48,7 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(REGISTER_VIDEO)
+        setToolbar(false,REGISTER_VIDEO,true)
 
         if (args.recordedId != -1) viewModel.getLecture(args.recordedId)
         binding.rvLecture.adapter = chapterAdapter

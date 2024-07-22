@@ -8,6 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.snackbar.Snackbar
+import com.ssafy.yoganavi.ui.loginUI.find.FindFragment
+import com.ssafy.yoganavi.ui.loginUI.join.JoinFragment
+import com.ssafy.yoganavi.ui.loginUI.login.LoginFragment
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_NOTICE
 
 typealias Inflate<T> = (LayoutInflater, ViewGroup?, Boolean) -> T
@@ -31,12 +34,15 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
     }
 
     fun showSnackBar(msg: String) = Snackbar.make(binding.root, msg, Snackbar.LENGTH_SHORT).show()
-    fun setToolbar(title: String) {
-        val mainEvent = MainEvent(
-            isBottomNavigationVisible = false,
-            title = title,
-            canGoBack = true,
-        )
-        activityViewModel.setMainEvent(mainEvent)
+    fun setToolbar(
+        isBottomNavigationVisible: Boolean,
+        title: String,
+        canGoBack: Boolean,
+        menuItem: String? = null,
+        menuListener: (() -> Unit)? = null
+    ) {
+        if (!(this is LoginFragment || this is FindFragment || this is JoinFragment)) {
+            activityViewModel.setMainEvent(isBottomNavigationVisible, title, canGoBack, menuItem, menuListener)
+        }
     }
 }
