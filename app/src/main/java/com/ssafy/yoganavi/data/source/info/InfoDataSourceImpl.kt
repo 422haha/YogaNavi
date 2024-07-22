@@ -4,6 +4,7 @@ import com.ssafy.yoganavi.data.source.YogaDetailResponse
 import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
+import com.ssafy.yoganavi.data.source.notice.NoticeData
 import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,5 +17,8 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
 
     override suspend fun getLecture(recordedId: Int): Response<YogaDetailResponse<LectureDetailData>> =
         infoAPI.getLecture(recordedId)
+
+    override suspend fun getNoticeList(): Response<YogaResponse<NoticeData>> =
+        infoAPI.getNoticeList()
 
 }
