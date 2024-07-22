@@ -19,8 +19,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding::inflate) {
 
-    private val viewModel : NoticeViewModel by viewModels()
-    private val noticeAdapter by lazy{ NoticeAdapter(::navigateToNoticeFragment) }
+    private val viewModel: NoticeViewModel by viewModels()
+    private val noticeAdapter by lazy { NoticeAdapter(::navigateToNoticeFragment) }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,6 +39,7 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding
             }
         }
     }
+
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.noticeList.collectLatest {
