@@ -13,5 +13,5 @@ public class SecurityConstants {
     // 시험용 짧은 시간
     public static final long ACCESS_TOKEN_EXPIRATION = 2591000000L;
 //    public static final long ACCESS_TOKEN_EXPIRATION = 30000; // 0.5분
-//    public static final long REFRESH_TOKEN_EXPIRATION = 120000; // 1분
+//    public static final long REFRESH_TOKEN_EXPIRATION = 60000; // 1분
 }

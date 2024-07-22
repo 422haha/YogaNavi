@@ -15,9 +15,6 @@ public class RecordedLectureChapter {
     private String description;
 
     @Column(nullable = false)
-    private String thumbnail;
-
-    @Column(nullable = false)
     private String videoUrl;
 
     @Column(nullable = false)
@@ -49,14 +46,6 @@ public class RecordedLectureChapter {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
     }
 
     public String getVideoUrl() {

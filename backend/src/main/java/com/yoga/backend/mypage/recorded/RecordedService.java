@@ -20,5 +20,12 @@ public interface RecordedService {
 
     LectureDto getLectureDetails(Long recordedId, String email);
 
+    LectureDto updateLecture(Long lectureId, LectureDto lectureDto, String email);
+
+    void deleteLecture(Long lectureId, String email);
+
+    LectureDto setLike(Long recordedId, String email);
+
+    LectureDto setDislike(Long recordedId, String email);
 }
 

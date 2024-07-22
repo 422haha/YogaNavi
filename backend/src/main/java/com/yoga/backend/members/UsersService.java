@@ -1,6 +1,9 @@
 package com.yoga.backend.members;
 
 import com.yoga.backend.common.entity.Users;
+import java.io.IOException;
+import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UsersService {
 
@@ -17,4 +20,8 @@ public interface UsersService {
     boolean validateResetToken(String email, String token);
 
     String resetPassword(String email, String newPassword);
+
+    List<Users> getUserByEmail(String email);
+
+    Users updateUserInfo(String email, String nickname, MultipartFile profileImage) throws IOException;
 }

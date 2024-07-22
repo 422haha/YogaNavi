@@ -2,83 +2,64 @@ package com.yoga.backend.common.handler;
 
 import com.google.gson.Gson;
 import com.yoga.backend.common.constants.SecurityConstants;
+import com.yoga.backend.common.entity.Users;
+import com.yoga.backend.common.util.JwtUtil;
+import com.yoga.backend.members.UsersRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.io.IOException;;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import org.springframework.stereotype.Component;
 
+/**
+ * 인증 성공 시 처리하는 핸들러
+ */
+@Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    /**
-     * 인증 성공 시 호출되는 메서드. JWT 액세스 토큰과 리프레시 토큰을 생성, 응답 헤더에 추가
-     *
-     * @param request        HttpServletRequest 객체
-     * @param response       HttpServletResponse 객체
-     * @param authentication 인증 정보
-     */
+    private final JwtUtil jwtUtil;
+
+    public CustomAuthenticationSuccessHandler(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException {
 
-        // JWT 생성을 위한 비밀 키 생성
-        SecretKey key = Keys.hmacShaKeyFor(
-            SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
+        String email = authentication.getName();
+        String role = authentication.getAuthorities().stream()
+            .findFirst()
+            .map(a -> a.getAuthority().replace("ROLE_", ""))
+            .orElse("");
 
-        // 액세스 토큰 생성
-        String accessToken = Jwts.builder()
-            .issuer("Yoga Navi")
-            .subject("JWT Token")
-            .claim("email", authentication.getName())
-            .claim("role", authentication.getAuthorities().stream()
-                .findFirst()
-                .map(a -> a.getAuthority().replace("ROLE_", ""))
-                .orElse(""))
-            .issuedAt(new Date())
-            .expiration(
-                new Date(System.currentTimeMillis() + SecurityConstants.ACCESS_TOKEN_EXPIRATION))
-            .signWith(key)
-            .compact();
+        String accessToken = jwtUtil.generateAccessToken(email, role);
+        String refreshToken = jwtUtil.generateRefreshToken(email);
 
-        // 리프레시 토큰 생성
-        String refreshToken = Jwts.builder()
-            .issuer("Yoga Navi")
-            .subject("Refresh Token")
-            .claim("username", authentication.getName())
-            .issuedAt(new Date())
-            .expiration(
-                new Date(System.currentTimeMillis() + SecurityConstants.REFRESH_TOKEN_EXPIRATION))
-            .signWith(key)
-            .compact();
+        // 새 토큰으로 업데이트하고 이전 세션 로그아웃
+        jwtUtil.updateUserTokenAndLogoutOthers(email, accessToken);
 
-        // 생성된 토큰 정보 출력
-        System.out.println("access token: " + accessToken);
-        System.out.println("refresh token: " + refreshToken);
-
-        // 응답 헤더에 토큰 정보 추가
         response.setHeader(SecurityConstants.JWT_HEADER, accessToken);
         response.setHeader(SecurityConstants.REFRESH_TOKEN_HEADER, refreshToken);
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.getWriter().write(getResponseBody());
+        response.getWriter().write(getResponseBody(role));
     }
 
-    private String getResponseBody() {
+    private String getResponseBody(String role) {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("message", "로그인 성공");
-        responseBody.put("data", new Object[]{});
+        responseBody.put("data", role.equals("TEACHER"));
 
         return new Gson().toJson(responseBody);
     }

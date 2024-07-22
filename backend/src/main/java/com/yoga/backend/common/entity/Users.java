@@ -25,11 +25,17 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     @Column(unique = true)
     private String nickname;
 
+    @Column
     private String profile_image_url;
 
+    @Column
     private String role;
 
+    @Column
     private String resetToken;
+
+    @Column
+    private String activeToken;
 
     public String getResetToken() {
         return resetToken;
@@ -82,4 +88,13 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     public void setRole(String role) {
         this.role = role;
     }
+
+    public String getActiveToken() {
+        return activeToken;
+    }
+
+    public void setActiveToken(String activeToken) {
+        this.activeToken = activeToken;
+    }
+
 }
