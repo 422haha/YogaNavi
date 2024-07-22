@@ -144,9 +144,9 @@ public class ArticleController {
      * @param id 게시글 ID
      * @return 게시글 정보
      */
-    @GetMapping("/update/{article_id}")
+    @GetMapping("/update/{articleId}")
     public ResponseEntity<Map<String, Object>> getArticleById(
-        @PathVariable("article_id") Long id) {
+        @PathVariable("articleId") Long id) {
         Map<String, Object> response = new HashMap<>();
         try {
             Optional<Article> article = articleService.getArticleById(id);
@@ -287,21 +287,22 @@ public class ArticleController {
      */
     private Map<String, Object> convertArticleToMap(Article article) {
         Map<String, Object> map = new HashMap<>();
-        map.put("article_id", article.getArticleId());
+        map.put("articleId", article.getArticleId());
 
-        // 작성자 정보가 null인지 확인합니다.
         Users user = article.getUser();
         if (user != null) {
-            map.put("user_id", user.getId());
-            map.put("user_name", user.getEmail()); // assuming user_name is the email
+            map.put("userId", user.getId());
+            map.put("userName", user.getEmail());
+            map.put("userProfileImage", user.getProfile_image_url());
         } else {
-            map.put("user_id", null);
-            map.put("user_name", null);
+            map.put("userId", null);
+            map.put("userName", null);
+            map.put("userProfileImage", null);
         }
 
         map.put("content", article.getContent());
-        map.put("created_at", article.getCreatedAt().toString());
-        map.put("image_url", article.getImageUrl());
+        map.put("createdAt", article.getCreatedAt().toString());
+        map.put("imageUrl", article.getImageUrl());
         return map;
     }
 }
