@@ -109,7 +109,7 @@ public class ArticleController {
      * @param token JWT 토큰
      * @return 게시글 목록
      */
-    @GetMapping("/user")
+    @GetMapping("/list")
     public ResponseEntity<Map<String, Object>> getArticlesByUserId(
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
@@ -132,6 +132,35 @@ public class ArticleController {
             }
         } catch (Exception e) {
             logger.error("Error fetching articles by user ID", e);
+            response.put("message", "서버 내부 오류가 발생했습니다");
+            response.put("data", new Object[]{});
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * 특정 게시글을 조회합니다.
+     *
+     * @param id 게시글 ID
+     * @return 게시글 정보
+     */
+    @GetMapping("/update/{article_id}")
+    public ResponseEntity<Map<String, Object>> getArticleById(
+        @PathVariable("article_id") Long id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Optional<Article> article = articleService.getArticleById(id);
+            if (article.isPresent()) {
+                response.put("message", "success");
+                response.put("data", convertArticleToMap(article.get()));
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("message", "게시글을 찾을 수 없습니다");
+                response.put("data", new Object[]{});
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            logger.error("Error fetching article by ID", e);
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
