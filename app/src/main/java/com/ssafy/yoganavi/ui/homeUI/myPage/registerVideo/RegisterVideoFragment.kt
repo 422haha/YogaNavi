@@ -16,6 +16,7 @@ import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
 import com.ssafy.yoganavi.databinding.FragmentRegisterVideoBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.ChapterAdapter
+import com.ssafy.yoganavi.ui.utils.CREATE
 import com.ssafy.yoganavi.ui.utils.REGISTER_VIDEO
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -48,8 +49,7 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(false,REGISTER_VIDEO,true)
-
+        setToolbar(false,REGISTER_VIDEO,true,CREATE) { Timber.d("생성!!!!!") }
         if (args.recordedId != -1) viewModel.getLecture(args.recordedId)
         binding.rvLecture.adapter = chapterAdapter
         initCollect()
