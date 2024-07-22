@@ -16,7 +16,6 @@ import com.ssafy.yoganavi.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
@@ -39,7 +38,6 @@ class LoginActivity : AppCompatActivity() {
     private fun initCollect() = lifecycleScope.launch {
         repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.tokenEvent.collectLatest {
-                Timber.d("TOKEN: $it")
                 moveMainActivity()
             }
         }
