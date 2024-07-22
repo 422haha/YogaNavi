@@ -17,6 +17,9 @@ interface InfoAPI {
     @GET("mypage/recorded-lecture/list/{recorded_id}")
     suspend fun getLecture(@Path("recorded_id") id: Int): Response<YogaDetailResponse<LectureDetailData>>
 
-    @GET("mypage/notification/user")
+    @GET("mypage/notification/list")
     suspend fun getNoticeList() : Response<YogaResponse<NoticeData>>
+
+    @GET("mypage/notification/update/{article_id}")
+    suspend fun getNotice(@Path("article_id") id:Int) : Response<YogaDetailResponse<NoticeData>>
 }

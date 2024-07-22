@@ -14,4 +14,6 @@ interface InfoDataSource {
     suspend fun getLecture(recordedId: Int): Response<YogaDetailResponse<LectureDetailData>>
 
     suspend fun getNoticeList(): Response<YogaResponse<NoticeData>>
+
+    suspend fun getNotice(articleId : Int): Response<YogaDetailResponse<NoticeData>>
 }

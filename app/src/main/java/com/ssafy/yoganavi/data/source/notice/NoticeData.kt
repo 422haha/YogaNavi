@@ -4,8 +4,8 @@ data class NoticeData(
     val articleId: Int = 0,
     val userId: Int = 0,
     val userName: String = "",
-    val userProfileImage: String = "",
+    val profileImageUrl: String = "",
     val content: String = "",
-    val createdAt: String = "",
+    val createdAt: Long = 0L,
     val imageUrl: String = ""
 )

@@ -11,4 +11,6 @@ interface InfoRepository {
     suspend fun getLecture(recordId: Int): DetailResponse<LectureDetailData>
 
     suspend fun getNoticeList() : ListResponse<NoticeData>
+
+    suspend fun getNotice(articleId : Int): DetailResponse<NoticeData>
 }

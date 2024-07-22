@@ -12,6 +12,7 @@ import com.ssafy.yoganavi.databinding.FragmentNoticeBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.ManagementVideoFragmentDirections
 import com.ssafy.yoganavi.ui.homeUI.myPage.notice.notices.NoticeAdapter
+import com.ssafy.yoganavi.ui.utils.MANAGEMENT_NOTICE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -25,6 +26,7 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setToolbar(false,MANAGEMENT_NOTICE,true)
 
         binding.rvMyList.adapter = noticeAdapter
         initCollect()
@@ -48,10 +50,9 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding
         }
     }
 
-    private fun navigateToNoticeFragment(recordedId: Int = -1) {
-        val directions = ManagementVideoFragmentDirections
-            .actionManagementVideoFragmentToRegisterVideoFragment(recordedId)
-
+    private fun navigateToNoticeFragment(articleId: Int = -1) {
+        val directions = NoticeFragmentDirections
+            .actionNoticeFragmentToRegisterNoticeFragment(articleId)
         findNavController().navigate(directions)
     }
 }

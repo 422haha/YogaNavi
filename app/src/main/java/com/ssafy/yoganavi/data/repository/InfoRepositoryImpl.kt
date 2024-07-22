@@ -38,6 +38,11 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toListResponse()
     }
 
+    override suspend fun getNotice(articleId: Int): DetailResponse<NoticeData> {
+        val response = withContext(ioDispatcher){infoDataSource.getNotice(articleId)}
+        return response.toDetailResponse()
+    }
+
     private inline fun <reified T> Response<YogaResponse<T>>.toListResponse(): ListResponse<T> {
         if (code() == FORBIDDEN) return ListResponse.AuthError(message = NO_AUTH)
 

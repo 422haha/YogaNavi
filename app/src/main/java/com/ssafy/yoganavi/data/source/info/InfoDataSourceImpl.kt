@@ -21,4 +21,6 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun getNoticeList(): Response<YogaResponse<NoticeData>> =
         infoAPI.getNoticeList()
 
+    override suspend fun getNotice(articleId: Int): Response<YogaDetailResponse<NoticeData>> =
+        infoAPI.getNotice(articleId)
 }
