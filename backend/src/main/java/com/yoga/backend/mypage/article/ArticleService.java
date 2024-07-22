@@ -18,14 +18,6 @@ public interface ArticleService {
     void saveArticle(Article article);
 
     /**
-     * 게시글 ID로 특정 게시글을 조회합니다.
-     *
-     * @param id 게시글 ID
-     * @return 게시글
-     */
-    Optional<Article> getArticleById(Long id);
-
-    /**
      * 모든 게시글을 조회합니다.
      *
      * @return 게시글 목록
@@ -39,6 +31,14 @@ public interface ArticleService {
      * @return 게시글 목록
      */
     List<Article> getArticlesByUserId(int userId);
+
+    /**
+     * 게시글 ID로 특정 게시글을 조회합니다.
+     *
+     * @param id 게시글 ID
+     * @return 게시글
+     */
+    Optional<Article> getArticleById(Long id);
 
     /**
      * 게시글을 삭제합니다.
