@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -287,21 +288,22 @@ public class ArticleController {
      */
     private Map<String, Object> convertArticleToMap(Article article) {
         Map<String, Object> map = new HashMap<>();
-        map.put("article_id", article.getArticleId());
+        map.put("articleId", article.getArticleId());
 
         // 작성자 정보가 null인지 확인합니다.
         Users user = article.getUser();
         if (user != null) {
-            map.put("user_id", user.getId());
-            map.put("user_name", user.getEmail()); // assuming user_name is the email
+            map.put("userId", user.getId());
+            map.put("userName", user.getEmail()); // assuming userName is the email
         } else {
-            map.put("user_id", null);
-            map.put("user_name", null);
+            map.put("userId", null);
+            map.put("userName", null);
         }
 
         map.put("content", article.getContent());
-        map.put("created_at", article.getCreatedAt().toString());
-        map.put("image_url", article.getImageUrl());
+        map.put("createdAt", article.getCreatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
+        map.put("updatedAt", article.getUpdatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
+        map.put("imageUrl", article.getImageUrl());
         return map;
     }
 }
