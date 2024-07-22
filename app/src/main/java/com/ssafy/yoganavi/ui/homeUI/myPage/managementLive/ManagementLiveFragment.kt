@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentManagementLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
-import com.ssafy.yoganavi.ui.core.MainEvent
 import com.ssafy.yoganavi.ui.core.MainViewModel
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_LIVE
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,7 +30,9 @@ class ManagementLiveFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setToolbar()
+        setToolbar(isBottomNavigationVisible = false,
+            title = MANAGEMENT_LIVE,
+            canGoBack = true,)
 
         initListener()
 
@@ -40,15 +41,6 @@ class ManagementLiveFragment :
         initCollect()
 
         viewModel.getLiveList()
-    }
-
-    private fun setToolbar() {
-        val mainEvent = MainEvent(
-            isBottomNavigationVisible = false,
-            title = MANAGEMENT_LIVE,
-            canGoBack = true,
-        )
-        activityViewModel.setMainEvent(mainEvent)
     }
 
     private fun initListener() {
