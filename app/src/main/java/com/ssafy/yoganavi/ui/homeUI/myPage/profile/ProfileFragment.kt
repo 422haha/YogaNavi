@@ -2,32 +2,19 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.profile
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentProfileBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
-import com.ssafy.yoganavi.ui.core.MainEvent
-import com.ssafy.yoganavi.ui.core.MainViewModel
 import com.ssafy.yoganavi.ui.utils.MY_PAGE
 
 class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBinding::inflate) {
-    private val activityViewModel: MainViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setToolbar()
+        setToolbar(true,MY_PAGE,false)
         initListener()
-    }
-
-    private fun setToolbar() {
-        val mainEvent = MainEvent(
-            isBottomNavigationVisible = true,
-            title = MY_PAGE,
-            canGoBack = false,
-        )
-        activityViewModel.setMainEvent(mainEvent)
     }
 
     private fun initListener() {
