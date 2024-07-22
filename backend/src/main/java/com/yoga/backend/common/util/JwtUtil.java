@@ -1,18 +1,13 @@
 package com.yoga.backend.common.util;
 
 import com.yoga.backend.common.constants.SecurityConstants;
-import com.yoga.backend.common.entity.Users;
-import com.yoga.backend.members.UsersRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.List;
+import java.util.Optional;
 import javax.crypto.SecretKey;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class JwtUtil {
@@ -24,8 +19,7 @@ public class JwtUtil {
         this.userRepository = userRepository;
     }
 
-    private final SecretKey key = Keys.hmacShaKeyFor(
-        SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
+        token = token.replace("Bearer ", "");
 
 
     // access token 생성
@@ -42,27 +36,11 @@ public class JwtUtil {
             .compact();
     }
 
-    // refresh token 생성
-    public String generateRefreshToken(String email) {
-        return Jwts.builder()
-            .issuer("Yoga Navi")
-            .subject("Refresh Token")
-            .claim("email", email)
-            .issuedAt(new Date())
-            .expiration(
-                new Date(System.currentTimeMillis() + SecurityConstants.REFRESH_TOKEN_EXPIRATION))
-            .signWith(key)
-            .compact();
-    }
-
-    // 토큰 검증
-    public Claims validateToken(String token) {
-        return Jwts.parser()
+        Claims claims = Jwts.parser()
             .verifyWith(key)
             .build()
             .parseSignedClaims(token)
             .getPayload();
-    }
 
     public String extractToken(String bearerToken) {
         return bearerToken.substring(7);

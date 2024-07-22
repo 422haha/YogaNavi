@@ -47,7 +47,7 @@ public class ArticleServiceImpl implements ArticleService {
      * @return 게시글 목록
      */
     @Override
-    public List<Article> getArticlesByUserId(int userId) { // userId 타입을 int로 수정
+    public List<Article> getArticlesByUserId(int userId) {
         return articleRepository.findByUserId(userId);
     }
 
@@ -80,6 +80,6 @@ public class ArticleServiceImpl implements ArticleService {
      */
     @Override
     public List<Article> findByContent(String content) {
-        return articleRepository.findByContent(content); // 추가된 메서드 구현
+        return articleRepository.findByContent(content);
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +94,7 @@ public class ArticleController {
                 .map(this::convertArticleToMap)
                 .collect(Collectors.toList());
             response.put("message", "success");
-            response.put("data", Map.of("article_list", articleList));
+            response.put("data", articleList);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error fetching all articles", e);
@@ -109,7 +110,7 @@ public class ArticleController {
      * @param token JWT 토큰
      * @return 게시글 목록
      */
-    @GetMapping("/user")
+    @GetMapping("/list")
     public ResponseEntity<Map<String, Object>> getArticlesByUserId(
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
@@ -123,7 +124,7 @@ public class ArticleController {
                     .map(this::convertArticleToMap)
                     .collect(Collectors.toList());
                 response.put("message", "success");
-                response.put("data", Map.of("article_list", articleList));
+                response.put("data", articleList);
                 return ResponseEntity.ok(response);
             } else {
                 response.put("message", "권한이 없습니다");
@@ -132,6 +133,35 @@ public class ArticleController {
             }
         } catch (Exception e) {
             logger.error("Error fetching articles by user ID", e);
+            response.put("message", "서버 내부 오류가 발생했습니다");
+            response.put("data", new Object[]{});
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * 특정 게시글을 조회합니다.
+     *
+     * @param id 게시글 ID
+     * @return 게시글 정보
+     */
+    @GetMapping("/update/{article_id}")
+    public ResponseEntity<Map<String, Object>> getArticleById(
+        @PathVariable("article_id") Long id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Optional<Article> article = articleService.getArticleById(id);
+            if (article.isPresent()) {
+                response.put("message", "success");
+                response.put("data", convertArticleToMap(article.get()));
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("message", "게시글을 찾을 수 없습니다");
+                response.put("data", new Object[]{});
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            logger.error("Error fetching article by ID", e);
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -258,21 +288,22 @@ public class ArticleController {
      */
     private Map<String, Object> convertArticleToMap(Article article) {
         Map<String, Object> map = new HashMap<>();
-        map.put("article_id", article.getArticleId());
+        map.put("articleId", article.getArticleId());
 
         // 작성자 정보가 null인지 확인합니다.
         Users user = article.getUser();
         if (user != null) {
-            map.put("user_id", user.getId());
-            map.put("user_name", user.getEmail()); // assuming user_name is the email
+            map.put("userId", user.getId());
+            map.put("userName", user.getEmail()); // assuming userName is the email
         } else {
-            map.put("user_id", null);
-            map.put("user_name", null);
+            map.put("userId", null);
+            map.put("userName", null);
         }
 
         map.put("content", article.getContent());
-        map.put("created_at", article.getCreatedAt().toString());
-        map.put("image_url", article.getImageUrl());
+        map.put("createdAt", article.getCreatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
+        map.put("updatedAt", article.getUpdatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
+        map.put("imageUrl", article.getImageUrl());
         return map;
     }
 }

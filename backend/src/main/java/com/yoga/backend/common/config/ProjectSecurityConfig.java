@@ -1,21 +1,14 @@
 package com.yoga.backend.common.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yoga.backend.common.handler.CustomAuthenticationSuccessHandler;
 import com.yoga.backend.common.filter.JWTTokenValidatorFilter;
 import com.yoga.backend.common.handler.CustomLoginFailureHandler;
-import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.members.UsersRepository;
 import jakarta.servlet.http.HttpServletRequest;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Collections;
 
 
-import java.util.HashMap;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -62,8 +55,8 @@ public class ProjectSecurityConfig {
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
         // 세션 관리 설정: stateless
-        http.sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         // CORS 구성
         http.cors(
@@ -85,7 +78,7 @@ public class ProjectSecurityConfig {
         http.csrf(csrf -> csrf.disable());
 
         // JWT 토큰 검증 필터 추가
-        http.addFilterBefore(jwtTokenValidatorFilter(), BasicAuthenticationFilter.class);
+        http.addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class);
 
         // URL 기반 권한 부여 설정
         http.authorizeHttpRequests((requests) -> requests
@@ -102,11 +95,22 @@ public class ProjectSecurityConfig {
 
         // 인증 성공 시 JWT 발급
         http.formLogin(form -> form
-                .successHandler(customAuthenticationSuccessHandler())
+                .successHandler(new CustomAuthenticationSuccessHandler())
                 .failureHandler(new CustomLoginFailureHandler())
 //            .loginPage("/login")
 //            .failureUrl("/login-fail")
         );
+
+//        http.sessionManagement(session -> session
+//            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+//            .maximumSessions(1)
+//            .maxSessionsPreventsLogin(false)
+//            .expiredSessionStrategy(event -> {
+//                HttpServletResponse response = event.getResponse();
+//                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//                response.getWriter().print("다른 사용자가 로그인 하여 이 세션은 만료됩니다.");
+//                response.flushBuffer();
+//            }));
 
         // HTTP 기본 인증 구성
         http.httpBasic(Customizer.withDefaults());

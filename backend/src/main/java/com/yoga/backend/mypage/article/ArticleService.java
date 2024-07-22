@@ -53,5 +53,5 @@ public interface ArticleService {
      * @param content 게시글 내용
      * @return 게시글 목록
      */
-    List<Article> findByContent(String content); // 추가된 메서드
+    List<Article> findByContent(String content);
 }
