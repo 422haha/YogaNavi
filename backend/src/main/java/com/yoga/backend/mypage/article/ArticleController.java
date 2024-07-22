@@ -39,7 +39,8 @@ public class ArticleController {
      * @param jwtUtil         JwtUtil 객체
      */
     @Autowired
-    public ArticleController(ArticleService articleService, UsersRepository usersRepository, JwtUtil jwtUtil) {
+    public ArticleController(ArticleService articleService, UsersRepository usersRepository,
+        JwtUtil jwtUtil) {
         this.articleService = articleService;
         this.usersRepository = usersRepository;
         this.jwtUtil = jwtUtil;
@@ -311,8 +312,10 @@ public class ArticleController {
         }
 
         map.put("content", article.getContent());
-        map.put("createdAt", article.getCreatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
-        map.put("updatedAt", article.getUpdatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
+        map.put("createdAt",
+            article.getCreatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
+        map.put("updatedAt",
+            article.getUpdatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
         map.put("imageUrl", article.getImageUrl());
         return map;
     }
