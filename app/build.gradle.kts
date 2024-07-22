@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -10,6 +13,9 @@ android {
     namespace = "com.ssafy.yoganavi"
     compileSdk = 34
 
+    val properties = Properties()
+    properties.load(FileInputStream(rootProject.file("local.properties")))
+
     defaultConfig {
         applicationId = "com.ssafy.yoganavi"
         minSdk = 24
@@ -18,6 +24,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "ACCESS_KEY", properties.getProperty("accessKey"))
+        buildConfigField("String", "SECRET_KEY", properties.getProperty("secretKey"))
     }
 
     buildTypes {
@@ -39,32 +47,36 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
 dependencies {
+    implementation("com.amazonaws:aws-android-sdk-mobile-client:2.73.0")
+    implementation("com.amazonaws:aws-android-sdk-s3:2.73.0")
+
     // ProgressBar
-    implementation (libs.androidx.swiperefreshlayout)
+    implementation(libs.androidx.swiperefreshlayout)
 
     //Glide
     implementation(libs.glide)
 
     //Data Store
-    implementation (libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.preferences)
 
     // HTTP Client
-    implementation (libs.gson)
-    implementation (libs.retrofit)
-    implementation (libs.converter.gson)
-    implementation (libs.okhttp)
-    implementation (libs.squareup.logging.interceptor)
+    implementation(libs.gson)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.squareup.logging.interceptor)
 
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 
     // Timber
-    implementation (libs.timber)
+    implementation(libs.timber)
 
     // Fragment
     implementation(libs.androidx.fragment.ktx)
@@ -79,12 +91,12 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     // CalendarView
-    implementation (libs.material.calendarview)
-    implementation (libs.threetenabp) // github pull
+    implementation(libs.material.calendarview)
+    implementation(libs.threetenabp) // github pull
 
     // Navigation
-    implementation (libs.androidx.navigation.fragment.ktx)
-    implementation (libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 
     //Glide
     implementation("com.github.bumptech.glide:glide:4.12.0")

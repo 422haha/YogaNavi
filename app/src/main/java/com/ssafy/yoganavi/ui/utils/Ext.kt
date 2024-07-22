@@ -31,3 +31,7 @@ const val MANAGEMENT_VIDEO = "녹화 강의 관리"
 
 // 이름 
 const val CREATE = "생성"
+const val SAVE = "저장 완료"
+const val BUCKET_NAME = "yoga-navi"
+const val THUMBNAIL = "thumbnails"
+const val VIDEO = "videos"

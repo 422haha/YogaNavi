@@ -3,6 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter
 import android.net.Uri
 import android.view.View
 import android.widget.MediaController
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
 import com.ssafy.yoganavi.databinding.CustomChapterViewBinding
@@ -22,8 +23,8 @@ class ChapterViewHolder(
             clearVideo()
         }
 
-        if (data.videoUrl.isNotBlank()) {
-            val uri = Uri.parse(data.videoUrl)
+        if (data.recordFile != null) {
+            val uri = data.recordFile.toUri()
             val mediaController = MediaController(root.context)
             mediaController.setAnchorView(ivVideo)
 
