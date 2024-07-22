@@ -8,6 +8,7 @@ import com.ssafy.yoganavi.data.repository.InfoRepositoryImpl
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
 import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
+import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.THUMBNAIL
 import com.ssafy.yoganavi.ui.utils.VIDEO
@@ -87,6 +88,12 @@ class RegisterVideoViewModel @Inject constructor(
     ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching {
             val lecture = lectureState.value
+
+            if (anyEmptyLecture(lecture)) {
+                onFailure(IS_BLANK)
+                return@launch
+            }
+
             val thumbnailFile = File(lecture.recordThumbnailPath)
             transferUtility.upload(BUCKET_NAME, lecture.thumbnailKey, thumbnailFile)
 
@@ -99,5 +106,17 @@ class RegisterVideoViewModel @Inject constructor(
         }
             .onSuccess { onSuccess() }
             .onFailure { onFailure(NO_RESPONSE) }
+    }
+
+    private fun anyEmptyLecture(lecture: LectureDetailData): Boolean {
+        if (lecture.recordThumbnail.isBlank() && lecture.recordThumbnailPath.isBlank()) return true
+        if (lecture.recordContent.isBlank() || lecture.recordTitle.isBlank()) return true
+        if (lecture.recordedLectureChapters.isEmpty()) return true
+
+        lecture.recordedLectureChapters.forEach { chapter ->
+            if (chapter.recordVideo.isBlank() && chapter.recordPath.isBlank()) return true
+            if (chapter.chapterTitle.isBlank() || chapter.chapterDescription.isBlank()) return true
+        }
+        return false
     }
 }
