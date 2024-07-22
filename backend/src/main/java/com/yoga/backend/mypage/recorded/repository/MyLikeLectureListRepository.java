@@ -20,7 +20,7 @@ public class MyLikeLectureListRepository {
         this.queryFactory = queryFactory;
     }
 
-    public List<LectureDto> findMyLikedLectures(Long userId) {
+    public List<LectureDto> findMyLikedLectures(int userId) {
         QRecordedLecture lecture = QRecordedLecture.recordedLecture;
         QRecordedLectureLike like = QRecordedLectureLike.recordedLectureLike;
 

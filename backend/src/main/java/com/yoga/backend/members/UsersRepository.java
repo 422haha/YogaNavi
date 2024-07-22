@@ -24,8 +24,8 @@ public interface UsersRepository extends CrudRepository<Users, Long> {
     @Query("SELECT u FROM Users u WHERE u.email = :email")
     Optional<Users> findByEmailWithLock(String email);
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE Users u SET u.activeToken = :newToken WHERE u.id = :userId")
-    void updateActiveToken(@Param("userId") int userId, @Param("newToken") String newToken);
+//    @Transactional
+//    @Modifying
+//    @Query("UPDATE Users u SET u.activeToken = :newToken WHERE u.id = :userId")
+//    void updateActiveToken(@Param("userId") int userId, @Param("newToken") String newToken);
 }

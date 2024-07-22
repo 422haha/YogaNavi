@@ -55,14 +55,11 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                 String email = String.valueOf(claims.get("email"));
                 String authorities = (String) claims.get("role");
 
-                if (jwtUtilvalidateUserToken(email, jwt)) {
-                    Authentication auth = new UsernamePasswordAuthenticationToken(email, null,
-                        AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                    filterChain.doFilter(request, response);
-                } else {
-                    sendUnauthorizedResponse(response, "다른 기기에서 로그인됨");
-                }
+                Authentication auth = new UsernamePasswordAuthenticationToken(email, null,
+                    AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
+                SecurityContextHolder.getContext().setAuthentication(auth);
+                filterChain.doFilter(request, response);
+
             } catch (ExpiredJwtException e) {
                 if (null == refreshToken) {
                     sendUnauthorizedResponse(response, "리프레시 토큰 요청");
