@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -22,7 +21,6 @@ import com.ssafy.yoganavi.ui.core.MainEvent
 import com.ssafy.yoganavi.ui.core.MainViewModel
 import com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.ChapterAdapter
 import com.ssafy.yoganavi.ui.utils.CREATE
-import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.REGISTER_VIDEO
 import com.ssafy.yoganavi.ui.utils.SAVE
 import com.ssafy.yoganavi.ui.utils.getPath
@@ -46,7 +44,7 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data ?: return@registerForActivityResult
                 val imagePath = getPath(requireContext(), imageUri)
-                if(imagePath.isNotBlank()) viewModel.setThumbnail(imageUri, imagePath)
+                if (imagePath.isNotBlank()) viewModel.setThumbnail(imagePath)
             }
         }
     private val videoUriLauncher =
@@ -83,8 +81,8 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.lectureState.collectLatest {
-                setView(it)
+            viewModel.lectureState.collectLatest { state ->
+                setView(state)
             }
         }
     }
@@ -97,13 +95,11 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
     private fun setView(data: LectureDetailData) = with(binding) {
         etContent.setText(data.recordTitle)
         etContent.setText(data.recordContent)
-
-        if (data.recordThumbnailFile != null) {
-            val uri = data.recordThumbnailFile.toUri()
+        if (data.recordThumbnailPath.isNotBlank()) {
+            val uri = Uri.parse(data.recordThumbnailPath)
             ivVideo.setImageURI(uri)
             tvAddThumbnail.visibility = View.GONE
         }
-
         chapterAdapter.submitList(data.recordedLectureChapters)
     }
 
@@ -123,7 +119,7 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
 
         handleVideoResult = { uri ->
             val realPath = getPath(requireContext(), uri)
-            if (realPath.isNotBlank()) viewModel.setVideo(data, uri, realPath)
+            if (realPath.isNotBlank()) viewModel.setVideo(data, realPath)
         }
 
         videoUriLauncher.launch(intent)
@@ -134,9 +130,8 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
         findNavController().popBackStack()
     }
 
-    private suspend fun failToUpload() = withContext(Dispatchers.Main) {
-        showSnackBar(NO_RESPONSE)
-        findNavController().popBackStack()
+    private suspend fun failToUpload(message: String) = withContext(Dispatchers.Main) {
+        showSnackBar(message)
     }
 
     private fun addChapter() = viewModel.addChapter()

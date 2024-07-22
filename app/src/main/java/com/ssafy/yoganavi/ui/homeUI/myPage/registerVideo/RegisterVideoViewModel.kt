@@ -1,14 +1,14 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo
 
-import android.net.Uri
-import androidx.core.net.toFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
+import com.amazonaws.services.s3.AmazonS3Client
 import com.ssafy.yoganavi.data.repository.InfoRepositoryImpl
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
 import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
+import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.THUMBNAIL
 import com.ssafy.yoganavi.ui.utils.VIDEO
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,12 +17,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.File
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class RegisterVideoViewModel @Inject constructor(
     private val repositoryImpl: InfoRepositoryImpl,
     private val transferUtility: TransferUtility,
+    private val s3Client: AmazonS3Client
 ) : ViewModel() {
 
     private val _lectureState = MutableStateFlow(LectureDetailData())
@@ -48,23 +51,30 @@ class RegisterVideoViewModel @Inject constructor(
         _lectureState.emit(newState)
     }
 
-    fun setThumbnail(thumbnailUri: Uri, path: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun setThumbnail(path: String) = viewModelScope.launch(Dispatchers.IO) {
+        val thumbnailKey = "$THUMBNAIL/${UUID.randomUUID()}"
+        val recordThumbnail = s3Client.getUrl(BUCKET_NAME, thumbnailKey)
+
         val newState = lectureState.value.copy(
-            recordThumbnail = "$THUMBNAIL/${thumbnailUri.lastPathSegment}",
-            recordThumbnailFile = thumbnailUri.toFile()
+            recordThumbnail = recordThumbnail.toString(),
+            recordThumbnailPath = path,
+            thumbnailKey = thumbnailKey
         )
         _lectureState.emit(newState)
     }
 
-    fun setVideo(data: VideoChapterData, videoUri: Uri, path: String) =
+    fun setVideo(data: VideoChapterData, path: String) =
         viewModelScope.launch(Dispatchers.IO) {
             val list = lectureState.value.recordedLectureChapters.toMutableList()
             val index = list.indexOfFirst { it == data }
             if (index == -1) return@launch
 
+            val recordKey = "$VIDEO/${UUID.randomUUID()}"
+            val recordVideo = s3Client.getUrl(BUCKET_NAME, recordKey)
             list[index] = list[index].copy(
-                recordVideo = "$VIDEO/${videoUri.lastPathSegment}",
-                recordFile = videoUri.toFile()
+                recordVideo = recordVideo.toString(),
+                recordKey = recordKey,
+                recordPath = path
             )
 
             val newState = lectureState.value.copy(recordedLectureChapters = list)
@@ -73,16 +83,21 @@ class RegisterVideoViewModel @Inject constructor(
 
     fun sendLecture(
         onSuccess: suspend () -> Unit,
-        onFailure: suspend () -> Unit
+        onFailure: suspend (String) -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
-//        runCatching {
-        val lecture = lectureState.value
-        transferUtility.upload(BUCKET_NAME, lecture.recordThumbnail, lecture.recordThumbnailFile)
-        lecture.recordedLectureChapters.forEach { chapter ->
-            transferUtility.upload(BUCKET_NAME, chapter.recordVideo, chapter.recordFile)
+        runCatching {
+            val lecture = lectureState.value
+            val thumbnailFile = File(lecture.recordThumbnailPath)
+            transferUtility.upload(BUCKET_NAME, lecture.thumbnailKey, thumbnailFile)
+
+            lecture.recordedLectureChapters.forEach { chapter ->
+                val recordFile = File(chapter.recordPath)
+                transferUtility.upload(BUCKET_NAME, chapter.recordKey, recordFile)
+            }
+
+            // TODO 서버로 강의 정보 전송
         }
-//        }
-//            .onSuccess { onSuccess() }
-//            .onFailure { onFailure() }
+            .onSuccess { onSuccess() }
+            .onFailure { onFailure(NO_RESPONSE) }
     }
 }

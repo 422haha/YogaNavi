@@ -1,7 +1,6 @@
 package com.ssafy.yoganavi.data.source.lecture
 
 import com.google.gson.annotations.Expose
-import java.io.File
 
 data class LectureDetailData(
     val id: Int = 0,
@@ -11,5 +10,8 @@ data class LectureDetailData(
     val recordedLectureChapters: List<VideoChapterData> = mutableListOf(),
 
     @Expose(serialize = false, deserialize = false)
-    val recordThumbnailFile: File? = null
+    val recordThumbnailPath: String = "",
+
+    @Expose(serialize = false, deserialize = false)
+    val thumbnailKey: String = ""
 )

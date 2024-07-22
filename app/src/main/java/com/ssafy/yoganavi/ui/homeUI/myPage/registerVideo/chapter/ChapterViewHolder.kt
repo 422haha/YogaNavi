@@ -1,9 +1,8 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter
 
-import android.net.Uri
 import android.view.View
-import android.widget.MediaController
-import androidx.core.net.toUri
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
 import com.ssafy.yoganavi.databinding.CustomChapterViewBinding
@@ -23,29 +22,41 @@ class ChapterViewHolder(
             clearVideo()
         }
 
-        if (data.recordFile != null) {
-            val uri = data.recordFile.toUri()
-            val mediaController = MediaController(root.context)
-            mediaController.setAnchorView(ivVideo)
-
-            ivVideo.apply {
-                setVideoURI(uri)
-                setMediaController(mediaController)
-                setOnPreparedListener { mediaPlayer ->
-                    mediaPlayer.start()
-                    mediaPlayer.pause()
-                }
-            }
+        val uri = if (data.recordPath.isNotBlank()) {
+            data.recordPath
+        } else if (data.recordVideo.isNotBlank()) {
+            data.recordVideo
+        } else {
+            ""
         }
+
+        if (uri.isNotBlank()) addVideo(uri)
+        else clearVideo()
     }
 
-    private fun clearVideo() {
-        binding.ivVideo.stopPlayback()
-        binding.ivVideo.setMediaController(null)
-        binding.ivVideo.setOnPreparedListener(null)
-        binding.ivVideo.setVideoURI(null)
-        binding.ivVideo.visibility = View.GONE
-        binding.ivVideo.visibility = View.VISIBLE
+    private fun addVideo(uri: String) = with(binding) {
+        val mediaItem = MediaItem.fromUri(uri)
+        pvVideo.player = ExoPlayer.Builder(root.context).build().apply {
+            setMediaItem(mediaItem)
+        }
+        pvVideo.player?.prepare()
+
+        tvAddVideo.visibility = View.GONE
+        grayView.visibility = View.GONE
+        pvVideo.visibility = View.VISIBLE
     }
 
+    private fun clearVideo() = with(binding) {
+        pvVideo.player?.let { player ->
+            player.stop()
+            player.clearMediaItems()
+            player.release()
+        }
+        pvVideo.player = null
+        System.gc()
+
+        tvAddVideo.visibility = View.VISIBLE
+        grayView.visibility = View.VISIBLE
+        pvVideo.visibility = View.GONE
+    }
 }

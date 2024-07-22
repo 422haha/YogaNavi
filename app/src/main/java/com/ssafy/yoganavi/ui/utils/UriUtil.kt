@@ -9,8 +9,9 @@ fun getPath(context: Context, contentUri: Uri): String {
     val proj = arrayOf(MediaStore.Images.Media.DATA)
     val cursor = context.contentResolver.query(contentUri, proj, null, null, null) ?: return ""
     cursor.moveToNext()
-    val path = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA))
-//    val uri = Uri.fromFile(File(path))
+    val data = cursor.getColumnIndex(MediaStore.MediaColumns.DATA)
+    if (data == -1) return ""
+    val path = cursor.getString(data)
     cursor.close()
     return path
 }
