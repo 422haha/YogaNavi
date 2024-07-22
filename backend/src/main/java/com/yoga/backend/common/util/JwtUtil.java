@@ -17,11 +17,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class JwtUtil {
 
+    private final UsersRepository userRepository;
+
     @Autowired
-    private UsersRepository userRepository;
+    public JwtUtil(UsersRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     private final SecretKey key = Keys.hmacShaKeyFor(
         SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
+
 
     // access token 생성
     public String generateAccessToken(String email, String role) {
@@ -71,28 +76,38 @@ public class JwtUtil {
 
     }
 
-    // 사용자의 토큰을 검증함.
-    public boolean validateUserToken(String email, String token) {
-        List<Users> userList = userRepository.findByEmail(email);
-        if (!userList.isEmpty()) {
-            Users user = userList.get(0);
-            return token.equals(user.getActiveToken());
-        }
-        return false;
+    public int getUserIdFromToken(String bearerToken) {
+        String token = extractToken(bearerToken);
+        Claims claims = validateToken(token);
+        return userRepository.findByEmail(claims.get("email", String.class)).get(0).getId();
     }
+
+//    // 사용자의 토큰을 검증함.
+//    public boolean validateUserToken(String email, String token) {
+//        List<Users> userList = userRepository.findByEmail(email);
+//        if (!userList.isEmpty()) {
+//            Users user = userList.get(0);
+//            System.out.println("token: " + token + " user token: " + user.getActiveToken());
+//            return token.equals(user.getActiveToken());
+//        }
+//        return false;
+//    }
 
     // 사용자의 토큰을 업데이트하고 이전 세션을 로그아웃
     @Transactional
     public void updateUserTokenAndLogoutOthers(String email, String newToken) {
-        List<Users> userList = userRepository.findByEmail(email);
-        if (!userList.isEmpty()) {
-            Users user = userList.get(0);
-            // 이전 토큰 저장
-            String oldToken = user.getActiveToken();
-            // 새 토큰으로 업데이트
-            user.setActiveToken(newToken);
-            userRepository.save(user);
-        }
+//        List<Users> userList = userRepository.findByEmail(email);
+//        if (!userList.isEmpty()) {
+//            Users user = userList.get(0);
+//            System.out.println("============user : "+user.getEmail());
+//            // 이전 토큰 저장
+//            String oldToken = user.getActiveToken();
+//            // 새 토큰으로 업데이트
+//            user.setActiveToken(newToken);
+//            System.out.println("");
+//            userRepository.updateActiveToken(user.getId(), newToken);
+//            System.out.println("====================="+newToken+"============user : "+user.getActiveToken());
+//        }
     }
 
     public void logoutUser(String email) {
@@ -108,13 +123,13 @@ public class JwtUtil {
         }
     }
 
-    public boolean isTokenValid(String token) {
-        try {
-            Claims claims = validateToken(token);
-            String email = claims.get("email", String.class);
-            return validateUserToken(email, token);
-        } catch (Exception e) {
-            return false;
-        }
-    }
+//    public boolean isTokenValid(String token) {
+//        try {
+//            Claims claims = validateToken(token);
+//            String email = claims.get("email", String.class);
+//            return validateUserToken(email, token);
+//        } catch (Exception e) {
+//            return false;
+//        }
+//    }
 }

@@ -14,14 +14,13 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class RecordedLectureListRepository {
-
     private final JPAQueryFactory queryFactory;
 
     public RecordedLectureListRepository(JPAQueryFactory queryFactory) {
         this.queryFactory = queryFactory;
     }
 
-    public List<LectureDto> findAllLectures(String email) {
+    public List<LectureDto> findAllLectures(int userId) { // Long에서 int로 변경
         QRecordedLecture lecture = QRecordedLecture.recordedLecture;
         QRecordedLectureLike like = QRecordedLectureLike.recordedLectureLike;
 
@@ -36,7 +35,7 @@ public class RecordedLectureListRepository {
                 Expressions.as(Expressions.constant(false), "myLike")
             ))
             .from(lecture)
-            .where(lecture.email.eq(email))
+            .where(lecture.userId.eq(userId))
             .fetch();
     }
 }

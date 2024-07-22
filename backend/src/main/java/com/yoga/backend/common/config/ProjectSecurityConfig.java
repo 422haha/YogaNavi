@@ -46,7 +46,8 @@ public class ProjectSecurityConfig {
         return new CustomAuthenticationSuccessHandler(jwtUtil);
     }
 
-    @Bean public JWTTokenValidatorFilter jwtTokenValidatorFilter() {
+    @Bean
+    public JWTTokenValidatorFilter jwtTokenValidatorFilter() {
         return new JWTTokenValidatorFilter(userRepository, jwtUtil);
     }
 
@@ -88,15 +89,14 @@ public class ProjectSecurityConfig {
 
         // URL 기반 권한 부여 설정
         http.authorizeHttpRequests((requests) -> requests
-//                .anyRequest().permitAll()
+                .anyRequest().permitAll()
 //            .requestMatchers("/myAccount").hasRole("USER")
 //            .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
 //            .requestMatchers("/test").authenticated()
 //            .requestMatchers("/mypage/recorded-lecture/").hasRole("TEACHER")
 //            .requestMatchers("/user").authenticated()
-                .requestMatchers("/members/**") // 추가된 부분
-                .permitAll()
-                .requestMatchers("/test").authenticated()
+//                .requestMatchers("/members/**").permitAll()
+//                .requestMatchers("/test").authenticated()
 
         ); // /members/register/** 엔드포인트에 대한 인증 제거
 

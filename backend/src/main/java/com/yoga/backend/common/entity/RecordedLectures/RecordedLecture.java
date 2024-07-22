@@ -1,6 +1,7 @@
 package com.yoga.backend.common.entity.RecordedLectures;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class RecordedLecture {
     private Long version;
 
     @Column(nullable = false)
-    private String email;
+    private int userId;
 
     @Column(nullable = false)
     private String title;
@@ -34,9 +35,6 @@ public class RecordedLecture {
 
     @Column(nullable = false)
     private long likeCount = 0;
-
-    @Column(nullable = false)
-    private Date dateCreated;
 
     public void incrementLikeCount() {
         this.likeCount++;
@@ -64,12 +62,12 @@ public class RecordedLecture {
         this.version = version;
     }
 
-    public String getEmail() {
-        return email;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getTitle() {
@@ -121,11 +119,4 @@ public class RecordedLecture {
         this.likeCount = likeCount;
     }
 
-    public Date getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
-    }
 }

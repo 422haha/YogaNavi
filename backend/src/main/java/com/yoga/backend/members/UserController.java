@@ -34,7 +34,6 @@ public class UserController {
         this.jwtUtil = jwtUtil;
     }
 
-
     /**
      * 회원 가입 컨트롤러
      *
@@ -180,18 +179,6 @@ public class UserController {
      * @param token 회원 가입 정보
      * @return 로그아웃 성공
      */
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-            if (jwtUtil.isTokenValid(token)) {
-                String email = jwtUtil.getEmailFromToken(token);
-                jwtUtil.logoutUser(email);
-                return ResponseEntity.ok().body(Map.of("message", "로그아웃 성공"));
-            }
-        }
-        return ResponseEntity.badRequest().body(Map.of("message", "잘못된 토큰"));
-    }
 
     /**
      * 사용자 정보 수정. 정보 가져오기

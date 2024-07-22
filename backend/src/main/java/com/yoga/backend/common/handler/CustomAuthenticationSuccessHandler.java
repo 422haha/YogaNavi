@@ -42,11 +42,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             .map(a -> a.getAuthority().replace("ROLE_", ""))
             .orElse("");
 
+
         String accessToken = jwtUtil.generateAccessToken(email, role);
         String refreshToken = jwtUtil.generateRefreshToken(email);
-
-        // 새 토큰으로 업데이트하고 이전 세션 로그아웃
-        jwtUtil.updateUserTokenAndLogoutOthers(email, accessToken);
 
         response.setHeader(SecurityConstants.JWT_HEADER, accessToken);
         response.setHeader(SecurityConstants.REFRESH_TOKEN_HEADER, refreshToken);

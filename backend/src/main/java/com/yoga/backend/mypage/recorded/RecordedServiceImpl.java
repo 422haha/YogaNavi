@@ -60,26 +60,26 @@ public class RecordedServiceImpl implements RecordedService {
     /**
      * 사용자가 업로드한 강의 목록을 조회
      *
-     * @param email 사용자 이메일
+     * @param userId 사용자 id
      * @return 사용자가 업로드한 강의 목록 (LectureDto 리스트)
      */
     @Override
     @Transactional(readOnly = true)
-    public List<LectureDto> getMyLectures(String email) {
-        List<LectureDto> lectures = recordedLectureListRepository.findAllLectures(email);
+    public List<LectureDto> getMyLectures(int userId) {
+        List<LectureDto> lectures = recordedLectureListRepository.findAllLectures(userId);
         return generatePresignedUrls(lectures);
     }
 
     /**
      * 사용자가 좋아요한 강의 목록을 조회
      *
-     * @param email 사용자 이메일
+     * @param userId 사용자 id
      * @return 사용자가 업로드한 강의 목록 (LectureDto 리스트)
      */
     @Override
     @Transactional(readOnly = true)
-    public List<LectureDto> getLikeLectures(String email) {
-        List<LectureDto> lectures = myLikeLectureListRepository.findMyLikedLectures(email);
+    public List<LectureDto> getLikeLectures(int userId) {
+        List<LectureDto> lectures = myLikeLectureListRepository.findMyLikedLectures(userId);
         return generatePresignedUrls(lectures);
     }
 
@@ -114,7 +114,7 @@ public class RecordedServiceImpl implements RecordedService {
     @Transactional
     public LectureDto saveLecture(LectureDto lectureDto) {
         RecordedLecture lecture = new RecordedLecture();
-        lecture.setEmail(lectureDto.getEmail());
+        lecture.setUserId(lectureDto.getUserId());
         lecture.setTitle(lectureDto.getRecordTitle());
         lecture.setContent(lectureDto.getRecordContent());
         lecture.setThumbnail(lectureDto.getRecordThumbnail());
@@ -164,16 +164,16 @@ public class RecordedServiceImpl implements RecordedService {
 
     @Override
     @Transactional(readOnly = true)
-    public LectureDto getLectureDetails(Long recordedId, String email) {
+    public LectureDto getLectureDetails(Long recordedId, int userId) {
         RecordedLecture lecture = recordedLectureRepository.findById(recordedId)
             .orElseThrow(() -> new RuntimeException("Lecture not found"));
 
         LectureDto dto = convertToDto(lecture);
         dto.setLikeCount(lecture.getLikeCount());
-        dto.setMyLike(lectureLikeRepository.existsByLectureIdAndUserEmail(recordedId, email));
+        dto.setMyLike(lectureLikeRepository.existsByLectureIdAndUserId(recordedId, userId));
 
         // Generate presigned URLs
-        dto.setRecordThumbnail(s3Service.generatePresignedUrl(dto.getRecordThumbnail(), 3600)); // 1 hour expiration
+        dto.setRecordThumbnail(s3Service.generatePresignedUrl(dto.getRecordThumbnail(), 3600));
 
         for (ChapterDto chapterDto : dto.getRecordedLectureChapters()) {
             chapterDto.setVideoUrl(s3Service.generatePresignedUrl(chapterDto.getVideoUrl(), 3600));
@@ -184,11 +184,11 @@ public class RecordedServiceImpl implements RecordedService {
 
     @Override
     @Transactional
-    public LectureDto updateLecture(Long lectureId, LectureDto lectureDto, String email) {
+    public LectureDto updateLecture(Long lectureId, LectureDto lectureDto, int userId) {
         RecordedLecture lecture = recordedLectureRepository.findById(lectureId)
             .orElseThrow(() -> new RuntimeException("강의가 없습니다."));
 
-        if (!lecture.getEmail().equals(email)) {
+        if (lecture.getUserId() != userId) {
             throw new RuntimeException("강의를 수정할 수 없습니다.");
         }
 
@@ -250,11 +250,11 @@ public class RecordedServiceImpl implements RecordedService {
 
     @Override
     @Transactional
-    public void deleteLecture(Long lectureId, String email) {
+    public void deleteLecture(Long lectureId, int userId) {
         RecordedLecture lecture = recordedLectureRepository.findById(lectureId)
             .orElseThrow(() -> new RuntimeException("강의가 없습니다."));
 
-        if (!lecture.getEmail().equals(email)) {
+        if (lecture.getUserId() != userId) {
             throw new RuntimeException("강의를 삭제할 수 없습니다.");
         }
 
@@ -270,13 +270,14 @@ public class RecordedServiceImpl implements RecordedService {
 
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public LectureDto setLike(Long recordedId, String email) {
+    public LectureDto setLike(Long recordedId, int userId) {
         return recordedLectureRepository.findById(recordedId)
             .map(lecture -> {
-                if (!lectureLikeRepository.existsByLectureIdAndUserEmail(recordedId, email)) {
+                if (!lectureLikeRepository.existsByLectureIdAndUserId(recordedId, userId)) {
                     RecordedLectureLike like = new RecordedLectureLike();
                     like.setLecture(lecture);
-                    like.setUserEmail(email);
+                    like.setUserId(userId);
+                    lectureLikeRepository.save(like);
                     lectureLikeRepository.save(like);
 
                     boolean updated = false;
@@ -292,18 +293,18 @@ public class RecordedServiceImpl implements RecordedService {
                         }
                     }
                 }
-                return getLectureDetails(recordedId, email);
+                return getLectureDetails(recordedId, userId);
             })
             .orElseThrow(() -> new RuntimeException("강의를 찾을 수 없습니다."));
     }
 
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public LectureDto setDislike(Long recordedId, String email) {
+    public LectureDto setDislike(Long recordedId, int userId) {
         return recordedLectureRepository.findById(recordedId)
             .map(lecture -> {
-                if (lectureLikeRepository.existsByLectureIdAndUserEmail(recordedId, email)) {
-                    lectureLikeRepository.deleteByLectureIdAndUserEmail(recordedId, email);
+                if (lectureLikeRepository.existsByLectureIdAndUserId(recordedId, userId)) {
+                    lectureLikeRepository.deleteByLectureIdAndUserId(recordedId, userId);
 
                     boolean updated = false;
                     while (!updated) {
@@ -318,7 +319,7 @@ public class RecordedServiceImpl implements RecordedService {
                         }
                     }
                 }
-                return getLectureDetails(recordedId, email);
+                return getLectureDetails(recordedId, userId);
             })
             .orElseThrow(() -> new RuntimeException("강의를 찾을 수 없습니다."));
     }
@@ -326,7 +327,7 @@ public class RecordedServiceImpl implements RecordedService {
     private LectureDto convertToDto(RecordedLecture lecture) {
         LectureDto dto = new LectureDto();
         dto.setRecordedId(lecture.getId());
-        dto.setEmail(lecture.getEmail());
+        dto.setUserId(lecture.getUserId());
         dto.setRecordTitle(lecture.getTitle());
         dto.setRecordContent(lecture.getContent());
         dto.setRecordThumbnail(lecture.getThumbnail());

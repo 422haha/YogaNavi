@@ -13,6 +13,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -54,7 +55,7 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                 String email = String.valueOf(claims.get("email"));
                 String authorities = (String) claims.get("role");
 
-                if (jwtUtil.validateUserToken(email, jwt)) {
+                if (jwtUtilvalidateUserToken(email, jwt)) {
                     Authentication auth = new UsernamePasswordAuthenticationToken(email, null,
                         AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
                     SecurityContextHolder.getContext().setAuthentication(auth);
@@ -84,8 +85,6 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
         FilterChain filterChain, String refreshToken) throws IOException, ServletException {
         if (refreshToken != null) {
             try {
-                SecretKey key = Keys.hmacShaKeyFor(
-                    SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
                 Claims refreshClaims = jwtUtil.validateToken(refreshToken);
 
                 String email = (String) refreshClaims.get("email");
@@ -93,16 +92,10 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
 
                 String newAccessToken = jwtUtil.generateAccessToken(email, role);
 
-                List<Users> userList = userRepository.findByEmail(email);
-                if (!userList.isEmpty()) {
-                    jwtUtil.updateUserTokenAndLogoutOthers(email, newAccessToken);
+                response.setStatus(HttpServletResponse.SC_CREATED);
+                response.setHeader(SecurityConstants.JWT_HEADER, newAccessToken);
+                filterChain.doFilter(request, response);
 
-                    response.setStatus(HttpServletResponse.SC_CREATED);
-                    response.setHeader(SecurityConstants.JWT_HEADER, newAccessToken);
-                    filterChain.doFilter(request, response);
-                } else {
-                    sendUnauthorizedResponse(response, "사용자를 찾을 수 없음");
-                }
             } catch (ExpiredJwtException e) {
                 sendUnauthorizedResponse(response, "리프레시 토큰 만료. 재로그인 필요");
             } catch (JwtException e) {
