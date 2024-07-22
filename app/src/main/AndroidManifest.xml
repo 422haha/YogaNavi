@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".ui.core.YogaApplication"
@@ -18,7 +19,7 @@
         tools:targetApi="31">
         <activity
             android:name=".ui.core.LoginActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,8 +28,7 @@
         </activity>
         <activity
             android:name=".ui.core.MainActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false" />
     </application>
 
 </manifest>
