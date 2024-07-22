@@ -28,6 +28,10 @@ const val PASSWORD_DIFF = "비밀번호가 일치하지 않습니다."
 const val MY_PAGE = "마이 페이지"
 const val REGISTER_VIDEO = "녹화 강의 생성"
 const val MANAGEMENT_VIDEO = "녹화 강의 관리"
+const val MANAGEMENT_NOTICE = "공지 관리"
+const val MANAGEMENT_INSERT = "공지 생성"
+const val MANAGEMENT_UPDATE = "공지 수정"
 
 // 이름 
 const val CREATE = "생성"
+const val REGISTER = "등록"

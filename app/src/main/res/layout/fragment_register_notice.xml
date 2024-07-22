@@ -22,7 +22,7 @@
                 android:hint="@string/write_info"
                 android:inputType="textMultiLine"
                 android:scrollHorizontally="false"
-                style="@style/LargeText"
+                android:textSize="@dimen/text_medium_large20"
                 android:padding="@dimen/padding_large"
                 android:gravity="top"
                 app:layout_constraintStart_toStartOf="parent"
@@ -34,7 +34,7 @@
             <View
                 android:id="@+id/divider5"
                 android:layout_width="0dp"
-                android:layout_height="1dp"
+                android:layout_height="0dp"
                 android:layout_marginHorizontal="@dimen/padding_large"
                 android:background="?android:attr/listDivider"
                 app:layout_constraintStart_toStartOf="parent"
@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/padding_medium"
                 android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
+                android:scaleType="fitCenter"
                 tools:src="@drawable/sample2"
                 app:layout_constraintTop_toBottomOf="@id/divider5"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -69,15 +69,15 @@
     <View
         android:id="@+id/divider4"
         android:layout_width="0dp"
-        android:layout_height="1dp"
+        android:layout_height="0dp"
         android:layout_marginHorizontal="@dimen/padding_large"
         android:background="?android:attr/listDivider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/cv_add_camera_text" />
+        app:layout_constraintBottom_toTopOf="@id/btn_add_photo" />
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cv_add_camera_text"
+        android:id="@+id/btn_add_photo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:strokeColor="@color/white"
@@ -88,7 +88,7 @@
 
         <TextView
             android:id="@+id/tv_add_photo"
-            style="@style/LargeText"
+            android:textSize="@dimen/text_medium_large20"
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

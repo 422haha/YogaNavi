@@ -95,5 +95,17 @@
             app:layout_constraintTop_toBottomOf="@id/iv_profile"
             tools:text="오늘은 늦지 마요!!" />
 
+        <ImageView
+            android:id="@+id/ivNotice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/sample"
+            android:layout_marginTop="@dimen/padding_medium"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_date"
+            />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

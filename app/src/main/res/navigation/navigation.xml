@@ -197,7 +197,12 @@
         android:id="@+id/registerNoticeFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.registerNotice.RegisterNoticeFragment"
         android:label="fragment_register_notice"
-        tools:layout="@layout/fragment_register_notice" />
+        tools:layout="@layout/fragment_register_notice" >
+        <argument
+            android:name="articleId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
     <fragment
         android:id="@+id/registerVideoFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.RegisterVideoFragment"
