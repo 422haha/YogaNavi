@@ -5,6 +5,7 @@ import com.yoga.backend.common.util.JwtUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 /*
  * 회원가입, 비밀번호 재설정, 회원정보 수정, 로그아웃 컨트롤러
  */
+@Slf4j
 @RestController
 @RequestMapping("/members")
 public class UserController {
@@ -47,11 +49,13 @@ public class UserController {
             try {
                 Users savedUsers = usersService.registerUser(registerDto);
                 if (savedUsers.getId() > 0) {
+                    log.info("회원가입 성공");
                     response.put("message", "회원가입 성공");
                     response.put("data", new Object[]{});
                     return ResponseEntity.status(HttpStatus.CREATED).body(response);
                 }
             } catch (Exception ex) {
+                log.info("회원가입 불가={}", ex.getMessage());
                 response.put("message", "회원가입 불가" + ex.getMessage());
                 response.put("data", new Object[]{});
 
@@ -59,10 +63,12 @@ public class UserController {
                     .body(response);
             }
         } else {
+            log.info("닉네임 중복");
             response.put("message", "닉네임 중복");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
+        log.info("회원가입 실패");
         response.put("message", "회원가입 실패");
         response.put("data", new Object[]{});
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -173,13 +179,6 @@ public class UserController {
     }
 
     /**
-     * 비밀번호 변경 컨트롤러
-     *
-     * @param token 회원 가입 정보
-     * @return 로그아웃 성공
-     */
-
-    /**
      * 사용자 정보 수정. 정보 가져오기
      *
      * @param token 회원 가입 정보
@@ -207,5 +206,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
 
 }

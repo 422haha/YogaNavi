@@ -12,9 +12,9 @@ public interface RecordedService {
 
     List<LectureDto> getLikeLectures(int userId);
 
-    CompletableFuture<LectureDto> saveLectureAsync(LectureDto lectureDto, String sessionId);
+    //   CompletableFuture<LectureDto> saveLectureAsync(LectureDto lectureDto, String sessionId);
 
-    LectureDto saveLecture(LectureDto lectureDto);
+    void saveLecture(LectureDto lectureDto);
 
     LectureCreationStatus getLectureCreationStatus(String sessionId);
 

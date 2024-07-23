@@ -84,35 +84,13 @@ public class RecordedServiceImpl implements RecordedService {
     }
 
     /**
-     * 강의를 비동기적으로 저장
-     *
-     * @param lectureDto 강의 정보
-     * @param sessionId 세션 ID
-     * @return 저장된 강의의 CompletableFuture
-     */
-    @Override
-    public CompletableFuture<LectureDto> saveLectureAsync(LectureDto lectureDto, String sessionId) {
-        CompletableFuture<LectureDto> future = CompletableFuture.supplyAsync(() -> {
-            try {
-                return saveLecture(lectureDto);
-            } catch (Exception e) {
-                throw new CompletionException(e);
-            }
-        }, taskExecutor);
-
-        ongoingTasks.put(sessionId, future);
-        return future;
-    }
-
-    /**
      * 강의를 저장
      *
      * @param lectureDto 강의 정보
-     * @return 저장된 강의 정보
      */
     @Override
     @Transactional
-    public LectureDto saveLecture(LectureDto lectureDto) {
+    public void saveLecture(LectureDto lectureDto) {
         RecordedLecture lecture = new RecordedLecture();
         lecture.setUserId(lectureDto.getUserId());
         lecture.setTitle(lectureDto.getRecordTitle());
@@ -124,15 +102,13 @@ public class RecordedServiceImpl implements RecordedService {
             RecordedLectureChapter chapter = new RecordedLectureChapter();
             chapter.setTitle(chapterDto.getChapterTitle());
             chapter.setDescription(chapterDto.getChapterDescription());
-            chapter.setVideoUrl(chapterDto.getVideoUrl());
+            chapter.setVideoUrl(chapterDto.getRecordVideo());
             chapter.setLecture(lecture);
             chapter.setChapterNumber(chapterDto.getChapterNumber());
             chapters.add(chapter);
         }
         lecture.setChapters(chapters);
 
-        RecordedLecture savedLecture = recordedLectureRepository.save(lecture);
-        return convertToDto(savedLecture);
     }
 
     /**
@@ -171,13 +147,6 @@ public class RecordedServiceImpl implements RecordedService {
         LectureDto dto = convertToDto(lecture);
         dto.setLikeCount(lecture.getLikeCount());
         dto.setMyLike(lectureLikeRepository.existsByLectureIdAndUserId(recordedId, userId));
-
-        // Generate presigned URLs
-        dto.setRecordThumbnail(s3Service.generatePresignedUrl(dto.getRecordThumbnail(), 3600));
-
-        for (ChapterDto chapterDto : dto.getRecordedLectureChapters()) {
-            chapterDto.setVideoUrl(s3Service.generatePresignedUrl(chapterDto.getVideoUrl(), 3600));
-        }
 
         return dto;
     }
@@ -241,9 +210,9 @@ public class RecordedServiceImpl implements RecordedService {
         chapter.setDescription(chapterDto.getChapterDescription());
         chapter.setChapterNumber(chapterDto.getChapterNumber());
 
-        if (!chapter.getVideoUrl().equals(chapterDto.getVideoUrl())) {
+        if (!chapter.getVideoUrl().equals(chapterDto.getRecordVideo())) {
             String oldVideo = chapter.getVideoUrl();
-            chapter.setVideoUrl(chapterDto.getVideoUrl());
+            chapter.setVideoUrl(chapterDto.getRecordVideo());
             s3Service.deleteFile(oldVideo);
         }
     }
@@ -341,7 +310,7 @@ public class RecordedServiceImpl implements RecordedService {
             chapterDto.setChapterTitle(chapter.getTitle());
             chapterDto.setChapterDescription(chapter.getDescription());
             chapterDto.setChapterNumber(chapter.getChapterNumber());
-            chapterDto.setVideoUrl(s3Service.generatePresignedUrl(chapter.getVideoUrl(), 3600));
+            chapterDto.setRecordVideo(s3Service.generatePresignedUrl(chapter.getVideoUrl(), 3600));
             chapterDtos.add(chapterDto);
         }
         dto.setRecordedLectureChapters(chapterDtos);

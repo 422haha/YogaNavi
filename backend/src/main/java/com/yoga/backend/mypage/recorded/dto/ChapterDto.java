@@ -10,6 +10,6 @@ public class ChapterDto {
     private long id;
     private String chapterTitle;
     private String chapterDescription;
-    private String videoUrl;
+    private String recordVideo;
     private int chapterNumber;
 }
