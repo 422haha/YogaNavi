@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,9 +102,13 @@ public class ArticleController {
         try {
             // 모든 게시글을 가져옵니다.
             List<Article> articles = articleService.getAllArticles();
+
+            // 게시글을 생성일 기준으로 역순으로 정렬합니다.
             List<Map<String, Object>> articleList = articles.stream()
+                .sorted(Comparator.comparing(Article::getCreatedAt).reversed())
                 .map(this::convertArticleToMap)
                 .collect(Collectors.toList());
+
             response.put("message", "success");
             response.put("data", articleList);
             return ResponseEntity.ok(response);
@@ -133,9 +138,13 @@ public class ArticleController {
             if (optionalUser.isPresent()) {
                 Users user = optionalUser.get();
                 List<Article> articles = articleService.getArticlesByUserId(user.getId());
+
+                // 게시글을 생성일 기준으로 역순으로 정렬합니다.
                 List<Map<String, Object>> articleList = articles.stream()
+                    .sorted(Comparator.comparing(Article::getCreatedAt).reversed())
                     .map(this::convertArticleToMap)
                     .collect(Collectors.toList());
+
                 response.put("message", "success");
                 response.put("data", articleList);
                 return ResponseEntity.ok(response);
@@ -183,7 +192,7 @@ public class ArticleController {
     }
 
     /**
-     * 특정 게시글을 수정합니다.
+     * 특정 게시글을 업데이트합니다.
      *
      * @param token      JWT 토큰
      * @param id         게시글 ID
@@ -217,13 +226,10 @@ public class ArticleController {
                 }
 
                 // 게시글 내용을 업데이트합니다.
-                existingArticle.setContent(articleDto.getContent());
-                existingArticle.setImageUrl(articleDto.getImageUrl());
-                existingArticle.setUpdatedAt(LocalDateTime.now());
-                articleService.saveArticle(existingArticle);
-
+                Article updatedArticle = articleService.updateArticle(id, articleDto.getContent());
+                updatedArticle.setImageUrl(articleDto.getImageUrl());
                 response.put("message", "게시글 수정 성공");
-                response.put("data", convertArticleToMap(existingArticle));
+                response.put("data", convertArticleToMap(updatedArticle));
                 return ResponseEntity.status(HttpStatus.OK).body(response);
             } else {
                 response.put("message", "권한이 없습니다");

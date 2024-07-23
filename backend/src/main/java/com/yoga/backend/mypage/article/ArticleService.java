@@ -41,6 +41,15 @@ public interface ArticleService {
     Optional<Article> getArticleById(Long id);
 
     /**
+     * 게시글을 업데이트합니다.
+     *
+     * @param articleId  게시글 ID
+     * @param newContent 새로운 게시글 내용
+     * @return 업데이트된 게시글
+     */
+    Article updateArticle(Long articleId, String newContent);
+
+    /**
      * 게시글을 삭제합니다.
      *
      * @param id 삭제할 게시글 ID
