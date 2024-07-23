@@ -118,33 +118,34 @@ public class RecordedController {
             recordedService.saveLecture(lectureDto);
 
             response.put("message", "강의가 성공적으로 생성되었습니다.");
-            response.put("data", new Object[]{});
+            response.put("data", true);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             response.put("message", "강의 생성 실패: " + e.getMessage());
+            response.put("data", false);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
-
-    /**
-     * 강의 생성 상태 확인 클라이언트는 주기적으로 getLectureCreationStatus를 호출해야함.
-     *
-     * @param sessionId 강의 생성 세션 ID
-     * @return 강의 생성 상태
-     */
-    @GetMapping("/status/{sessionId}")
-    public ResponseEntity<Map<String, Object>> getLectureCreationStatus(
-        @PathVariable String sessionId) {
-        Map<String, Object> response = new HashMap<>();
-        LectureCreationStatus status = recordedService.getLectureCreationStatus(sessionId);
-        response.put("message", status.getMessage());
-        response.put("data", new String[]{status.getStatus()});
-        if (status.getLectureDto() != null) {
-            response.put("lecture", status.getLectureDto());
-        }
-        return ResponseEntity.ok(response);
-    }
+//
+//    /**
+//     * 강의 생성 상태 확인 클라이언트는 주기적으로 getLectureCreationStatus를 호출해야함.
+//     *
+//     * @param sessionId 강의 생성 세션 ID
+//     * @return 강의 생성 상태
+//     */
+//    @GetMapping("/status/{sessionId}")
+//    public ResponseEntity<Map<String, Object>> getLectureCreationStatus(
+//        @PathVariable String sessionId) {
+//        Map<String, Object> response = new HashMap<>();
+//        LectureCreationStatus status = recordedService.getLectureCreationStatus(sessionId);
+//        response.put("message", status.getMessage());
+//        response.put("data", new String[]{status.getStatus()});
+//        if (status.getLectureDto() != null) {
+//            response.put("lecture", status.getLectureDto());
+//        }
+//        return ResponseEntity.ok(response);
+//    }
 
 
     /**
