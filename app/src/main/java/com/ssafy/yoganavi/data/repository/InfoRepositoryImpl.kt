@@ -50,8 +50,8 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toDetailResponse()
     }
 
-    override suspend fun updateLive(liveId: Int): DetailResponse<Unit> {
-        val response = withContext(ioDispatcher) { infoDataSource.updateLive(liveId) }
+    override suspend fun updateLive(registerLiveRequest: RegisterLiveRequest, liveId: Int): DetailResponse<Unit> {
+        val response = withContext(ioDispatcher) { infoDataSource.updateLive(registerLiveRequest, liveId) }
         return response.toDetailResponse()
     }
 

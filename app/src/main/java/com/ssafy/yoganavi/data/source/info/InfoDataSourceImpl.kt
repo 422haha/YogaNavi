@@ -29,8 +29,8 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun createLive(registerLiveRequest: RegisterLiveRequest): Response<YogaDetailResponse<Unit>> =
         infoAPI.createLive(registerLiveRequest)
 
-    override suspend fun updateLive(liveId: Int): Response<YogaDetailResponse<Unit>> =
-        infoAPI.updateLive(liveId)
+    override suspend fun updateLive(registerLiveRequest: RegisterLiveRequest, liveId: Int): Response<YogaDetailResponse<Unit>> =
+        infoAPI.updateLive(registerLiveRequest, liveId)
 
     override suspend fun deleteLive(liveId: Int): Response<YogaDetailResponse<Unit>> =
         infoAPI.deleteLive(liveId)

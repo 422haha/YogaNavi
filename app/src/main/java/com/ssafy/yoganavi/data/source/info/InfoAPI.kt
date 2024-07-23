@@ -34,7 +34,7 @@ interface InfoAPI {
     suspend fun createLive(@Body registerLiveRequest: RegisterLiveRequest): Response<YogaDetailResponse<Unit>>
 
     @PUT("mypage/live-lecture-manage/update/{live_id}")
-    suspend fun updateLive(liveId: Int): Response<YogaDetailResponse<Unit>>
+    suspend fun updateLive(@Body registerLiveRequest: RegisterLiveRequest, @Path("live_id") liveId: Int): Response<YogaDetailResponse<Unit>>
 
     @DELETE("mypage/live-lecture-manage/delete/{live_id}")
     suspend fun deleteLive(liveId: Int): Response<YogaDetailResponse<Unit>>
