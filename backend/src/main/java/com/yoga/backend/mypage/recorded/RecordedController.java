@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -62,7 +64,6 @@ public class RecordedController {
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-
     }
 
 
@@ -126,27 +127,6 @@ public class RecordedController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
-//
-//    /**
-//     * 강의 생성 상태 확인 클라이언트는 주기적으로 getLectureCreationStatus를 호출해야함.
-//     *
-//     * @param sessionId 강의 생성 세션 ID
-//     * @return 강의 생성 상태
-//     */
-//    @GetMapping("/status/{sessionId}")
-//    public ResponseEntity<Map<String, Object>> getLectureCreationStatus(
-//        @PathVariable String sessionId) {
-//        Map<String, Object> response = new HashMap<>();
-//        LectureCreationStatus status = recordedService.getLectureCreationStatus(sessionId);
-//        response.put("message", status.getMessage());
-//        response.put("data", new String[]{status.getStatus()});
-//        if (status.getLectureDto() != null) {
-//            response.put("lecture", status.getLectureDto());
-//        }
-//        return ResponseEntity.ok(response);
-//    }
-
 
     /**
      * 업로드한 강의의 상세 정보 조회
