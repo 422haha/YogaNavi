@@ -68,10 +68,6 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                 }
             } catch (JwtException e) {
                 sendUnauthorizedResponse(response, "액세스 토큰 처리 불가");
-            } catch (Exception e) {
-                // 예외 발생 시 트랜잭션 롤백
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                sendUnauthorizedResponse(response, "인증 처리 중 오류 발생");
             }
         } else {
             filterChain.doFilter(request, response);

@@ -22,8 +22,8 @@ public class LectureDto {
     private String creationStatus;
 
     // QueryDSL용 생성자 수정
-    public LectureDto(Long recordedId, String recordTitle, String recordThumbnail, long likeCount,
-        Boolean myLike) {
+    public LectureDto(Long recordedId, String recordTitle, String recordThumbnail,
+        long likeCount, boolean myLike) {
         this.recordedId = recordedId;
         this.recordTitle = recordTitle;
         this.recordThumbnail = recordThumbnail;

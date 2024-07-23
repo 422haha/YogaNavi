@@ -15,25 +15,18 @@ public class RecordedLecture {
     @Version
     private Long version;
 
-    @Column(nullable = false)
     private int userId;
 
-    @Column(nullable = false)
     private String title;
 
     @Column(name = "record_content", nullable = false)
     private String content;
 
-    @Column(nullable = false)
     private String thumbnail;
 
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL)
     private List<RecordedLectureChapter> chapters;
 
-    @Column(nullable = false)
-    private String creationStatus;
-
-    @Column(nullable = false)
     private long likeCount = 0;
 
     public void incrementLikeCount() {
@@ -101,14 +94,6 @@ public class RecordedLecture {
     public void setChapters(
         List<RecordedLectureChapter> chapters) {
         this.chapters = chapters;
-    }
-
-    public String getCreationStatus() {
-        return creationStatus;
-    }
-
-    public void setCreationStatus(String creationStatus) {
-        this.creationStatus = creationStatus;
     }
 
     public long getLikeCount() {
