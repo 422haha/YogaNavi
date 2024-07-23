@@ -11,9 +11,11 @@ import com.google.android.material.timepicker.TimeFormat
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentRegisterLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
+import com.ssafy.yoganavi.ui.utils.END
 import com.ssafy.yoganavi.ui.utils.MODIFY_LIVE
 import com.ssafy.yoganavi.ui.utils.REGISTER
 import com.ssafy.yoganavi.ui.utils.REGISTER_LIVE
+import com.ssafy.yoganavi.ui.utils.START
 import com.ssafy.yoganavi.ui.utils.formatDotDate
 import com.ssafy.yoganavi.ui.utils.formatTime
 import com.ssafy.yoganavi.ui.utils.formatZeroDate
@@ -23,9 +25,6 @@ import java.util.Calendar
 @AndroidEntryPoint
 class RegisterLiveFragment :
     BaseFragment<FragmentRegisterLiveBinding>(FragmentRegisterLiveBinding::inflate) {
-
-    private val START = 1
-    private val END = 2
 
     private val args: RegisterLiveFragmentArgs by navArgs()
 
@@ -123,7 +122,8 @@ class RegisterLiveFragment :
 
         if(state == START) startDatePickerDialog = datePicker
         else endDatePickerDialog = datePicker
-
+        
+        // TODO lateinit으로 설정하기
         datePicker.apply {
             if(state == START && (viewModel.liveState.endDate) != 0L) {
                 datePicker.datePicker.maxDate = viewModel.liveState.endDate
