@@ -11,7 +11,11 @@ interface InfoRepository {
 
     suspend fun getLectureList(): ListResponse<LectureData>
 
-    suspend fun getLecture(recordId: Int): DetailResponse<LectureDetailData>
+    suspend fun createLecture(lecture: LectureDetailData): DetailResponse<Boolean>
+
+    suspend fun getLecture(recordId: Long): DetailResponse<LectureDetailData>
+
+    suspend fun updateLecture(lecture: LectureDetailData): DetailResponse<Boolean>
 
     // Live
     suspend fun getLiveList(): ListResponse<LiveLectureData>

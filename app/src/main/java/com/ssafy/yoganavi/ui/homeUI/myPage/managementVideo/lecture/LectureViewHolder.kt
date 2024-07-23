@@ -9,7 +9,7 @@ import com.ssafy.yoganavi.ui.utils.toK
 
 class LectureViewHolder(
     private val binding: ListItemLectureThumbnailBinding,
-    private val navigateToRegisterVideoFragment: (Int) -> Unit
+    private val navigateToRegisterVideoFragment: (Long) -> Unit
 ) : ViewHolder(binding.root) {
 
     private var likeCount = 0

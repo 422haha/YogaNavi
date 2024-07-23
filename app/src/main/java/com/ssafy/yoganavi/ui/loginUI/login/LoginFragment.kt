@@ -54,7 +54,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
         }
     }
 
-    private fun loginSuccess(data: LogInEvent<Unit>) {
+    private fun loginSuccess(data: LogInEvent) {
         showSnackBar(data.message)
         moveMainActivity()
     }

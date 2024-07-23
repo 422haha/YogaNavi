@@ -1,11 +1,12 @@
 package com.ssafy.yoganavi.data.source.user
 
+import com.ssafy.yoganavi.data.source.YogaDetailResponse
 import com.ssafy.yoganavi.data.source.YogaResponse
 import retrofit2.Response
 
 interface UserDataSource {
 
-    suspend fun logIn(userRequest: UserRequest): Response<YogaResponse<Unit>>
+    suspend fun logIn(userRequest: UserRequest): Response<YogaDetailResponse<Boolean>>
 
     suspend fun signUp(userRequest: UserRequest): Response<YogaResponse<Unit>>
 

@@ -20,8 +20,14 @@ interface InfoAPI {
     @GET("mypage/recorded-lecture/list")
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>
 
-    @GET("mypage/recorded-lecture/list/{recorded_id}")
-    suspend fun getLecture(@Path("recorded_id") id: Int): Response<YogaDetailResponse<LectureDetailData>>
+    @POST("mypage/recorded-lecture/create")
+    suspend fun createLecture(@Body lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>>
+
+    @GET("mypage/recorded-lecture/detail/{recorded_id}")
+    suspend fun getLecture(@Path("recorded_id") id: Long): Response<YogaDetailResponse<LectureDetailData>>
+
+    @POST("mypage/recorded-lecture/detail")
+    suspend fun updateLecture(@Body lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>>
 
     // Live
     @GET("mypage/live-lecture-manage")

@@ -30,7 +30,7 @@ object NetworkModule {
         OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(dataStoreRepository))
             .addInterceptor(HttpLoggingInterceptor().apply {
-                setLevel(HttpLoggingInterceptor.Level.HEADERS)
+                setLevel(HttpLoggingInterceptor.Level.BODY)
             })
             .readTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
             .connectTimeout(TIME_OUT, TimeUnit.MILLISECONDS)

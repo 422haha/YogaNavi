@@ -37,4 +37,9 @@ const val MANAGEMENT_LIVE = "화상 강의 관리"
 
 // 이름 
 const val CREATE = "생성"
+const val UPDATE = "수정"
+const val SAVE = "저장 완료"
+const val BUCKET_NAME = "yoga-navi"
+const val THUMBNAIL = "thumbnails"
+const val VIDEO = "videos"
 const val REGISTER = "등록"
