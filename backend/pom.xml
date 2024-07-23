@@ -13,7 +13,7 @@
   <artifactId>backend</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>backend</name>
-  <description>공통</description>
+  <description>Common backend project</description>
   <url/>
   <licenses>
     <license/>
@@ -98,41 +98,33 @@
       <artifactId>lombok</artifactId>
       <scope>provided</scope>
     </dependency>
-
-
-    <!-- swagger를 위한 의존성 추가. springdoc로 검색 : SpringDoc OpenAPI Starter
-    WebMVC UI -->
-    <!--
-    https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
+    <!-- Swagger dependency for API documentation -->
+    <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
       <version>2.4.0</version>
     </dependency>
-
-    <!-- 이메일 인증 하기 위해서 -->
+    <!-- Email dependency for email verification -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-mail</artifactId>
     </dependency>
-    <!-- AWS S3 SDK Dependency 추가 -->
+    <!-- AWS S3 SDK dependency for file storage -->
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>s3</artifactId>
       <version>2.20.50</version>
     </dependency>
-
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-dbcp2</artifactId>
     </dependency>
-
-    <!--QUERYDSL-->
+    <!-- QueryDSL dependencies for type-safe queries -->
     <dependency>
       <groupId>com.querydsl</groupId>
       <artifactId>querydsl-jpa</artifactId>
@@ -156,14 +148,11 @@
       <artifactId>querydsl-sql</artifactId>
       <version>5.1.0</version>
     </dependency>
-
     <dependency>
       <groupId>jakarta.persistence</groupId>
       <artifactId>jakarta.persistence-api</artifactId>
     </dependency>
-
   </dependencies>
-
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
     <resources>
@@ -233,5 +222,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>
