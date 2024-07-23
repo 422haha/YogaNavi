@@ -52,6 +52,16 @@
         app:layout_constraintStart_toStartOf="@id/iv_favorite"
         app:layout_constraintTop_toBottomOf="@id/iv_favorite" />
 
+    <RadioButton
+        android:id="@+id/rb_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_extra_small"
+        android:clickable="false"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/tv_title"
         style="@style/commonText"
