@@ -56,18 +56,6 @@ class UserRepositoryImpl @Inject constructor(
         return response.toListResponse()
     }
 
-//    private fun Response<YogaResponse<Unit>>.toListResponse(): ListResponse<Unit> {
-//        body()?.let {
-//            if (isSuccessful) return ListResponse.Success(it.data, it.message)
-//            else return ListResponse.Error(it.data, it.message)
-//        }
-//
-//        val gson = errorBody()?.let { Gson().fromJson(it.charStream(), YogaResponse::class.java) }
-//        val errorMessage = gson?.message
-//        return if (errorMessage.isNullOrBlank()) ListResponse.Error(message = NO_RESPONSE)
-//        else ListResponse.Error(message = errorMessage)
-//    }
-
     private inline fun <reified T> Response<YogaResponse<T>>.toListResponse(): ListResponse<T> {
         if (code() == FORBIDDEN) return ListResponse.AuthError(message = NO_AUTH)
 

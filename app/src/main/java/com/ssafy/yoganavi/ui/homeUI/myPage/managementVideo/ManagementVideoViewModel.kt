@@ -25,8 +25,10 @@ class ManagementVideoViewModel @Inject constructor(
             .onFailure { it.printStackTrace() }
     }
 
-    fun setLectureLike(likes: Int) = viewModelScope.launch(Dispatchers.IO) {
-        // TODO 좋아요 로직 구현
+    fun setLectureLike(recordedId: Long, like: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+        runCatching { infoRepository.likeLecture(recordedId, like) }
+            .onSuccess { getLectureList() }
+            .onFailure { it.printStackTrace() }
     }
 
     fun deleteLecture(indexes: List<Int>) = viewModelScope.launch(Dispatchers.IO) {

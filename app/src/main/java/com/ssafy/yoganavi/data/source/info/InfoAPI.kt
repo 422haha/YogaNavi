@@ -35,6 +35,12 @@ interface InfoAPI {
     @DELETE("mypage/recorded-lecture/list")
     suspend fun deleteLectures(@Body recordIdList: List<Long>): Response<YogaDetailResponse<Boolean>>
 
+    @POST("mypage/recorded-lecture/like/{recorded_id}")
+    suspend fun likeLecture(
+        @Path("recorded_id") id: Long,
+        @Body like: Boolean
+    ): Response<YogaDetailResponse<Boolean>>
+
     // Live
     @GET("mypage/live-lecture-manage")
     suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>>

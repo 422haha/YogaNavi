@@ -9,7 +9,8 @@ import com.ssafy.yoganavi.ui.utils.toK
 
 class LectureViewHolder(
     private val binding: ListItemLectureThumbnailBinding,
-    private val navigateToRegisterVideoFragment: (Long) -> Unit
+    private val navigateToRegisterVideoFragment: (Long) -> Unit,
+    private val sendLikeLecture: (Long, Boolean) -> Unit
 ) : ViewHolder(binding.root) {
 
     private var likeCount = 0
@@ -40,7 +41,7 @@ class LectureViewHolder(
             if (ivFavorite.isSelected) likeCount++ else likeCount--
             tvCount.text = likeCount.toK()
 
-            // TODO 서버에 데이터 전송
+            sendLikeLecture(data.recordedId, ivFavorite.isSelected)
         }
 
         ivThumbnail.setOnClickListener {

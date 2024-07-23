@@ -25,7 +25,12 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
     FragmentManagementVideoBinding::inflate
 ) {
     private val viewModel: ManagementVideoViewModel by viewModels()
-    private val lectureAdapter by lazy { LectureAdapter(::navigateToRegisterVideoFragment) }
+    private val lectureAdapter by lazy {
+        LectureAdapter(
+            navigateToRegisterVideoFragment = ::navigateToRegisterVideoFragment,
+            sendLikeLecture = ::sendLikeLecture
+        )
+    }
     private var isDeleteMode = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -76,11 +81,14 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
             val childView = getChildAt(idx)
             val deleteBtn = childView.findViewById<RadioButton>(R.id.rb_delete)
             val thumbnailView = childView.findViewById<ImageView>(R.id.iv_thumbnail)
+            val likeView = childView.findViewById<ImageView>(R.id.iv_favorite)
 
             if (deleteBtn.isChecked) {
                 indexList.add(idx)
             }
+
             thumbnailView.isClickable = true
+            likeView.isClickable = true
             childView.isClickable = false
             deleteBtn.isChecked = false
             deleteBtn.visibility = View.GONE
@@ -93,8 +101,10 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
             val childView = getChildAt(idx)
             val deleteBtn = childView.findViewById<RadioButton>(R.id.rb_delete)
             val thumbnailView = childView.findViewById<ImageView>(R.id.iv_thumbnail)
+            val likeView = childView.findViewById<ImageView>(R.id.iv_favorite)
 
             thumbnailView.isClickable = false
+            likeView.isClickable = false
             childView.isClickable = true
             deleteBtn.visibility = View.VISIBLE
 
@@ -110,6 +120,11 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
         canGoBack = true,
         menuItem = menu,
         menuListener = ::setMode
+    )
+
+    private fun sendLikeLecture(recordedId: Long, like: Boolean) = viewModel.setLectureLike(
+        recordedId = recordedId,
+        like = like
     )
 
     private fun navigateToRegisterVideoFragment(recordedId: Long = -1L) {

@@ -50,6 +50,11 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toDetailResponse()
     }
 
+    override suspend fun likeLecture(recordedId: Long, like: Boolean): DetailResponse<Boolean> {
+        val response = withContext(ioDispatcher) { infoDataSource.likeLecture(recordedId, like) }
+        return response.toDetailResponse()
+    }
+
     override suspend fun getLiveList(): ListResponse<LiveLectureData> {
         val response = withContext(ioDispatcher) { infoDataSource.getLiveList() }
         return response.toListResponse()
