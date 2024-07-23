@@ -8,9 +8,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
+import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.databinding.FragmentNoticeBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
-import com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.ManagementVideoFragmentDirections
 import com.ssafy.yoganavi.ui.homeUI.myPage.notice.notices.NoticeAdapter
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_NOTICE
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,8 +21,7 @@ import kotlinx.coroutines.launch
 class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding::inflate) {
 
     private val viewModel: NoticeViewModel by viewModels()
-    private val noticeAdapter by lazy { NoticeAdapter(::navigateToNoticeFragment) }
-
+    private val noticeAdapter by lazy { NoticeAdapter(::navigateToNoticeFragment, ::noticeDelete) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -55,4 +54,9 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding
             .actionNoticeFragmentToRegisterNoticeFragment(articleId)
         findNavController().navigate(directions)
     }
+
+    private fun noticeDelete(noticeData: NoticeData) {
+        viewModel.deleteNotice(noticeData.articleId)
+    }
+
 }

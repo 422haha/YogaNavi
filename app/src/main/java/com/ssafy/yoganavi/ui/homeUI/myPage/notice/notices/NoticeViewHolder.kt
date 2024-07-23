@@ -1,8 +1,5 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.notice.notices
 
-import android.util.Log
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.data.source.notice.NoticeData
@@ -13,8 +10,7 @@ class NoticeViewHolder (
     private val binding:ListItemNoticeBinding,
     private val navigateToRegisterNoticeFragment: (Int)->Unit
 ): ViewHolder(binding.root) {
-    fun bind(item: NoticeData) = with(binding) {
-        Log.d("싸피", "bind: $item")
+    fun bind(item: NoticeData,noticeDeleteClick: (NoticeData)->Unit) = with(binding) {
         Glide.with(binding.root)
             .load(item.profileImageUrl)
             .circleCrop()
@@ -23,15 +19,14 @@ class NoticeViewHolder (
             .load(item.imageUrl)
             .into(ivNotice)
         tvTeacherNickname.text = item.userName
-        tvDate.text =  formatDashWeekDate(item.createdAt)
+        tvDate.text =  formatDashWeekDate(item.updatedAt)
         tvContent.text = item.content
 
-        tvEditBtn.setOnClickListener {
+        binding.root.setOnClickListener {
             navigateToRegisterNoticeFragment(item.articleId)
         }
         tvDeleteBtn.setOnClickListener {
-            // TODO: delete구현
-
+            noticeDeleteClick(item)
         }
     }
 }
