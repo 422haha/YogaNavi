@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 /**
  * 인증 성공 시 처리하는 핸들러
  */
+@Slf4j
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
@@ -45,6 +47,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         String accessToken = jwtUtil.generateAccessToken(email, role);
         String refreshToken = jwtUtil.generateRefreshToken(email);
+
+        log.info("accessToken={}", accessToken);
+        log.info("refreshToken={}", refreshToken);
 
         response.setHeader(SecurityConstants.JWT_HEADER, accessToken);
         response.setHeader(SecurityConstants.REFRESH_TOKEN_HEADER, refreshToken);

@@ -2,12 +2,14 @@ package com.yoga.backend.mypage.recorded;
 
 import com.yoga.backend.common.util.JwtUtil;
 import com.yoga.backend.members.UsersRepository;
+import com.yoga.backend.mypage.recorded.dto.ChapterDto;
 import com.yoga.backend.mypage.recorded.dto.LectureCreationStatus;
 import com.yoga.backend.mypage.recorded.dto.LectureDto;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ import java.util.List;
  * FIXME: 업로드한 강의 목록 조회 및 업로드한 강의 상세 보기 s3와 연결 (아마 끝)
  *
  * */
+@Slf4j
 @RestController
 @RequestMapping("/mypage/recorded-lecture")
 public class RecordedController {
@@ -47,6 +50,7 @@ public class RecordedController {
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
         int userId = jwtUtil.getUserIdFromToken(token);
+        log.info("사용자 ={}", userId);
         List<LectureDto> lectureList = recordedService.getMyLectures(userId);
 
         if (!lectureList.isEmpty()) {
@@ -104,16 +108,20 @@ public class RecordedController {
             int userId = jwtUtil.getUserIdFromToken(token);
             lectureDto.setUserId(userId);
 
-            String sessionId = UUID.randomUUID().toString();
-            CompletableFuture<LectureDto> futureLecture = recordedService.saveLectureAsync(
-                lectureDto, sessionId);
+            System.out.println(lectureDto.getRecordThumbnail());
+            System.out.println(lectureDto.getRecordTitle());
+            System.out.println(lectureDto.getRecordContent());
+            for(ChapterDto ch :lectureDto.getRecordedLectureChapters()){
+                System.out.println(ch.getChapterDescription());
+            }
 
-            response.put("message", "강의 생성 요청이 접수되었습니다.");
-            response.put("data", sessionId);
-            return ResponseEntity.accepted().body(response);
+            recordedService.saveLecture(lectureDto);
+
+            response.put("message", "강의가 성공적으로 생성되었습니다.");
+            response.put("data", new Object[]{});
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            response.put("message", "강의 생성 요청 실패: " + e.getMessage());
-            response.put("data", new String[]{e.getMessage()});
+            response.put("message", "강의 생성 실패: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
