@@ -98,6 +98,7 @@ class RegisterVideoViewModel @Inject constructor(
         runCatching {
 
             lectureDetailData = lectureDetailData.copy(
+                recordedId = id,
                 recordTitle = lectureTitle,
                 recordContent = lectureContent
             )

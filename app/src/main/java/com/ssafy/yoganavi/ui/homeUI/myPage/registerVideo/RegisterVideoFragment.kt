@@ -72,13 +72,13 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
             menuListener = ::makeLecture
         )
 
-        if (args.recordedId != -1L) viewModel.getLecture(args.recordedId) { data ->
-            setView(data)
-        }
-
         binding.rvLecture.adapter = chapterAdapter
         initCollect()
         initListener()
+
+        if (args.recordedId != -1L) viewModel.getLecture(args.recordedId) { data ->
+            setView(data)
+        }
     }
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {

@@ -1,7 +1,7 @@
 package com.ssafy.yoganavi.data.source.lecture
 
 data class LectureDetailData(
-    val id: Long = 0,
+    val recordedId: Long = 0,
     val recordTitle: String = "",
     val recordContent: String = "",
     val recordThumbnail: String = "",
