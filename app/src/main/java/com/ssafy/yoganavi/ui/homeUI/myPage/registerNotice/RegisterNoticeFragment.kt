@@ -35,7 +35,7 @@ class RegisterNoticeFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.ivPhoto.visibility = View.GONE
-        binding.ivCancel2.visibility = View.GONE
+        binding.ivCancel.visibility = View.GONE
         binding.btnAddPhoto.visibility = View.VISIBLE
 
         if (args.articleId != -1) {
@@ -75,7 +75,7 @@ class RegisterNoticeFragment :
             saveEditText()
             openGallery()
         }
-        binding.ivCancel2.setOnClickListener {
+        binding.ivCancel.setOnClickListener {
             saveEditText()
             viewModel.removeImage()
         }
@@ -93,11 +93,11 @@ class RegisterNoticeFragment :
                         .load(notice.imageUrl)
                         .into(binding.ivPhoto)
                     binding.ivPhoto.visibility = View.VISIBLE
-                    binding.ivCancel2.visibility = View.VISIBLE
+                    binding.ivCancel.visibility = View.VISIBLE
                     binding.btnAddPhoto.visibility = View.GONE
                 } else {
                     binding.ivPhoto.visibility = View.GONE
-                    binding.ivCancel2.visibility = View.GONE
+                    binding.ivCancel.visibility = View.GONE
                     binding.btnAddPhoto.visibility = View.VISIBLE
                 }
             }
@@ -115,7 +115,7 @@ class RegisterNoticeFragment :
                 val data = result.data?.data ?: return@registerForActivityResult
                 viewModel.addImage(data.toString())
                 binding.ivPhoto.visibility = View.VISIBLE
-                binding.ivCancel2.visibility = View.VISIBLE
+                binding.ivCancel.visibility = View.VISIBLE
                 binding.etNotice.setText(viewModel.notice.value.content)
             }
         }

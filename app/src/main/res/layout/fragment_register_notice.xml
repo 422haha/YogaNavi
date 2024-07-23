@@ -54,7 +54,7 @@
                 app:layout_constraintStart_toStartOf="parent" /> <!-- 가로 세로 비율 1:1 설정 -->
 
             <ImageView
-                android:id="@+id/iv_cancel2"
+                android:id="@+id/iv_cancel"
                 android:layout_width="@dimen/icon_mini"
                 android:layout_height="@dimen/icon_mini"
                 android:src="@drawable/baseline_cancel_red"
