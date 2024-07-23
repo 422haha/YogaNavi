@@ -63,7 +63,7 @@
             android:background="@android:color/transparent"
             android:padding="@dimen/padding_medium"
             android:text="@string/delete"
-            android:textSize="16sp"
+            style="@style/BoldSmallText"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
