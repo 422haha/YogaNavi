@@ -31,6 +31,9 @@ const val MANAGEMENT_VIDEO = "녹화 강의 관리"
 const val MANAGEMENT_NOTICE = "공지 관리"
 const val MANAGEMENT_INSERT = "공지 생성"
 const val MANAGEMENT_UPDATE = "공지 수정"
+const val REGISTER_LIVE = "화상 강의 생성"
+const val MODIFY_LIVE = "화상 강의 수정"
+const val MANAGEMENT_LIVE = "화상 강의 관리"
 
 // 이름 
 const val CREATE = "생성"

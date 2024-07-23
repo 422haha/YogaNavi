@@ -182,6 +182,7 @@
             android:layout_marginHorizontal="@dimen/padding_extra_extra_large"
             android:layout_marginTop="@dimen/padding_medium"
             app:helperText="MM/DD/YYYY"
+            app:layout_constraintBottom_toTopOf="@id/tv_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/til_start">
@@ -208,6 +209,7 @@
             android:text="@string/time"
             android:textSize="@dimen/text_medium_large"
             android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/btn_start"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/til_end" />
@@ -219,6 +221,7 @@
             android:layout_marginStart="@dimen/padding_extra_extra_large"
             android:text="@string/init_time"
             android:textColor="@color/black"
+            app:layout_constraintBottom_toTopOf="@id/tv_max_num"
             app:layout_constraintEnd_toStartOf="@id/tv_tilde"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_time" />
@@ -245,12 +248,33 @@
             app:layout_constraintStart_toEndOf="@id/tv_tilde"
             app:layout_constraintTop_toTopOf="@id/btn_start" />
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/padding_extra_extra_large"
+        <TextView
+            android:id="@+id/tv_max_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_large"
+            android:paddingBottom="@dimen/padding_medium"
+            android:text="@string/max_num"
+            android:textSize="@dimen/text_medium_large"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/sp_max_num"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_end"/>
+            app:layout_constraintTop_toBottomOf="@id/btn_start" />
+
+        <Spinner
+            android:id="@+id/sp_max_num"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/padding_extra_extra_large"
+            android:dropDownWidth="match_parent"
+            android:entries="@array/maxnum_array"
+            android:paddingHorizontal="@dimen/padding_small"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_max_num" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

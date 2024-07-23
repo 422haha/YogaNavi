@@ -26,9 +26,12 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
         super.onViewCreated(view, savedInstanceState)
         setToolbar(false,MANAGEMENT_VIDEO,true)
 
-        binding.rvLecture.adapter = lectureAdapter
-        initCollect()
         initListener()
+
+        binding.rvLecture.adapter = lectureAdapter
+
+        initCollect()
+
         viewModel.getLectureList()
     }
 

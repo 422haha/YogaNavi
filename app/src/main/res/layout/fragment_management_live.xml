@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.homeUI.myPage.managementLive.ManagementLiveFragment">
+    tools:context=".ui.homeUI.myPage.likeTeacher.managementLive.ManagementLiveFragment">
 
     <TextView
         android:id="@+id/tv_proceeding_live"
@@ -25,6 +25,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:paddingHorizontal="@dimen/padding_medium"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
