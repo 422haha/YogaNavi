@@ -25,7 +25,8 @@ import com.ssafy.yoganavi.ui.utils.CREATE
 import com.ssafy.yoganavi.ui.utils.REGISTER_VIDEO
 import com.ssafy.yoganavi.ui.utils.SAVE
 import com.ssafy.yoganavi.ui.utils.UPDATE
-import com.ssafy.yoganavi.ui.utils.getPath
+import com.ssafy.yoganavi.ui.utils.getImagePath
+import com.ssafy.yoganavi.ui.utils.getVideoPath
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -44,7 +45,7 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data ?: return@registerForActivityResult
-                val imagePath = getPath(requireContext(), imageUri)
+                val imagePath = getImagePath(requireContext(), imageUri)
                 if (imagePath.isNotBlank()) {
                     val uri = Uri.parse(imagePath)
                     binding.ivVideo.setImageURI(uri)
@@ -132,7 +133,7 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
         }
 
         handleVideoResult = { uri ->
-            val realPath = getPath(requireContext(), uri)
+            val realPath = getVideoPath(requireContext(), uri)
             if (realPath.isNotBlank()) viewModel.setVideo(data, realPath)
         }
 
