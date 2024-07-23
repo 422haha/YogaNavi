@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.ui.homeUI.myPage.likeTeacher.managementLive
+package com.ssafy.yoganavi.ui.homeUI.myPage.managementLive
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

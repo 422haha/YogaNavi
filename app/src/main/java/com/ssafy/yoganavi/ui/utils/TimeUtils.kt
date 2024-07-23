@@ -21,3 +21,10 @@ fun formatDashDate(milliseconds: Long): String {
     val date = Date(milliseconds)
     return formatter.format(date)
 }
+
+fun formatDashWeekDate(milliseconds: Long): String {
+    val formatter = SimpleDateFormat("yyyy-MM-dd EEEE", Locale.getDefault())
+    val date = Date(milliseconds)
+    val tempStr = formatter.format(date)
+    return tempStr.substring(0,tempStr.length-2)
+}

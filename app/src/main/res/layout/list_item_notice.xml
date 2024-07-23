@@ -5,22 +5,22 @@
     android:id="@+id/cv_notice"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="0dp"
+    android:layout_marginHorizontal="@dimen/padding_small"
+    android:layout_marginVertical="@dimen/padding_small"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="20dp"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    app:strokeColor="@color/gray_20"
-    android:layout_marginHorizontal="@dimen/padding_small"
-    android:layout_marginTop="@dimen/padding_small"
-    app:strokeWidth="1dp">
+    app:layout_constraintTop_toTopOf="parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="2dp"
-        android:padding="@dimen/padding_medium">
+        android:paddingHorizontal="@dimen/padding_medium"
+        android:paddingTop="@dimen/padding_medium"
+        android:paddingBottom="@dimen/padding_large">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_profile"
@@ -51,49 +51,43 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/iv_profile"
             app:layout_constraintStart_toStartOf="@id/tv_teacher_nickname"
             app:layout_constraintTop_toBottomOf="@id/tv_teacher_nickname"
             tools:text="2024-07-13 토" />
 
         <TextView
-            android:id="@+id/tv_editBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/padding_small"
-            android:background="@android:color/transparent"
-            android:paddingStart="@dimen/padding_medium"
-            android:paddingBottom="@dimen/padding_medium"
-            android:text="@string/edit"
-            style="@style/BoldSmallText"
-            app:layout_constraintEnd_toStartOf="@id/tv_deleteBtn"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
             android:id="@+id/tv_deleteBtn"
+            style="@style/BoldSmallText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/padding_small"
             android:background="@android:color/transparent"
-            android:paddingEnd="@dimen/padding_medium"
-            android:paddingBottom="@dimen/padding_medium"
+            android:padding="@dimen/padding_medium"
             android:text="@string/delete"
-            style="@style/BoldSmallText"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_editBtn" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tv_content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/padding_medium"
+            android:layout_marginVertical="@dimen/padding_extra_large"
             android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_profile"
             tools:text="오늘은 늦지 마요!!" />
 
+        <ImageView
+            android:id="@+id/ivNotice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_medium"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/sample"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_content" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
