@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewbinding.ViewBinding
@@ -33,6 +34,11 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
     }
 
     fun showSnackBar(msg: String) = Snackbar.make(binding.root, msg, Snackbar.LENGTH_SHORT).show()
+    fun showSnackBar(@StringRes msgResId: Int) {
+        val message = getString(msgResId)
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+    }
+
     fun setToolbar(
         isBottomNavigationVisible: Boolean,
         title: String,
@@ -41,7 +47,13 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
         menuListener: (() -> Unit)? = null
     ) {
         if (!(this is LoginFragment || this is FindFragment || this is JoinFragment)) {
-            activityViewModel.setMainEvent(isBottomNavigationVisible, title, canGoBack, menuItem, menuListener)
+            activityViewModel.setMainEvent(
+                isBottomNavigationVisible,
+                title,
+                canGoBack,
+                menuItem,
+                menuListener
+            )
         }
     }
 }

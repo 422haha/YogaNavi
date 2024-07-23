@@ -1,9 +1,9 @@
 package com.ssafy.yoganavi.ui.loginUI.login
 
-sealed class LogInEvent<T>(
-    val data: List<T>,
+sealed class LogInEvent(
+    val data: Boolean,
     val message: String
 ) {
-    class LoginSuccess<T>(data: List<T>, message: String) : LogInEvent<T>(data, message)
-    class LoginError<T>(data: List<T> = mutableListOf(), message: String) : LogInEvent<T>(data, message)
+    class LoginSuccess(data: Boolean, message: String) : LogInEvent(data, message)
+    class LoginError(data: Boolean = false, message: String) : LogInEvent(data, message)
 }

@@ -24,7 +24,7 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(false,MANAGEMENT_VIDEO,true)
+        setToolbar(false, MANAGEMENT_VIDEO, true)
 
         initListener()
 
@@ -49,7 +49,7 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
         }
     }
 
-    private fun navigateToRegisterVideoFragment(recordedId: Int = -1) {
+    private fun navigateToRegisterVideoFragment(recordedId: Long = -1L) {
         val directions = ManagementVideoFragmentDirections
             .actionManagementVideoFragmentToRegisterVideoFragment(recordedId)
 

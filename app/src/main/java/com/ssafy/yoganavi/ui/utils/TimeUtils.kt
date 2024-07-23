@@ -22,6 +22,13 @@ fun formatDashDate(milliseconds: Long): String {
     return formatter.format(date)
 }
 
+fun formatDashWeekDate(milliseconds: Long): String {
+    val formatter = SimpleDateFormat("yyyy-MM-dd EEEE", Locale.getDefault())
+    val date = Date(milliseconds)
+    val tempStr = formatter.format(date)
+    return tempStr.substring(0,tempStr.length-2)
+}
+
 fun formatZeroDate(hour: Int, minute: Int): String {
     val hourStr: String = if(hour < 10) "0$hour" else "$hour"
 

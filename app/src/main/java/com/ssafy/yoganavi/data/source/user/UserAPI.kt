@@ -1,5 +1,6 @@
 package com.ssafy.yoganavi.data.source.user
 
+import com.ssafy.yoganavi.data.source.YogaDetailResponse
 import com.ssafy.yoganavi.data.source.YogaResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -14,7 +15,7 @@ interface UserAPI {
     suspend fun login(
         @Field("username") username: String,
         @Field("password") password: String
-    ): Response<YogaResponse<Unit>>
+    ): Response<YogaDetailResponse<Boolean>>
 
     @POST("members/register")
     suspend fun signUp(@Body userRequest: UserRequest): Response<YogaResponse<Unit>>
