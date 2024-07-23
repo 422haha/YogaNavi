@@ -31,6 +31,13 @@ public class ArticleController {
     private final JwtUtil jwtUtil;
     private static final Logger logger = LoggerFactory.getLogger(ArticleController.class);
 
+    /**
+     * ArticleController 생성자
+     *
+     * @param articleService  ArticleService 객체
+     * @param usersRepository UsersRepository 객체
+     * @param jwtUtil         JwtUtil 객체
+     */
     @Autowired
     public ArticleController(ArticleService articleService, UsersRepository usersRepository,
         JwtUtil jwtUtil) {
@@ -44,14 +51,16 @@ public class ArticleController {
      *
      * @param token      JWT 토큰
      * @param articleDto 게시글 DTO
-     * @return 작성 결과 메시지
+     * @return 작성 결과 메시지와 데이터
      */
     @PostMapping("/write")
     public ResponseEntity<Map<String, Object>> createArticle(
         @RequestHeader("Authorization") String token, @RequestBody ArticleDto articleDto) {
         Map<String, Object> response = new HashMap<>();
         try {
-            Optional<Users> optionalUser = getUserFromToken(token);
+            // 토큰에서 사용자 ID를 추출합니다.
+            int userId = jwtUtil.getUserIdFromToken(token);
+            Optional<Users> optionalUser = usersRepository.findById((long) userId);
 
             if (optionalUser.isPresent()) {
                 Users user = optionalUser.get();
@@ -62,6 +71,7 @@ public class ArticleController {
                 article.setCreatedAt(LocalDateTime.now());
                 article.setUpdatedAt(LocalDateTime.now());
 
+                // 게시글을 저장합니다.
                 articleService.saveArticle(article);
 
                 response.put("message", "게시글 작성 성공");
@@ -73,7 +83,7 @@ public class ArticleController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            logger.error("Error creating article", e);
+            logger.error("게시글 작성 중 오류 발생", e);
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -89,6 +99,7 @@ public class ArticleController {
     public ResponseEntity<Map<String, Object>> getAllArticles() {
         Map<String, Object> response = new HashMap<>();
         try {
+            // 모든 게시글을 가져옵니다.
             List<Article> articles = articleService.getAllArticles();
             List<Map<String, Object>> articleList = articles.stream()
                 .map(this::convertArticleToMap)
@@ -97,7 +108,7 @@ public class ArticleController {
             response.put("data", articleList);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("Error fetching all articles", e);
+            logger.error("모든 게시글 조회 중 오류 발생", e);
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -115,7 +126,9 @@ public class ArticleController {
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
         try {
-            Optional<Users> optionalUser = getUserFromToken(token);
+            // 토큰에서 사용자 ID를 추출합니다.
+            int userId = jwtUtil.getUserIdFromToken(token);
+            Optional<Users> optionalUser = usersRepository.findById((long) userId);
 
             if (optionalUser.isPresent()) {
                 Users user = optionalUser.get();
@@ -132,7 +145,7 @@ public class ArticleController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            logger.error("Error fetching articles by user ID", e);
+            logger.error("사용자 ID로 게시글 조회 중 오류 발생", e);
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -150,6 +163,7 @@ public class ArticleController {
         @PathVariable("article_id") Long id) {
         Map<String, Object> response = new HashMap<>();
         try {
+            // 게시글 ID로 특정 게시글을 가져옵니다.
             Optional<Article> article = articleService.getArticleById(id);
             if (article.isPresent()) {
                 response.put("message", "success");
@@ -161,7 +175,7 @@ public class ArticleController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
         } catch (Exception e) {
-            logger.error("Error fetching article by ID", e);
+            logger.error("게시글 ID로 게시글 조회 중 오류 발생", e);
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -174,7 +188,7 @@ public class ArticleController {
      * @param token      JWT 토큰
      * @param id         게시글 ID
      * @param articleDto 수정할 게시글 정보
-     * @return 수정 결과 메시지
+     * @return 수정 결과 메시지와 데이터
      */
     @PutMapping("/update/{id}")
     public ResponseEntity<Map<String, Object>> updateArticle(
@@ -182,7 +196,9 @@ public class ArticleController {
         @RequestBody ArticleDto articleDto) {
         Map<String, Object> response = new HashMap<>();
         try {
-            Optional<Users> optionalUser = getUserFromToken(token);
+            // 토큰에서 사용자 ID를 추출합니다.
+            int userId = jwtUtil.getUserIdFromToken(token);
+            Optional<Users> optionalUser = usersRepository.findById((long) userId);
 
             if (optionalUser.isPresent()) {
                 Users user = optionalUser.get();
@@ -200,6 +216,7 @@ public class ArticleController {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
                 }
 
+                // 게시글 내용을 업데이트합니다.
                 existingArticle.setContent(articleDto.getContent());
                 existingArticle.setImageUrl(articleDto.getImageUrl());
                 existingArticle.setUpdatedAt(LocalDateTime.now());
@@ -214,7 +231,7 @@ public class ArticleController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            logger.error("Error updating article", e);
+            logger.error("게시글 수정 중 오류 발생", e);
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -226,14 +243,16 @@ public class ArticleController {
      *
      * @param token JWT 토큰
      * @param id    게시글 ID
-     * @return 삭제 결과 메시지
+     * @return 삭제 결과 메시지와 데이터
      */
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Map<String, Object>> deleteArticle(
         @RequestHeader("Authorization") String token, @PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
         try {
-            Optional<Users> optionalUser = getUserFromToken(token);
+            // 토큰에서 사용자 ID를 추출합니다.
+            int userId = jwtUtil.getUserIdFromToken(token);
+            Optional<Users> optionalUser = usersRepository.findById((long) userId);
 
             if (optionalUser.isPresent()) {
                 Users user = optionalUser.get();
@@ -251,6 +270,7 @@ public class ArticleController {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
                 }
 
+                // 게시글을 삭제합니다.
                 articleService.deleteArticle(id);
 
                 response.put("message", "게시글 삭제 성공");
@@ -262,22 +282,11 @@ public class ArticleController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            logger.error("Error deleting article", e);
+            logger.error("게시글 삭제 중 오류 발생", e);
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-    }
-
-    /**
-     * JWT 토큰을 이용해 사용자 정보를 가져옵니다.
-     *
-     * @param token JWT 토큰
-     * @return 사용자 정보
-     */
-    private Optional<Users> getUserFromToken(String token) {
-        String email = jwtUtil.getEmailFromToken(token);
-        return usersRepository.findByEmail(email).stream().findFirst();
     }
 
     /**
@@ -295,14 +304,18 @@ public class ArticleController {
         if (user != null) {
             map.put("userId", user.getId());
             map.put("userName", user.getEmail()); // assuming userName is the email
+            map.put("profileImageUrl", user.getProfile_image_url()); // 사용자 프로필 이미지 추가
         } else {
             map.put("userId", null);
             map.put("userName", null);
+            map.put("profileImageUrl", null);
         }
 
         map.put("content", article.getContent());
-        map.put("createdAt", article.getCreatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
-        map.put("updatedAt", article.getUpdatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
+        map.put("createdAt",
+            article.getCreatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
+        map.put("updatedAt",
+            article.getUpdatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
         map.put("imageUrl", article.getImageUrl());
         return map;
     }
