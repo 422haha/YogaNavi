@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.homeUI.myPage.likeTeacher.managementLive.ManagementLiveFragment">
+    tools:context=".ui.homeUI.myPage.managementLive.ManagementLiveFragment">
 
     <TextView
         android:id="@+id/tv_proceeding_live"

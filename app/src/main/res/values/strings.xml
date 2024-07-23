@@ -39,8 +39,8 @@
 
     <string name="choose_week">가능 요일 선택</string>
     <string name="choose_date">날짜 선택</string>
-    <string name="start">시작</string>
-    <string name="end">종료</string>
+    <string name="start_date">시작 날짜</string>
+    <string name="end_date">종료 날짜</string>
     <string name="input_content">강의 내용을 입력하세요.</string>
     <string name="lecture_title">강의 제목</string>
     <string name="title_info">제목을 작성하세요.</string>
@@ -50,8 +50,6 @@
     <string name="add_chapter">+챕터 추가+</string>
     <string name="click_thumbnail_info">클릭해서 썸네일을 추가하세요</string>
     <string name="click_video_info">클릭해서 영상을 추가하세요</string>
-
-
 
     <!-- 필터 시작 -->
     <string name="align">정렬</string>

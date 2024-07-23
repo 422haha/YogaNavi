@@ -220,7 +220,7 @@
     </fragment>
     <fragment
         android:id="@+id/managementLiveFragment"
-        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.likeTeacher.managementLive.ManagementLiveFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.managementLive.ManagementLiveFragment"
         android:label="fragment_management_live"
         tools:layout="@layout/fragment_management_live">
         <action

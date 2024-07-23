@@ -21,3 +21,11 @@ fun formatDashDate(milliseconds: Long): String {
     val date = Date(milliseconds)
     return formatter.format(date)
 }
+
+fun formatZeroDate(hour: Int, minute: Int): String {
+    val hourStr: String = if(hour < 10) "0$hour" else "$hour"
+
+    val minuteStr: String = if(minute < 10) "0$minute" else "$minute"
+
+    return "$hourStr:$minuteStr"
+}

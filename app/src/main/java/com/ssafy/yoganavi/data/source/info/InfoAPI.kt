@@ -5,8 +5,10 @@ import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
+import com.ssafy.yoganavi.data.source.live.RegisterLiveRequest
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -29,7 +31,7 @@ interface InfoAPI {
     suspend fun getLive(@Path("live_id") id: Int): Response<YogaDetailResponse<LiveLectureData>>
 
     @POST("mypage/live-lecture-manage/create")
-    suspend fun createLive(): Response<YogaDetailResponse<Unit>>
+    suspend fun createLive(@Body registerLiveRequest: RegisterLiveRequest): Response<YogaDetailResponse<Unit>>
 
     @PUT("mypage/live-lecture-manage/update/{live_id}")
     suspend fun updateLive(liveId: Int): Response<YogaDetailResponse<Unit>>

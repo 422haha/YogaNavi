@@ -7,6 +7,7 @@ import com.ssafy.yoganavi.data.source.info.InfoDataSource
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
+import com.ssafy.yoganavi.data.source.live.RegisterLiveRequest
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.di.IoDispatcher
 import com.ssafy.yoganavi.ui.utils.FORBIDDEN
@@ -44,8 +45,8 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toDetailResponse()
     }
 
-    override suspend fun createLive(): DetailResponse<Unit> {
-        val response = withContext(ioDispatcher) { infoDataSource.createLive() }
+    override suspend fun createLive(registerLiveRequest: RegisterLiveRequest): DetailResponse<Unit> {
+        val response = withContext(ioDispatcher) { infoDataSource.createLive(registerLiveRequest) }
         return response.toDetailResponse()
     }
 

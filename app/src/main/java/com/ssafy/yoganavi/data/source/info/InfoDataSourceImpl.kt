@@ -5,6 +5,7 @@ import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
+import com.ssafy.yoganavi.data.source.live.RegisterLiveRequest
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import retrofit2.Response
 import javax.inject.Inject
@@ -25,8 +26,8 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun getLive(liveId: Int): Response<YogaDetailResponse<LiveLectureData>> =
         infoAPI.getLive(liveId)
 
-    override suspend fun createLive(): Response<YogaDetailResponse<Unit>> =
-        infoAPI.createLive()
+    override suspend fun createLive(registerLiveRequest: RegisterLiveRequest): Response<YogaDetailResponse<Unit>> =
+        infoAPI.createLive(registerLiveRequest)
 
     override suspend fun updateLive(liveId: Int): Response<YogaDetailResponse<Unit>> =
         infoAPI.updateLive(liveId)
