@@ -10,8 +10,9 @@ import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentManagementLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
-import com.ssafy.yoganavi.ui.homeUI.myPage.likeTeacher.managementLive.ManagementLiveAdapter
+import com.ssafy.yoganavi.ui.core.MainViewModel
 import com.ssafy.yoganavi.ui.homeUI.myPage.likeTeacher.managementLive.ManagementLiveFragmentDirections
+import com.ssafy.yoganavi.ui.homeUI.myPage.likeTeacher.managementLive.ManagementLiveAdapter
 import com.ssafy.yoganavi.ui.homeUI.myPage.likeTeacher.managementLive.ManagementLiveViewModel
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_LIVE
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,11 +30,9 @@ class ManagementLiveFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setToolbar(
-            isBottomNavigationVisible = false,
+        setToolbar(isBottomNavigationVisible = false,
             title = MANAGEMENT_LIVE,
-            canGoBack = true,
-        )
+            canGoBack = true,)
 
         initListener()
 

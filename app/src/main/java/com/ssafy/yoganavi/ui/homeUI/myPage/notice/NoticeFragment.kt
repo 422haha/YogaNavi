@@ -8,9 +8,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
+import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.databinding.FragmentNoticeBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.notice.notices.NoticeAdapter
+import com.ssafy.yoganavi.ui.utils.MANAGEMENT_NOTICE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -19,11 +21,11 @@ import kotlinx.coroutines.launch
 class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding::inflate) {
 
     private val viewModel: NoticeViewModel by viewModels()
-    private val noticeAdapter by lazy { NoticeAdapter(::navigateToNoticeFragment) }
-
+    private val noticeAdapter by lazy { NoticeAdapter(::navigateToNoticeFragment, ::noticeDelete) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setToolbar(false, MANAGEMENT_NOTICE, true)
 
         binding.rvMyList.adapter = noticeAdapter
         initCollect()
@@ -47,10 +49,14 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding
         }
     }
 
-    private fun navigateToNoticeFragment(recordedId: Int = -1) {
-//        val directions = ManagementVideoFragmentDirections
-//            .actionManagementVideoFragmentToRegisterVideoFragment(recordedId)
-//
-//        findNavController().navigate(directions)
+    private fun navigateToNoticeFragment(articleId: Int = -1) {
+        val directions = NoticeFragmentDirections
+            .actionNoticeFragmentToRegisterNoticeFragment(articleId)
+        findNavController().navigate(directions)
     }
+
+    private fun noticeDelete(noticeData: NoticeData) {
+        viewModel.deleteNotice(noticeData.articleId)
+    }
+
 }

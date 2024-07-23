@@ -6,6 +6,7 @@ import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.notice.NoticeData
+import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import retrofit2.Response
 
 interface InfoDataSource {
@@ -30,4 +31,15 @@ interface InfoDataSource {
     suspend fun deleteLive(liveId: Int): Response<YogaDetailResponse<Unit>>
 
     suspend fun getNoticeList(): Response<YogaResponse<NoticeData>>
+
+    suspend fun getNotice(articleId: Int): Response<YogaDetailResponse<NoticeData>>
+
+    suspend fun insertNotice(registerNoticeRequest: RegisterNoticeRequest): Response<YogaDetailResponse<Unit>>
+
+    suspend fun updateNotice(
+        registerNoticeRequest: RegisterNoticeRequest,
+        articleId: Int
+    ): Response<YogaDetailResponse<Unit>>
+
+    suspend fun deleteNotice(articleId: Int): Response<YogaDetailResponse<Unit>>
 }

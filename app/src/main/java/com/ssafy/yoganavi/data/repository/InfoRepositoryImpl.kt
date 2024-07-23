@@ -8,6 +8,7 @@ import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.notice.NoticeData
+import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.di.IoDispatcher
 import com.ssafy.yoganavi.ui.utils.FORBIDDEN
 import com.ssafy.yoganavi.ui.utils.NO_AUTH
@@ -72,6 +73,35 @@ class InfoRepositoryImpl @Inject constructor(
     override suspend fun getNoticeList(): ListResponse<NoticeData> {
         val response = withContext(ioDispatcher) { infoDataSource.getNoticeList() }
         return response.toListResponse()
+    }
+
+    override suspend fun getNotice(articleId: Int): DetailResponse<NoticeData> {
+        val response = withContext(ioDispatcher) { infoDataSource.getNotice(articleId) }
+        return response.toDetailResponse()
+    }
+
+    override suspend fun insertNotice(registerNoticeRequest: RegisterNoticeRequest): DetailResponse<Unit> {
+        val response =
+            withContext(ioDispatcher) { infoDataSource.insertNotice(registerNoticeRequest) }
+        return response.toDetailResponse()
+    }
+
+    override suspend fun updateNotice(
+        registerNoticeRequest: RegisterNoticeRequest,
+        articleId: Int
+    ): DetailResponse<Unit> {
+        val response = withContext(ioDispatcher) {
+            infoDataSource.updateNotice(
+                registerNoticeRequest,
+                articleId
+            )
+        }
+        return response.toDetailResponse()
+    }
+
+    override suspend fun deleteNotice(articleId: Int): DetailResponse<Unit> {
+        val response = withContext(ioDispatcher) { infoDataSource.deleteNotice(articleId) }
+        return response.toDetailResponse()
     }
 
     private inline fun <reified T> Response<YogaResponse<T>>.toListResponse(): ListResponse<T> {
