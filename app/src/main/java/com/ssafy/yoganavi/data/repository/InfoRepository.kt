@@ -5,7 +5,6 @@ import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
-import com.ssafy.yoganavi.data.source.user.UserRequest
 
 interface InfoRepository {
 
@@ -16,6 +15,8 @@ interface InfoRepository {
     suspend fun getLecture(recordId: Long): DetailResponse<LectureDetailData>
 
     suspend fun updateLecture(lecture: LectureDetailData): DetailResponse<Boolean>
+
+    suspend fun deleteLectures(recordIdList: List<Long>): DetailResponse<Boolean>
 
     // Live
     suspend fun getLiveList(): ListResponse<LiveLectureData>

@@ -24,7 +24,10 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
         infoAPI.getLecture(recordedId)
 
     override suspend fun updateLecture(lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>> =
-        infoAPI.updateLecture(lecture)
+        infoAPI.updateLecture(id = lecture.recordedId, lecture = lecture)
+
+    override suspend fun deleteLectures(recordIdList: List<Long>): Response<YogaDetailResponse<Boolean>> =
+        infoAPI.deleteLectures(recordIdList)
 
     override suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>> =
         infoAPI.getLiveList()
