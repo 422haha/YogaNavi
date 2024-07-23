@@ -197,11 +197,11 @@
         android:id="@+id/registerNoticeFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.registerNotice.RegisterNoticeFragment"
         android:label="fragment_register_notice"
-        tools:layout="@layout/fragment_register_notice" >
+        tools:layout="@layout/fragment_register_notice">
         <argument
             android:name="articleId"
-            app:argType="integer"
-            android:defaultValue="-1" />
+            android:defaultValue="-1"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/registerVideoFragment"
@@ -217,15 +217,15 @@
         android:id="@+id/liveFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.schedule.live.LiveFragment"
         android:label="fragment_live"
-        tools:layout="@layout/fragment_live" >
+        tools:layout="@layout/fragment_live">
         <argument
             android:name="getLiveId"
-            app:argType="integer"
-            android:defaultValue="-1" />
+            android:defaultValue="-1"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/managementLiveFragment"
-        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.likeTeacher.managementLive.ManagementLiveFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.managementLive.ManagementLiveFragment"
         android:label="fragment_management_live"
         tools:layout="@layout/fragment_management_live">
         <action
@@ -241,15 +241,15 @@
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/registerLiveFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.registerLive.RegisterLiveFragment"
-        android:label="RegisterLiveFragment" >
+        android:label="RegisterLiveFragment">
         <argument
             android:name="liveId"
-            app:argType="integer"
-            android:defaultValue="-1" />
+            android:defaultValue="-1"
+            app:argType="integer" />
     </fragment>
 </navigation>

@@ -7,16 +7,16 @@ import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.databinding.ListItemNoticeBinding
 
 class NoticeAdapter(
-    private val navigateToRegisterNoticeFragment:(Int)->Unit,
-    private val noticeDeleteClick : (NoticeData)->Unit
-) : ListAdapter<NoticeData, NoticeViewHolder>(NoticeItemCallback()){
+    private val navigateToRegisterNoticeFragment: (Int) -> Unit,
+    private val noticeDeleteClick: (NoticeData) -> Unit
+) : ListAdapter<NoticeData, NoticeViewHolder>(NoticeItemCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoticeViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ListItemNoticeBinding.inflate(inflater,parent,false)
-        return NoticeViewHolder(binding,navigateToRegisterNoticeFragment)
+        val binding = ListItemNoticeBinding.inflate(inflater, parent, false)
+        return NoticeViewHolder(binding, navigateToRegisterNoticeFragment)
     }
 
     override fun onBindViewHolder(holder: NoticeViewHolder, position: Int) {
-        holder.bind(currentList[position],noticeDeleteClick)
+        holder.bind(currentList[position], noticeDeleteClick)
     }
 }

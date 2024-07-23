@@ -46,9 +46,7 @@ class RegisterNoticeFragment :
                     showSnackBar(R.string.notice_info)
                 } else {
                     viewModel.updateNotice(notice) {
-                        withContext(Dispatchers.Main) {
-                            findNavController().popBackStack()
-                        }
+                        goBackStack()
                     }
                 }
             }
@@ -59,9 +57,7 @@ class RegisterNoticeFragment :
                     showSnackBar(R.string.notice_info)
                 } else {
                     viewModel.insertNotice(notice) {
-                        withContext(Dispatchers.Main) {
-                            findNavController().popBackStack()
-                        }
+                        goBackStack()
                     }
                 }
             }
@@ -80,9 +76,11 @@ class RegisterNoticeFragment :
             viewModel.removeImage()
         }
     }
+
     private fun saveEditText() = viewLifecycleOwner.lifecycleScope.launch {
         viewModel.setContent(binding.etNotice.text.toString())
     }
+
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.notice.collectLatest {
@@ -119,4 +117,8 @@ class RegisterNoticeFragment :
                 binding.etNotice.setText(viewModel.notice.value.content)
             }
         }
+
+    private suspend fun goBackStack() = withContext(Dispatchers.Main) {
+        findNavController().popBackStack()
+    }
 }

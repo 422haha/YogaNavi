@@ -23,14 +23,17 @@ interface InfoRepository {
     suspend fun updateLive(liveId: Int): DetailResponse<Unit>
 
     suspend fun deleteLive(liveId: Int): DetailResponse<Unit>
-    
-    suspend fun getNoticeList() : ListResponse<NoticeData>
 
-    suspend fun getNotice(articleId : Int): DetailResponse<NoticeData>
+    suspend fun getNoticeList(): ListResponse<NoticeData>
 
-    suspend fun insertNotice(registerNoticeRequest: RegisterNoticeRequest) : DetailResponse<Unit>
+    suspend fun getNotice(articleId: Int): DetailResponse<NoticeData>
 
-    suspend fun updateNotice(registerNoticeRequest: RegisterNoticeRequest, articleId: Int) : DetailResponse<Unit>
+    suspend fun insertNotice(registerNoticeRequest: RegisterNoticeRequest): DetailResponse<Unit>
+
+    suspend fun updateNotice(
+        registerNoticeRequest: RegisterNoticeRequest,
+        articleId: Int
+    ): DetailResponse<Unit>
 
     suspend fun deleteNotice(articleId: Int): DetailResponse<Unit>
 }

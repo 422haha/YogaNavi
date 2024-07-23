@@ -25,7 +25,7 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(false,MANAGEMENT_NOTICE,true)
+        setToolbar(false, MANAGEMENT_NOTICE, true)
 
         binding.rvMyList.adapter = noticeAdapter
         initCollect()

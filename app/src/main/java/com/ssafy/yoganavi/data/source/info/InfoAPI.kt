@@ -40,17 +40,20 @@ interface InfoAPI {
     suspend fun deleteLive(liveId: Int): Response<YogaDetailResponse<Unit>>
 
     @GET("mypage/notification/list")
-    suspend fun getNoticeList() : Response<YogaResponse<NoticeData>>
+    suspend fun getNoticeList(): Response<YogaResponse<NoticeData>>
 
     @GET("mypage/notification/update/{article_id}")
-    suspend fun getNotice(@Path("article_id") id:Int) : Response<YogaDetailResponse<NoticeData>>
+    suspend fun getNotice(@Path("article_id") id: Int): Response<YogaDetailResponse<NoticeData>>
 
     @POST("mypage/notification/write")
-    suspend fun insertNotice(@Body registerNoticeRequest : RegisterNoticeRequest) : Response<YogaDetailResponse<Unit>>
+    suspend fun insertNotice(@Body registerNoticeRequest: RegisterNoticeRequest): Response<YogaDetailResponse<Unit>>
 
     @PUT("mypage/notification/update/{article_id}")
-    suspend fun updateNotice(@Body registerNoticeRequest : RegisterNoticeRequest, @Path("article_id") id: Int) : Response<YogaDetailResponse<Unit>>
+    suspend fun updateNotice(
+        @Body registerNoticeRequest: RegisterNoticeRequest,
+        @Path("article_id") id: Int
+    ): Response<YogaDetailResponse<Unit>>
 
     @DELETE("mypage/notification/delete/{article_id}")
-    suspend fun deleteNotice(@Path("article_id") id : Int) : Response<YogaDetailResponse<Unit>>
+    suspend fun deleteNotice(@Path("article_id") id: Int): Response<YogaDetailResponse<Unit>>
 }

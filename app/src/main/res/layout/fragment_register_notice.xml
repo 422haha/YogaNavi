@@ -19,17 +19,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
+                android:gravity="top"
                 android:hint="@string/write_info"
                 android:inputType="textMultiLine"
+                android:minHeight="400dp"
+                android:padding="@dimen/padding_large"
                 android:scrollHorizontally="false"
                 android:textSize="@dimen/text_medium_large20"
-                android:padding="@dimen/padding_large"
-                android:gravity="top"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintHeight_default="spread"
-                android:minHeight="400dp" /> <!-- 최소 높이 설정 -->
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" /> <!-- 최소 높이 설정 -->
 
             <View
                 android:id="@+id/divider5"
@@ -37,8 +37,8 @@
                 android:layout_height="0dp"
                 android:layout_marginHorizontal="@dimen/padding_large"
                 android:background="?android:attr/listDivider"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/et_notice" />
 
             <ImageView
@@ -48,10 +48,10 @@
                 android:layout_margin="@dimen/padding_medium"
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter"
-                tools:src="@drawable/sample2"
-                app:layout_constraintTop_toBottomOf="@id/divider5"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" /> <!-- 가로 세로 비율 1:1 설정 -->
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider5"
+                tools:src="@drawable/sample2" /> <!-- 가로 세로 비율 1:1 설정 -->
 
             <ImageView
                 android:id="@+id/iv_cancel"
@@ -72,28 +72,28 @@
         android:layout_height="0dp"
         android:layout_marginHorizontal="@dimen/padding_large"
         android:background="?android:attr/listDivider"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btn_add_photo"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/btn_add_photo" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/btn_add_photo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:strokeColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/divider4">
+        app:layout_constraintTop_toTopOf="@id/divider4"
+        app:strokeColor="@color/white">
 
         <TextView
             android:id="@+id/tv_add_photo"
-            android:textSize="@dimen/text_medium_large20"
-            android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:paddingVertical="@dimen/padding_large"
             android:text="@string/add_photo"
+            android:textSize="@dimen/text_medium_large20"
             app:drawableStartCompat="@drawable/photo_camera"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -39,6 +39,7 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
         val message = getString(msgResId)
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
     }
+
     fun setToolbar(
         isBottomNavigationVisible: Boolean,
         title: String,
@@ -47,7 +48,13 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
         menuListener: (() -> Unit)? = null
     ) {
         if (!(this is LoginFragment || this is FindFragment || this is JoinFragment)) {
-            activityViewModel.setMainEvent(isBottomNavigationVisible, title, canGoBack, menuItem, menuListener)
+            activityViewModel.setMainEvent(
+                isBottomNavigationVisible,
+                title,
+                canGoBack,
+                menuItem,
+                menuListener
+            )
         }
     }
 }

@@ -25,14 +25,17 @@ interface InfoDataSource {
     suspend fun updateLive(liveId: Int): Response<YogaDetailResponse<Unit>>
 
     suspend fun deleteLive(liveId: Int): Response<YogaDetailResponse<Unit>>
-    
+
     suspend fun getNoticeList(): Response<YogaResponse<NoticeData>>
 
-    suspend fun getNotice(articleId : Int): Response<YogaDetailResponse<NoticeData>>
+    suspend fun getNotice(articleId: Int): Response<YogaDetailResponse<NoticeData>>
 
-    suspend fun insertNotice(registerNoticeRequest : RegisterNoticeRequest): Response<YogaDetailResponse<Unit>>
+    suspend fun insertNotice(registerNoticeRequest: RegisterNoticeRequest): Response<YogaDetailResponse<Unit>>
 
-    suspend fun updateNotice(registerNoticeRequest : RegisterNoticeRequest, articleId: Int): Response<YogaDetailResponse<Unit>>
+    suspend fun updateNotice(
+        registerNoticeRequest: RegisterNoticeRequest,
+        articleId: Int
+    ): Response<YogaDetailResponse<Unit>>
 
     suspend fun deleteNotice(articleId: Int): Response<YogaDetailResponse<Unit>>
 }

@@ -61,22 +61,31 @@ class InfoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getNoticeList(): ListResponse<NoticeData> {
-        val response = withContext(ioDispatcher){infoDataSource.getNoticeList()}
+        val response = withContext(ioDispatcher) { infoDataSource.getNoticeList() }
         return response.toListResponse()
     }
 
     override suspend fun getNotice(articleId: Int): DetailResponse<NoticeData> {
-        val response = withContext(ioDispatcher){infoDataSource.getNotice(articleId)}
+        val response = withContext(ioDispatcher) { infoDataSource.getNotice(articleId) }
         return response.toDetailResponse()
     }
 
     override suspend fun insertNotice(registerNoticeRequest: RegisterNoticeRequest): DetailResponse<Unit> {
-        val response = withContext(ioDispatcher) { infoDataSource.insertNotice(registerNoticeRequest) }
+        val response =
+            withContext(ioDispatcher) { infoDataSource.insertNotice(registerNoticeRequest) }
         return response.toDetailResponse()
     }
 
-    override suspend fun updateNotice(registerNoticeRequest: RegisterNoticeRequest, articleId : Int): DetailResponse<Unit> {
-        val response = withContext(ioDispatcher) { infoDataSource.updateNotice(registerNoticeRequest,articleId) }
+    override suspend fun updateNotice(
+        registerNoticeRequest: RegisterNoticeRequest,
+        articleId: Int
+    ): DetailResponse<Unit> {
+        val response = withContext(ioDispatcher) {
+            infoDataSource.updateNotice(
+                registerNoticeRequest,
+                articleId
+            )
+        }
         return response.toDetailResponse()
     }
 
