@@ -4,7 +4,7 @@ import com.ssafy.yoganavi.data.source.user.UserRequest
 
 interface UserRepository {
 
-    suspend fun logIn(userRequest: UserRequest): ListResponse<Unit>
+    suspend fun logIn(userRequest: UserRequest): DetailResponse<Boolean>
 
     suspend fun signUp(userRequest: UserRequest): ListResponse<Unit>
 

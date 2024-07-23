@@ -29,8 +29,13 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toListResponse()
     }
 
-    override suspend fun getLecture(recordId: Int): DetailResponse<LectureDetailData> {
+    override suspend fun getLecture(recordId: Long): DetailResponse<LectureDetailData> {
         val response = withContext(ioDispatcher) { infoDataSource.getLecture(recordId) }
+        return response.toDetailResponse()
+    }
+
+    override suspend fun createLecture(lecture: LectureDetailData): DetailResponse<Boolean> {
+        val response = withContext(ioDispatcher) { infoDataSource.createLecture(lecture) }
         return response.toDetailResponse()
     }
 
@@ -39,13 +44,18 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toListResponse()
     }
 
+    override suspend fun createLive(): DetailResponse<Unit> {
+        val response = withContext(ioDispatcher) { infoDataSource.createLive() }
+        return response.toDetailResponse()
+    }
+
     override suspend fun getLive(liveId: Int): DetailResponse<LiveLectureData> {
         val response = withContext(ioDispatcher) { infoDataSource.getLive(liveId) }
         return response.toDetailResponse()
     }
 
-    override suspend fun createLive(): DetailResponse<Unit> {
-        val response = withContext(ioDispatcher) { infoDataSource.createLive() }
+    override suspend fun updateLecture(lecture: LectureDetailData): DetailResponse<Boolean> {
+        val response = withContext(ioDispatcher) { infoDataSource.updateLecture(lecture) }
         return response.toDetailResponse()
     }
 
@@ -60,7 +70,7 @@ class InfoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getNoticeList(): ListResponse<NoticeData> {
-        val response = withContext(ioDispatcher){infoDataSource.getNoticeList()}
+        val response = withContext(ioDispatcher) { infoDataSource.getNoticeList() }
         return response.toListResponse()
     }
 

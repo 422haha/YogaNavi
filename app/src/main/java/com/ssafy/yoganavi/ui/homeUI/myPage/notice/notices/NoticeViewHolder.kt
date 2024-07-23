@@ -5,10 +5,10 @@ import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.databinding.ListItemNoticeBinding
 
-class NoticeViewHolder (
-    private val binding:ListItemNoticeBinding,
-    private val navigateToRegisterNoticeFragment: (Int)->Unit
-): ViewHolder(binding.root) {
+class NoticeViewHolder(
+    private val binding: ListItemNoticeBinding,
+    private val navigateToRegisterNoticeFragment: (Int) -> Unit
+) : ViewHolder(binding.root) {
     fun bind(item: NoticeData) = with(binding) {
 
         Glide.with(binding.root)

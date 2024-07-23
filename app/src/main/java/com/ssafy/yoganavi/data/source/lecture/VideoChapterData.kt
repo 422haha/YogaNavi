@@ -1,6 +1,5 @@
 package com.ssafy.yoganavi.data.source.lecture
 
-import com.google.gson.annotations.Expose
 import java.util.UUID
 
 data class VideoChapterData(
@@ -8,12 +7,12 @@ data class VideoChapterData(
     val chapterDescription: String = "",
     val recordVideo: String = "",
 
-    @Expose(serialize = false, deserialize = false)
+    @Transient
     val id: UUID = UUID.randomUUID(),
 
-    @Expose(serialize = false, deserialize = false)
+    @Transient
     val recordPath: String = "",
 
-    @Expose(serialize = false, deserialize = false)
+    @Transient
     val recordKey: String = ""
 )

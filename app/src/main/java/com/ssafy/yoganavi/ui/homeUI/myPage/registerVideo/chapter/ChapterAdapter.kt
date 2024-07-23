@@ -8,7 +8,7 @@ import com.ssafy.yoganavi.databinding.CustomChapterViewBinding
 
 class ChapterAdapter(
     private val addVideoListener: (VideoChapterData) -> Unit,
-    private val deleteListener: (VideoChapterData) -> Unit
+    private val deleteListener: (VideoChapterData) -> Unit,
 ) : ListAdapter<VideoChapterData, ChapterViewHolder>(ChapterDiffUtil()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChapterViewHolder {

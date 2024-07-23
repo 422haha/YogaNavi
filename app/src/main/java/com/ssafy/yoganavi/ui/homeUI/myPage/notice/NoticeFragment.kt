@@ -10,7 +10,6 @@ import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentNoticeBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
-import com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.ManagementVideoFragmentDirections
 import com.ssafy.yoganavi.ui.homeUI.myPage.notice.notices.NoticeAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -49,9 +48,9 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding
     }
 
     private fun navigateToNoticeFragment(recordedId: Int = -1) {
-        val directions = ManagementVideoFragmentDirections
-            .actionManagementVideoFragmentToRegisterVideoFragment(recordedId)
-
-        findNavController().navigate(directions)
+//        val directions = ManagementVideoFragmentDirections
+//            .actionManagementVideoFragmentToRegisterVideoFragment(recordedId)
+//
+//        findNavController().navigate(directions)
     }
 }

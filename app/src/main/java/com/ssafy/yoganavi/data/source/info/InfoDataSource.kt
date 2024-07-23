@@ -12,7 +12,11 @@ interface InfoDataSource {
 
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>
 
-    suspend fun getLecture(recordedId: Int): Response<YogaDetailResponse<LectureDetailData>>
+    suspend fun createLecture(lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>>
+
+    suspend fun getLecture(recordedId: Long): Response<YogaDetailResponse<LectureDetailData>>
+
+    suspend fun updateLecture(lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>>
 
     // live
     suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>>
@@ -24,6 +28,6 @@ interface InfoDataSource {
     suspend fun updateLive(liveId: Int): Response<YogaDetailResponse<Unit>>
 
     suspend fun deleteLive(liveId: Int): Response<YogaDetailResponse<Unit>>
-    
+
     suspend fun getNoticeList(): Response<YogaResponse<NoticeData>>
 }

@@ -7,7 +7,7 @@ import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.databinding.ListItemLectureThumbnailBinding
 
 class LectureAdapter(
-    private val navigateToRegisterVideoFragment: (Int) -> Unit
+    private val navigateToRegisterVideoFragment: (Long) -> Unit
 ) : ListAdapter<LectureData, LectureViewHolder>(LectureItemCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LectureViewHolder {
