@@ -9,8 +9,10 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +26,16 @@ public class JwtUtil {
         this.userRepository = userRepository;
     }
 
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
     private final SecretKey key = Keys.hmacShaKeyFor(
         SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
 
 
     // access token 생성
     public String generateAccessToken(String email, String role) {
-        return Jwts.builder()
+        String token = Jwts.builder()
             .issuer("Yoga Navi")
             .subject("JWT Token")
             .claim("email", email)
@@ -40,6 +45,12 @@ public class JwtUtil {
                 new Date(System.currentTimeMillis() + SecurityConstants.ACCESS_TOKEN_EXPIRATION))
             .signWith(key)
             .compact();
+
+        // 추가
+        redisTemplate.opsForValue()
+            .set(email, token, SecurityConstants.ACCESS_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
+
+        return token;
     }
 
     // refresh token 생성
@@ -82,33 +93,6 @@ public class JwtUtil {
         return userRepository.findByEmail(claims.get("email", String.class)).get(0).getId();
     }
 
-//    // 사용자의 토큰을 검증함.
-//    public boolean validateUserToken(String email, String token) {
-//        List<Users> userList = userRepository.findByEmail(email);
-//        if (!userList.isEmpty()) {
-//            Users user = userList.get(0);
-//            System.out.println("token: " + token + " user token: " + user.getActiveToken());
-//            return token.equals(user.getActiveToken());
-//        }
-//        return false;
-//    }
-
-    // 사용자의 토큰을 업데이트하고 이전 세션을 로그아웃
-    @Transactional
-    public void updateUserTokenAndLogoutOthers(String email, String newToken) {
-//        List<Users> userList = userRepository.findByEmail(email);
-//        if (!userList.isEmpty()) {
-//            Users user = userList.get(0);
-//            System.out.println("============user : "+user.getEmail());
-//            // 이전 토큰 저장
-//            String oldToken = user.getActiveToken();
-//            // 새 토큰으로 업데이트
-//            user.setActiveToken(newToken);
-//            System.out.println("");
-//            userRepository.updateActiveToken(user.getId(), newToken);
-//            System.out.println("====================="+newToken+"============user : "+user.getActiveToken());
-//        }
-    }
 
     public void logoutUser(String email) {
         List<Users> userList = userRepository.findByEmail(email);
@@ -123,13 +107,21 @@ public class JwtUtil {
         }
     }
 
-//    public boolean isTokenValid(String token) {
-//        try {
-//            Claims claims = validateToken(token);
-//            String email = claims.get("email", String.class);
-//            return validateUserToken(email, token);
-//        } catch (Exception e) {
-//            return false;
-//        }
-//    }
+    // 추가
+    public void invalidateToken(String email) {
+        redisTemplate.delete(email);
+    }
+
+    // 추가
+    public boolean isTokenValid(String token) {
+        try {
+            Claims claims = validateToken(token);
+            String email = claims.get("email", String.class);
+            String storedToken = redisTemplate.opsForValue().get(email);
+            return token.equals(storedToken);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }

@@ -44,6 +44,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             .map(a -> a.getAuthority().replace("ROLE_", ""))
             .orElse("");
 
+        // 추가
+        jwtUtil.invalidateToken(email);
 
         String accessToken = jwtUtil.generateAccessToken(email, role);
         String refreshToken = jwtUtil.generateRefreshToken(email);
