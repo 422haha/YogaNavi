@@ -37,8 +37,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun initCollect() = lifecycleScope.launch {
         repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.tokenEvent.collectLatest {
-                moveMainActivity()
+            viewModel.userEvent.collectLatest { isSuccess ->
+                if (isSuccess) moveMainActivity()
             }
         }
     }
@@ -59,6 +59,6 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-//        ㅛ.getToken()
+        viewModel.autoLogin()
     }
 }

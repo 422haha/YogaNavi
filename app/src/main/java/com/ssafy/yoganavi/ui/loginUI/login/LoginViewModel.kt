@@ -2,8 +2,10 @@ package com.ssafy.yoganavi.ui.loginUI.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.yoganavi.data.repository.response.DetailResponse
+import com.ssafy.yoganavi.data.repository.DataStoreRepository
 import com.ssafy.yoganavi.data.repository.UserRepository
+import com.ssafy.yoganavi.data.repository.response.DetailResponse
+import com.ssafy.yoganavi.data.source.user.User
 import com.ssafy.yoganavi.data.source.user.UserRequest
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.NO_AUTH
@@ -19,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val dataStoreRepository: DataStoreRepository
 ) : ViewModel() {
 
     private val _loginEvent: MutableSharedFlow<LogInEvent> = MutableSharedFlow()
@@ -35,6 +38,10 @@ class LoginViewModel @Inject constructor(
         runCatching { userRepository.logIn(request) }
             .onSuccess { emitResponse(it) }
             .onFailure { emitError(NO_RESPONSE) }
+    }
+
+    fun saveUser(user: User) = viewModelScope.launch(Dispatchers.IO) {
+        dataStoreRepository.setUser(user)
     }
 
     private suspend fun emitResponse(response: DetailResponse<Boolean>) = when (response) {
