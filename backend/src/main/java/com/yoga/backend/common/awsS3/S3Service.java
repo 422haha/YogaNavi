@@ -104,15 +104,39 @@ public class S3Service {
      * @param fileUrl 삭제할 파일의 S3 URL
      */
     public void deleteFile(String fileUrl) {
-        // S3 URL에서 키를 추출
-        String key = extractKeyFromUrl(fileUrl);
-        // S3에서 파일을 삭제
-        s3Client.deleteObject(DeleteObjectRequest.builder()
-            .bucket(bucketName)  // 버킷 이름 설정
-            .key(key)            // 키 설정
-            .build());
+        try {
+            String key = extractKeyFromUrl(fileUrl);
+            if (key != null && !key.isEmpty()) {
+                s3Client.deleteObject(DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build());
+                log.info("Successfully deleted file with key: {}", key);
+            } else {
+                log.warn("Unable to delete file. Invalid URL: {}", fileUrl);
+            }
+        } catch (Exception e) {
+            log.error("Error deleting file from S3: {}", fileUrl, e);
+        }
     }
 
+    /**
+     * S3 URL에서 키를 추출
+     *
+     * @param fileUrl S3 URL
+     * @return 추출된 키
+     */
+    private String extractKeyFromUrl(String fileUrl) {
+        try {
+            URL url = new URL(fileUrl);
+            String path = url.getPath();
+            // Remove leading '/' if present
+            return path.startsWith("/") ? path.substring(1) : path;
+        } catch (MalformedURLException e) {
+            log.error("Invalid S3 URL: {}", fileUrl, e);
+            return null;
+        }
+    }
     /**
      * 고유한 파일 이름을 생성
      *
@@ -135,16 +159,6 @@ public class S3Service {
         return "https://" + bucketName + ".s3.amazonaws.com/" + key;
     }
 
-    /**
-     * S3 URL에서 키를 추출
-     *
-     * @param fileUrl S3 URL
-     * @return 추출된 키
-     */
-    private String extractKeyFromUrl(String fileUrl) {
-        // S3 URL에서 ".com/" 이후의 부분을 키로 추출
-        return fileUrl.substring(fileUrl.indexOf(".com/") + 5);
-    }
 
     public String generatePresignedUrl(String key, long expirationInSeconds) {
         // 키에서 버킷 이름을 제거 (만약 포함되어 있다면)

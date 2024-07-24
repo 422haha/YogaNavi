@@ -1,10 +1,13 @@
 package com.yoga.backend.mypage.recorded;
 
 
+import com.yoga.backend.mypage.recorded.dto.DeleteDto;
 import com.yoga.backend.mypage.recorded.dto.LectureCreationStatus;
 import com.yoga.backend.mypage.recorded.dto.LectureDto;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface RecordedService {
 
@@ -16,11 +19,10 @@ public interface RecordedService {
 
     LectureDto getLectureDetails(Long recordedId, int userId);
 
-    LectureDto updateLecture(Long lectureId, LectureDto lectureDto, int userId);
+    boolean updateLecture(LectureDto lectureDto);
 
-    void deleteLecture(Long lectureId, int userId);
+    void deleteLectures(DeleteDto deleteDto, int userId);
 
-    LectureDto setLike(Long recordedId, int userId);
+    boolean toggleLike(Long recordedId, int userId);
 
-    LectureDto setDislike(Long recordedId, int userId);
 }
