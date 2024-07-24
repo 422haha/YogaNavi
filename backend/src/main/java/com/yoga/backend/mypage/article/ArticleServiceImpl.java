@@ -1,13 +1,14 @@
 package com.yoga.backend.mypage.article;
 
 import com.yoga.backend.common.entity.Article;
+import com.yoga.backend.common.awsS3.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 게시글(공지사항) 서비스 구현 클래스
@@ -15,11 +16,16 @@ import java.util.Optional;
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
+    private static final String S3_BASE_URL = "https://yoga-navi.s3.ap-northeast-2.amazonaws.com/";
+    private static final long URL_EXPIRATION_SECONDS = 86400; // 24 hours
+
     private final ArticleRepository articleRepository;
+    private final S3Service s3Service;
 
     @Autowired
-    public ArticleServiceImpl(ArticleRepository articleRepository) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, S3Service s3Service) {
         this.articleRepository = articleRepository;
+        this.s3Service = s3Service;
     }
 
     /**
@@ -45,7 +51,8 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional(readOnly = true)
     public List<Article> getAllArticles() {
-        return articleRepository.findAll();
+        List<Article> articles = articleRepository.findAll();
+        return applyPresignedUrls(articles);
     }
 
     /**
@@ -57,7 +64,8 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional(readOnly = true)
     public List<Article> getArticlesByUserId(int userId) {
-        return articleRepository.findByUserId(userId);
+        List<Article> articles = articleRepository.findByUserId(userId);
+        return applyPresignedUrls(articles);
     }
 
     /**
@@ -69,7 +77,9 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Article> getArticleById(Long id) {
-        return articleRepository.findById(id);
+        Optional<Article> articleOpt = articleRepository.findById(id);
+        return articleOpt.map(
+            article -> applyPresignedUrls(Collections.singletonList(article)).get(0));
     }
 
     /**
@@ -77,18 +87,28 @@ public class ArticleServiceImpl implements ArticleService {
      *
      * @param articleId  게시글 ID
      * @param newContent 새로운 게시글 내용
+     * @param newImage   새로운 이미지 URL
      * @return 업데이트된 게시글
      */
     @Override
     @Transactional
-    public Article updateArticle(Long articleId, String newContent) {
+    public Article updateArticle(Long articleId, String newContent, String newImage) {
         try {
             Optional<Article> optionalArticle = articleRepository.findById(articleId);
 
             if (optionalArticle.isPresent()) {
                 Article article = optionalArticle.get();
                 article.setContent(newContent);
-                return articleRepository.save(article);
+
+                // 이미지가 변경된 경우 기존 이미지 삭제
+                if (!article.getImage().equals(newImage)) {
+                    String oldImage = article.getImage();
+                    article.setImage(newImage);
+                    s3Service.deleteFile(oldImage);
+                }
+
+                Article updatedArticle = articleRepository.save(article);
+                return applyPresignedUrls(Collections.singletonList(updatedArticle)).get(0);
             } else {
                 throw new RuntimeException("게시글을 찾을 수 없습니다.");
             }
@@ -106,7 +126,15 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional
     public void deleteArticle(Long id) {
         try {
-            articleRepository.deleteById(id);
+            Optional<Article> articleOpt = articleRepository.findById(id);
+            if (articleOpt.isPresent()) {
+                Article article = articleOpt.get();
+                // S3에서 이미지 파일 삭제
+                s3Service.deleteFile(article.getImage());
+                articleRepository.deleteById(id);
+            } else {
+                throw new RuntimeException("게시글을 찾을 수 없습니다.");
+            }
         } catch (OptimisticLockingFailureException e) {
             throw new RuntimeException("게시글 삭제 중 충돌이 발생했습니다. 다시 시도해 주세요.", e);
         }
@@ -121,6 +149,56 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional(readOnly = true)
     public List<Article> findByContent(String content) {
-        return articleRepository.findByContent(content);
+        List<Article> articles = articleRepository.findByContent(content);
+        return applyPresignedUrls(articles);
+    }
+
+    /**
+     * Presigned URL을 적용하여 게시글 목록을 반환합니다.
+     *
+     * @param articles 게시글 목록
+     * @return Presigned URL이 적용된 게시글 목록
+     */
+    private List<Article> applyPresignedUrls(List<Article> articles) {
+        Map<String, String> presignedUrls = generatePresignedUrls(articles);
+
+        return articles.stream()
+            .peek(article -> article.setImage(getPresignedUrl(article.getImage(), presignedUrls)))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * 게시글 목록에 대한 Presigned URL을 생성합니다.
+     *
+     * @param articles 게시글 목록
+     * @return 생성된 Presigned URL 맵
+     */
+    private Map<String, String> generatePresignedUrls(List<Article> articles) {
+        Set<String> keysToGenerate = articles.stream()
+            .map(Article::getImage)
+            .filter(image -> image != null && image.startsWith(S3_BASE_URL))
+            .map(image -> image.substring(S3_BASE_URL.length()))
+            .collect(Collectors.toSet());
+
+        if (keysToGenerate.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return s3Service.generatePresignedUrls(keysToGenerate, URL_EXPIRATION_SECONDS);
+    }
+
+    /**
+     * 주어진 URL에 대해 Presigned URL을 반환합니다.
+     *
+     * @param url           원본 URL
+     * @param presignedUrls Presigned URL 맵
+     * @return Presigned URL 또는 원본 URL
+     */
+    private String getPresignedUrl(String url, Map<String, String> presignedUrls) {
+        if (url != null && url.startsWith(S3_BASE_URL)) {
+            String key = url.substring(S3_BASE_URL.length());
+            return presignedUrls.getOrDefault(key, url);
+        }
+        return url;
     }
 }
