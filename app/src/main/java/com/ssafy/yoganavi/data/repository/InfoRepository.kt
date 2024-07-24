@@ -20,7 +20,7 @@ interface InfoRepository {
 
     suspend fun deleteLectures(recordIdList: List<Long>): DetailResponse<Boolean>
 
-    suspend fun likeLecture(recordedId: Long, like: Boolean): DetailResponse<Boolean>
+    suspend fun likeLecture(recordedId: Long): DetailResponse<Boolean>
 
     // Live
     suspend fun getLiveList(): ListResponse<LiveLectureData>

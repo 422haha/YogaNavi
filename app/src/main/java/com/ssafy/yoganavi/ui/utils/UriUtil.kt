@@ -67,7 +67,7 @@ fun getImagePath(context: Context, uri: Uri): String {
     val webpFile = File(context.filesDir, "${name.substringBeforeLast('.')}.webp")
     try {
         FileOutputStream(webpFile).use { outputStream ->
-            bitmap.compress(Bitmap.CompressFormat.WEBP, 80, outputStream)
+            bitmap.compress(Bitmap.CompressFormat.WEBP, 70, outputStream)
         }
     } catch (e: Exception) {
         e.printStackTrace()

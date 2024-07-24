@@ -25,8 +25,8 @@ class ManagementVideoViewModel @Inject constructor(
             .onFailure { it.printStackTrace() }
     }
 
-    fun setLectureLike(recordedId: Long, like: Boolean) = viewModelScope.launch(Dispatchers.IO) {
-        runCatching { infoRepository.likeLecture(recordedId, like) }
+    fun setLectureLike(recordedId: Long) = viewModelScope.launch(Dispatchers.IO) {
+        runCatching { infoRepository.likeLecture(recordedId) }
             .onSuccess { getLectureList() }
             .onFailure { it.printStackTrace() }
     }

@@ -5,7 +5,7 @@ data class LectureDetailData(
     val recordTitle: String = "",
     val recordContent: String = "",
     val recordThumbnail: String = "",
-    val recordedLectureChapters: List<VideoChapterData> = mutableListOf(),
+    val recordedLectureChapters: MutableList<VideoChapterData> = mutableListOf(),
 
     @Transient
     val recordThumbnailPath: String = "",

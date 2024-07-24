@@ -86,7 +86,7 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.chapterList.collectLatest { list ->
                 chapterAdapter.submitList(list)
-                viewModel.setChapterList(list)
+                viewModel.setChapterList(list.toMutableList())
             }
         }
     }

@@ -93,7 +93,7 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
             deleteBtn.isChecked = false
             deleteBtn.visibility = View.GONE
         }
-        viewModel.deleteLecture(indexList)
+        if (indexList.isNotEmpty()) viewModel.deleteLecture(indexList)
     }
 
     private fun setSelectListener() = with(binding.rvLecture) {
@@ -122,10 +122,7 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
         menuListener = ::setMode
     )
 
-    private fun sendLikeLecture(recordedId: Long, like: Boolean) = viewModel.setLectureLike(
-        recordedId = recordedId,
-        like = like
-    )
+    private fun sendLikeLecture(recordedId: Long) = viewModel.setLectureLike(recordedId)
 
     private fun navigateToRegisterVideoFragment(recordedId: Long = -1L) {
         val directions = ManagementVideoFragmentDirections
