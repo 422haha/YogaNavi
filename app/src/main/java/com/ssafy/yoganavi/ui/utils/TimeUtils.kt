@@ -28,3 +28,11 @@ fun formatDashWeekDate(milliseconds: Long): String {
     val tempStr = formatter.format(date)
     return tempStr.substring(0,tempStr.length-2)
 }
+
+fun formatZeroDate(hour: Int, minute: Int): String {
+    val hourStr: String = if(hour < 10) "0$hour" else "$hour"
+
+    val minuteStr: String = if(minute < 10) "0$minute" else "$minute"
+
+    return "$hourStr:$minuteStr"
+}

@@ -1,13 +1,12 @@
 package com.ssafy.yoganavi.data.source.live
 
 data class RegisterLiveRequest(
-    val teacherId: Int,
-    val liveTitle: String,
-    val liveContent : String,
-    val availableDay: String,
-    val startDate: Long,
-    val endDate: Long,
-    val startTime: Long,
-    val endTime: Long,
-    val maxNum: Int
+    var liveTitle: String = "",
+    var liveContent : String = "",
+    var availableDay: String = "",
+    var startDate: Long = 0L,
+    var endDate: Long = 0L,
+    var startTime: Long = 0L,
+    var endTime: Long = 0L,
+    var maxLiveNum: Int = 0
 )

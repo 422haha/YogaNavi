@@ -8,6 +8,7 @@ import com.ssafy.yoganavi.data.source.info.InfoDataSource
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
+import com.ssafy.yoganavi.data.source.live.RegisterLiveRequest
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.di.IoDispatcher
@@ -37,6 +38,7 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toDetailResponse()
     }
 
+
     override suspend fun updateLecture(lecture: LectureDetailData): DetailResponse<Boolean> {
         val response = withContext(ioDispatcher) { infoDataSource.updateLecture(lecture) }
         return response.toDetailResponse()
@@ -49,33 +51,34 @@ class InfoRepositoryImpl @Inject constructor(
 
     override suspend fun likeLecture(recordedId: Long): DetailResponse<Boolean> {
         val response = withContext(ioDispatcher) { infoDataSource.likeLecture(recordedId) }
-        return response.toDetailResponse()
-    }
 
+    // Live 시작
     override suspend fun getLiveList(): ListResponse<LiveLectureData> {
         val response = withContext(ioDispatcher) { infoDataSource.getLiveList() }
         return response.toListResponse()
     }
 
-    override suspend fun createLive(): DetailResponse<Unit> {
-        val response = withContext(ioDispatcher) { infoDataSource.createLive() }
+    override suspend fun createLive(registerLiveRequest: RegisterLiveRequest): DetailResponse<Unit> {
+        val response = withContext(ioDispatcher) { infoDataSource.createLive(registerLiveRequest) }
+        return response.toDetailResponse()
+    }
+        override suspend fun getLive(liveId: Int): DetailResponse<LiveLectureData> {
+            val response = withContext(ioDispatcher) { infoDataSource.getLive(liveId) }
+            return response.toDetailResponse()
+        }
+
+        override suspend fun updateLive(registerLiveRequest: RegisterLiveRequest, liveId: Int): DetailResponse<Unit> {
+        val response = withContext(ioDispatcher) { infoDataSource.updateLive(registerLiveRequest, liveId) }
         return response.toDetailResponse()
     }
 
-    override suspend fun getLive(liveId: Int): DetailResponse<LiveLectureData> {
-        val response = withContext(ioDispatcher) { infoDataSource.getLive(liveId) }
-        return response.toDetailResponse()
-    }
-
-    override suspend fun updateLive(liveId: Int): DetailResponse<Unit> {
-        val response = withContext(ioDispatcher) { infoDataSource.updateLive(liveId) }
-        return response.toDetailResponse()
-    }
-
-    override suspend fun deleteLive(liveId: Int): DetailResponse<Unit> {
+        override suspend fun deleteLive(liveId: Int): DetailResponse<Unit> {
         val response = withContext(ioDispatcher) { infoDataSource.deleteLive(liveId) }
         return response.toDetailResponse()
     }
+
+    // Live 끝
+
 
     override suspend fun getNoticeList(): ListResponse<NoticeData> {
         val response = withContext(ioDispatcher) { infoDataSource.getNoticeList() }
