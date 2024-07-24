@@ -32,10 +32,10 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
             .load(profileData.profileImageUrl)
             .into(ivIcon)
 
-        if (!profileData.isTeacher) {
-            tvManagementVideo.visibility = View.GONE
-            tvManagementLive.visibility = View.GONE
-            tvRegisterNotice.visibility = View.GONE
+        if (profileData.isTeacher) {
+            tvManagementVideo.visibility = View.VISIBLE
+            tvManagementLive.visibility = View.VISIBLE
+            tvRegisterNotice.visibility = View.VISIBLE
         }
     }
 
