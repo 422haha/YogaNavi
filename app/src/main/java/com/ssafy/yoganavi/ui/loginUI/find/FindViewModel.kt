@@ -2,7 +2,7 @@ package com.ssafy.yoganavi.ui.loginUI.find
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.yoganavi.data.repository.ListResponse
+import com.ssafy.yoganavi.data.repository.response.ListResponse
 import com.ssafy.yoganavi.data.repository.UserRepository
 import com.ssafy.yoganavi.data.source.user.UserRequest
 import com.ssafy.yoganavi.ui.utils.IS_BLANK

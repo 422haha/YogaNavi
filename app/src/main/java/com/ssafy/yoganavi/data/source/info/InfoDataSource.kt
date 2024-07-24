@@ -20,6 +20,10 @@ interface InfoDataSource {
 
     suspend fun updateLecture(lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>>
 
+    suspend fun deleteLectures(recordIdList: List<Long>): Response<YogaDetailResponse<Boolean>>
+
+    suspend fun likeLecture(recordedId: Long): Response<YogaDetailResponse<Boolean>>
+
     // live
     suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>>
 

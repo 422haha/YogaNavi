@@ -27,8 +27,17 @@ interface InfoAPI {
     @GET("mypage/recorded-lecture/detail/{recorded_id}")
     suspend fun getLecture(@Path("recorded_id") id: Long): Response<YogaDetailResponse<LectureDetailData>>
 
-    @POST("mypage/recorded-lecture/detail")
-    suspend fun updateLecture(@Body lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>>
+    @PUT("mypage/recorded-lecture/update/{recorded_id}")
+    suspend fun updateLecture(
+        @Path("recorded_id") id: Long,
+        @Body lecture: LectureDetailData
+    ): Response<YogaDetailResponse<Boolean>>
+
+    @POST("mypage/recorded-lecture/delete")
+    suspend fun deleteLectures(@Body body: HashMap<String, List<Long>>): Response<YogaDetailResponse<Boolean>>
+
+    @POST("mypage/recorded-lecture/like/{recorded_id}")
+    suspend fun likeLecture(@Path("recorded_id") id: Long): Response<YogaDetailResponse<Boolean>>
 
     // Live
     @GET("mypage/live-lecture-manage")

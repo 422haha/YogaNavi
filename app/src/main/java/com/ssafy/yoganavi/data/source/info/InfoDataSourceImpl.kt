@@ -25,7 +25,13 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
         infoAPI.getLecture(recordedId)
 
     override suspend fun updateLecture(lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>> =
-        infoAPI.updateLecture(lecture)
+        infoAPI.updateLecture(id = lecture.recordedId, lecture = lecture)
+
+    override suspend fun deleteLectures(recordIdList: List<Long>): Response<YogaDetailResponse<Boolean>> =
+        infoAPI.deleteLectures(hashMapOf("lectureIds" to recordIdList))
+
+    override suspend fun likeLecture(recordedId: Long): Response<YogaDetailResponse<Boolean>> =
+        infoAPI.likeLecture(recordedId)
 
     override suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>> =
         infoAPI.getLiveList()
@@ -54,8 +60,7 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun updateNotice(
         registerNoticeRequest: RegisterNoticeRequest,
         articleId: Int
-    ): Response<YogaDetailResponse<Unit>> =
-        infoAPI.updateNotice(registerNoticeRequest, articleId)
+    ): Response<YogaDetailResponse<Unit>> = infoAPI.updateNotice(registerNoticeRequest, articleId)
 
     override suspend fun deleteNotice(articleId: Int): Response<YogaDetailResponse<Unit>> =
         infoAPI.deleteNotice(articleId)
