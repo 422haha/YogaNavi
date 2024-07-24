@@ -23,5 +23,5 @@ public interface UsersService {
 
     List<Users> getUserByEmail(String email);
 
-    Users updateUserInfo(String email, String nickname, MultipartFile profileImage) throws IOException;
+
 }
