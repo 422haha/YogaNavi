@@ -24,7 +24,7 @@ public class RecordedLecture {
 
     private String thumbnail;
 
-    @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecordedLectureChapter> chapters;
 
     private long likeCount = 0;
