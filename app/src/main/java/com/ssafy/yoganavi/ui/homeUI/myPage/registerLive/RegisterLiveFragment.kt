@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.view.get
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -20,6 +21,7 @@ import com.ssafy.yoganavi.ui.utils.formatDotDate
 import com.ssafy.yoganavi.ui.utils.formatTime
 import com.ssafy.yoganavi.ui.utils.formatZeroDate
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 import java.util.Calendar
 
 @AndroidEntryPoint
@@ -46,35 +48,42 @@ class RegisterLiveFragment :
             canGoBack = true,
             menuItem = REGISTER,
             menuListener = {
-                viewModel.liveState.apply {
-                    liveTitle = binding.etTitle.text.toString()
-                    liveContent = binding.etContent.text.toString()
+                viewModel.liveLectureData.apply {
+                    with(binding) {
+                        liveTitle = etTitle.text.toString()
+                        liveContent = etContent.text.toString()
 
-                    // TODO 가능 요일 선택(백앤드 배열 or string 결정 후)
+                        // TODO 가능 요일 선택(백앤드 배열 or string 결정 후)
 
-                    maxLiveNum = 1
+                        maxLiveNum = 1
+                    }
                 }
+
                 viewModel.createLive()
+
+                findNavController().popBackStack()
             })
     }
 
     private fun setModifyInfo() {
-        viewModel.getLive(args.liveId) { data ->
+        viewModel.getLive(args.liveId) {
             with(binding) {
-                etTitle.setText(data.liveTitle)
-                etContent.setText(data.liveContent)
+                with(viewModel) {
+                    etTitle.setText(liveLectureData.liveTitle)
+                    etContent.setText(liveLectureData.liveContent)
 
-                // TODO: 가능 요일 선택(백앤드 배열 or string 결정 후)
+                    // TODO: 가능 요일 선택(백앤드 배열 or string 결정 후)
 
-                tieStart.setText(formatDotDate(data.startDate))
-                tieEnd.setText(formatDotDate(data.endDate))
+                    tieStart.setText(formatDotDate(liveLectureData.startDate))
+                    tieEnd.setText(formatDotDate(liveLectureData.endDate))
 
-                btnStart.text = formatTime(data.startTime)
-                btnEnd.text = formatTime(data.endTime)
+                    btnStart.text = formatTime(liveLectureData.startTime)
+                    btnEnd.text = formatTime(liveLectureData.endTime)
 
-                val size = resources.getStringArray(R.array.maxnum_array).size
-                if(data.maxNum in 1..size)
-                    spMaxNum[data.maxNum - 1]
+                    val size = resources.getStringArray(R.array.maxnum_array).size
+                    if(liveLectureData.maxLiveNum in 1..size)
+                        spMaxNum[liveLectureData.maxLiveNum - 1]
+                }
             }
         }
     }
@@ -111,25 +120,27 @@ class RegisterLiveFragment :
 
                 val pickData = calendar.timeInMillis
 
+                Timber.d("$pickData")
+
                 if (state == START) {
                     binding.tieStart.setText("$sYear.${sMonth + 1}.$sDay")
-                    viewModel.liveState.startTime = pickData
+                    viewModel.liveLectureData.startTime = pickData
                 } else if (state == END) {
                     binding.tieEnd.setText("$sYear.${sMonth + 1}.$sDay")
-                    viewModel.liveState.endTime = pickData
+                    viewModel.liveLectureData.endTime = pickData
                 }
             }, year, month, day)
 
         if(state == START) startDatePickerDialog = datePicker
         else endDatePickerDialog = datePicker
-        
+
         // TODO lateinit으로 설정하기
         datePicker.apply {
-            if(state == START && (viewModel.liveState.endDate) != 0L) {
-                datePicker.datePicker.maxDate = viewModel.liveState.endDate
+            if(state == START && (viewModel.liveLectureData.endDate) != 0L) {
+                datePicker.datePicker.maxDate = viewModel.liveLectureData.endDate
             }
-            if(state == END && (viewModel.liveState.startDate) != 0L) {
-                datePicker.datePicker.minDate = viewModel.liveState.startDate
+            if(state == END && (viewModel.liveLectureData.startDate) != 0L) {
+                datePicker.datePicker.minDate = viewModel.liveLectureData.startDate
             }
             show()
         }
@@ -153,11 +164,11 @@ class RegisterLiveFragment :
 
             if (state == START) {
                 binding.btnStart.text = timeStr
-                viewModel.liveState.startTime = pickTime
+                viewModel.liveLectureData.startTime = pickTime
             }
             else if (state == END) {
                 binding.btnEnd.text = timeStr
-                viewModel.liveState.endTime = pickTime
+                viewModel.liveLectureData.endTime = pickTime
             }
         }
 

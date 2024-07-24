@@ -23,7 +23,7 @@ interface InfoDataSource {
     // live
     suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>>
 
-    suspend fun getLive(liveId: Int): Response<YogaDetailResponse<LiveLectureData>>
+    suspend fun getLive(liveId: Int): Response<YogaDetailResponse<RegisterLiveRequest>>
 
     suspend fun createLive(registerLiveRequest : RegisterLiveRequest): Response<YogaDetailResponse<Unit>>
 

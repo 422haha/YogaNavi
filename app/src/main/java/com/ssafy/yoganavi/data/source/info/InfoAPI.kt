@@ -35,7 +35,7 @@ interface InfoAPI {
     suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>>
 
     @GET("mypage/live-lecture/list/{live_id}")
-    suspend fun getLive(@Path("live_id") id: Int): Response<YogaDetailResponse<LiveLectureData>>
+    suspend fun getLive(@Path("live_id") id: Int): Response<YogaDetailResponse<RegisterLiveRequest>>
 
     @POST("mypage/live-lecture-manage/create")
     suspend fun createLive(@Body registerLiveRequest: RegisterLiveRequest): Response<YogaDetailResponse<Unit>>

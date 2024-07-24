@@ -62,7 +62,7 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toDetailResponse()
     }
 
-    override suspend fun getLive(liveId: Int): DetailResponse<LiveLectureData> {
+    override suspend fun getLive(liveId: Int): DetailResponse<RegisterLiveRequest> {
         val response = withContext(ioDispatcher) { infoDataSource.getLive(liveId) }
         return response.toDetailResponse()
     }

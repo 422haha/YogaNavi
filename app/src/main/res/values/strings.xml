@@ -80,6 +80,7 @@
     <string name="proceeding_live">진행중인 강의</string>
     <string name="emptyMessage">리스트가 비어있습니다 :)</string>
     <string name="max_num">최대 수강인원</string>
+    <string name="live_delete_msg">화상강의 일정이 삭제되었습니다.</string>
     <!-- 필터 끝 -->
 
     <string-array name="maxnum_array">

@@ -30,7 +30,7 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>> =
         infoAPI.getLiveList()
 
-    override suspend fun getLive(liveId: Int): Response<YogaDetailResponse<LiveLectureData>> =
+    override suspend fun getLive(liveId: Int): Response<YogaDetailResponse<RegisterLiveRequest>> =
         infoAPI.getLive(liveId)
 
     override suspend fun createLive(registerLiveRequest: RegisterLiveRequest): Response<YogaDetailResponse<Unit>> =

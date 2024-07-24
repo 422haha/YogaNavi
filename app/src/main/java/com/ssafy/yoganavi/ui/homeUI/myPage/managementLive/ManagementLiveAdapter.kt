@@ -12,10 +12,11 @@ import com.ssafy.yoganavi.ui.utils.formatTime
 
 class ManagementLiveAdapter(
     private val navigateToLiveFragment: (Int) -> Unit,
+    private val deleteLive: (Int) -> Unit,
 ) : ListAdapter<LiveLectureData, ManagementLiveAdapter.ViewHolder>(LiveDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent, navigateToLiveFragment)
+        return ViewHolder.from(parent, navigateToLiveFragment, deleteLive)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -24,28 +25,35 @@ class ManagementLiveAdapter(
 
     class ViewHolder(
         private val binding: ListItemLiveBinding,
-        private val navigateToLiveFragment: (Int) -> Unit
+        private val navigateToLiveFragment: (Int) -> Unit,
+        private val deleteLive: (Int) -> Unit
     ) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: LiveLectureData) {
             val date = "${formatDotDate(item.startDate)}~${formatDotDate(item.endDate)}"
-            binding.tvDate.text = date
 
-            binding.tvLectureTitle.text = item.liveTitle
+            with(binding) {
+                tvDate.text = date
 
-            val time = "${formatTime(item.startTime)}~${formatTime(item.endTime)}"
-            binding.tvLectureTime.text = "${item.availableDay} | $time"
+                tvLectureTitle.text = item.liveTitle
 
-            binding.vEnterBtn.setOnClickListener {
-                navigateToLiveFragment(item.liveId)
+                val time = "${formatTime(item.startTime)}~${formatTime(item.endTime)}"
+                tvLectureTime.text = "${item.availableDay} | $time"
+
+                vEnterBtn.setOnClickListener { navigateToLiveFragment(item.liveId) }
+
+                tvDeleteBtn.setOnClickListener { deleteLive(item.liveId) }
             }
         }
 
         companion object {
-            fun from(parent: ViewGroup, navigateToLiveFragment: (Int) -> Unit): ViewHolder {
+            fun from(parent: ViewGroup,
+                     navigateToLiveFragment: (Int) -> Unit,
+                     deleteLive: (Int) -> Unit): ViewHolder {
                 return ViewHolder(
                     ListItemLiveBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                    navigateToLiveFragment = navigateToLiveFragment
+                    navigateToLiveFragment = navigateToLiveFragment,
+                    deleteLive = deleteLive
                 )
             }
         }

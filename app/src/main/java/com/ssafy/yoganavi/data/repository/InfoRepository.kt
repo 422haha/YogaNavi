@@ -20,7 +20,7 @@ interface InfoRepository {
     // Live
     suspend fun getLiveList(): ListResponse<LiveLectureData>
 
-    suspend fun getLive(liveId: Int): DetailResponse<LiveLectureData>
+    suspend fun getLive(liveId: Int): DetailResponse<RegisterLiveRequest>
 
     suspend fun createLive(registerLiveRequest : RegisterLiveRequest): DetailResponse<Unit>
 

@@ -1,10 +1,14 @@
 package com.ssafy.yoganavi.data.source.live
 
-// 2-2, 5-5, 5-6
+import com.google.gson.annotations.SerializedName
+
 data class LiveLectureData(
     val liveId:Int,
+    @SerializedName("userId")
     val teacherId: Int,
+    @SerializedName("nickname")
     val teacherName: String,
+    @SerializedName("profileImageUrl")
     val teacherProfile: String,
     val liveTitle: String,
     val liveContent : String,
@@ -13,6 +17,6 @@ data class LiveLectureData(
     val endDate: Long,
     val startTime: Long,
     val endTime: Long,
-    val regTime: Long,
-    val maxNum: Int
+    val regDate: Long,
+    val maxLiveNum: Int
 )

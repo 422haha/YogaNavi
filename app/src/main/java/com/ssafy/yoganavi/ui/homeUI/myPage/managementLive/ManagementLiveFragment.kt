@@ -1,5 +1,6 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.managementLive
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -19,7 +20,7 @@ import kotlinx.coroutines.launch
 class ManagementLiveFragment :
     BaseFragment<FragmentManagementLiveBinding>(FragmentManagementLiveBinding::inflate) {
 
-    private val liveAdapter by lazy { ManagementLiveAdapter(::navigateToLiveFragment) }
+    private val liveAdapter by lazy { ManagementLiveAdapter(::navigateToLiveFragment, :: deleteLive) }
 
     private val viewModel: ManagementLiveViewModel by viewModels()
 
@@ -60,5 +61,30 @@ class ManagementLiveFragment :
             .actionManagementLiveFragmentToLiveFragment(liveId)
 
         findNavController().navigate(directions)
+    }
+
+    private fun deleteLive(liveId: Int = -1) {
+        if(liveId != -1) {
+            showDeleteDialog(liveId)
+        }
+    }
+
+    private fun showDeleteDialog(liveId: Int) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("화상강의 삭제")
+            .setMessage("정말로 삭제하시겠습니까?")
+            .setPositiveButton("확인") { _, _ ->
+                viewModel.deleteLive(liveId) {
+                    showSnackBar(getString(R.string.live_delete_msg))
+                }
+            }
+            .setNegativeButton("취소", null)
+            .show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.getLiveList()
     }
 }
