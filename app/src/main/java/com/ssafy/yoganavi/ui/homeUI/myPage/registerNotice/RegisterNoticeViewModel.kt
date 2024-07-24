@@ -55,18 +55,14 @@ class RegisterNoticeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
 
             val imageUrlKey = "$NOTICE/${UUID.randomUUID()}"
+            Timber.d("싸피 $imageUrlKey")
             val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
 
-            _notice.emit(notice.value.copy(
-                imageUrl = imageUrl.toString(),
-                imageUrlPath = notice.value.imageUrlPath,
-                imageUrlKey = imageUrlKey
-            ))
-
             val noticeFile = File(notice.value.imageUrlPath)
-            transferUtility.upload(BUCKET_NAME, notice.value.imageUrlKey, noticeFile)
+            Timber.d("싸피 $noticeFile")
+            transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile)
 
-            val request = RegisterNoticeRequest(content = content, imageUrl = notice.value.imageUrl)
+            val request = RegisterNoticeRequest(content = content, imageUrl = imageUrl.toString())
 
             runCatching { infoRepository.insertNotice(request) }
                 .onSuccess { onSuccess() }
@@ -75,7 +71,16 @@ class RegisterNoticeViewModel @Inject constructor(
 
     fun updateNotice(content: String, onSuccess: suspend () -> Unit) =
         viewModelScope.launch(Dispatchers.IO) {
-            val request = RegisterNoticeRequest(content = content, imageUrl = notice.value.imageUrl)
+            val imageUrlKey = "$NOTICE/${UUID.randomUUID()}"
+            Timber.d("싸피 $imageUrlKey")
+            val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
+
+            val noticeFile = File(notice.value.imageUrlPath)
+            Timber.d("싸피 $noticeFile")
+            transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile)
+
+            val request = RegisterNoticeRequest(content = content, imageUrl = imageUrl.toString())
+
             runCatching { infoRepository.updateNotice(request, notice.value.articleId) }
                 .onSuccess { onSuccess() }
                 .onFailure { it.printStackTrace() }
