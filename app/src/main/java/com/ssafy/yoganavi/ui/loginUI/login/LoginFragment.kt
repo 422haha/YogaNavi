@@ -9,7 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
-import com.ssafy.yoganavi.data.source.user.User
 import com.ssafy.yoganavi.databinding.FragmentLoginBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.core.MainActivity
@@ -32,7 +31,6 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
         binding.btnLogin.setOnClickListener {
             val email = binding.tieId.text.toString()
             val password = binding.tiePassword.text.toString()
-            viewModel.saveUser(User(email = email, password = password))
             viewModel.login(email, password)
         }
 
@@ -58,7 +56,6 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
 
     private fun loginSuccess(data: LogInEvent) {
         showSnackBar(data.message)
-        viewModel.saveUser(User(teacher = data.data))
         moveMainActivity()
     }
 

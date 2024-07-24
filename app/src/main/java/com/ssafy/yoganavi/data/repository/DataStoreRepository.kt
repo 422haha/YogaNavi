@@ -16,9 +16,8 @@ import javax.inject.Inject
 
 class DataStoreRepository @Inject constructor(val context: Context) {
     private val Context.datastore: DataStore<Preferences> by preferencesDataStore(name = "user")
-    private val email = stringPreferencesKey("email")
-    private val password = stringPreferencesKey("password")
     private val nickname = stringPreferencesKey("nickname")
+    private val userImage = stringPreferencesKey("image")
     private val teacher = booleanPreferencesKey("teacher")
     private val accessToken = stringPreferencesKey("accessToken")
     private val refreshToken = stringPreferencesKey("refreshToken")
@@ -27,20 +26,18 @@ class DataStoreRepository @Inject constructor(val context: Context) {
         .catch {
             emit(emptyPreferences())
         }.map { preferences ->
-            val email = preferences[email] ?: ""
-            val password = preferences[password] ?: ""
             val nickname = preferences[nickname] ?: ""
+            val userImage = preferences[userImage] ?: ""
             val teacher = preferences[teacher] ?: false
             val accessToken = preferences[accessToken] ?: ""
             val refreshToken = preferences[refreshToken] ?: ""
 
-            User(email, password, nickname, teacher, accessToken, refreshToken)
+            User(nickname, userImage, teacher, accessToken, refreshToken)
         }
 
     suspend fun setUser(user: User) = context.datastore.edit { preference ->
-        preference[email] = user.email.ifBlank { preference[email] ?: "" }
-        preference[password] = user.password.ifBlank { preference[password] ?: "" }
         preference[nickname] = user.nickname.ifBlank { preference[nickname] ?: "" }
+        preference[userImage] = user.imageUrl.ifBlank { preference[userImage] ?: "" }
         preference[teacher] = user.teacher
         preference[accessToken] = user.accessToken.ifBlank { preference[accessToken] } ?: ""
         preference[refreshToken] = user.refreshToken.ifBlank { preference[refreshToken] ?: "" }
