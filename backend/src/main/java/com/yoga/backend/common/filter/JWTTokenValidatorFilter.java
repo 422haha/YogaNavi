@@ -51,14 +51,23 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
         if (null != jwt && jwt.startsWith("Bearer ")) {
             jwt = jwtUtil.extractToken(jwt);
             try {
-                Claims claims = jwtUtil.validateToken(jwt);
-                String email = String.valueOf(claims.get("email"));
-                String authorities = (String) claims.get("role");
 
-                Authentication auth = new UsernamePasswordAuthenticationToken(email, null,
-                    AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
-                SecurityContextHolder.getContext().setAuthentication(auth);
-                filterChain.doFilter(request, response);
+                // 추가 if~else
+                if (jwtUtil.isTokenValid(jwt)) {
+
+                    Claims claims = jwtUtil.validateToken(jwt);
+                    String email = String.valueOf(claims.get("email"));
+                    String authorities = (String) claims.get("role");
+
+                    Authentication auth = new UsernamePasswordAuthenticationToken(email, null,
+                        AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                    filterChain.doFilter(request, response);
+                }else {
+                    // 토큰이 유효하지 않은 경우 (다른 기기에서 로그인)
+                    sendUnauthorizedResponse(response, "다른 기기에서 로그인되어 세션이 만료되었습니다.");
+                    return;
+                }
 
             } catch (ExpiredJwtException e) {
                 if (null == refreshToken) {
