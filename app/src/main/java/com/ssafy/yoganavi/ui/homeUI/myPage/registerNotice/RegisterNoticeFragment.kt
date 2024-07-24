@@ -1,12 +1,13 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.registerNotice
 
-import android.app.Activity.RESULT_OK
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +21,7 @@ import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_INSERT
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_UPDATE
 import com.ssafy.yoganavi.ui.utils.REGISTER
+import com.ssafy.yoganavi.ui.utils.getPath
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -31,7 +33,16 @@ class RegisterNoticeFragment :
     BaseFragment<FragmentRegisterNoticeBinding>(FragmentRegisterNoticeBinding::inflate) {
     private val args by navArgs<RegisterNoticeFragmentArgs>()
     private val viewModel: RegisterNoticeViewModel by viewModels()
-
+    private val imageUriLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val imageUri = result.data?.data ?: return@registerForActivityResult
+                val imagePath = getPath(requireContext(), imageUri)
+                if (imagePath.isNotBlank()) {
+                    viewModel.addImage(imagePath)
+                }
+            }
+        }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.ivPhoto.visibility = View.GONE
@@ -69,7 +80,7 @@ class RegisterNoticeFragment :
     private fun initListener() {
         binding.btnAddPhoto.setOnClickListener {
             saveEditText()
-            openGallery()
+            addPhoto()
         }
         binding.ivCancel.setOnClickListener {
             saveEditText()
@@ -83,8 +94,7 @@ class RegisterNoticeFragment :
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.notice.collectLatest {
-                val notice = it
+            viewModel.notice.collectLatest { notice ->
                 binding.etNotice.setText(notice.content)
                 if (notice.imageUrl.isNotBlank()) {
                     Glide.with(requireActivity())
@@ -93,7 +103,14 @@ class RegisterNoticeFragment :
                     binding.ivPhoto.visibility = View.VISIBLE
                     binding.ivCancel.visibility = View.VISIBLE
                     binding.btnAddPhoto.visibility = View.GONE
-                } else {
+                }
+                else if(notice.imageUrlPath.isNotBlank()){
+                    binding.ivPhoto.setImageURI(notice.imageUrlPath.toUri())
+                    binding.ivPhoto.visibility = View.VISIBLE
+                    binding.ivCancel.visibility = View.VISIBLE
+                    binding.btnAddPhoto.visibility = View.GONE
+                }
+                else {
                     binding.ivPhoto.visibility = View.GONE
                     binding.ivCancel.visibility = View.GONE
                     binding.btnAddPhoto.visibility = View.VISIBLE
@@ -101,22 +118,13 @@ class RegisterNoticeFragment :
             }
         }
     }
-
-    private fun openGallery() {
-        val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
-        pickImageLauncher.launch(gallery)
-    }
-
-    private val pickImageLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val data = result.data?.data ?: return@registerForActivityResult
-                viewModel.addImage(data.toString())
-                binding.ivPhoto.visibility = View.VISIBLE
-                binding.ivCancel.visibility = View.VISIBLE
-                binding.etNotice.setText(viewModel.notice.value.content)
-            }
+    private fun addPhoto() {
+        val intent = Intent().apply {
+            type = "image/*"
+            action = Intent.ACTION_GET_CONTENT
         }
+        imageUriLauncher.launch(intent)
+    }
 
     private suspend fun goBackStack() = withContext(Dispatchers.Main) {
         findNavController().popBackStack()
