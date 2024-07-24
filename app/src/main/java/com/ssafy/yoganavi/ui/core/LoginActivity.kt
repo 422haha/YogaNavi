@@ -59,6 +59,6 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.getToken()
+//        ㅛ.getToken()
     }
 }

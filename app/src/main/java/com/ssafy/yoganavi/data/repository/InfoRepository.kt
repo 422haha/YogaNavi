@@ -3,9 +3,9 @@ package com.ssafy.yoganavi.data.repository
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
+import com.ssafy.yoganavi.data.source.live.RegisterLiveRequest
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
-import com.ssafy.yoganavi.data.source.user.UserRequest
 
 interface InfoRepository {
 
@@ -22,9 +22,9 @@ interface InfoRepository {
 
     suspend fun getLive(liveId: Int): DetailResponse<LiveLectureData>
 
-    suspend fun createLive(): DetailResponse<Unit>
+    suspend fun createLive(registerLiveRequest : RegisterLiveRequest): DetailResponse<Unit>
 
-    suspend fun updateLive(liveId: Int): DetailResponse<Unit>
+    suspend fun updateLive(registerLiveRequest: RegisterLiveRequest, liveId: Int): DetailResponse<Unit>
 
     suspend fun deleteLive(liveId: Int): DetailResponse<Unit>
 
