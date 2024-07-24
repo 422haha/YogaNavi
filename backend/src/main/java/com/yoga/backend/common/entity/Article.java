@@ -44,4 +44,22 @@ public class Article {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    /**
+     * 이미지 URL을 반환합니다.
+     *
+     * @return 이미지 URL
+     */
+    public String getImage() {
+        return imageUrl;
+    }
+
+    /**
+     * 이미지 URL을 설정합니다.
+     *
+     * @param image 이미지 URL
+     */
+    public void setImage(String image) {
+        this.imageUrl = image;
+    }
 }
