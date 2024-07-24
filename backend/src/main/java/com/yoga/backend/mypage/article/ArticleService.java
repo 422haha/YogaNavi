@@ -1,7 +1,6 @@
 package com.yoga.backend.mypage.article;
 
 import com.yoga.backend.common.entity.Article;
-
 import java.util.List;
 import java.util.Optional;
 
