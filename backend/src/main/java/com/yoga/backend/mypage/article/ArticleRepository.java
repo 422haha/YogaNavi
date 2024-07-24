@@ -26,5 +26,5 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
      * @param content 게시글 내용
      * @return 게시글 목록
      */
-    List<Article> findByContent(String content);  // findByContent 메소드 추가
+    List<Article> findByContent(String content);
 }

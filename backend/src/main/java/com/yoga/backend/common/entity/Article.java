@@ -25,12 +25,16 @@ public class Article {
     private LocalDateTime updatedAt; // 수정일자
     private String imageUrl; // 이미지 URL
 
+    @Version
+    private Integer version; // 낙관적 락을 위한 버전 필드
+
     /**
      * 게시글 생성 전에 호출되어 생성일자를 설정합니다.
      */
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+        this.version = 0;
     }
 
     /**
@@ -39,5 +43,23 @@ public class Article {
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    /**
+     * 이미지 URL을 반환합니다.
+     *
+     * @return 이미지 URL
+     */
+    public String getImage() {
+        return imageUrl;
+    }
+
+    /**
+     * 이미지 URL을 설정합니다.
+     *
+     * @param image 이미지 URL
+     */
+    public void setImage(String image) {
+        this.imageUrl = image;
     }
 }

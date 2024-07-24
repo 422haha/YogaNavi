@@ -1,8 +1,17 @@
 package com.yoga.backend.common.awsS3;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,8 +27,11 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
+@Slf4j
 @Service
 public class S3Service {
+
+    private static final String BASE_URL = "https://yoga-navi.s3.ap-northeast-2.amazonaws.com/";
 
     // S3 클라이언트
     private final S3Client s3Client;
@@ -92,15 +104,39 @@ public class S3Service {
      * @param fileUrl 삭제할 파일의 S3 URL
      */
     public void deleteFile(String fileUrl) {
-        // S3 URL에서 키를 추출
-        String key = extractKeyFromUrl(fileUrl);
-        // S3에서 파일을 삭제
-        s3Client.deleteObject(DeleteObjectRequest.builder()
-            .bucket(bucketName)  // 버킷 이름 설정
-            .key(key)            // 키 설정
-            .build());
+        try {
+            String key = extractKeyFromUrl(fileUrl);
+            if (key != null && !key.isEmpty()) {
+                s3Client.deleteObject(DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build());
+                log.info("Successfully deleted file with key: {}", key);
+            } else {
+                log.warn("Unable to delete file. Invalid URL: {}", fileUrl);
+            }
+        } catch (Exception e) {
+            log.error("Error deleting file from S3: {}", fileUrl, e);
+        }
     }
 
+    /**
+     * S3 URL에서 키를 추출
+     *
+     * @param fileUrl S3 URL
+     * @return 추출된 키
+     */
+    private String extractKeyFromUrl(String fileUrl) {
+        try {
+            URL url = new URL(fileUrl);
+            String path = url.getPath();
+            // Remove leading '/' if present
+            return path.startsWith("/") ? path.substring(1) : path;
+        } catch (MalformedURLException e) {
+            log.error("Invalid S3 URL: {}", fileUrl, e);
+            return null;
+        }
+    }
     /**
      * 고유한 파일 이름을 생성
      *
@@ -123,18 +159,13 @@ public class S3Service {
         return "https://" + bucketName + ".s3.amazonaws.com/" + key;
     }
 
-    /**
-     * S3 URL에서 키를 추출
-     *
-     * @param fileUrl S3 URL
-     * @return 추출된 키
-     */
-    private String extractKeyFromUrl(String fileUrl) {
-        // S3 URL에서 ".com/" 이후의 부분을 키로 추출
-        return fileUrl.substring(fileUrl.indexOf(".com/") + 5);
-    }
 
     public String generatePresignedUrl(String key, long expirationInSeconds) {
+        // 키에서 버킷 이름을 제거 (만약 포함되어 있다면)
+        if (key.startsWith(bucketName + "/")) {
+            key = key.substring(bucketName.length() + 1);
+        }
+
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
             .bucket(bucketName)
             .key(key)
@@ -146,7 +177,86 @@ public class S3Service {
             .build();
 
         PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(getObjectPresignRequest);
+        String presignedUrl = presignedGetObjectRequest.url().toString();
 
-        return presignedGetObjectRequest.url().toString();
+        return normalizeUrl(presignedUrl);
+    }
+
+    private String normalizeUrl(String url) {
+        String decodedUrl = url;
+        // URL 디코딩을 여러 번 수행하여 중첩된 인코딩 해결
+        while (decodedUrl.contains("%")) {
+            try {
+                String newDecodedUrl = URLDecoder.decode(decodedUrl, StandardCharsets.UTF_8);
+                if (newDecodedUrl.equals(decodedUrl)) {
+                    break;  // 더 이상 디코딩할 것이 없으면 중단
+                }
+                decodedUrl = newDecodedUrl;
+            } catch (IllegalArgumentException e) {
+                // 디코딩 중 오류 발생 시 현재 상태로 중단
+                break;
+            }
+        }
+
+        // 중복된 기본 URL 제거
+        if (decodedUrl.contains(BASE_URL + BASE_URL)) {
+            decodedUrl = decodedUrl.replace(BASE_URL + BASE_URL, BASE_URL);
+        }
+
+        try {
+            URL parsedUrl = new URL(decodedUrl);
+            String baseUrl = parsedUrl.getProtocol() + "://" + parsedUrl.getHost() + parsedUrl.getPath();
+            String query = parsedUrl.getQuery();
+
+            if (query == null) {
+                return baseUrl;
+            }
+
+            // 중복 쿼리 파라미터 제거
+            Map<String, String> params = new LinkedHashMap<>();
+            for (String param : query.split("&")) {
+                String[] keyValue = param.split("=", 2);
+                if (keyValue.length == 2) {
+                    params.putIfAbsent(keyValue[0], keyValue[1]);
+                }
+            }
+
+            StringBuilder normalizedQuery = new StringBuilder();
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                if (normalizedQuery.length() > 0) {
+                    normalizedQuery.append('&');
+                }
+                normalizedQuery.append(entry.getKey()).append('=').append(entry.getValue());
+            }
+
+            return baseUrl + "?" + normalizedQuery;
+        } catch (MalformedURLException e) {
+            log.error("URL normalization failed", e);
+            return url;
+        }
+    }
+
+    public Map<String, String> generatePresignedUrls(Set<String> keys, long expirationInSeconds) {
+        Map<String, String> presignedUrls = new HashMap<>();
+        for (String key : keys) {
+            if (key.startsWith(bucketName + "/")) {
+                key = key.substring(bucketName.length() + 1);
+            }
+
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+
+            GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofSeconds(expirationInSeconds))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+            PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(getObjectPresignRequest);
+            String presignedUrl = presignedGetObjectRequest.url().toString();
+            presignedUrls.put(key, normalizeUrl(presignedUrl));  // normalizeUrl 적용
+        }
+        return presignedUrls;
     }
 }

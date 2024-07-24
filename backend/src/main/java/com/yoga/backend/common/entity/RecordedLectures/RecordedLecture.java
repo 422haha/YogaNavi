@@ -2,10 +2,15 @@ package com.yoga.backend.common.entity.RecordedLectures;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class RecordedLecture {
 
     @Id
@@ -15,26 +20,27 @@ public class RecordedLecture {
     @Version
     private Long version;
 
-    @Column(nullable = false)
     private int userId;
 
-    @Column(nullable = false)
     private String title;
 
     @Column(name = "record_content", nullable = false)
     private String content;
 
-    @Column(nullable = false)
     private String thumbnail;
 
-    @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecordedLectureChapter> chapters;
 
-    @Column(nullable = false)
-    private String creationStatus;
-
-    @Column(nullable = false)
     private long likeCount = 0;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    @Column(name = "last_modified_at", nullable = false)
+    private LocalDateTime lastModifiedDate;
 
     public void incrementLikeCount() {
         this.likeCount++;
@@ -103,14 +109,6 @@ public class RecordedLecture {
         this.chapters = chapters;
     }
 
-    public String getCreationStatus() {
-        return creationStatus;
-    }
-
-    public void setCreationStatus(String creationStatus) {
-        this.creationStatus = creationStatus;
-    }
-
     public long getLikeCount() {
         return likeCount;
     }
@@ -119,4 +117,27 @@ public class RecordedLecture {
         this.likeCount = likeCount;
     }
 
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LocalDateTime getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public Long getCreatedDateAsLong() {
+        return createdDate.toEpochSecond(ZoneOffset.UTC) * 1000;
+    }
+
+    public Long getLastModifiedDateAsLong() {
+        return lastModifiedDate.toEpochSecond(ZoneOffset.UTC) * 1000;
+    }
 }

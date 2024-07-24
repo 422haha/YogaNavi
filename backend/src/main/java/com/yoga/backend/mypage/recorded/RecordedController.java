@@ -2,16 +2,12 @@ package com.yoga.backend.mypage.recorded;
 
 import com.yoga.backend.common.util.JwtUtil;
 import com.yoga.backend.members.UsersRepository;
-import com.yoga.backend.mypage.recorded.dto.ChapterDto;
-import com.yoga.backend.mypage.recorded.dto.LectureCreationStatus;
+import com.yoga.backend.mypage.recorded.dto.DeleteDto;
 import com.yoga.backend.mypage.recorded.dto.LectureDto;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /*
- * TODO: 종아요, 좋아요 취소 구현 (아마 끝)
- * TODO: 좋아요한 강의 목록 조회( 아마 끝 )
- * TODO: 강의 삭제, 수정 구현 (아마 끝)
- * FIXME: 업로드한 강의 목록 조회 및 업로드한 강의 상세 보기 s3와 연결 (아마 끝)
+ *
  *
  * */
 @Slf4j
@@ -50,7 +43,7 @@ public class RecordedController {
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
         int userId = jwtUtil.getUserIdFromToken(token);
-        log.info("사용자 ={}", userId);
+        log.info("사용자 ID: {}", userId);
         List<LectureDto> lectureList = recordedService.getMyLectures(userId);
 
         if (!lectureList.isEmpty()) {
@@ -62,7 +55,6 @@ public class RecordedController {
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-
     }
 
 
@@ -91,7 +83,6 @@ public class RecordedController {
 
     }
 
-
     /**
      * 새로운 강의를 생성하기를 요청
      *
@@ -107,16 +98,7 @@ public class RecordedController {
         try {
             int userId = jwtUtil.getUserIdFromToken(token);
             lectureDto.setUserId(userId);
-
-            System.out.println(lectureDto.getRecordThumbnail());
-            System.out.println(lectureDto.getRecordTitle());
-            System.out.println(lectureDto.getRecordContent());
-            for(ChapterDto ch :lectureDto.getRecordedLectureChapters()){
-                System.out.println(ch.getChapterDescription());
-            }
-
             recordedService.saveLecture(lectureDto);
-
             response.put("message", "강의가 성공적으로 생성되었습니다.");
             response.put("data", true);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -126,27 +108,6 @@ public class RecordedController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
-//
-//    /**
-//     * 강의 생성 상태 확인 클라이언트는 주기적으로 getLectureCreationStatus를 호출해야함.
-//     *
-//     * @param sessionId 강의 생성 세션 ID
-//     * @return 강의 생성 상태
-//     */
-//    @GetMapping("/status/{sessionId}")
-//    public ResponseEntity<Map<String, Object>> getLectureCreationStatus(
-//        @PathVariable String sessionId) {
-//        Map<String, Object> response = new HashMap<>();
-//        LectureCreationStatus status = recordedService.getLectureCreationStatus(sessionId);
-//        response.put("message", status.getMessage());
-//        response.put("data", new String[]{status.getStatus()});
-//        if (status.getLectureDto() != null) {
-//            response.put("lecture", status.getLectureDto());
-//        }
-//        return ResponseEntity.ok(response);
-//    }
-
 
     /**
      * 업로드한 강의의 상세 정보 조회
@@ -172,76 +133,110 @@ public class RecordedController {
         }
     }
 
-    @PutMapping("/update/{recorded_id}")
+    /**
+     * 강의의 정보 수정
+     * @param token      jwt 토큰
+     * @param lectureDto 수정된 강의 dto
+     * @return 강의 수정 성공/실패 응답
+     */
+    @PutMapping("/update/{recordedId}")
     public ResponseEntity<Map<String, Object>> updateLecture(
         @RequestHeader("Authorization") String token,
-        @PathVariable Long recorded_id,
+        @PathVariable Long recordedId,
         @RequestBody LectureDto lectureDto) {
         Map<String, Object> response = new HashMap<>();
-        try {
-            int userId = jwtUtil.getUserIdFromToken(token);
-            LectureDto updatedLecture = recordedService.updateLecture(recorded_id, lectureDto,
-                userId);
-            response.put("message", "강의가 성공적으로 수정되었습니다.");
-            response.put("data", updatedLecture);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("message", "강의 수정 중 오류가 발생했습니다: " + e.getMessage());
-            response.put("data", new Object[]{});
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-    }
+        lectureDto.setRecordedId(recordedId);
 
-    @DeleteMapping("/delete/{recorded_id}")
-    public ResponseEntity<Map<String, Object>> deleteLecture(
-        @RequestHeader("Authorization") String token,
-        @PathVariable Long recorded_id) {
-        Map<String, Object> response = new HashMap<>();
+        log.info("강의 수정 ID: {}", recordedId);
+        log.debug("LectureDto: {}", lectureDto);
+
         try {
             int userId = jwtUtil.getUserIdFromToken(token);
-            recordedService.deleteLecture(recorded_id, userId);
-            response.put("message", "강의가 성공적으로 삭제되었습니다.");
-            response.put("data", new Object[]{});
-            return ResponseEntity.ok(response);
+            lectureDto.setUserId(userId);
+            boolean updateResult = recordedService.updateLecture(lectureDto);
+
+            if (updateResult) {
+                log.info("강의 ID {} 수정 성공", recordedId);
+                response.put("message", "강의 수정 성공");
+                response.put("data", true);
+                return ResponseEntity.ok(response);
+            } else {
+                log.warn("강의 ID {} 수정 실패", recordedId);
+                response.put("message", "강의 수정 실패");
+                response.put("data", false);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
         } catch (Exception e) {
-            response.put("message", "강의 삭제 중 오류가 발생했습니다: " + e.getMessage());
-            response.put("data", new Object[]{});
+            log.error("강의 ID {} 수정 중 오류 발생: {}", recordedId, e.getMessage(), e);
+            response.put("message", "강의 수정 중 오류 발생: " + e.getMessage());
+            response.put("data", false);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
     /**
+     * 강의 삭제 요청
+     *
+     * @param token      jwt 토큰
+     * @param deleteDto  삭제할 강의 ID 리스트를 포함한 DTO
+     * @return 강의 삭제 성공/실패 응답
+     */
+    @PostMapping("/delete")
+    public ResponseEntity<Map<String, Object>> deleteLectures(
+        @RequestHeader("Authorization") String token,
+        @RequestBody DeleteDto deleteDto) {
+
+        for(Long l: deleteDto.getLectureIds()){
+            log.debug("삭제할 강의 ID: {}", l); // 삭제할 강의 ID를 로그에 기록
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        try {
+            int userId = jwtUtil.getUserIdFromToken(token);
+            log.info("사용자 {}가 강의 삭제 시도: {}", userId, deleteDto);
+
+            recordedService.deleteLectures(deleteDto, userId);
+
+            response.put("message", "선택된 강의들이 성공적으로 삭제되었습니다.");
+            response.put("data", true);
+            log.info("사용자 {}의 강의 삭제 성공", userId);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            log.error("강의 삭제 중 오류 발생: {}", e.getMessage());
+            response.put("message", e.getMessage());
+            response.put("data", false);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            log.error("강의 삭제중 예상치 못한 에러 발생", e);
+            response.put("message", "서버 오류가 발생했습니다: " + e.getMessage());
+            response.put("data", false);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+
+    /**
      * 강의 좋아요, 좋아요 취소
      *
      * @param token      jwt
-     * @param lectureDto 좋아요 및 강의 관련 정보를 받아올 dto
-     * @return 강의 상세 정보
+     * @param recordedId 강의 id
+     * @return 좋아요/취소 성공/실패 응답
      */
-    @PostMapping("/like")
+    @PostMapping("/like/{recordedId}")
     public ResponseEntity<Map<String, Object>> like(@RequestHeader("Authorization") String token,
-        @RequestBody LectureDto lectureDto) {
+        @PathVariable Long recordedId) {
         Map<String, Object> response = new HashMap<>();
         int userId = jwtUtil.getUserIdFromToken(token);
         try {
-
-            LectureDto updatedLecture;
-            if (lectureDto.isMyLike()) { //좋아요 취소
-                updatedLecture = recordedService.setLike(lectureDto.getRecordedId(), userId);
-                response.put("message", "좋아요 성공");
-
-            } else { // 좋아요 하기
-                updatedLecture = recordedService.setDislike(lectureDto.getRecordedId(), userId);
-                response.put("message", "좋아요 취소");
-            }
-            response.put("data", updatedLecture);
+            boolean isLiked = recordedService.toggleLike(recordedId, userId);
+            log.info("사용자 {}가 강의 {} 좋아요/취소", userId, recordedId);
+            response.put("message", isLiked ? "좋아요 성공" : "좋아요 취소");
+            response.put("data", isLiked);
             return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (OptimisticLockingFailureException e) {
-            response.put("message", "다시 시도해주세요.");
-            response.put("data", new Object[]{});
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         } catch (Exception e) {
+            log.error("Error processing like/unlike for lecture {} by user {}", recordedId, userId, e);
             response.put("message", "오류가 발생했습니다: " + e.getMessage());
-            response.put("data", new Object[]{});
+            response.put("data", false);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

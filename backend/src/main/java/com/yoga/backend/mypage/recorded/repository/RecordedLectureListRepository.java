@@ -1,8 +1,6 @@
 package com.yoga.backend.mypage.recorded.repository;
 
-import static com.querydsl.core.types.Projections.constructor;
-
-import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yoga.backend.common.entity.RecordedLectures.QRecordedLecture;
@@ -20,19 +18,20 @@ public class RecordedLectureListRepository {
         this.queryFactory = queryFactory;
     }
 
-    public List<LectureDto> findAllLectures(int userId) { // Long에서 int로 변경
+    public List<LectureDto> findAllLectures(int userId) {
         QRecordedLecture lecture = QRecordedLecture.recordedLecture;
         QRecordedLectureLike like = QRecordedLectureLike.recordedLectureLike;
 
         return queryFactory
-            .select(constructor(LectureDto.class,
-                Expressions.as(lecture.id, "recordedId"),
-                Expressions.as(lecture.title, "recordTitle"),
-                Expressions.as(lecture.thumbnail, "recordThumbnail"),
-                Expressions.as(JPAExpressions.select(like.id.count())
+            .select(Projections.constructor(LectureDto.class,
+                lecture.id.as("recordedId"),
+                lecture.title.as("recordTitle"),
+                lecture.thumbnail.as("recordThumbnail"),
+                lecture.likeCount.as("likeCount"),
+                JPAExpressions.selectOne()
                     .from(like)
-                    .where(like.lecture.eq(lecture)), "likeCount"),
-                Expressions.as(Expressions.constant(false), "myLike")
+                    .where(like.lecture.eq(lecture).and(like.userId.eq(userId)))
+                    .exists().as("myLike")
             ))
             .from(lecture)
             .where(lecture.userId.eq(userId))

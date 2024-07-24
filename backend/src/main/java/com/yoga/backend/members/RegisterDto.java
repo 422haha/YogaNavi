@@ -7,6 +7,7 @@ public class RegisterDto {
     private String nickname;
     private boolean isTeacher;
     private int authnumber;
+    private String imageUrl;
 
     public int getAuthnumber() {
         return authnumber;
@@ -46,5 +47,13 @@ public class RegisterDto {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

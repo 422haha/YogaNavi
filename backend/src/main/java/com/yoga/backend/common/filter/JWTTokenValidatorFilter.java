@@ -51,14 +51,23 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
         if (null != jwt && jwt.startsWith("Bearer ")) {
             jwt = jwtUtil.extractToken(jwt);
             try {
-                Claims claims = jwtUtil.validateToken(jwt);
-                String email = String.valueOf(claims.get("email"));
-                String authorities = (String) claims.get("role");
 
-                Authentication auth = new UsernamePasswordAuthenticationToken(email, null,
-                    AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
-                SecurityContextHolder.getContext().setAuthentication(auth);
-                filterChain.doFilter(request, response);
+                // 추가 if~else
+                if (jwtUtil.isTokenValid(jwt)) {
+
+                    Claims claims = jwtUtil.validateToken(jwt);
+                    String email = String.valueOf(claims.get("email"));
+                    String authorities = (String) claims.get("role");
+
+                    Authentication auth = new UsernamePasswordAuthenticationToken(email, null,
+                        AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                    filterChain.doFilter(request, response);
+                }else {
+                    // 토큰이 유효하지 않은 경우 (다른 기기에서 로그인)
+                    sendUnauthorizedResponse(response, "다른 기기에서 로그인되어 세션이 만료되었습니다.");
+                    return;
+                }
 
             } catch (ExpiredJwtException e) {
                 if (null == refreshToken) {
@@ -68,10 +77,6 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                 }
             } catch (JwtException e) {
                 sendUnauthorizedResponse(response, "액세스 토큰 처리 불가");
-            } catch (Exception e) {
-                // 예외 발생 시 트랜잭션 롤백
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                sendUnauthorizedResponse(response, "인증 처리 중 오류 발생");
             }
         } else {
             filterChain.doFilter(request, response);

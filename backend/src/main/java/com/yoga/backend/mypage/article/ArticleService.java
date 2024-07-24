@@ -1,7 +1,6 @@
 package com.yoga.backend.mypage.article;
 
 import com.yoga.backend.common.entity.Article;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +38,16 @@ public interface ArticleService {
      * @return 게시글
      */
     Optional<Article> getArticleById(Long id);
+
+    /**
+     * 게시글을 업데이트합니다.
+     *
+     * @param articleId  게시글 ID
+     * @param newContent 새로운 게시글 내용
+     * @param newImage   새로운 이미지 URL
+     * @return 업데이트된 게시글
+     */
+    Article updateArticle(Long articleId, String newContent, String newImage);
 
     /**
      * 게시글을 삭제합니다.

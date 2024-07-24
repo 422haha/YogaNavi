@@ -8,12 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -58,8 +55,7 @@ public class ArticleController {
         @RequestHeader("Authorization") String token, @RequestBody ArticleDto articleDto) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // 토큰에서 사용자 ID를 추출합니다.
-            int userId = jwtUtil.getUserIdFromToken(token);
+            int userId = jwtUtil.getUserIdFromToken(token); // JWT 토큰에서 사용자 ID 추출
             Optional<Users> optionalUser = usersRepository.findById((long) userId);
 
             if (optionalUser.isPresent()) {
@@ -67,7 +63,7 @@ public class ArticleController {
                 Article article = new Article();
                 article.setUser(user);
                 article.setContent(articleDto.getContent());
-                article.setImageUrl(articleDto.getImageUrl());
+                article.setImage(articleDto.getImageUrl());
                 article.setCreatedAt(LocalDateTime.now());
                 article.setUpdatedAt(LocalDateTime.now());
 
@@ -101,9 +97,13 @@ public class ArticleController {
         try {
             // 모든 게시글을 가져옵니다.
             List<Article> articles = articleService.getAllArticles();
+
+            // 게시글을 생성일 기준으로 역순으로 정렬합니다.
             List<Map<String, Object>> articleList = articles.stream()
+                .sorted(Comparator.comparing(Article::getCreatedAt).reversed())
                 .map(this::convertArticleToMap)
                 .collect(Collectors.toList());
+
             response.put("message", "success");
             response.put("data", articleList);
             return ResponseEntity.ok(response);
@@ -126,16 +126,19 @@ public class ArticleController {
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // 토큰에서 사용자 ID를 추출합니다.
-            int userId = jwtUtil.getUserIdFromToken(token);
+            int userId = jwtUtil.getUserIdFromToken(token); // JWT 토큰에서 사용자 ID 추출
             Optional<Users> optionalUser = usersRepository.findById((long) userId);
 
             if (optionalUser.isPresent()) {
                 Users user = optionalUser.get();
                 List<Article> articles = articleService.getArticlesByUserId(user.getId());
+
+                // 게시글을 생성일 기준으로 역순으로 정렬합니다.
                 List<Map<String, Object>> articleList = articles.stream()
+                    .sorted(Comparator.comparing(Article::getCreatedAt).reversed())
                     .map(this::convertArticleToMap)
                     .collect(Collectors.toList());
+
                 response.put("message", "success");
                 response.put("data", articleList);
                 return ResponseEntity.ok(response);
@@ -183,7 +186,7 @@ public class ArticleController {
     }
 
     /**
-     * 특정 게시글을 수정합니다.
+     * 특정 게시글을 업데이트합니다.
      *
      * @param token      JWT 토큰
      * @param id         게시글 ID
@@ -196,8 +199,7 @@ public class ArticleController {
         @RequestBody ArticleDto articleDto) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // 토큰에서 사용자 ID를 추출합니다.
-            int userId = jwtUtil.getUserIdFromToken(token);
+            int userId = jwtUtil.getUserIdFromToken(token); // JWT 토큰에서 사용자 ID 추출
             Optional<Users> optionalUser = usersRepository.findById((long) userId);
 
             if (optionalUser.isPresent()) {
@@ -217,13 +219,10 @@ public class ArticleController {
                 }
 
                 // 게시글 내용을 업데이트합니다.
-                existingArticle.setContent(articleDto.getContent());
-                existingArticle.setImageUrl(articleDto.getImageUrl());
-                existingArticle.setUpdatedAt(LocalDateTime.now());
-                articleService.saveArticle(existingArticle);
-
+                Article updatedArticle = articleService.updateArticle(id, articleDto.getContent(),
+                    articleDto.getImageUrl());
                 response.put("message", "게시글 수정 성공");
-                response.put("data", convertArticleToMap(existingArticle));
+                response.put("data", convertArticleToMap(updatedArticle));
                 return ResponseEntity.status(HttpStatus.OK).body(response);
             } else {
                 response.put("message", "권한이 없습니다");
@@ -250,8 +249,7 @@ public class ArticleController {
         @RequestHeader("Authorization") String token, @PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // 토큰에서 사용자 ID를 추출합니다.
-            int userId = jwtUtil.getUserIdFromToken(token);
+            int userId = jwtUtil.getUserIdFromToken(token); // JWT 토큰에서 사용자 ID 추출
             Optional<Users> optionalUser = usersRepository.findById((long) userId);
 
             if (optionalUser.isPresent()) {
@@ -303,7 +301,7 @@ public class ArticleController {
         Users user = article.getUser();
         if (user != null) {
             map.put("userId", user.getId());
-            map.put("userName", user.getEmail()); // assuming userName is the email
+            map.put("userName", user.getEmail()); // 사용자 이메일을 userName으로 사용
             map.put("profileImageUrl", user.getProfile_image_url()); // 사용자 프로필 이미지 추가
         } else {
             map.put("userId", null);
@@ -316,7 +314,7 @@ public class ArticleController {
             article.getCreatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
         map.put("updatedAt",
             article.getUpdatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
-        map.put("imageUrl", article.getImageUrl());
+        map.put("imageUrl", article.getImage());
         return map;
     }
 }
