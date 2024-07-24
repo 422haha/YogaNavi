@@ -169,29 +169,6 @@ public class UsersServiceImpl implements UsersService {
         return usersRepository.findByEmail(email);
     }
 
-    @Transactional
-    public Users updateUserInfo(String email, String nickname, MultipartFile profileImage)
-        throws IOException {
-        List<Users> users = usersRepository.findByEmail(email);
-        if (!users.isEmpty()) {
-            Users user = users.get(0);
 
-            if (nickname != null && !nickname.isEmpty()) {
-                user.setNickname(nickname);
-            }
-
-            if (profileImage != null && !profileImage.isEmpty()) {
-                String imageUrl = s3Service.uploadFile(profileImage, "profile-images");
-                if (user.getProfile_image_url() != null) {
-                    s3Service.deleteFile(user.getProfile_image_url());
-                }
-                user.setProfile_image_url(imageUrl);
-            }
-
-            return usersRepository.save(user);
-        } else {
-            throw new RuntimeException("User not found");
-        }
-    }
 
 }
