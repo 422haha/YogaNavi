@@ -45,9 +45,10 @@ public interface ArticleService {
      *
      * @param articleId  게시글 ID
      * @param newContent 새로운 게시글 내용
+     * @param newImage   새로운 이미지 URL
      * @return 업데이트된 게시글
      */
-    Article updateArticle(Long articleId, String newContent);
+    Article updateArticle(Long articleId, String newContent, String newImage);
 
     /**
      * 게시글을 삭제합니다.
