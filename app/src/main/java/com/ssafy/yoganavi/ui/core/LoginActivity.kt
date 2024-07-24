@@ -9,13 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.ssafy.yoganavi.R
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
@@ -31,17 +26,11 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
-        initCollect()
         initGestureBarColor()
+        autoLogin()
     }
 
-    private fun initCollect() = lifecycleScope.launch {
-        repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.userEvent.collectLatest { isSuccess ->
-                if (isSuccess) moveMainActivity()
-            }
-        }
-    }
+    private fun autoLogin() = viewModel.autoLogin(::moveMainActivity)
 
     private fun moveMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
@@ -55,10 +44,5 @@ class LoginActivity : AppCompatActivity() {
             statusBarColor = Color.WHITE
         }
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.autoLogin()
     }
 }

@@ -6,6 +6,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface UserAPI {
@@ -35,4 +36,6 @@ interface UserAPI {
     @POST("members/find-password")
     suspend fun registerPassword(@Body userRequest: UserRequest): Response<YogaResponse<Unit>>
 
+    @GET("is-on")
+    suspend fun isServerOn(): Response<YogaResponse<Unit>>
 }

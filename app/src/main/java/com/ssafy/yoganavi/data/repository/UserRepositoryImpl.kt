@@ -52,4 +52,9 @@ class UserRepositoryImpl @Inject constructor(
         val response = withContext(ioDispatcher) { userDataSource.registerPassword(userRequest) }
         return response.toListResponse()
     }
+
+    override suspend fun isServerOn(): ListResponse<Unit> {
+        val response = withContext(ioDispatcher) { userDataSource.isServerOn() }
+        return response.toListResponse()
+    }
 }
