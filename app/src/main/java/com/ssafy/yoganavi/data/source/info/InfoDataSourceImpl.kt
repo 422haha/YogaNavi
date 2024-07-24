@@ -6,6 +6,7 @@ import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.live.RegisterLiveRequest
+import com.ssafy.yoganavi.data.source.mypage.ProfileData
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import retrofit2.Response
@@ -15,6 +16,10 @@ import javax.inject.Singleton
 @Singleton
 class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : InfoDataSource {
 
+    override suspend fun getProfile(): Response<YogaDetailResponse<ProfileData>> =
+        infoAPI.getProfile()
+
+    // LECTURE
     override suspend fun getLectureList(): Response<YogaResponse<LectureData>> =
         infoAPI.getLectureList()
 
@@ -33,6 +38,7 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun likeLecture(recordedId: Long): Response<YogaDetailResponse<Boolean>> =
         infoAPI.likeLecture(recordedId)
 
+    // LIVE
     override suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>> =
         infoAPI.getLiveList()
 
@@ -42,12 +48,16 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun createLive(registerLiveRequest: RegisterLiveRequest): Response<YogaDetailResponse<Unit>> =
         infoAPI.createLive(registerLiveRequest)
 
-    override suspend fun updateLive(registerLiveRequest: RegisterLiveRequest, liveId: Int): Response<YogaDetailResponse<Unit>> =
+    override suspend fun updateLive(
+        registerLiveRequest: RegisterLiveRequest,
+        liveId: Int
+    ): Response<YogaDetailResponse<Unit>> =
         infoAPI.updateLive(registerLiveRequest, liveId)
 
     override suspend fun deleteLive(liveId: Int): Response<YogaDetailResponse<Unit>> =
         infoAPI.deleteLive(liveId)
 
+    // NOTICE
     override suspend fun getNoticeList(): Response<YogaResponse<NoticeData>> =
         infoAPI.getNoticeList()
 

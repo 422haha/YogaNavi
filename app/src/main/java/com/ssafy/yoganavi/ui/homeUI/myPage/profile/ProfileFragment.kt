@@ -6,7 +6,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.R
-import com.ssafy.yoganavi.data.source.user.User
+import com.ssafy.yoganavi.data.source.mypage.ProfileData
 import com.ssafy.yoganavi.databinding.FragmentProfileBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.MY_PAGE
@@ -21,18 +21,21 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
 
         setToolbar(true, MY_PAGE, false)
         initListener()
-        getUserInfo()
+        getProfileData()
     }
 
-    private fun getUserInfo() = viewModel.getUserInfo(::setInfo)
+    private fun getProfileData() = viewModel.getProfileData(::bindData)
 
-    private fun setInfo(user: User) = with(binding) {
-        tvName.text = user.nickname
+    private fun bindData(profileData: ProfileData) = with(binding) {
+        tvName.text = profileData.nickname
+        Glide.with(requireContext())
+            .load(profileData.profileImageUrl)
+            .into(ivIcon)
 
-        if (user.imageUrl.isNotBlank()) {
-            Glide.with(requireContext())
-                .load(user.imageUrl)
-                .into(ivIcon)
+        if (!profileData.isTeacher) {
+            tvManagementVideo.visibility = View.GONE
+            tvManagementLive.visibility = View.GONE
+            tvRegisterNotice.visibility = View.GONE
         }
     }
 
@@ -45,6 +48,10 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
             tvManagementLive.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_managementLiveFragment) }
             tvManagementVideo.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_managementVideoFragment) }
             tvRegisterNotice.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_noticeFragment) }
+            tvLogout.setOnClickListener {
+                viewModel.clearUserData()
+                logout()
+            }
         }
     }
 }

@@ -6,11 +6,15 @@ import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.live.RegisterLiveRequest
+import com.ssafy.yoganavi.data.source.mypage.ProfileData
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 
 interface InfoRepository {
 
+    suspend fun getProfile(): DetailResponse<ProfileData>
+
+    // LECTURE
     suspend fun getLectureList(): ListResponse<LectureData>
 
     suspend fun createLecture(lecture: LectureDetailData): DetailResponse<Boolean>
@@ -23,7 +27,7 @@ interface InfoRepository {
 
     suspend fun likeLecture(recordedId: Long): DetailResponse<Boolean>
 
-    // Live
+    // LIVE
     suspend fun getLiveList(): ListResponse<LiveLectureData>
 
     suspend fun getLive(liveId: Int): DetailResponse<LiveLectureData>
@@ -34,6 +38,7 @@ interface InfoRepository {
 
     suspend fun deleteLive(liveId: Int): DetailResponse<Unit>
 
+    // NOTICE
     suspend fun getNoticeList(): ListResponse<NoticeData>
 
     suspend fun getNotice(articleId: Int): DetailResponse<NoticeData>
