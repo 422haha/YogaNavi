@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
@@ -52,7 +54,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional(readOnly = true)
     public List<Article> getAllArticles() {
         List<Article> articles = articleRepository.findAll();
-        return applyPresignedUrls(articles);
+        return applyPresignedUrlsAsync(articles);
     }
 
     /**
@@ -65,7 +67,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional(readOnly = true)
     public List<Article> getArticlesByUserId(int userId) {
         List<Article> articles = articleRepository.findByUserId(userId);
-        return applyPresignedUrls(articles);
+        return applyPresignedUrlsAsync(articles);
     }
 
     /**
@@ -79,7 +81,7 @@ public class ArticleServiceImpl implements ArticleService {
     public Optional<Article> getArticleById(Long id) {
         Optional<Article> articleOpt = articleRepository.findById(id);
         return articleOpt.map(
-            article -> applyPresignedUrls(Collections.singletonList(article)).get(0));
+            article -> applyPresignedUrlsAsync(Collections.singletonList(article)).get(0));
     }
 
     /**
@@ -108,7 +110,7 @@ public class ArticleServiceImpl implements ArticleService {
                 }
 
                 Article updatedArticle = articleRepository.save(article);
-                return applyPresignedUrls(Collections.singletonList(updatedArticle)).get(0);
+                return applyPresignedUrlsAsync(Collections.singletonList(updatedArticle)).get(0);
             } else {
                 throw new RuntimeException("게시글을 찾을 수 없습니다.");
             }
@@ -150,7 +152,19 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional(readOnly = true)
     public List<Article> findByContent(String content) {
         List<Article> articles = articleRepository.findByContent(content);
-        return applyPresignedUrls(articles);
+        return applyPresignedUrlsAsync(articles);
+    }
+
+    /**
+     * Presigned URL을 비동기로 생성합니다.
+     *
+     * @param keysToGenerate 생성할 키 목록
+     * @return Presigned URL 맵을 포함하는 CompletableFuture
+     */
+    private CompletableFuture<Map<String, String>> generatePresignedUrlsAsync(
+        Set<String> keysToGenerate) {
+        return CompletableFuture.supplyAsync(
+            () -> s3Service.generatePresignedUrls(keysToGenerate, URL_EXPIRATION_SECONDS));
     }
 
     /**
@@ -159,21 +173,7 @@ public class ArticleServiceImpl implements ArticleService {
      * @param articles 게시글 목록
      * @return Presigned URL이 적용된 게시글 목록
      */
-    private List<Article> applyPresignedUrls(List<Article> articles) {
-        Map<String, String> presignedUrls = generatePresignedUrls(articles);
-
-        return articles.stream()
-            .peek(article -> article.setImage(getPresignedUrl(article.getImage(), presignedUrls)))
-            .collect(Collectors.toList());
-    }
-
-    /**
-     * 게시글 목록에 대한 Presigned URL을 생성합니다.
-     *
-     * @param articles 게시글 목록
-     * @return 생성된 Presigned URL 맵
-     */
-    private Map<String, String> generatePresignedUrls(List<Article> articles) {
+    private List<Article> applyPresignedUrlsAsync(List<Article> articles) {
         Set<String> keysToGenerate = articles.stream()
             .map(Article::getImage)
             .filter(image -> image != null && image.startsWith(S3_BASE_URL))
@@ -181,10 +181,18 @@ public class ArticleServiceImpl implements ArticleService {
             .collect(Collectors.toSet());
 
         if (keysToGenerate.isEmpty()) {
-            return Collections.emptyMap();
+            return articles;
         }
 
-        return s3Service.generatePresignedUrls(keysToGenerate, URL_EXPIRATION_SECONDS);
+        try {
+            Map<String, String> presignedUrls = generatePresignedUrlsAsync(keysToGenerate).get();
+            return articles.stream()
+                .peek(
+                    article -> article.setImage(getPresignedUrl(article.getImage(), presignedUrls)))
+                .collect(Collectors.toList());
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException("Presigned URL 생성 중 오류 발생", e);
+        }
     }
 
     /**
