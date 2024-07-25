@@ -24,9 +24,9 @@ class ManagementLiveViewModel @Inject constructor(
             .onFailure { it.printStackTrace() }
     }
 
-    fun deleteLive(liveId: Int, onSuccess: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+    fun deleteLive(liveId: Int, onDeleteComplete: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.deleteLive(liveId) }
-            .onSuccess { onSuccess() }
+            .onSuccess { onDeleteComplete() }
             .onFailure { it.printStackTrace() }
     }
 }

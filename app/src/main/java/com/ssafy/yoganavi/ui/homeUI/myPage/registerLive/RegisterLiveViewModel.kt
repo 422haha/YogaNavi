@@ -16,12 +16,12 @@ class RegisterLiveViewModel @Inject constructor(
 
     var liveLectureData = LiveLectureData()
 
-    fun getLive(liveId: Int, onSuccess: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+    fun getLive(liveId: Int, onReadLive: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.getLive(liveId) }
             .onSuccess {
                 it.data?.let { data ->
                     liveLectureData = data
-                    onSuccess()
+                    onReadLive()
                 }
             }
             .onFailure { it.printStackTrace() }
