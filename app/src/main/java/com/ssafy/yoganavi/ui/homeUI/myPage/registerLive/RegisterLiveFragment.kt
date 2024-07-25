@@ -131,7 +131,7 @@ class RegisterLiveFragment :
                 { _, sYear, sMonth, sDay ->
                     calendar.set(sYear, sMonth, sDay)
 
-                    binding.tieEnd.setText("$sYear.${sMonth + 1}.$sDay")
+                    binding.tieEnd.setText(IntToDate(year, month, day))
                     viewModel.liveLectureData.endDate = calendar.timeInMillis
                 }, year, month, day
             ).apply {
