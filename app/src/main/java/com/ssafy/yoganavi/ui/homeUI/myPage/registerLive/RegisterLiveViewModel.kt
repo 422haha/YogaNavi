@@ -7,7 +7,6 @@ import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,11 +27,17 @@ class RegisterLiveViewModel @Inject constructor(
             .onFailure { it.printStackTrace() }
     }
 
-    fun createLive() = viewModelScope.launch(Dispatchers.IO) {
+    fun createLive(popBack: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
         runCatching {
-            Timber.d("로오오그${liveLectureData.endDate}")
             infoRepository.createLive(liveLectureData) }
-            .onSuccess { Timber.d("생성") }
+            .onSuccess { popBack() }
+            .onFailure { it.printStackTrace() }
+    }
+
+    fun updateLive(popBack: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+        runCatching {
+            infoRepository.updateLive(liveLectureData, liveLectureData.liveId) }
+            .onSuccess { popBack() }
             .onFailure { it.printStackTrace() }
     }
 }

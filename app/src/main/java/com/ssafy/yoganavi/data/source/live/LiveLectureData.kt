@@ -13,10 +13,10 @@ data class LiveLectureData(
     var liveTitle: String = "",
     var liveContent : String = "",
     var availableDay: String = "",
-    var startDate: Long = -1L,
-    var endDate: Long = -1L,
-    var startTime: Long = -1L,
-    var endTime: Long = -1L,
+    var startDate: Long = 0L,
+    var endDate: Long = 0L,
+    var startTime: Long = 0L,
+    var endTime: Long = 0L,
     var regDate: Long = 0L,
     var maxLiveNum: Int = 0
 )

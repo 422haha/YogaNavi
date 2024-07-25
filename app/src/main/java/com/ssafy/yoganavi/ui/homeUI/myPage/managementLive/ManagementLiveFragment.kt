@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentManagementLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
+import com.ssafy.yoganavi.ui.utils.CREATE
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_LIVE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -20,7 +21,7 @@ import kotlinx.coroutines.launch
 class ManagementLiveFragment :
     BaseFragment<FragmentManagementLiveBinding>(FragmentManagementLiveBinding::inflate) {
 
-    private val liveAdapter by lazy { ManagementLiveAdapter(::navigateToLiveFragment, ::navigateToUpdateFragment, ::deleteLive) }
+    private val liveAdapter by lazy { ManagementLiveAdapter(::navigateToLiveFragment, ::navigateToRegisterFragment, ::deleteLive) }
 
     private val viewModel: ManagementLiveViewModel by viewModels()
 
@@ -43,7 +44,7 @@ class ManagementLiveFragment :
     private fun initListener() {
         with(binding) {
             floatingActionButton.setOnClickListener {
-                findNavController().navigate(R.id.action_managementLiveFragment_to_registerLiveFragment)
+                navigateToRegisterFragment(state = CREATE, liveId = -1)
             }
         }
     }
@@ -63,9 +64,9 @@ class ManagementLiveFragment :
         findNavController().navigate(directions)
     }
 
-    private fun navigateToUpdateFragment(liveId: Int = -1) {
+    private fun navigateToRegisterFragment(state: String, liveId: Int = -1) {
         val directions = ManagementLiveFragmentDirections
-            .actionManagementLiveFragmentToRegisterLiveFragment(liveId)
+            .actionManagementLiveFragmentToRegisterLiveFragment(state = state, liveId = liveId)
 
         findNavController().navigate(directions)
     }
