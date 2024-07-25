@@ -5,6 +5,7 @@ import com.ssafy.yoganavi.data.repository.response.ListResponse
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
+import com.ssafy.yoganavi.data.source.mypage.ProfileData
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 
