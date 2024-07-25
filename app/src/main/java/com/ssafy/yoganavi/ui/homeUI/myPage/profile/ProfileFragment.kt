@@ -52,10 +52,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
             tvManagementLive.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_managementLiveFragment) }
             tvManagementVideo.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_managementVideoFragment) }
             tvRegisterNotice.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_noticeFragment) }
-            tvLogout.setOnClickListener {
-                viewModel.clearUserData()
-                logout()
-            }
+            tvLogout.setOnClickListener { viewModel.clearUserData(::logout) }
         }
     }
 }

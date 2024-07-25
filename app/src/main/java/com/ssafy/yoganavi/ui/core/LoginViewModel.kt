@@ -19,7 +19,9 @@ class LoginViewModel @Inject constructor(
 
     fun autoLogin(login: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
         runCatching {
-            dataStoreRepository.accessToken.firstOrNull() ?: return@launch
+            val token = dataStoreRepository.accessToken.firstOrNull() ?: return@launch
+            if (token.isBlank()) return@launch
+
             val response = userRepository.isServerOn()
             if (response !is ListResponse.Success) return@launch
         }.onSuccess { login() }

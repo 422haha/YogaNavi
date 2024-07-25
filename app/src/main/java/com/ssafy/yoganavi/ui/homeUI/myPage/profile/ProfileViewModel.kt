@@ -23,7 +23,8 @@ class ProfileViewModel @Inject constructor(
                 .onFailure { it.printStackTrace() }
         }
 
-    fun clearUserData() = viewModelScope.launch(Dispatchers.IO) {
-        dataStoreRepository.clearToken()
+    fun clearUserData(moveLogin: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+        runCatching { dataStoreRepository.clearToken() }
+            .onSuccess { moveLogin() }
     }
 }
