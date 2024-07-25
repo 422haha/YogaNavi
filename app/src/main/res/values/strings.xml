@@ -36,6 +36,7 @@
     <string name="chapter">순서</string>
     <string name="add_photo"> 사진 추가하기</string>
     <string name="write_info">글을 작성하는 공간입니다.</string>
+    <string name="logout">로그아웃</string>
 
     <string name="choose_week">가능 요일 선택</string>
     <string name="choose_date">날짜 선택</string>

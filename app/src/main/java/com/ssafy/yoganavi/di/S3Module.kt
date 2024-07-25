@@ -45,4 +45,5 @@ object S3Module {
         .context(context.applicationContext)
         .s3Client(s3Client)
         .build()
+
 }

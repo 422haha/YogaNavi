@@ -1,5 +1,7 @@
 package com.ssafy.yoganavi.data.repository
 
+import com.ssafy.yoganavi.data.repository.response.DetailResponse
+import com.ssafy.yoganavi.data.repository.response.ListResponse
 import com.ssafy.yoganavi.data.source.user.UserRequest
 
 interface UserRepository {
@@ -18,4 +20,5 @@ interface UserRepository {
 
     suspend fun registerPassword(userRequest: UserRequest): ListResponse<Unit>
 
+    suspend fun isServerOn(): ListResponse<Unit>
 }

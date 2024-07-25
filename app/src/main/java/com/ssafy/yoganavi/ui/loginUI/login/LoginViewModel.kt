@@ -2,8 +2,8 @@ package com.ssafy.yoganavi.ui.loginUI.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.yoganavi.data.repository.DetailResponse
 import com.ssafy.yoganavi.data.repository.UserRepository
+import com.ssafy.yoganavi.data.repository.response.DetailResponse
 import com.ssafy.yoganavi.data.source.user.UserRequest
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.NO_AUTH

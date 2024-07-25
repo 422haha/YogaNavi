@@ -11,6 +11,9 @@ import retrofit2.Response
 
 interface InfoDataSource {
 
+    suspend fun getProfile(): Response<YogaDetailResponse<ProfileData>>
+
+    // LECTURE
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>
 
     suspend fun createLecture(lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>>
@@ -19,7 +22,11 @@ interface InfoDataSource {
 
     suspend fun updateLecture(lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>>
 
-    // live
+    suspend fun deleteLectures(recordIdList: List<Long>): Response<YogaDetailResponse<Boolean>>
+
+    suspend fun likeLecture(recordedId: Long): Response<YogaDetailResponse<Boolean>>
+
+    // LIVE
     suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>>
 
     suspend fun getLive(liveId: Int): Response<YogaDetailResponse<LiveLectureData>>
@@ -30,6 +37,7 @@ interface InfoDataSource {
 
     suspend fun deleteLive(liveId: Int): Response<YogaDetailResponse<Unit>>
 
+    // NOTICE
     suspend fun getNoticeList(): Response<YogaResponse<NoticeData>>
 
     suspend fun getNotice(articleId: Int): Response<YogaDetailResponse<NoticeData>>

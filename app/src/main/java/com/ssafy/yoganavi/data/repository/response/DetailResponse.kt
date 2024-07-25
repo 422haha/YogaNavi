@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.data.repository
+package com.ssafy.yoganavi.data.repository.response
 
 sealed class DetailResponse<T>(
     val data: T?,

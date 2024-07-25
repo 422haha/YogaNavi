@@ -4,8 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.amazonaws.services.s3.AmazonS3Client
-import com.ssafy.yoganavi.data.repository.DetailResponse
+import com.amazonaws.services.s3.model.ObjectMetadata
 import com.ssafy.yoganavi.data.repository.InfoRepository
+import com.ssafy.yoganavi.data.repository.response.DetailResponse
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
 import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
@@ -43,6 +44,7 @@ class RegisterVideoViewModel @Inject constructor(
                 .onSuccess {
                     it.data?.let { lecture ->
                         setView(lecture)
+                        lectureDetailData = lecture
                         _chapterList.emit(lecture.recordedLectureChapters)
                     }
                 }
@@ -98,6 +100,7 @@ class RegisterVideoViewModel @Inject constructor(
         runCatching {
 
             lectureDetailData = lectureDetailData.copy(
+                recordedId = id,
                 recordTitle = lectureTitle,
                 recordContent = lectureContent
             )
@@ -125,12 +128,29 @@ class RegisterVideoViewModel @Inject constructor(
                 return@launch
             }
 
-            val thumbnailFile = File(lectureDetailData.recordThumbnailPath)
-            transferUtility.upload(BUCKET_NAME, lectureDetailData.thumbnailKey, thumbnailFile)
+            if (lectureDetailData.recordThumbnailPath.isNotBlank()) {
+                val thumbnailFile = File(lectureDetailData.recordThumbnailPath)
+                val metadata = ObjectMetadata().apply { contentType = "image/webp" }
+                transferUtility.upload(
+                    BUCKET_NAME,
+                    lectureDetailData.thumbnailKey,
+                    thumbnailFile,
+                    metadata
+                )
+            } else {
+                val thumbnailUrl = lectureDetailData.recordThumbnail.substringBefore("?")
+                lectureDetailData = lectureDetailData.copy(recordThumbnail = thumbnailUrl)
+            }
 
-            lectureDetailData.recordedLectureChapters.forEach { chapter ->
-                val recordFile = File(chapter.recordPath)
-                transferUtility.upload(BUCKET_NAME, chapter.recordKey, recordFile)
+            lectureDetailData.recordedLectureChapters.forEachIndexed { index, chapter ->
+                if (chapter.recordPath.isNotBlank()) {
+                    val recordFile = File(chapter.recordPath)
+                    transferUtility.upload(BUCKET_NAME, chapter.recordKey, recordFile)
+                } else {
+                    val videoUrl = chapter.recordVideo.substringBefore("?")
+                    val newChapter = chapter.copy(recordVideo = videoUrl)
+                    lectureDetailData.recordedLectureChapters[index] = newChapter
+                }
             }
 
             val response = if (id == -1L) {
@@ -151,7 +171,7 @@ class RegisterVideoViewModel @Inject constructor(
             .onFailure { onFailure(NO_RESPONSE) }
     }
 
-    fun setChapterList(list: List<VideoChapterData>) {
+    fun setChapterList(list: MutableList<VideoChapterData>) {
         lectureDetailData = lectureDetailData.copy(recordedLectureChapters = list)
     }
 

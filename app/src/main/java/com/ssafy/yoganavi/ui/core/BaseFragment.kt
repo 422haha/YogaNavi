@@ -1,5 +1,6 @@
 package com.ssafy.yoganavi.ui.core
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -55,5 +56,13 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
                 menuListener
             )
         }
+    }
+
+    fun logout() {
+        if (this is LoginFragment || this is FindFragment || this is JoinFragment) return
+
+        val intent = Intent(requireContext(), LoginActivity::class.java)
+        startActivity(intent)
+        requireActivity().finish()
     }
 }

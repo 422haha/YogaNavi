@@ -42,8 +42,11 @@ const val UPDATE = "수정"
 const val SAVE = "저장 완료"
 const val BUCKET_NAME = "yoga-navi"
 const val THUMBNAIL = "thumbnails"
+const val NOTICE = "notices"
 const val VIDEO = "videos"
 const val REGISTER = "등록"
+const val EDIT = "편집"
+const val DELETE = "삭제"
 
 // 캘린더, 타임 Picker
 const val START = 1
