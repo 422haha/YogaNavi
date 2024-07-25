@@ -21,7 +21,6 @@ import com.ssafy.yoganavi.ui.utils.formatDotDate
 import com.ssafy.yoganavi.ui.utils.formatTime
 import com.ssafy.yoganavi.ui.utils.formatZeroDate
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import java.util.Calendar
 
 @AndroidEntryPoint
@@ -54,7 +53,7 @@ class RegisterLiveFragment :
                         liveContent = etContent.text.toString()
 
                         // TODO 가능 요일 선택(백앤드 배열 or string 결정 후)
-
+                        availableDay = ""
                         maxLiveNum = 1
                     }
                 }
@@ -81,7 +80,7 @@ class RegisterLiveFragment :
                     btnEnd.text = formatTime(liveLectureData.endTime)
 
                     val size = resources.getStringArray(R.array.maxnum_array).size
-                    if(liveLectureData.maxLiveNum in 1..size)
+                    if (liveLectureData.maxLiveNum in 1..size)
                         spMaxNum[liveLectureData.maxLiveNum - 1]
                 }
             }
@@ -90,21 +89,13 @@ class RegisterLiveFragment :
 
     private fun initListener() {
         with(binding) {
-            tieStart.setOnClickListener {
-                showCalendar(START)
-            }
+            tieStart.setOnClickListener { showCalendar(START) }
 
-            tieEnd.setOnClickListener {
-                showCalendar(END)
-            }
+            tieEnd.setOnClickListener { showCalendar(END) }
 
-            btnStart.setOnClickListener {
-                showTimePicker(START)
-            }
+            btnStart.setOnClickListener { showTimePicker(START) }
 
-            btnEnd.setOnClickListener {
-                showTimePicker(END)
-            }
+            btnEnd.setOnClickListener { showTimePicker(END) }
         }
     }
 
@@ -114,35 +105,38 @@ class RegisterLiveFragment :
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-        val datePicker = DatePickerDialog(requireContext(), R.style.MySpinnerDatePickerStyle,
-            { _, sYear, sMonth, sDay ->
-                calendar.set(sYear, sMonth, sDay)
+        if (state == START) {
+            startDatePickerDialog = DatePickerDialog(
+                requireContext(),
+                R.style.MySpinnerDatePickerStyle,
+                { _, sYear, sMonth, sDay ->
+                    calendar.set(sYear, sMonth, sDay)
 
-                val pickData = calendar.timeInMillis
+                    with(viewModel.liveLectureData) {
+                        binding.tieStart.setText("$sYear.${sMonth + 1}.$sDay")
+                        startDate = calendar.timeInMillis
 
-                Timber.d("$pickData")
+                        if (endDate < startDate && endDate == -1L) {
+                            binding.tieEnd.setText("$sYear.${sMonth + 1}.$sDay")
+                            endDate = calendar.timeInMillis
+                        }
+                    }
+                }, year, month, day
+            ).apply { show() }
+        } else if (state == END) {
+            endDatePickerDialog = DatePickerDialog(
+                requireContext(),
+                R.style.MySpinnerDatePickerStyle,
+                { _, sYear, sMonth, sDay ->
+                    calendar.set(sYear, sMonth, sDay)
 
-                if (state == START) {
-                    binding.tieStart.setText("$sYear.${sMonth + 1}.$sDay")
-                    viewModel.liveLectureData.startTime = pickData
-                } else if (state == END) {
                     binding.tieEnd.setText("$sYear.${sMonth + 1}.$sDay")
-                    viewModel.liveLectureData.endTime = pickData
-                }
-            }, year, month, day)
-
-        if(state == START) startDatePickerDialog = datePicker
-        else endDatePickerDialog = datePicker
-
-        // TODO lateinit으로 설정하기
-        datePicker.apply {
-            if(state == START && (viewModel.liveLectureData.endDate) != 0L) {
-                datePicker.datePicker.maxDate = viewModel.liveLectureData.endDate
+                    viewModel.liveLectureData.endDate = calendar.timeInMillis
+                }, year, month, day
+            ).apply {
+                datePicker.minDate = viewModel.liveLectureData.startDate
+                show()
             }
-            if(state == END && (viewModel.liveLectureData.startDate) != 0L) {
-                datePicker.datePicker.minDate = viewModel.liveLectureData.startDate
-            }
-            show()
         }
     }
 
@@ -160,13 +154,13 @@ class RegisterLiveFragment :
 
         materialTimePicker.addOnPositiveButtonClickListener {
             val timeStr: String = formatZeroDate(materialTimePicker.hour, materialTimePicker.minute)
-            val pickTime: Long = ((materialTimePicker.hour * 60) + materialTimePicker.minute).toLong()
+            val pickTime: Long =
+                ((materialTimePicker.hour * 3600) + (materialTimePicker.minute * 60)).toLong()
 
             if (state == START) {
                 binding.btnStart.text = timeStr
                 viewModel.liveLectureData.startTime = pickTime
-            }
-            else if (state == END) {
+            } else if (state == END) {
                 binding.btnEnd.text = timeStr
                 viewModel.liveLectureData.endTime = pickTime
             }
