@@ -197,6 +197,7 @@ public class ArticleController {
     public ResponseEntity<Map<String, Object>> updateArticle(
         @RequestHeader("Authorization") String token, @PathVariable Long id,
         @RequestBody ArticleDto articleDto) {
+        logger.info("updateArticle:"+articleDto);
         Map<String, Object> response = new HashMap<>();
         try {
             int userId = jwtUtil.getUserIdFromToken(token); // JWT 토큰에서 사용자 ID 추출
