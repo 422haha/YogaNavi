@@ -4,11 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.InfoRepository
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
-import com.ssafy.yoganavi.data.source.live.RegisterLiveRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,17 +14,30 @@ class RegisterLiveViewModel @Inject constructor(
     private val infoRepository: InfoRepository
 ) : ViewModel() {
 
-    private val _liveState = RegisterLiveRequest()
-    val liveState: RegisterLiveRequest = _liveState
+    var liveLectureData = LiveLectureData()
 
-    fun getLive(liveId: Int, onSuccess: (LiveLectureData) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+    fun getLive(liveId: Int, onReadLive: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.getLive(liveId) }
-            .onSuccess { it.data?.let { data -> onSuccess(data) } }
+            .onSuccess {
+                it.data?.let { data ->
+                    liveLectureData = data
+                    onReadLive()
+                }
+            }
             .onFailure { it.printStackTrace() }
     }
 
-    fun createLive() = viewModelScope.launch(Dispatchers.IO) {
-        runCatching { infoRepository.createLive(liveState) }
+    fun createLive(popBack: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+        runCatching {
+            infoRepository.createLive(liveLectureData) }
+            .onSuccess { popBack() }
+            .onFailure { it.printStackTrace() }
+    }
+
+    fun updateLive(popBack: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+        runCatching {
+            infoRepository.updateLive(liveLectureData, liveLectureData.liveId) }
+            .onSuccess { popBack() }
             .onFailure { it.printStackTrace() }
     }
 }

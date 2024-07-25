@@ -251,5 +251,8 @@
             android:name="liveId"
             android:defaultValue="-1"
             app:argType="integer" />
+        <argument
+            android:name="state"
+            app:argType="string" />
     </fragment>
 </navigation>

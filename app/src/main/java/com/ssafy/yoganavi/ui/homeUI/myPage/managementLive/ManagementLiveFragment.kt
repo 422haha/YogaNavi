@@ -1,5 +1,6 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.managementLive
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -10,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentManagementLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
+import com.ssafy.yoganavi.ui.utils.CREATE
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_LIVE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -19,7 +21,7 @@ import kotlinx.coroutines.launch
 class ManagementLiveFragment :
     BaseFragment<FragmentManagementLiveBinding>(FragmentManagementLiveBinding::inflate) {
 
-    private val liveAdapter by lazy { ManagementLiveAdapter(::navigateToLiveFragment) }
+    private val liveAdapter by lazy { ManagementLiveAdapter(::navigateToLiveFragment, ::navigateToRegisterFragment, ::deleteLive) }
 
     private val viewModel: ManagementLiveViewModel by viewModels()
 
@@ -42,7 +44,7 @@ class ManagementLiveFragment :
     private fun initListener() {
         with(binding) {
             floatingActionButton.setOnClickListener {
-                findNavController().navigate(R.id.action_managementLiveFragment_to_registerLiveFragment)
+                navigateToRegisterFragment(state = CREATE, liveId = -1)
             }
         }
     }
@@ -60,5 +62,37 @@ class ManagementLiveFragment :
             .actionManagementLiveFragmentToLiveFragment(liveId)
 
         findNavController().navigate(directions)
+    }
+
+    private fun navigateToRegisterFragment(state: String, liveId: Int = -1) {
+        val directions = ManagementLiveFragmentDirections
+            .actionManagementLiveFragmentToRegisterLiveFragment(state = state, liveId = liveId)
+
+        findNavController().navigate(directions)
+    }
+
+    private fun deleteLive(liveId: Int = -1) {
+        if(liveId != -1) {
+            showDeleteDialog(liveId)
+        }
+    }
+
+    private fun showDeleteDialog(liveId: Int) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("화상강의 삭제")
+            .setMessage("정말로 삭제하시겠습니까?")
+            .setPositiveButton("확인") { _, _ ->
+                viewModel.deleteLive(liveId) {
+                    showSnackBar(getString(R.string.live_delete_msg))
+                }
+            }
+            .setNegativeButton("취소", null)
+            .show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.getLiveList()
     }
 }
