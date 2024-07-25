@@ -16,6 +16,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UsersRepository extends CrudRepository<Users, Long> {
 
+    List<Users> findById(int id);
+
     List<Users> findByEmail(String email);
 
     List<Users> findByNickname(String nickname);
@@ -24,8 +26,6 @@ public interface UsersRepository extends CrudRepository<Users, Long> {
     @Query("SELECT u FROM Users u WHERE u.email = :email")
     Optional<Users> findByEmailWithLock(String email);
 
-//    @Transactional
-//    @Modifying
-//    @Query("UPDATE Users u SET u.activeToken = :newToken WHERE u.id = :userId")
-//    void updateActiveToken(@Param("userId") int userId, @Param("newToken") String newToken);
+    @Query("SELECT u FROM Users u JOIN u.hashtags h WHERE h.name = :hashtagName")
+    List<Users> findUsersByHashtag(@Param("hashtagName") String hashtagName);
 }

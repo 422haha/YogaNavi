@@ -58,6 +58,7 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                     Claims claims = jwtUtil.validateToken(jwt);
                     String email = String.valueOf(claims.get("email"));
                     String authorities = (String) claims.get("role");
+                    
 
                     Authentication auth = new UsernamePasswordAuthenticationToken(email, null,
                         AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));

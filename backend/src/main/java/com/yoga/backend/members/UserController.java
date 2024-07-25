@@ -2,6 +2,8 @@ package com.yoga.backend.members;
 
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.util.JwtUtil;
+import com.yoga.backend.members.dto.RegisterDto;
+import com.yoga.backend.members.dto.UpdateDto;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -181,24 +183,67 @@ public class UserController {
     /**
      * 사용자 정보 수정. 정보 가져오기
      *
-     * @param token 회원 가입 정보
-     * @return 회원 정보
+     * @param token 토큰
+     * @return 회원 정보, 선생이라면 해시태그도
+     *
+     * @TODO 선생이면 해시태그도 반환
      */
     @GetMapping("/update")
-    public ResponseEntity<Map<String, Object>> getMyInfo(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<Map<String, Object>> getMyInfo(
+        @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
         try {
             String email = jwtUtil.getEmailFromToken(token);
-            List<Users> users = usersService.getUserByEmail(email);
+            Users user = usersService.getUserByEmail(email);
 
-            if (!users.isEmpty()) {
-                Users user = users.get(0);
-                response.put("nickname", user.getNickname());
-                response.put("profileImageUrl", user.getProfile_image_url());
-                response.put("role", user.getRole());
+            if (user!=null) {
+
+                RegisterDto registerDto = new RegisterDto();
+                registerDto.setImageUrl(user.getProfile_image_url());
+                registerDto.setNickname(user.getNickname());
+                registerDto.setTeacher(jwtUtil.getRoleFromToken(token).equals("TEACHER"));
+
+                response.put("message", "success");
+                response.put("data", registerDto);
                 return ResponseEntity.ok(response);
             } else {
                 response.put("message", "User not found");
+                response.put("data", new Object[]{});
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            response.put("message", "Error retrieving user information: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * 사용자 정보 수정. 정보 수정
+     *
+     * @param token 토큰
+     * @return 수정 후 회원 정보, 선생이라면 해시태그도
+     *
+     * @TODO 선생이면 해시태그도 반환
+     */
+    @PostMapping("/update")
+    public ResponseEntity<Map<String, Object>> updateUserInfo(
+        @RequestHeader("Authorization") String token, @RequestBody UpdateDto updateDto) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String email = jwtUtil.getEmailFromToken(token);
+            Users user = usersService.updateUser(updateDto, email);
+            if (user != null) {
+                RegisterDto registerDto = new RegisterDto();
+                registerDto.setImageUrl(user.getProfile_image_url());
+                registerDto.setNickname(user.getNickname());
+                registerDto.setTeacher(jwtUtil.getRoleFromToken(token).equals("TEACHER"));
+
+                response.put("message", "success");
+                response.put("data", registerDto);
+                return ResponseEntity.ok(response);
+            }else{
+                response.put("message", "User not found");
+                response.put("data", new Object[]{});
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
         } catch (Exception e) {
