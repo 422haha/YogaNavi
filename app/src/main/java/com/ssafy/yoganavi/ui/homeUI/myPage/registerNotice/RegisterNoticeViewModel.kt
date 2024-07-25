@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.services.s3.model.ObjectMetadata
 import com.ssafy.yoganavi.data.repository.InfoRepository
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
@@ -55,12 +56,11 @@ class RegisterNoticeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
 
             val imageUrlKey = "$NOTICE/${UUID.randomUUID()}"
-            Timber.d("싸피 $imageUrlKey")
             val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
 
             val noticeFile = File(notice.value.imageUrlPath)
-            Timber.d("싸피 $noticeFile")
-            transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile)
+            val metadata = ObjectMetadata().apply{contentType = "image/webp"}
+            transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile,metadata)
 
             val request = RegisterNoticeRequest(content = content, imageUrl = imageUrl.toString())
 
@@ -72,13 +72,16 @@ class RegisterNoticeViewModel @Inject constructor(
     fun updateNotice(content: String, onSuccess: suspend () -> Unit) =
         viewModelScope.launch(Dispatchers.IO) {
             val imageUrlKey = "$NOTICE/${UUID.randomUUID()}"
-            Timber.d("싸피 $imageUrlKey")
             val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
 
-            val noticeFile = File(notice.value.imageUrlPath)
-            Timber.d("싸피 $noticeFile")
-            transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile)
-
+            if (notice.value.imageUrlPath.isNotBlank()) {
+                val noticeFile = File(notice.value.imageUrlPath)
+                val metadata = ObjectMetadata().apply{contentType = "image/webp"}
+                transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile,metadata)
+            } else {
+                val imageUrl2 = notice.value.imageUrl.substringBefore("?")
+                _notice.emit(notice.value.copy(imageUrl = imageUrl2))
+            }
             val request = RegisterNoticeRequest(content = content, imageUrl = imageUrl.toString())
 
             runCatching { infoRepository.updateNotice(request, notice.value.articleId) }
