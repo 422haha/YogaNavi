@@ -5,7 +5,6 @@ import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
-import com.ssafy.yoganavi.data.source.live.RegisterLiveRequest
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import retrofit2.Response
@@ -23,11 +22,11 @@ interface InfoDataSource {
     // live
     suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>>
 
-    suspend fun getLive(liveId: Int): Response<YogaDetailResponse<RegisterLiveRequest>>
+    suspend fun getLive(liveId: Int): Response<YogaDetailResponse<LiveLectureData>>
 
-    suspend fun createLive(registerLiveRequest : RegisterLiveRequest): Response<YogaDetailResponse<Unit>>
+    suspend fun createLive(liveLectureData : LiveLectureData): Response<YogaDetailResponse<Unit>>
 
-    suspend fun updateLive(registerLiveRequest: RegisterLiveRequest, liveId: Int): Response<YogaDetailResponse<Unit>>
+    suspend fun updateLive(liveLectureData: LiveLectureData, liveId: Int): Response<YogaDetailResponse<Unit>>
 
     suspend fun deleteLive(liveId: Int): Response<YogaDetailResponse<Unit>>
 

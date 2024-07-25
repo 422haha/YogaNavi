@@ -5,7 +5,6 @@ import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
-import com.ssafy.yoganavi.data.source.live.RegisterLiveRequest
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import retrofit2.Response
@@ -30,14 +29,14 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>> =
         infoAPI.getLiveList()
 
-    override suspend fun getLive(liveId: Int): Response<YogaDetailResponse<RegisterLiveRequest>> =
+    override suspend fun getLive(liveId: Int): Response<YogaDetailResponse<LiveLectureData>> =
         infoAPI.getLive(liveId)
 
-    override suspend fun createLive(registerLiveRequest: RegisterLiveRequest): Response<YogaDetailResponse<Unit>> =
-        infoAPI.createLive(registerLiveRequest)
+    override suspend fun createLive(liveLectureData: LiveLectureData): Response<YogaDetailResponse<Unit>> =
+        infoAPI.createLive(liveLectureData)
 
-    override suspend fun updateLive(registerLiveRequest: RegisterLiveRequest, liveId: Int): Response<YogaDetailResponse<Unit>> =
-        infoAPI.updateLive(registerLiveRequest, liveId)
+    override suspend fun updateLive(liveLectureData: LiveLectureData, liveId: Int): Response<YogaDetailResponse<Unit>> =
+        infoAPI.updateLive(liveLectureData, liveId)
 
     override suspend fun deleteLive(liveId: Int): Response<YogaDetailResponse<Unit>> =
         infoAPI.deleteLive(liveId)

@@ -3,20 +3,20 @@ package com.ssafy.yoganavi.data.source.live
 import com.google.gson.annotations.SerializedName
 
 data class LiveLectureData(
-    val liveId:Int,
+    val liveId:Int = 0,
     @SerializedName("userId")
-    val teacherId: Int,
+    val teacherId: Int = 0,
     @SerializedName("nickname")
-    val teacherName: String,
+    val teacherName: String = "",
     @SerializedName("profileImageUrl")
-    val teacherProfile: String,
-    val liveTitle: String,
-    val liveContent : String,
-    val availableDay: String,
-    val startDate: Long,
-    val endDate: Long,
-    val startTime: Long,
-    val endTime: Long,
-    val regDate: Long,
-    val maxLiveNum: Int
+    val teacherProfile: String = "",
+    var liveTitle: String = "",
+    var liveContent : String = "",
+    var availableDay: String = "",
+    var startDate: Long = -1L,
+    var endDate: Long = -1L,
+    var startTime: Long = -1L,
+    var endTime: Long = -1L,
+    var regDate: Long = 0L,
+    var maxLiveNum: Int = 0
 )
