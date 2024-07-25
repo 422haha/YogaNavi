@@ -113,6 +113,7 @@ class RegisterVideoViewModel @Inject constructor(
             val chapterList = mutableListOf<VideoChapterData>()
             for (index in titleList.indices) {
                 val data = VideoChapterData(
+                    id = lectureDetailData.recordedLectureChapters[index].id,
                     chapterTitle = titleList[index],
                     chapterDescription = contentList[index],
                     recordVideo = lectureDetailData.recordedLectureChapters[index].recordVideo,
@@ -139,7 +140,10 @@ class RegisterVideoViewModel @Inject constructor(
                 )
             } else {
                 val thumbnailUrl = lectureDetailData.recordThumbnail.substringBefore("?")
-                lectureDetailData = lectureDetailData.copy(recordThumbnail = thumbnailUrl)
+                lectureDetailData = lectureDetailData.copy(
+                    recordedId = id,
+                    recordThumbnail = thumbnailUrl
+                )
             }
 
             lectureDetailData.recordedLectureChapters.forEachIndexed { index, chapter ->
