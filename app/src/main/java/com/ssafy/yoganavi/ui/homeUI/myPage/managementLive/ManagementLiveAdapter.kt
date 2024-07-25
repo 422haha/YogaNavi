@@ -12,11 +12,12 @@ import com.ssafy.yoganavi.ui.utils.formatTime
 
 class ManagementLiveAdapter(
     private val navigateToLiveFragment: (Int) -> Unit,
+    private val navigateToUpdateFragment: (Int) -> Unit,
     private val deleteLive: (Int) -> Unit,
 ) : ListAdapter<LiveLectureData, ManagementLiveAdapter.ViewHolder>(LiveDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent, navigateToLiveFragment, deleteLive)
+        return ViewHolder.from(parent, navigateToLiveFragment, navigateToUpdateFragment, deleteLive)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -26,6 +27,7 @@ class ManagementLiveAdapter(
     class ViewHolder(
         private val binding: ListItemLiveBinding,
         private val navigateToLiveFragment: (Int) -> Unit,
+        private val navigateToUpdateFragment: (Int) -> Unit,
         private val deleteLive: (Int) -> Unit
     ) :
         RecyclerView.ViewHolder(binding.root) {
@@ -42,6 +44,8 @@ class ManagementLiveAdapter(
 
                 vEnterBtn.setOnClickListener { navigateToLiveFragment(item.liveId) }
 
+                tvEditBtn.setOnClickListener { navigateToUpdateFragment(item.liveId) }
+
                 tvDeleteBtn.setOnClickListener { deleteLive(item.liveId) }
             }
         }
@@ -49,10 +53,12 @@ class ManagementLiveAdapter(
         companion object {
             fun from(parent: ViewGroup,
                      navigateToLiveFragment: (Int) -> Unit,
+                     navigateToUpdateFragment: (Int) -> Unit,
                      deleteLive: (Int) -> Unit): ViewHolder {
                 return ViewHolder(
                     ListItemLiveBinding.inflate(LayoutInflater.from(parent.context), parent, false),
                     navigateToLiveFragment = navigateToLiveFragment,
+                    navigateToUpdateFragment = navigateToUpdateFragment,
                     deleteLive = deleteLive
                 )
             }

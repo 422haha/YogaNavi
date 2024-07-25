@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 class ManagementLiveFragment :
     BaseFragment<FragmentManagementLiveBinding>(FragmentManagementLiveBinding::inflate) {
 
-    private val liveAdapter by lazy { ManagementLiveAdapter(::navigateToLiveFragment, :: deleteLive) }
+    private val liveAdapter by lazy { ManagementLiveAdapter(::navigateToLiveFragment, ::navigateToUpdateFragment, ::deleteLive) }
 
     private val viewModel: ManagementLiveViewModel by viewModels()
 
@@ -59,6 +59,13 @@ class ManagementLiveFragment :
     private fun navigateToLiveFragment(liveId: Int = -1) {
         val directions = ManagementLiveFragmentDirections
             .actionManagementLiveFragmentToLiveFragment(liveId)
+
+        findNavController().navigate(directions)
+    }
+
+    private fun navigateToUpdateFragment(liveId: Int = -1) {
+        val directions = ManagementLiveFragmentDirections
+            .actionManagementLiveFragmentToRegisterLiveFragment(liveId)
 
         findNavController().navigate(directions)
     }
