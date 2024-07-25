@@ -25,7 +25,7 @@ public class LiveLectures {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long liveId; // 강의 ID (Primary Key)
+    private Integer liveId; // 강의 ID (Primary Key)
 
     @Column(length = 30, nullable = false)
     private String liveTitle; // 강의 제목

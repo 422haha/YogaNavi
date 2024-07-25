@@ -1,5 +1,6 @@
 package com.yoga.backend.common.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,10 +24,10 @@ public class MyLiveLecture {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long myListId; // 나의 강의 목록 ID (Primary Key)
+    private Integer myListId; // 나의 강의 목록 ID (Primary Key)
 
-    @ManyToOne
-    @JoinColumn(name = "live_id")
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "live_id", nullable = false)
     private LiveLectures liveLecture; // 실시간 강의 ID (Foreign Key)
 
     @ManyToOne
