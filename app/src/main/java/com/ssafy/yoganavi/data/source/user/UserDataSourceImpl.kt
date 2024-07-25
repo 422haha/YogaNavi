@@ -29,4 +29,7 @@ class UserDataSourceImpl @Inject constructor(private val userAPI: UserAPI) : Use
 
     override suspend fun registerPassword(userRequest: UserRequest): Response<YogaResponse<Unit>> =
         userAPI.registerPassword(userRequest)
+
+    override suspend fun isServerOn(): Response<YogaResponse<Unit>> =
+        userAPI.isServerOn()
 }
