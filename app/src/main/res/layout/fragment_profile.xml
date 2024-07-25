@@ -1,115 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.homeUI.myPage.profile.ProfileFragment">
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/iv_icon"
-        android:layout_width="@dimen/icon_large"
-        android:layout_height="@dimen/icon_large"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_launcher_background" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".ui.homeUI.myPage.profile.ProfileFragment">
 
-    <TextView
-        android:id="@+id/tv_name"
-        android:layout_width="wrap_content"
-        android:layout_height="39dp"
-        android:layout_marginTop="@dimen/padding_small"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/tv_like_teacher"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_icon"
-        tools:text="요창민" />
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/iv_icon"
+            android:layout_width="@dimen/icon_large"
+            android:layout_height="@dimen/icon_large"
+            android:layout_marginTop="@dimen/padding_large"
+            android:background="@drawable/user"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/Circle" />
 
-    <TextView
-        android:id="@+id/tv_like_teacher"
-        style="@style/profile"
-        android:layout_marginTop="@dimen/padding_extra_large"
-        android:text="@string/like_teacher_list"
-        android:textSize="16sp"
-        app:drawableStartCompat="@drawable/favorite"
-        app:layout_constraintBottom_toTopOf="@id/tv_like_lecture"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_name"
-        tools:ignore="RtlSymmetry" />
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="39dp"
+            android:layout_marginTop="@dimen/padding_small"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/tv_like_teacher"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_icon"
+            tools:text="요창민" />
 
-    <TextView
-        android:id="@+id/tv_like_lecture"
-        style="@style/profile"
-        android:text="@string/like_lecture_list"
-        android:textSize="16sp"
-        app:drawableStartCompat="@drawable/favorite"
-        app:layout_constraintBottom_toTopOf="@id/tv_my_list"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_like_teacher"
-        tools:ignore="RtlSymmetry" />
+        <TextView
+            android:id="@+id/tv_like_teacher"
+            style="@style/profile"
+            android:layout_marginTop="@dimen/padding_extra_large"
+            android:text="@string/like_teacher_list"
+            android:textSize="16sp"
+            app:drawableStartCompat="@drawable/favorite"
+            app:layout_constraintBottom_toTopOf="@id/tv_like_lecture"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_name"
+            tools:ignore="RtlSymmetry" />
 
-    <TextView
-        android:id="@+id/tv_my_list"
-        style="@style/profile"
-        android:text="@string/my_list"
-        android:textSize="16sp"
-        app:drawableStartCompat="@drawable/inbox"
-        app:layout_constraintBottom_toTopOf="@id/tv_modify"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_like_lecture"
-        tools:ignore="RtlSymmetry" />
+        <TextView
+            android:id="@+id/tv_like_lecture"
+            style="@style/profile"
+            android:text="@string/like_lecture_list"
+            android:textSize="16sp"
+            app:drawableStartCompat="@drawable/favorite"
+            app:layout_constraintBottom_toTopOf="@id/tv_my_list"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_like_teacher"
+            tools:ignore="RtlSymmetry" />
 
-    <TextView
-        android:id="@+id/tv_modify"
-        style="@style/profile"
-        android:text="@string/modify"
-        android:textSize="16sp"
-        app:drawableStartCompat="@drawable/sentiment_satisfied"
-        app:layout_constraintBottom_toTopOf="@id/tv_management_video"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_my_list"
-        tools:ignore="RtlSymmetry" />
+        <TextView
+            android:id="@+id/tv_my_list"
+            style="@style/profile"
+            android:text="@string/my_list"
+            android:textSize="16sp"
+            app:drawableStartCompat="@drawable/inbox"
+            app:layout_constraintBottom_toTopOf="@id/tv_modify"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_like_lecture"
+            tools:ignore="RtlSymmetry" />
 
-    <TextView
-        android:id="@+id/tv_management_video"
-        style="@style/profile"
-        android:text="@string/management_video"
-        android:textSize="16sp"
-        app:drawableStartCompat="@drawable/play_arrow"
-        app:layout_constraintBottom_toTopOf="@id/tv_management_live"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_modify"
-        tools:ignore="RtlSymmetry" />
+        <TextView
+            android:id="@+id/tv_modify"
+            style="@style/profile"
+            android:text="@string/modify"
+            android:textSize="16sp"
+            app:drawableStartCompat="@drawable/sentiment_satisfied"
+            app:layout_constraintBottom_toTopOf="@id/tv_management_video"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_my_list"
+            tools:ignore="RtlSymmetry" />
 
-    <TextView
-        android:id="@+id/tv_management_live"
-        style="@style/profile"
-        android:text="@string/management_live"
-        android:textSize="16sp"
-        app:drawableStartCompat="@drawable/photo_camera"
-        app:layout_constraintBottom_toTopOf="@id/tv_register_notice"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_management_video"
-        tools:ignore="RtlSymmetry" />
+        <TextView
+            android:id="@+id/tv_management_video"
+            style="@style/profile"
+            android:text="@string/management_video"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/play_arrow"
+            app:layout_constraintBottom_toTopOf="@id/tv_management_live"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_modify"
+            tools:ignore="RtlSymmetry" />
 
-    <TextView
-        android:id="@+id/tv_register_notice"
-        style="@style/profile"
-        android:text="@string/register_notice"
-        android:textSize="16sp"
-        app:drawableStartCompat="@drawable/edit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_management_live"
-        tools:ignore="RtlSymmetry" />
+        <TextView
+            android:id="@+id/tv_management_live"
+            style="@style/profile"
+            android:text="@string/management_live"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/photo_camera"
+            app:layout_constraintBottom_toTopOf="@id/tv_register_notice"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_management_video"
+            tools:ignore="RtlSymmetry" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tv_register_notice"
+            style="@style/profile"
+            android:text="@string/register_notice"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/edit"
+            app:layout_constraintBottom_toTopOf="@id/tv_logout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_management_live"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/tv_logout"
+            style="@style/profile"
+            android:text="@string/logout"
+            android:textSize="16sp"
+            app:drawableStartCompat="@drawable/logout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_register_notice"
+            tools:ignore="RtlSymmetry" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

@@ -7,41 +7,34 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class DataStoreRepository @Inject constructor(val context: Context) {
-    private val Context.datastore: DataStore<Preferences> by preferencesDataStore(name = "jwt")
-    private val tokenKey = stringPreferencesKey("token")
-    private val refreshKey = stringPreferencesKey("refresh")
+@Singleton
+class DataStoreRepository @Inject constructor(@ApplicationContext val context: Context) {
+    private val Context.datastore: DataStore<Preferences> by preferencesDataStore(name = "user")
+    private val accessKey = stringPreferencesKey("accessToken")
+    private val refreshKey = stringPreferencesKey("refreshToken")
 
-    val token: Flow<String> = context.datastore.data
-        .catch { _ ->
-            emit(emptyPreferences())
-        }
-        .map { preferences: Preferences ->
-            preferences[tokenKey] ?: ""
-        }
+    val accessToken: Flow<String> = context.datastore.data.catch { emit(emptyPreferences()) }
+        .map { preference -> preference[accessKey] ?: "" }
 
-    val refreshToken: Flow<String> = context.datastore.data
-        .catch { _ ->
-            emit(emptyPreferences())
-        }
-        .map { preferences: Preferences ->
-            preferences[refreshKey] ?: ""
-        }
+    val refreshToken: Flow<String> = context.datastore.data.catch { emit(emptyPreferences()) }
+        .map { preference -> preference[refreshKey] ?: "" }
 
-    suspend fun setToken(token: String) = context.datastore.edit {
-        it[tokenKey] = token
+    suspend fun setAccessToken(accessToken: String) = context.datastore.edit { preference ->
+        preference[accessKey] = accessToken
     }
 
-    suspend fun setRefreshToken(refreshToken: String) = context.datastore.edit {
-        it[refreshKey] = refreshToken
+    suspend fun setRefreshToken(refreshToken: String) = context.datastore.edit { preference ->
+        preference[refreshKey] = refreshToken
     }
 
-    suspend fun clearToken() = context.datastore.edit {
-        it.clear()
+    suspend fun clearToken() = context.datastore.edit { preference ->
+        preference.clear()
     }
 }
