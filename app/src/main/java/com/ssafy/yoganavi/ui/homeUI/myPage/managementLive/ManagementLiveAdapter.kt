@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.databinding.ListItemLiveBinding
 import com.ssafy.yoganavi.ui.utils.UPDATE
+import com.ssafy.yoganavi.ui.utils.WeeklyAndTime
 import com.ssafy.yoganavi.ui.utils.formatDotDate
 import com.ssafy.yoganavi.ui.utils.formatTime
 
@@ -41,7 +42,7 @@ class ManagementLiveAdapter(
                 tvLectureTitle.text = item.liveTitle
 
                 val time = "${formatTime(item.startTime)}~${formatTime(item.endTime)}"
-                tvLectureTime.text = "${item.availableDay} | $time"
+                tvLectureTime.text = WeeklyAndTime(item.availableDay, time)
 
                 vEnterBtn.setOnClickListener { navigateToLiveFragment(item.liveId) }
 
