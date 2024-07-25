@@ -13,6 +13,7 @@ import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentRegisterLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.END
+import com.ssafy.yoganavi.ui.utils.IntToDate
 import com.ssafy.yoganavi.ui.utils.MODIFY_LIVE
 import com.ssafy.yoganavi.ui.utils.REGISTER
 import com.ssafy.yoganavi.ui.utils.REGISTER_LIVE
@@ -113,11 +114,11 @@ class RegisterLiveFragment :
                     calendar.set(sYear, sMonth, sDay)
 
                     with(viewModel.liveLectureData) {
-                        binding.tieStart.setText("$sYear.${sMonth + 1}.$sDay")
+                        binding.tieStart.setText(IntToDate(year, month, day))
                         startDate = calendar.timeInMillis
 
-                        if (endDate < startDate && endDate == -1L) {
-                            binding.tieEnd.setText("$sYear.${sMonth + 1}.$sDay")
+                        if (endDate < startDate && endDate != -1L) {
+                            binding.tieEnd.setText(IntToDate(year, month, day))
                             endDate = calendar.timeInMillis
                         }
                     }
@@ -143,12 +144,24 @@ class RegisterLiveFragment :
     private fun showTimePicker(state: Int) {
         val title: String = if (state == START) "시작" else "종료"
 
+        val prevTime: Long = if(state == START) viewModel.liveLectureData.startTime
+        else if(state == END) viewModel.liveLectureData.endTime
+        else -1
+
+        val prevHour: Int = if (prevTime > 0L) (prevTime / 3600).toInt()
+        else 0
+
+        val prevMinute: Int = if (prevTime > 0L && ((prevTime % 3600) > 0L)) ((prevTime % 3600) / 60).toInt()
+        else 0
+
         val materialTimePicker = MaterialTimePicker.Builder()
             .setTimeFormat(TimeFormat.CLOCK_12H)
             .setInputMode(MaterialTimePicker.INPUT_MODE_KEYBOARD)
             .setTitleText("$title 시간")
             .setNegativeButtonText("취소")
             .setPositiveButtonText("확인")
+            .setHour(prevHour)
+            .setMinute(prevMinute)
             .setTheme(R.style.CustomMaterialTimePickerTheme)
             .build()
 
@@ -157,10 +170,10 @@ class RegisterLiveFragment :
             val pickTime: Long =
                 ((materialTimePicker.hour * 3600) + (materialTimePicker.minute * 60)).toLong()
 
-            if (state == START) {
+            if(state == START) {
                 binding.btnStart.text = timeStr
                 viewModel.liveLectureData.startTime = pickTime
-            } else if (state == END) {
+            } else if(state == END) {
                 binding.btnEnd.text = timeStr
                 viewModel.liveLectureData.endTime = pickTime
             }
