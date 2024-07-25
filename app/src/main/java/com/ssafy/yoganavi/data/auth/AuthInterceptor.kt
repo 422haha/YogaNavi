@@ -27,7 +27,7 @@ class AuthInterceptor @Inject constructor(
     }
 
     private fun Interceptor.Chain.addToken(): Response {
-        val token = runBlocking { dataStoreRepository.token.firstOrNull() } ?: ""
+        val token = runBlocking { dataStoreRepository.accessToken.firstOrNull() } ?: ""
         val url = request().url.pathSegments.firstOrNull()
         val requestBuilder = request().newBuilder()
 
@@ -48,7 +48,7 @@ class AuthInterceptor @Inject constructor(
 
     private fun Response.saveToken() {
         header(TOKEN)?.let { newToken ->
-            runBlocking { dataStoreRepository.setToken(newToken) }
+            runBlocking { dataStoreRepository.setAccessToken(newToken) }
         }
 
         header(REFRESH_TOKEN)?.let { newRefreshToken ->

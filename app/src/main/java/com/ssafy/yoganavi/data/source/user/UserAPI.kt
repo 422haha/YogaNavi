@@ -35,4 +35,6 @@ interface UserAPI {
     @POST("members/find-password")
     suspend fun registerPassword(@Body userRequest: UserRequest): Response<YogaResponse<Unit>>
 
+    @POST("is-on")
+    suspend fun isServerOn(): Response<YogaResponse<Unit>>
 }

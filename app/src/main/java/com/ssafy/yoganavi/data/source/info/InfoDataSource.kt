@@ -6,12 +6,16 @@ import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.live.RegisterLiveRequest
+import com.ssafy.yoganavi.data.source.mypage.ProfileData
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import retrofit2.Response
 
 interface InfoDataSource {
 
+    suspend fun getProfile(): Response<YogaDetailResponse<ProfileData>>
+
+    // LECTURE
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>
 
     suspend fun createLecture(lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>>
@@ -24,17 +28,21 @@ interface InfoDataSource {
 
     suspend fun likeLecture(recordedId: Long): Response<YogaDetailResponse<Boolean>>
 
-    // live
+    // LIVE
     suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>>
 
     suspend fun getLive(liveId: Int): Response<YogaDetailResponse<LiveLectureData>>
 
-    suspend fun createLive(registerLiveRequest : RegisterLiveRequest): Response<YogaDetailResponse<Unit>>
+    suspend fun createLive(registerLiveRequest: RegisterLiveRequest): Response<YogaDetailResponse<Unit>>
 
-    suspend fun updateLive(registerLiveRequest: RegisterLiveRequest, liveId: Int): Response<YogaDetailResponse<Unit>>
+    suspend fun updateLive(
+        registerLiveRequest: RegisterLiveRequest,
+        liveId: Int
+    ): Response<YogaDetailResponse<Unit>>
 
     suspend fun deleteLive(liveId: Int): Response<YogaDetailResponse<Unit>>
 
+    // NOTICE
     suspend fun getNoticeList(): Response<YogaResponse<NoticeData>>
 
     suspend fun getNotice(articleId: Int): Response<YogaDetailResponse<NoticeData>>
