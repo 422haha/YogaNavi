@@ -52,3 +52,8 @@ const val DELETE = "삭제"
 // 캘린더, 타임 Picker
 const val START = 1
 const val END = 2
+
+// 화상강의 등록
+const val END_STR = "종료 날짜"
+const val LIMIT_STR = "무기한"
+const val LIMIT_DATE = 4102358400000 // 2099.12.31

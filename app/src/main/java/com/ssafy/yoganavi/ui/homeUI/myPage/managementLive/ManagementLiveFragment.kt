@@ -89,10 +89,4 @@ class ManagementLiveFragment :
             .setNegativeButton("취소", null)
             .show()
     }
-
-    override fun onResume() {
-        super.onResume()
-
-        viewModel.getLiveList()
-    }
 }
