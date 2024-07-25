@@ -16,11 +16,12 @@ class ProfileViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) : ViewModel() {
 
-    fun getProfileData(bindData: (ProfileData) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        runCatching { infoRepository.getProfile() }
-            .onSuccess { it.data?.let(bindData) }
-            .onFailure { it.printStackTrace() }
-    }
+    fun getProfileData(bindData: suspend (ProfileData) -> Unit) =
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching { infoRepository.getProfile() }
+                .onSuccess { it.data?.let { data -> bindData(data) } }
+                .onFailure { it.printStackTrace() }
+        }
 
     fun clearUserData() = viewModelScope.launch(Dispatchers.IO) {
         dataStoreRepository.clearToken()

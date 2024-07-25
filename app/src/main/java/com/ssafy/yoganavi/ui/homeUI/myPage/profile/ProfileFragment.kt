@@ -11,6 +11,8 @@ import com.ssafy.yoganavi.databinding.FragmentProfileBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.MY_PAGE
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBinding::inflate) {
@@ -26,16 +28,18 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
 
     private fun getProfileData() = viewModel.getProfileData(::bindData)
 
-    private fun bindData(profileData: ProfileData) = with(binding) {
-        tvName.text = profileData.nickname
-        Glide.with(requireContext())
-            .load(profileData.profileImageUrl)
-            .into(ivIcon)
+    private suspend fun bindData(profileData: ProfileData) = withContext(Dispatchers.Main) {
+        with(binding) {
+            tvName.text = profileData.nickname
+            Glide.with(requireContext())
+                .load(profileData.imageUrl)
+                .into(ivIcon)
 
-        if (profileData.isTeacher) {
-            tvManagementVideo.visibility = View.VISIBLE
-            tvManagementLive.visibility = View.VISIBLE
-            tvRegisterNotice.visibility = View.VISIBLE
+            if (profileData.teacher) {
+                tvManagementVideo.visibility = View.VISIBLE
+                tvManagementLive.visibility = View.VISIBLE
+                tvRegisterNotice.visibility = View.VISIBLE
+            }
         }
     }
 
