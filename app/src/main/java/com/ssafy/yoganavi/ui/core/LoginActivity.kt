@@ -45,10 +45,4 @@ class LoginActivity : AppCompatActivity() {
         }
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
     }
-
-    override fun onResume() {
-        super.onResume()
-
-        // viewModel.getToken()
-    }
 }
