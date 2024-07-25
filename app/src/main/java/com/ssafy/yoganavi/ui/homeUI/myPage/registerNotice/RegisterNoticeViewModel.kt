@@ -45,7 +45,7 @@ class RegisterNoticeViewModel @Inject constructor(
     }
 
     fun addImage(url: String) = viewModelScope.launch(Dispatchers.IO) {
-        _notice.emit(notice.value.copy(imageUrlPath = url))
+        _notice.emit(notice.value.copy(imageUrl = "", imageUrlPath = url, imageUrlKey = ""))
     }
 
     fun setContent(content: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -59,8 +59,8 @@ class RegisterNoticeViewModel @Inject constructor(
             val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
 
             val noticeFile = File(notice.value.imageUrlPath)
-            val metadata = ObjectMetadata().apply{contentType = "image/webp"}
-            transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile,metadata)
+            val metadata = ObjectMetadata().apply { contentType = "image/webp" }
+            transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile, metadata)
 
             val request = RegisterNoticeRequest(content = content, imageUrl = imageUrl.toString())
 
@@ -76,13 +76,14 @@ class RegisterNoticeViewModel @Inject constructor(
 
             if (notice.value.imageUrlPath.isNotBlank()) {
                 val noticeFile = File(notice.value.imageUrlPath)
-                val metadata = ObjectMetadata().apply{contentType = "image/webp"}
-                transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile,metadata)
+                val metadata = ObjectMetadata().apply { contentType = "image/webp" }
+                transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile, metadata)
+                _notice.emit(notice.value.copy(imageUrl = imageUrl.toString()))
             } else {
                 val imageUrl2 = notice.value.imageUrl.substringBefore("?")
                 _notice.emit(notice.value.copy(imageUrl = imageUrl2))
             }
-            val request = RegisterNoticeRequest(content = content, imageUrl = imageUrl.toString())
+            val request = RegisterNoticeRequest(content = content, imageUrl = notice.value.imageUrl)
 
             runCatching { infoRepository.updateNotice(request, notice.value.articleId) }
                 .onSuccess { onSuccess() }

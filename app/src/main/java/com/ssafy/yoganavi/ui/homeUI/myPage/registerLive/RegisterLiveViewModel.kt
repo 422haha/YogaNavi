@@ -27,7 +27,7 @@ class RegisterLiveViewModel @Inject constructor(
 
     fun createLive() = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.createLive(liveState) }
-            .onSuccess { Timber.d("생성") }
+            .onSuccess {  }
             .onFailure { it.printStackTrace() }
     }
 }
