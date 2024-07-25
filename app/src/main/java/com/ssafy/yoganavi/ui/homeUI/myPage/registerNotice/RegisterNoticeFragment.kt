@@ -21,7 +21,7 @@ import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_INSERT
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_UPDATE
 import com.ssafy.yoganavi.ui.utils.REGISTER
-import com.ssafy.yoganavi.ui.utils.getPath
+import com.ssafy.yoganavi.ui.utils.getImagePath
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -37,7 +37,7 @@ class RegisterNoticeFragment :
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data ?: return@registerForActivityResult
-                val imagePath = getPath(requireContext(), imageUri)
+                val imagePath = getImagePath(requireContext(), imageUri)
                 if (imagePath.isNotBlank()) {
                     viewModel.addImage(imagePath)
                 }
