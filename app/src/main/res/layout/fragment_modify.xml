@@ -1,138 +1,187 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.homeUI.myPage.modify.ModifyFragment">
+    android:fillViewport="true">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/iv_icon"
-        android:layout_width="@dimen/icon_little_large"
-        android:layout_height="@dimen/icon_little_large"
-        android:layout_gravity="center"
-        android:layout_marginTop="@dimen/padding_extra_large"
-        android:background="@color/gray_20"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearanceOverlay="@style/Circle" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".ui.homeUI.myPage.modify.ModifyFragment">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cv_icon"
-        android:layout_width="@dimen/icon_mini"
-        android:layout_height="@dimen/icon_mini"
-        android:elevation="0dp"
-        app:cardCornerRadius="50dp"
-        app:layout_constraintBottom_toBottomOf="@id/iv_icon"
-        app:layout_constraintEnd_toEndOf="@+id/iv_icon">
-
-        <ImageView
-            android:id="@+id/iv_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/iv_icon"
+            android:layout_width="@dimen/icon_little_large"
+            android:layout_height="@dimen/icon_little_large"
             android:layout_gravity="center"
-            android:src="@drawable/edit" />
-    </androidx.cardview.widget.CardView>
+            android:layout_marginTop="@dimen/padding_extra_large"
+            android:scaleType="centerCrop"
+            android:src="@drawable/user"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/Circle" />
 
-    <TextView
-        android:id="@+id/tv_nickname"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/padding_medium"
-        android:layout_marginTop="@dimen/padding_extra_large"
-        android:text="@string/nickname"
-        app:layout_constraintBottom_toTopOf="@id/til_nn"
-        app:layout_constraintStart_toStartOf="@id/til_nn"
-        app:layout_constraintTop_toBottomOf="@id/cv_icon" />
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_icon"
+            android:layout_width="@dimen/icon_mini"
+            android:layout_height="@dimen/icon_mini"
+            android:elevation="0dp"
+            app:cardCornerRadius="50dp"
+            app:layout_constraintBottom_toBottomOf="@id/iv_icon"
+            app:layout_constraintEnd_toEndOf="@+id/iv_icon">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/til_nn"
-        style="@style/boxCornerRadiusStyle"
-        app:errorEnabled="true"
-        app:layout_constraintBottom_toTopOf="@id/tv_pw"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_nickname">
+            <ImageView
+                android:id="@+id/iv_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/edit" />
+        </androidx.cardview.widget.CardView>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/tie_nn"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_nickname"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:lines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginStart="@dimen/padding_medium"
+            android:layout_marginTop="@dimen/padding_extra_large"
+            android:text="@string/nickname"
+            app:layout_constraintBottom_toTopOf="@id/til_nn"
+            app:layout_constraintStart_toStartOf="@id/til_nn"
+            app:layout_constraintTop_toBottomOf="@id/cv_icon" />
 
-    <TextView
-        android:id="@+id/tv_pw"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/padding_medium"
-        android:layout_marginTop="@dimen/padding_small"
-        android:text="@string/password"
-        app:layout_constraintBottom_toTopOf="@id/til_pw"
-        app:layout_constraintStart_toStartOf="@id/til_pw"
-        app:layout_constraintTop_toBottomOf="@id/til_nn" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_nn"
+            style="@style/boxCornerRadiusStyle"
+            app:errorEnabled="true"
+            app:layout_constraintBottom_toTopOf="@id/tv_pw"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_nickname">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/til_pw"
-        style="@style/boxCornerRadiusStyle"
-        app:errorEnabled="true"
-        app:layout_constraintBottom_toTopOf="@id/tv_pw_again"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_pw"
-        app:passwordToggleEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tie_nn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:lines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/tie_pw"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_pw"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:lines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginStart="@dimen/padding_medium"
+            android:layout_marginTop="@dimen/padding_small"
+            android:text="@string/password"
+            app:layout_constraintBottom_toTopOf="@id/til_pw"
+            app:layout_constraintStart_toStartOf="@id/til_pw"
+            app:layout_constraintTop_toBottomOf="@id/til_nn" />
 
-    <TextView
-        android:id="@+id/tv_pw_again"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/padding_medium"
-        android:layout_marginTop="@dimen/padding_small"
-        android:text="@string/check_password"
-        app:layout_constraintBottom_toTopOf="@id/til_pw_again"
-        app:layout_constraintStart_toStartOf="@id/til_pw_again"
-        app:layout_constraintTop_toBottomOf="@id/til_pw" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_pw"
+            style="@style/boxCornerRadiusStyle"
+            app:errorEnabled="true"
+            app:layout_constraintBottom_toTopOf="@id/tv_pw_again"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_pw"
+            app:passwordToggleEnabled="true">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/til_pw_again"
-        style="@style/boxCornerRadiusStyle"
-        app:errorEnabled="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_pw_again">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tie_pw"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:lines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/tie_pw_again"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_pw_again"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:lines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginStart="@dimen/padding_medium"
+            android:layout_marginTop="@dimen/padding_small"
+            android:text="@string/check_password"
+            app:layout_constraintBottom_toTopOf="@id/til_pw_again"
+            app:layout_constraintStart_toStartOf="@id/til_pw_again"
+            app:layout_constraintTop_toBottomOf="@id/til_pw" />
 
-    <Button
-        android:id="@+id/check"
-        style="@style/commonText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/padding_extra_extra_large"
-        android:layout_marginTop="@dimen/padding_extra_large"
-        android:layout_marginEnd="@dimen/padding_extra_extra_large"
-        android:layout_marginBottom="@dimen/padding_large"
-        android:height="@dimen/ti_height"
-        android:text="@string/check"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/til_pw_again" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_pw_again"
+            style="@style/boxCornerRadiusStyle"
+            app:errorEnabled="true"
+            app:layout_constraintBottom_toTopOf="@id/tv_hashtag"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_pw_again">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tie_pw_again"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:lines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/tv_hashtag"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_medium"
+            android:layout_marginTop="@dimen/padding_small"
+            android:text="@string/hash_tag"
+            app:layout_constraintBottom_toTopOf="@id/til_hash_tag"
+            app:layout_constraintStart_toStartOf="@+id/til_hash_tag"
+            app:layout_constraintTop_toBottomOf="@id/til_pw_again" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_hash_tag"
+            style="@style/boxCornerRadiusStyle"
+            app:errorEnabled="true"
+            app:layout_constraintBottom_toTopOf="@id/rv_hash_tag"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_hashtag">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tie_hash_tag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:lines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_hash_tag"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_extra_extra_large"
+            android:layout_marginEnd="@dimen/padding_extra_extra_large"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            app:layout_constraintBottom_toTopOf="@id/check"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/til_hash_tag" />
+
+        <Button
+            android:id="@+id/check"
+            style="@style/commonText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_extra_extra_large"
+            android:layout_marginTop="@dimen/padding_extra_large"
+            android:layout_marginEnd="@dimen/padding_extra_extra_large"
+            android:layout_marginBottom="@dimen/padding_large"
+            android:height="@dimen/ti_height"
+            android:text="@string/check"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_hash_tag" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

@@ -6,7 +6,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.R
-import com.ssafy.yoganavi.data.source.mypage.ProfileData
+import com.ssafy.yoganavi.data.source.mypage.Profile
 import com.ssafy.yoganavi.databinding.FragmentProfileBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.MY_PAGE
@@ -28,14 +28,14 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
 
     private fun getProfileData() = viewModel.getProfileData(::bindData)
 
-    private suspend fun bindData(profileData: ProfileData) = withContext(Dispatchers.Main) {
+    private suspend fun bindData(profile: Profile) = withContext(Dispatchers.Main) {
         with(binding) {
-            tvName.text = profileData.nickname
+            tvName.text = profile.nickname
             Glide.with(requireContext())
-                .load(profileData.imageUrl)
+                .load(profile.imageUrl)
                 .into(ivIcon)
 
-            if (profileData.teacher) {
+            if (profile.teacher) {
                 tvManagementVideo.visibility = View.VISIBLE
                 tvManagementLive.visibility = View.VISIBLE
                 tvRegisterNotice.visibility = View.VISIBLE

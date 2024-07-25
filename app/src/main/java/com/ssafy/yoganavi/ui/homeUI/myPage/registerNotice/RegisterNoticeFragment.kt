@@ -3,9 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.registerNotice
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.View
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
@@ -21,7 +19,7 @@ import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_INSERT
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_UPDATE
 import com.ssafy.yoganavi.ui.utils.REGISTER
-import com.ssafy.yoganavi.ui.utils.getPath
+import com.ssafy.yoganavi.ui.utils.getImagePath
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -37,12 +35,17 @@ class RegisterNoticeFragment :
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data ?: return@registerForActivityResult
-                val imagePath = getPath(requireContext(), imageUri)
-                if (imagePath.isNotBlank()) {
-                    viewModel.addImage(imagePath)
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                    val imagePath = getImagePath(requireContext(), imageUri)
+                    if (imagePath.isNotBlank()) {
+                        withContext(Dispatchers.Main) {
+                            viewModel.addImage(imagePath)
+                        }
+                    }
                 }
             }
         }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.ivPhoto.visibility = View.GONE
@@ -103,14 +106,12 @@ class RegisterNoticeFragment :
                     binding.ivPhoto.visibility = View.VISIBLE
                     binding.ivCancel.visibility = View.VISIBLE
                     binding.btnAddPhoto.visibility = View.GONE
-                }
-                else if(notice.imageUrlPath.isNotBlank()){
+                } else if (notice.imageUrlPath.isNotBlank()) {
                     binding.ivPhoto.setImageURI(notice.imageUrlPath.toUri())
                     binding.ivPhoto.visibility = View.VISIBLE
                     binding.ivCancel.visibility = View.VISIBLE
                     binding.btnAddPhoto.visibility = View.GONE
-                }
-                else {
+                } else {
                     binding.ivPhoto.visibility = View.GONE
                     binding.ivCancel.visibility = View.GONE
                     binding.btnAddPhoto.visibility = View.VISIBLE
@@ -118,6 +119,7 @@ class RegisterNoticeFragment :
             }
         }
     }
+
     private fun addPhoto() {
         val intent = Intent().apply {
             type = "image/*"

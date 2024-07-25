@@ -6,14 +6,14 @@ import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.live.RegisterLiveRequest
-import com.ssafy.yoganavi.data.source.mypage.ProfileData
+import com.ssafy.yoganavi.data.source.mypage.Profile
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import retrofit2.Response
 
 interface InfoDataSource {
 
-    suspend fun getProfile(): Response<YogaDetailResponse<ProfileData>>
+    suspend fun getProfile(): Response<YogaDetailResponse<Profile>>
 
     // LECTURE
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>

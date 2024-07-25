@@ -6,7 +6,7 @@ import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.live.RegisterLiveRequest
-import com.ssafy.yoganavi.data.source.mypage.ProfileData
+import com.ssafy.yoganavi.data.source.mypage.Profile
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import retrofit2.Response
@@ -19,8 +19,8 @@ import retrofit2.http.Path
 
 interface InfoAPI {
 
-    @GET("mypage")
-    suspend fun getProfile(): Response<YogaDetailResponse<ProfileData>>
+    @GET("mypage/info")
+    suspend fun getProfile(): Response<YogaDetailResponse<Profile>>
 
     // LECTURE
     @GET("mypage/recorded-lecture/list")
