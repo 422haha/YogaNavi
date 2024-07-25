@@ -30,16 +30,25 @@ public class LiveLectures {
     @Column(length = 30, nullable = false)
     private String liveTitle; // 강의 제목
 
-    @Column(length = 300, nullable = false)
+    @Column(length = 300)
     private String liveContent; // 강의 내용
 
+    @Column(nullable = false)
     private Long startDate; // 시작 날짜
+
+    @Column(nullable = false)
     private Long endDate; // 종료 날짜
 
+    @Column(nullable = false)
     private Long startTime; // 강의 시작 시간
+
+    @Column(nullable = false)
     private Long endTime; // 강의 종료 시간
 
+    @Column(nullable = false)
     private Integer maxLiveNum; // 최대 수강자 수
+
+    @Column(nullable = false)
     private Long regDate; // 강의 등록 시간
 
     @ManyToOne
