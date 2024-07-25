@@ -1,4 +1,4 @@
-package com.yoga.backend.service;
+package com.yoga.backend.common.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;

@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import java.util.Set;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
@@ -17,25 +18,31 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     private int id;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(nullable = false)
     private String pwd;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String nickname;
 
     @Column
     private String profile_image_url;
 
-    @Column
+    @Column(nullable = false)
     private String role;
 
     @Column
     private String resetToken;
 
-    @Column
-    private String activeToken;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "user_hashtags",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "hashtag_id")
+    )
+    private Set<Hashtag> hashtags;
 
     public String getResetToken() {
         return resetToken;
@@ -88,13 +95,21 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     public void setRole(String role) {
         this.role = role;
     }
-
-    public String getActiveToken() {
-        return activeToken;
+    public Set<Hashtag> getHashtags() {
+        return hashtags;
     }
 
-    public void setActiveToken(String activeToken) {
-        this.activeToken = activeToken;
+    public void setHashtags(Set<Hashtag> hashtags) {
+        this.hashtags = hashtags;
     }
 
+    public void addHashtag(Hashtag hashtag) {
+        this.hashtags.add(hashtag);
+        hashtag.getUsers().add(this);
+    }
+
+    public void removeHashtag(Hashtag hashtag) {
+        this.hashtags.remove(hashtag);
+        hashtag.getUsers().remove(this);
+    }
 }

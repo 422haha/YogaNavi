@@ -93,19 +93,12 @@ public class JwtUtil {
         return userRepository.findByEmail(claims.get("email", String.class)).get(0).getId();
     }
 
-
-    public void logoutUser(String email) {
-        List<Users> userList = userRepository.findByEmail(email);
-        if (!userList.isEmpty()) {
-            Users user = userList.get(0);
-            String oldToken = user.getActiveToken();
-
-            // 활성 토큰을 null로 설정
-            user.setActiveToken(null);
-            userRepository.save(user);
-
-        }
+    public String getRoleFromToken(String bearerToken) {
+        String token = extractToken(bearerToken);
+        Claims claims = validateToken(token);
+        return claims.get("role", String.class);
     }
+
 
     // 추가
     public void invalidateToken(String email) {
@@ -123,5 +116,66 @@ public class JwtUtil {
             return false;
         }
     }
+
+    /*
+    *
+    *동시성 고려한 코드
+    *
+    public String generateAccessToken(String email, String role) {
+        String token = Jwts.builder()
+            .issuer("Yoga Navi")
+            .subject("JWT Token")
+            .claim("email", email)
+            .claim("role", role)
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + SecurityConstants.ACCESS_TOKEN_EXPIRATION))
+            .signWith(key)
+            .compact();
+
+        // Redis에 토큰 저장 (동시성 고려)
+        redisTemplate.execute(new SessionCallback<Object>() {
+            @Override
+            public Object execute(RedisOperations operations) throws DataAccessException {
+                operations.multi();
+                operations.opsForValue().set(email, token, SecurityConstants.ACCESS_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
+                return operations.exec();
+            }
+        });
+
+        return token;
+    }
+
+    public void invalidateToken(String email) {
+        // Redis에서 토큰 삭제 (동시성 고려)
+        redisTemplate.execute(new SessionCallback<Object>() {
+            @Override
+            public Object execute(RedisOperations operations) throws DataAccessException {
+                operations.multi();
+                operations.delete(email);
+                return operations.exec();
+            }
+        });
+    }
+
+    public boolean isTokenValid(String token) {
+        try {
+            Claims claims = validateToken(token);
+            String email = claims.get("email", String.class);
+
+            // Redis에서 토큰 확인 (동시성 고려)
+            return redisTemplate.execute(new SessionCallback<Boolean>() {
+                @Override
+                public Boolean execute(RedisOperations operations) throws DataAccessException {
+                    operations.multi();
+                    String storedToken = (String) operations.opsForValue().get(email);
+                    List<Object> results = operations.exec();
+                    return token.equals(results.get(0));
+                }
+            });
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    */
 
 }

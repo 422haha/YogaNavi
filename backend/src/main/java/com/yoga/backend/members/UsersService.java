@@ -1,9 +1,9 @@
 package com.yoga.backend.members;
 
 import com.yoga.backend.common.entity.Users;
-import java.io.IOException;
+import com.yoga.backend.members.dto.RegisterDto;
+import com.yoga.backend.members.dto.UpdateDto;
 import java.util.List;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface UsersService {
 
@@ -21,7 +21,8 @@ public interface UsersService {
 
     String resetPassword(String email, String newPassword);
 
-    List<Users> getUserByEmail(String email);
+    Users getUserByEmail(String email);
 
 
+    Users updateUser(UpdateDto updateDto, String email);
 }
