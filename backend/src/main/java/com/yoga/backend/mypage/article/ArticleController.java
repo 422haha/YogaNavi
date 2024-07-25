@@ -13,8 +13,6 @@ import java.time.ZoneOffset;
 import java.util.*;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 게시글(공지사항) 관련 요청을 처리하는 컨트롤러 클래스
@@ -26,7 +24,6 @@ public class ArticleController {
     private final ArticleService articleService;
     private final UsersRepository usersRepository;
     private final JwtUtil jwtUtil;
-    private static final Logger logger = LoggerFactory.getLogger(ArticleController.class);
 
     /**
      * ArticleController 생성자
@@ -79,7 +76,6 @@ public class ArticleController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            logger.error("게시글 작성 중 오류 발생", e);
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -108,7 +104,6 @@ public class ArticleController {
             response.put("data", articleList);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("모든 게시글 조회 중 오류 발생", e);
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -148,7 +143,6 @@ public class ArticleController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            logger.error("사용자 ID로 게시글 조회 중 오류 발생", e);
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -178,7 +172,6 @@ public class ArticleController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
         } catch (Exception e) {
-            logger.error("게시글 ID로 게시글 조회 중 오류 발생", e);
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -197,7 +190,6 @@ public class ArticleController {
     public ResponseEntity<Map<String, Object>> updateArticle(
         @RequestHeader("Authorization") String token, @PathVariable Long id,
         @RequestBody ArticleDto articleDto) {
-        logger.info("updateArticle:"+articleDto);
         Map<String, Object> response = new HashMap<>();
         try {
             int userId = jwtUtil.getUserIdFromToken(token); // JWT 토큰에서 사용자 ID 추출
@@ -231,7 +223,6 @@ public class ArticleController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            logger.error("게시글 수정 중 오류 발생", e);
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -281,7 +272,6 @@ public class ArticleController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            logger.error("게시글 삭제 중 오류 발생", e);
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
