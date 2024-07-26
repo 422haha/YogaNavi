@@ -5,6 +5,8 @@ import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.util.JwtUtil;
 import com.yoga.backend.members.UsersRepository;
+import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateDto;
+import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateResponseDto;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,7 +38,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * 실시간 강의를 생성합니다.
      *
      * @param liveLectureCreateDto 실시간 강의 DTO
-     * @return 생성된 실시간 강의 엔티티
+     * @return 생성된 실시간 강의 응답 DTO
      */
     @Override
     public LiveLectureCreateResponseDto createLiveLecture(LiveLectureCreateDto liveLectureCreateDto) {
@@ -82,12 +84,14 @@ public class LiveLectureServiceImpl implements LiveLectureService {
 
     /**
      * 모든 실시간 강의를 조회
+     *
      * @return 모든 실시간 강의 리스트
      */
     @Override
     public List<LiveLectures> getAllLiveLectures() {
         return liveLecturesRepository.findAll();
-    } // 모든 화상 강의를 조회
+    }
+
     /**
      * 특정 사용자 ID에 대한 나의 실시간 강의 목록을 조회
      * @param userId 사용자 ID
@@ -98,11 +102,23 @@ public class LiveLectureServiceImpl implements LiveLectureService {
         return myLiveLectureRepository.findByUserId(userId);  // 특정 사용자가 등록한 화상 강의 목록을 조회
     }
 
+    /**
+     * 사용자 ID로 화상 강의를 조회합니다.
+     *
+     * @param userId 사용자 ID
+     * @return 해당 사용자의 실시간 강의 리스트
+     */
     @Override
     public List<LiveLectures> getLiveLecturesByUserId(Integer userId) {
         return liveLectureRepository.findByUserId(userId);
     }
 
+    /**
+     * 화상 강의를 수정합니다.
+     *
+     * @param liveLectureCreateDto 수정할 화상 강의 DTO
+     * @return 수정된 화상 강의 엔티티
+     */
     @Override
     public LiveLectures updateLiveLecture(LiveLectureCreateDto liveLectureCreateDto) {
         LiveLectures liveLecture = liveLectureRepository.findById(liveLectureCreateDto.getLiveId())
@@ -136,22 +152,43 @@ public class LiveLectureServiceImpl implements LiveLectureService {
         return liveLectureRepository.save(liveLecture);
     }
 
-    //단일화상강의조회
+    /**
+     * 단일 화상 강의를 조회합니다.
+     *
+     * @param liveId 화상 강의 ID
+     * @return 해당 화상 강의 엔티티
+     */
     @Override
     public LiveLectures getLiveLectureById(Integer liveId) {
         return liveLectureRepository.findById(liveId).orElse(null);
     }
 
-    // 본인 맞는지 확인
+    /**
+     * 화상 강의의 소유자인지 확인합니다.
+     *
+     * @param liveId 화상 강의 ID
+     * @param userId 사용자 ID
+     * @return 소유자 여부
+     */
     @Override
     public boolean isLectureOwner(Integer liveId, Integer userId) {
         Optional<LiveLectures> lectureOpt = liveLectureRepository.findById(liveId);
         return lectureOpt.isPresent() && Objects.equals(lectureOpt.get().getUser().getId(), userId);
     }
 
-    //삭제
+
+    /**
+     * 화상 강의를 삭제합니다.
+     *
+     * @param liveId 화상 강의 ID
+     */
     @Override
     public void deleteLiveLectureById(Integer liveId) {
+        // 먼저 my_live_lecture 테이블에서 관련 항목 삭제
+        List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findByLiveLecture_LiveId(liveId);
+        myLiveLectureRepository.deleteAll(myLiveLectures);
+
+        // 그런 다음 live_lectures 테이블에서 항목 삭제
         liveLectureRepository.deleteById(liveId);
     }
 
