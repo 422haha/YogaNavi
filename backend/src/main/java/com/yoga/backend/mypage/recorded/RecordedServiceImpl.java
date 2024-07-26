@@ -39,20 +39,24 @@ public class RecordedServiceImpl implements RecordedService {
     public static final long URL_EXPIRATION_SECONDS = 86400;
     private static final String S3_BASE_URL = "https://yoga-navi.s3.ap-northeast-2.amazonaws.com/";
 
-    @Autowired
-    private RecordedLectureListRepository recordedLectureListRepository;
+    private final S3Service s3Service;
+    private final RecordedLectureRepository recordedLectureRepository;
+    private final RecordedLectureListRepository recordedLectureListRepository;
+    private final MyLikeLectureListRepository myLikeLectureListRepository;
+    private final RecordedLectureLikeRepository lectureLikeRepository;
 
     @Autowired
-    private RecordedLectureRepository recordedLectureRepository;
-
-    @Autowired
-    private MyLikeLectureListRepository myLikeLectureListRepository;
-
-    @Autowired
-    private RecordedLectureLikeRepository lectureLikeRepository;
-
-    @Autowired
-    private S3Service s3Service;
+    public RecordedServiceImpl(S3Service s3Service,
+        RecordedLectureRepository recordedLectureRepository,
+        RecordedLectureListRepository recordedLectureListRepository,
+        MyLikeLectureListRepository myLikeLectureListRepository,
+        RecordedLectureLikeRepository lectureLikeRepository) {
+        this.s3Service = s3Service;
+        this.recordedLectureRepository = recordedLectureRepository;
+        this.recordedLectureListRepository = recordedLectureListRepository;
+        this.myLikeLectureListRepository = myLikeLectureListRepository;
+        this.lectureLikeRepository = lectureLikeRepository;
+    }
 
     /**
      * 사용자가 업로드한 강의 목록을 조회

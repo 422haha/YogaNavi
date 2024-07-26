@@ -8,6 +8,7 @@ import com.yoga.backend.members.dto.UpdateDto;
 import com.yoga.backend.members.repository.HashtagRepository;
 import com.yoga.backend.members.repository.UsersRepository;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -61,6 +62,7 @@ public class UsersServiceImpl implements UsersService {
         users.setPwd(registerDto.getPassword());
         users.setEmail(registerDto.getEmail());
         users.setNickname(registerDto.getNickname());
+
         if (registerDto.isTeacher()) {
             users.setRole("TEACHER");
         } else {
@@ -272,6 +274,10 @@ public class UsersServiceImpl implements UsersService {
         List<Users> users = usersRepository.findById(userId);
         if (!users.isEmpty()) {
             Users user = users.get(0);
+
+            if (user.getHashtags() == null) {
+                user.setHashtags(new HashSet<>());
+            }
 
             // 기존 해시태그 모두 제거
             user.getHashtags().clear();

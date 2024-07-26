@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -42,7 +43,7 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "hashtag_id")
     )
-    private Set<Hashtag> hashtags;
+    private Set<Hashtag> hashtags = new HashSet<>();
 
     public String getResetToken() {
         return resetToken;
@@ -95,6 +96,7 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     public void setRole(String role) {
         this.role = role;
     }
+
     public Set<Hashtag> getHashtags() {
         return hashtags;
     }
@@ -104,7 +106,13 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     }
 
     public void addHashtag(Hashtag hashtag) {
+        if (this.hashtags == null) {
+            this.hashtags = new HashSet<>();
+        }
         this.hashtags.add(hashtag);
+        if (hashtag.getUsers() == null) {
+            hashtag.setUsers(new HashSet<>());
+        }
         hashtag.getUsers().add(this);
     }
 
