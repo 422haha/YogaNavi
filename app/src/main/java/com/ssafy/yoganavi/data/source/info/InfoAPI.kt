@@ -43,7 +43,7 @@ interface InfoAPI {
     @POST("mypage/recorded-lecture/delete")
     suspend fun deleteLectures(@Body body: HashMap<String, List<Long>>): Response<YogaDetailResponse<Boolean>>
 
-    @POST("mypage/recorded-lecture/like/{recorded_id}")
+    @POST("recorded-lecture/like/{recorded_id}")
     suspend fun likeLecture(@Path("recorded_id") id: Long): Response<YogaDetailResponse<Boolean>>
 
     // Live
