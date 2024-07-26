@@ -8,7 +8,7 @@ import com.ssafy.yoganavi.data.source.info.InfoDataSource
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
-import com.ssafy.yoganavi.data.source.mypage.ProfileData
+import com.ssafy.yoganavi.data.source.mypage.Profile
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.di.IoDispatcher
@@ -23,8 +23,13 @@ class InfoRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : InfoRepository {
 
-    override suspend fun getProfile(): DetailResponse<ProfileData> {
+    override suspend fun getProfile(): DetailResponse<Profile> {
         val response = withContext(ioDispatcher) { infoDataSource.getProfile() }
+        return response.toDetailResponse()
+    }
+
+    override suspend fun updateProfile(profile: Profile): DetailResponse<Profile> {
+        val response = withContext(ioDispatcher) { infoDataSource.updateProfile(profile) }
         return response.toDetailResponse()
     }
 

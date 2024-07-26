@@ -52,6 +52,9 @@ android {
 }
 
 dependencies {
+    //Flexible RecyclerView
+    implementation (libs.google.flexbox)
+
     // Exo Player
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.exoplayer.dash)
