@@ -4,9 +4,11 @@ import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.util.JwtUtil;
 import com.yoga.backend.members.dto.RegisterDto;
 import com.yoga.backend.members.dto.UpdateDto;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RestController
-@RequestMapping("/members")
+@RequestMapping("/")
 public class UserController {
 
 
@@ -38,12 +40,12 @@ public class UserController {
     }
 
     /**
-     * 회원 가입 컨트롤러
+     * 회원 가입을 처리
      *
-     * @param registerDto 회원 가입 정보
+     * @param registerDto 회원 가입에 필요한 정보 DTO
      * @return 회원 가입 결과
      */
-    @PostMapping("/register")
+    @PostMapping("/members/register")
     public ResponseEntity<Map<String, Object>> registerUser(@RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
         boolean check = usersService.checkNickname(registerDto.getNickname());
@@ -77,12 +79,12 @@ public class UserController {
     }
 
     /**
-     * 회원가입을 위한 인증번호 전송 컨트롤러
+     * 회원가입을 위한 인증번호를 이메일로 전송
      *
-     * @param registerDto 회원 가입 정보
+     * @param registerDto 이메일 정보를 담은 DTO
      * @return 인증번호 전송 결과
      */
-    @PostMapping("/register/email")
+    @PostMapping("/members/register/email")
     public ResponseEntity<Map<String, Object>> registerUserEmail(
         @RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
@@ -105,12 +107,12 @@ public class UserController {
     }
 
     /**
-     * 회원가입을 위한 인증번호 확인 컨트롤러
+     * 회원가입 시 전송된 인증번호를 확인
      *
-     * @param registerDto 회원 가입 정보
+     * @param registerDto 인증번호를 담은 DTO
      * @return 인증번호 확인 결과
      */
-    @PostMapping("/register/authnumber")
+    @PostMapping("/members/register/authnumber")
     public ResponseEntity<Map<String, Object>> checkAuthNumber(
         @RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
@@ -126,12 +128,12 @@ public class UserController {
     }
 
     /**
-     * 비밀번호 재설정을 위한 인증번호 전송 컨트롤러
+     * 비밀번호 재설정을 위한 인증번호를 이메일로 전송
      *
-     * @param registerDto 회원 가입 정보
+     * @param registerDto 이메일 정보를 담은 DTO
      * @return 인증번호 전송 결과
      */
-    @PostMapping("/find-password/email")
+    @PostMapping("/members/find-password/email")
     public ResponseEntity<Map<String, Object>> passwordUserEmail(
         @RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
@@ -142,12 +144,12 @@ public class UserController {
     }
 
     /**
-     * 인증번호 확인 컨트롤러
+     * 비밀번호 재설정을 위한 인증번호를 확인
      *
-     * @param registerDto 회원 가입 정보
+     * @param registerDto 인증번호를 담은 DTO
      * @return 인증번호 확인 결과
      */
-    @PostMapping("/find-password/authnumber")
+    @PostMapping("/members/find-password/authnumber")
     public ResponseEntity<Map<String, Object>> passwordCheckAuthNumber(
         @RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
@@ -165,12 +167,12 @@ public class UserController {
     }
 
     /**
-     * 비밀번호 변경 컨트롤러
+     * 비밀번호를 변경
      *
-     * @param registerDto 회원 가입 정보
-     * @return 변경 결과
+     * @param registerDto 새 비밀번호 정보를 담은 DTO
+     * @return 비밀번호 변경 결과
      */
-    @PostMapping("/find-password")
+    @PostMapping("/members/find-password")
     public ResponseEntity<Map<String, Object>> setPassword(@RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
         String result = usersService.resetPassword(registerDto.getEmail(),
@@ -181,30 +183,34 @@ public class UserController {
     }
 
     /**
-     * 사용자 정보 수정. 정보 가져오기
+     * 사용자 정보를 조회
      *
-     * @param token 토큰
-     * @return 회원 정보, 선생이라면 해시태그도
-     *
-     * @TODO 선생이면 해시태그도 반환
+     * @param token 사용자 인증 토큰
+     * @return 사용자 정보를 담은 ResponseEntity
      */
-    @GetMapping("/update")
+    @GetMapping("/mypage/info")
     public ResponseEntity<Map<String, Object>> getMyInfo(
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
         try {
-            String email = jwtUtil.getEmailFromToken(token);
-            Users user = usersService.getUserByEmail(email);
+            int userId = jwtUtil.getUserIdFromToken(token);
+            Users user = usersService.getUserByUserId(userId);
 
-            if (user!=null) {
+            if (user != null) {
+                UpdateDto responseDto = new UpdateDto();
+                boolean isTeacher = jwtUtil.getRoleFromToken(token).equals("TEACHER");
+                responseDto.setImageUrl(user.getProfile_image_url());
+                responseDto.setNickname(user.getNickname());
+                responseDto.setTeacher(isTeacher);
 
-                RegisterDto registerDto = new RegisterDto();
-                registerDto.setImageUrl(user.getProfile_image_url());
-                registerDto.setNickname(user.getNickname());
-                registerDto.setTeacher(jwtUtil.getRoleFromToken(token).equals("TEACHER"));
+                if (isTeacher) {
+                    Set<String> myTags = usersService.getUserHashtags(userId);
+                    List<String> tags = new ArrayList<>(myTags);
+                    responseDto.setHashTags(tags);
+                }
 
                 response.put("message", "success");
-                response.put("data", registerDto);
+                response.put("data", responseDto);
                 return ResponseEntity.ok(response);
             } else {
                 response.put("message", "User not found");
@@ -218,30 +224,36 @@ public class UserController {
     }
 
     /**
-     * 사용자 정보 수정. 정보 수정
+     * 사용자 정보 수정
      *
-     * @param token 토큰
-     * @return 수정 후 회원 정보, 선생이라면 해시태그도
-     *
-     * @TODO 선생이면 해시태그도 반환
+     * @param token 사용자 인증 토큰
+     * @param updateDto 수정할 사용자 정보를 담은 DTO
+     * @return 수정된 사용자 정보를 담은 ResponseEntity
      */
-    @PostMapping("/update")
+    @PostMapping("/mypage/update")
     public ResponseEntity<Map<String, Object>> updateUserInfo(
         @RequestHeader("Authorization") String token, @RequestBody UpdateDto updateDto) {
         Map<String, Object> response = new HashMap<>();
         try {
-            String email = jwtUtil.getEmailFromToken(token);
-            Users user = usersService.updateUser(updateDto, email);
+            int userId = jwtUtil.getUserIdFromToken(token);
+            Users user = usersService.updateUser(updateDto, userId);
             if (user != null) {
-                RegisterDto registerDto = new RegisterDto();
-                registerDto.setImageUrl(user.getProfile_image_url());
-                registerDto.setNickname(user.getNickname());
-                registerDto.setTeacher(jwtUtil.getRoleFromToken(token).equals("TEACHER"));
+                UpdateDto responseDto = new UpdateDto();
+                boolean isTeacher = jwtUtil.getRoleFromToken(token).equals("TEACHER");
+                responseDto.setImageUrl(user.getProfile_image_url());
+                responseDto.setNickname(user.getNickname());
+                responseDto.setTeacher(isTeacher);
+
+                if (isTeacher) {
+                    Set<String> myTags = usersService.getUserHashtags(userId);
+                    List<String> tags = new ArrayList<>(myTags);
+                    responseDto.setHashTags(tags);
+                }
 
                 response.put("message", "success");
-                response.put("data", registerDto);
+                response.put("data", responseDto);
                 return ResponseEntity.ok(response);
-            }else{
+            } else {
                 response.put("message", "User not found");
                 response.put("data", new Object[]{});
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
@@ -251,6 +263,4 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
-
 }

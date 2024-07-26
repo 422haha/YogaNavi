@@ -1,11 +1,17 @@
 package com.yoga.backend.members;
 
 import com.yoga.backend.common.awsS3.S3Service;
+import com.yoga.backend.common.entity.Hashtag;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.dto.RegisterDto;
 import com.yoga.backend.members.dto.UpdateDto;
+import com.yoga.backend.members.repository.HashtagRepository;
+import com.yoga.backend.members.repository.UsersRepository;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UsersServiceImpl implements UsersService {
 
+    public static final long URL_EXPIRATION_SECONDS = 86400; // 1 hour
+
     @Autowired
     private S3Service s3Service;
 
@@ -28,20 +36,21 @@ public class UsersServiceImpl implements UsersService {
     private final PasswordEncoder passwordEncoder;
     private HashtagRepository hashtagRepository;
 
-    public UsersServiceImpl(UsersRepository usersRepository, PasswordEncoder passwordEncoder, HashtagRepository hashtagRepository) {
+    public UsersServiceImpl(UsersRepository usersRepository, PasswordEncoder passwordEncoder,
+        HashtagRepository hashtagRepository) {
         this.usersRepository = usersRepository;
         this.passwordEncoder = passwordEncoder;
         this.hashtagRepository = hashtagRepository;
     }
 
     /**
-     * 회원가입 서비스
+     * 회원가입
      *
-     * @param registerDto 회원가입 정보
-     * @return 저장된 사용자 정보
+     * @param registerDto 사용자 등록 정보를 담은 DTO
+     * @return 등록된 사용자 엔티티
      */
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Users registerUser(RegisterDto registerDto) {
         // 비밀번호 해시화
         String hashPwd = passwordEncoder.encode(registerDto.getPassword());
@@ -62,10 +71,10 @@ public class UsersServiceImpl implements UsersService {
     }
 
     /**
-     * 이메일 중복 확인 서비스
+     * 닉네임의 중복 여부를 확인
      *
-     * @param nickname 확인할 이메일
-     * @return 이메일 중복 여부
+     * @param nickname 확인할 닉네임
+     * @return 닉네임 사용 가능 여부
      */
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
@@ -78,10 +87,10 @@ public class UsersServiceImpl implements UsersService {
     }
 
     /**
-     * 이메일 중복 확인 서비스
+     * 이메일의 중복 여부 확인
      *
      * @param email 확인할 이메일
-     * @return 이메일 중복 여부
+     * @return 이메일 사용 가능 여부
      */
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
@@ -94,10 +103,11 @@ public class UsersServiceImpl implements UsersService {
     }
 
     /**
-     * 인증번호 전송 서비스
-     * @param to 수신자 이메일
+     * 인증번호 전송
+     *
+     * @param to      수신자 이메일
      * @param subject 메일 제목
-     * @param text 메일 내용
+     * @param text    메일 내용
      */
     @Override
     public void sendSimpleMessage(String to, String subject, String text) {
@@ -109,13 +119,13 @@ public class UsersServiceImpl implements UsersService {
     }
 
     /**
-     * 인증번호 전송 서비스
+     * 비밀번호 재설정 토큰을 생성하고 이메일로 전송
      *
-     * @param email 수신자 이메일
-     *
+     * @param email 사용자 이메일
+     * @return 토큰 전송 결과 메시지
      */
     @Override
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public String sendPasswordResetToken(String email) {
         Optional<Users> userOpt = usersRepository.findByEmailWithLock(email);
         if (userOpt.isPresent()) {
@@ -134,14 +144,14 @@ public class UsersServiceImpl implements UsersService {
     }
 
     /**
-     * 인증번호 전송 서비스
+     * 비밀번호 재설정 토큰의 유효성 검증
      *
-     * @param email 수신자 이메일
-     * @param token 토큰값
-     * @return 토큰값 일치 여부
+     * @param email 사용자 이메일
+     * @param token 검증할 토큰
+     * @return 토큰 유효성 여부
      */
     @Override
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public boolean validateResetToken(String email, String token) {
         Optional<Users> userOpt = usersRepository.findByEmailWithLock(email);
         if (userOpt.isPresent()) {
@@ -153,10 +163,11 @@ public class UsersServiceImpl implements UsersService {
 
 
     /**
-     * 비밀번호 재설정 서비스
+     * 사용자의 비밀번호 재설정
      *
-     * @param newPassword 회원 정보
-     *
+     * @param email       사용자 이메일
+     * @param newPassword 새 비밀번호
+     * @return 비밀번호 재설정 결과 메시지
      */
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
@@ -173,29 +184,113 @@ public class UsersServiceImpl implements UsersService {
         return "비밀번호 재설정 실패";
     }
 
+    /**
+     * 사용자 ID로 사용자 정보 조회
+     *
+     * @param userId 조회할 사용자 ID
+     * @return 조회된 사용자 엔티티, 없으면 null
+     */
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public Users getUserByEmail(String email) {
-        return usersRepository.findByEmail(email).get(0);
-    }
+    public Users getUserByUserId(int userId) {
+        List<Users> users = usersRepository.findById(userId);
 
-    @Override
-    public Users updateUser(UpdateDto updateDto, String email){
-        Optional<Users> userOpt = usersRepository.findByEmailWithLock(email);
-        if (userOpt.isPresent()) {
-            Users user = userOpt.get();
-            if(updateDto.getNickname()!=null){
-                user.setNickname(updateDto.getNickname());
+        if (!users.isEmpty()) {
+            Users user = users.get(0);
+            String profileImageUrl = user.getProfile_image_url();
+            if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+                String presignedUrl = s3Service.generatePresignedUrl(profileImageUrl,
+                    URL_EXPIRATION_SECONDS);
+                user.setProfile_image_url(presignedUrl);
+            } else {
+                user.setProfile_image_url(null);
             }
-            if(updateDto.getImageUrl()!=null){
-                user.setProfile_image_url(updateDto.getImageUrl());
-            }
-            if(updateDto.getPassword()!=null){
-                user.setPwd(passwordEncoder.encode(updateDto.getPassword()));
-            }
-        return usersRepository.save(user);
+            return user;
         }
         return null;
+    }
+
+    /**
+     * 사용자 정보 업데이트
+     *
+     * @param updateDto 업데이트할 사용자 정보를 담은 DTO
+     * @param userId    업데이트할 사용자 ID
+     * @return 업데이트된 사용자 엔티티, 실패 시 null
+     */
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Users updateUser(UpdateDto updateDto, int userId) {
+        List<Users> users = usersRepository.findById(userId);
+        if (!users.isEmpty()) {
+            Users user = users.get(0);
+            if (updateDto.getNickname() != null) {
+                user.setNickname(updateDto.getNickname());
+            }
+            if (updateDto.getImageUrl() != null) {
+
+                user.setProfile_image_url(updateDto.getImageUrl());
+            }
+            if (updateDto.getPassword() != null) {
+                user.setPwd(passwordEncoder.encode(updateDto.getPassword()));
+            }
+            if (!updateDto.getHashTags().isEmpty()) {
+                updateUserHashtags(userId, Set.copyOf(updateDto.getHashTags()));
+            }
+            return usersRepository.save(user);
+        }
+        return null;
+    }
+
+    /**
+     * 사용자의 해시태그 목록 조회
+     *
+     * @param userId 조회할 사용자 ID
+     * @return 사용자의 해시태그 Set
+     */
+    @Override
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+    public Set<String> getUserHashtags(int userId) {
+        List<Users> users = usersRepository.findById(userId);
+        if (!users.isEmpty()) {
+            Users user = users.get(0);
+            return user.getHashtags().stream()
+                .map(Hashtag::getName)
+                .collect(Collectors.toSet());
+        }
+        return Collections.emptySet();
+    }
+
+    /**
+     * 사용자의 해시태그 업데이트.
+     *
+     * @param userId 업데이트할 사용자 ID
+     * @param newHashtags 새로운 해시태그 Set
+     */
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public void updateUserHashtags(int userId, Set<String> newHashtags) {
+        List<Users> users = usersRepository.findById(userId);
+        if (!users.isEmpty()) {
+            Users user = users.get(0);
+
+            // 기존 해시태그 모두 제거
+            user.getHashtags().clear();
+
+            // 새로운 해시태그 추가
+            for (String tagName : newHashtags) {
+                Hashtag hashtag = hashtagRepository.findByName(tagName)
+                    .orElseGet(() -> {
+                        Hashtag newTag = new Hashtag();
+                        newTag.setName(tagName);
+                        return hashtagRepository.save(newTag);
+                    });
+                user.addHashtag(hashtag);
+            }
+
+            usersRepository.save(user);
+        } else {
+            throw new RuntimeException("사용자가 없음: " + userId);
+        }
     }
 
 }

@@ -1,13 +1,11 @@
-package com.yoga.backend.members;
+package com.yoga.backend.members.repository;
 
 import jakarta.persistence.LockModeType;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import com.yoga.backend.common.entity.Users;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -26,6 +24,6 @@ public interface UsersRepository extends CrudRepository<Users, Long> {
     @Query("SELECT u FROM Users u WHERE u.email = :email")
     Optional<Users> findByEmailWithLock(String email);
 
-    @Query("SELECT u FROM Users u JOIN u.hashtags h WHERE h.name = :hashtagName")
+    @Query("SELECT u FROM Users u JOIN FETCH u.hashtags h WHERE h.name = :hashtagName")
     List<Users> findUsersByHashtag(@Param("hashtagName") String hashtagName);
 }

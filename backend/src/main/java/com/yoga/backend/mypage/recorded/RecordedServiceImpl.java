@@ -15,10 +15,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
@@ -30,15 +28,16 @@ import java.util.List;
 
 
 /**
- * 녹화 강의 관련 비즈니스 로직을 처리하는 서비스 구현 클래스.
- * 강의 목록 조회, 강의 생성, 수정, 삭제 및 좋아요 기능을 제공.
+ * @TODO 업데이트 하고 안쓰는 애들 삭제 시 잘 생성된것도 삭제됨.
+ * <p>
+ * 녹화 강의 관련 비즈니스 로직을 처리하는 서비스 구현 클래스. 강의 목록 조회, 강의 생성, 수정, 삭제 및 좋아요 기능을 제공.
  */
 @Slf4j
 @Service
 public class RecordedServiceImpl implements RecordedService {
 
+    public static final long URL_EXPIRATION_SECONDS = 86400;
     private static final String S3_BASE_URL = "https://yoga-navi.s3.ap-northeast-2.amazonaws.com/";
-    private static final long URL_EXPIRATION_SECONDS = 86400; // 1 hour
 
     @Autowired
     private RecordedLectureListRepository recordedLectureListRepository;
@@ -58,7 +57,7 @@ public class RecordedServiceImpl implements RecordedService {
     /**
      * 사용자가 업로드한 강의 목록을 조회
      *
-     * @param userId 사용자 id
+     * @param userId 사용자 ID
      * @return 사용자가 업로드한 강의 목록 (LectureDto 리스트)
      */
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
@@ -68,22 +67,22 @@ public class RecordedServiceImpl implements RecordedService {
     }
 
     /**
-     * 사용자가 좋아요한 강의 목록 조회
+     * 사용자가 좋아요한 강의 목록을 조회
      *
-     * @param userId 사용자 id
+     * @param userId 사용자 ID
      * @return 사용자가 좋아요한 강의 목록 (LectureDto 리스트)
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LectureDto> getLikeLectures(int userId) {
         List<LectureDto> lectures = myLikeLectureListRepository.findMyLikedLectures(userId);
         return generatePresignedUrlsLike(lectures);
     }
 
     /**
-     * 새로운 강의 업로드
+     * 새로운 강의를 업로드
      *
-     * @param lectureDto 사용자가 저장할 강의 dto
+     * @param lectureDto 사용자가 저장할 강의 정보
      */
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -109,11 +108,11 @@ public class RecordedServiceImpl implements RecordedService {
     }
 
     /**
-     * 강의 내용 상세 조회
+     * 강의 내용 상세 정보를 조회
      *
-     * @param recordedId 강의 id
-     * @param userId 사용자 id
-     * @return 사용자가 업로드한 강의 상세 정보
+     * @param recordedId 강의 ID
+     * @param userId     사용자 ID
+     * @return 강의 상세 정보
      */
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
@@ -130,25 +129,31 @@ public class RecordedServiceImpl implements RecordedService {
     }
 
     /**
-     * 강의 세부내용 업데이트
+     * 강의 정보를 업데이트
      *
-     * @param lectureDto 업데이트할 내용 dto
-     * @return 업데이트 결과
+     * @param lectureDto 업데이트할 강의 정보
+     * @return 업데이트 성공 여부
      */
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public boolean updateLecture(LectureDto lectureDto) {
         try {
+            // 데이터베이스에서 강의 정보를 조회
             RecordedLecture lecture = recordedLectureRepository.findById(lectureDto.getRecordedId())
                 .orElseThrow(() -> new RuntimeException("강의를 찾을 수 없습니다."));
 
+            // 사용자 권한 확인
             if (lecture.getUserId() != lectureDto.getUserId()) {
                 throw new RuntimeException("해당 강의를 수정할 권한이 없습니다.");
             }
 
+            // 강의 기본 정보 업데이트 (제목, 내용, 썸네일)
             updateLectureDetails(lecture, lectureDto);
+
+            // 강의 챕터 정보 업데이트 (추가, 수정, 삭제)
             updateChapters(lecture, lectureDto.getRecordedLectureChapters());
 
+            // 변경된 강의 정보를 데이터베이스에 저장
             recordedLectureRepository.save(lecture);
             return true;
         } catch (Exception e) {
@@ -157,80 +162,138 @@ public class RecordedServiceImpl implements RecordedService {
         }
     }
 
+    /**
+     * 강의의 기본 정보를 업데이트
+     *
+     * @param lecture    기존 강의 엔티티
+     * @param lectureDto 새로운 강의 정보가 담긴 DTO
+     */
     private void updateLectureDetails(RecordedLecture lecture, LectureDto lectureDto) {
+        // 강의 제목 업데이트 (변경된 경우)
         if (!lecture.getTitle().equals(lectureDto.getRecordTitle())) {
             lecture.setTitle(lectureDto.getRecordTitle());
             log.info("강의 제목 업데이트: {}", lectureDto.getRecordTitle());
         }
 
+        // 강의 내용 업데이트 (변경된 경우)
         if (!lecture.getContent().equals(lectureDto.getRecordContent())) {
             lecture.setContent(lectureDto.getRecordContent());
             log.info("강의 내용 업데이트");
         }
 
+        // 강의 썸네일 업데이트 (변경된 경우)
         if (!lecture.getThumbnail().equals(lectureDto.getRecordThumbnail())) {
+            // 기존 썸네일 삭제
             s3Service.deleteFile(lecture.getThumbnail());
+            // 새 썸네일 설정
             lecture.setThumbnail(lectureDto.getRecordThumbnail());
             log.info("강의 썸네일 업데이트: {}", lectureDto.getRecordThumbnail());
         }
     }
 
+    /**
+     * 강의의 챕터 정보를 업데이트하는 메서드
+     *
+     * @param lecture     기존 강의 엔티티
+     * @param chapterDtos 새로운 챕터 정보가 담긴 DTO 리스트
+     */
     private void updateChapters(RecordedLecture lecture, List<ChapterDto> chapterDtos) {
-        Map<Long, RecordedLectureChapter> existingChapters = lecture.getChapters().stream()
-            .collect(Collectors.toMap(RecordedLectureChapter::getId, Function.identity()));
+        // 현재 강의의 모든 챕터 ID를 Set으로 저장
+        Set<Long> existingChapterIds = lecture.getChapters().stream()
+            .map(RecordedLectureChapter::getId)
+            .collect(Collectors.toSet());
 
-        List<RecordedLectureChapter> updatedChapters = new ArrayList<>();
+        // 프론트에서 보낸 챕터 ID를 Set으로 저장
+        Set<Long> receivedChapterIds = chapterDtos.stream()
+            .map(ChapterDto::getId)
+            .filter(id -> id != 0) // 새로 추가된 챕터는 ID가 0이므로 제외
+            .collect(Collectors.toSet());
 
+        // 삭제될 챕터 ID (기존 ID 중 받지 않은 ID)
+        Set<Long> chapterIdsToDelete = new HashSet<>(existingChapterIds);
+        chapterIdsToDelete.removeAll(receivedChapterIds);
+
+        // 챕터 삭제 처리
+        for (Long chapterId : chapterIdsToDelete) {
+            RecordedLectureChapter chapterToDelete = lecture.getChapters().stream()
+                .filter(chapter -> chapter.getId().equals(chapterId))
+                .findFirst()
+                .orElse(null);
+
+            if (chapterToDelete != null) {
+                if (chapterToDelete.getVideoUrl() != null && !chapterToDelete.getVideoUrl()
+                    .isEmpty()) {
+                    s3Service.deleteFile(chapterToDelete.getVideoUrl());
+                }
+                lecture.getChapters().remove(chapterToDelete);
+                log.info("챕터 삭제: {}", chapterId);
+            }
+        }
+
+        // 챕터 업데이트 및 새 챕터 추가
         for (ChapterDto chapterDto : chapterDtos) {
-            if (chapterDto.getId() != 0 && existingChapters.containsKey(chapterDto.getId())) {
-                // 기존 챕터 수정
-                RecordedLectureChapter chapter = existingChapters.get(chapterDto.getId());
-                updateChapter(chapter, chapterDto);
-                updatedChapters.add(chapter);
-                existingChapters.remove(chapterDto.getId());
-                log.info("챕터 업데이트: {}", chapter.getId());
+            if (chapterDto.getId() != 0) {
+                // 기존 챕터 업데이트
+                RecordedLectureChapter chapter = lecture.getChapters().stream()
+                    .filter(c -> c.getId() == chapterDto.getId())
+                    .findFirst()
+                    .orElse(null);
+
+                if (chapter != null) {
+                    updateChapter(chapter, chapterDto);
+                }
             } else {
                 // 새 챕터 추가
                 RecordedLectureChapter newChapter = createChapter(chapterDto, lecture);
-                updatedChapters.add(newChapter);
-                log.info("새 챕터 추가: {}", newChapter.getTitle()); // ID 대신 제목 로깅
+                lecture.getChapters().add(newChapter);
+                log.info("새 챕터 추가: {}", newChapter.getTitle());
             }
         }
-
-        // 삭제된 챕터 처리
-        for (RecordedLectureChapter removedChapter : existingChapters.values()) {
-            if (removedChapter.getVideoUrl() != null && !removedChapter.getVideoUrl().isEmpty()) {
-                s3Service.deleteFile(removedChapter.getVideoUrl());
-            }
-            log.info("챕터 삭제: {}", removedChapter.getId());
-        }
-
-        lecture.getChapters().clear(); // 기존 챕터 목록 비우기
-        lecture.getChapters().addAll(updatedChapters); // 업데이트된 챕터 목록 추가
     }
 
+    /**
+     * 개별 챕터 정보를 업데이트
+     *
+     * @param chapter    기존 챕터 엔티티
+     * @param chapterDto 새로운 챕터 정보가 담긴 DTO
+     */
     private void updateChapter(RecordedLectureChapter chapter, ChapterDto chapterDto) {
-        if (!chapter.getTitle().equals(chapterDto.getChapterTitle())) {
+        // 챕터 제목 업데이트 (변경된 경우에만)
+        if (!Objects.equals(chapter.getTitle(), chapterDto.getChapterTitle())) {
             chapter.setTitle(chapterDto.getChapterTitle());
             log.info("챕터 제목 업데이트: {}", chapter.getId());
         }
 
+        // 챕터 설명 업데이트 (변경된 경우에만)
         if (!Objects.equals(chapter.getDescription(), chapterDto.getChapterDescription())) {
             chapter.setDescription(chapterDto.getChapterDescription());
             log.info("챕터 설명 업데이트: {}", chapter.getId());
         }
 
+        // 챕터 번호 업데이트 (변경된 경우에만)
         if (chapter.getChapterNumber() != chapterDto.getChapterNumber()) {
             chapter.setChapterNumber(chapterDto.getChapterNumber());
             log.info("챕터 번호 업데이트: {}", chapter.getId());
         }
 
-        if (!Objects.equals(chapter.getVideoUrl(), chapterDto.getRecordVideo())) {
-            if (chapter.getVideoUrl() != null && !chapter.getVideoUrl().isEmpty()) {
-                s3Service.deleteFile(chapter.getVideoUrl());
+        // 비디오 URL 업데이트
+        String existingUrl = chapter.getVideoUrl();
+        String newUrl = chapterDto.getRecordVideo();
+
+        if (!Objects.equals(extractS3Key(existingUrl), extractS3Key(newUrl))) {
+            if (newUrl != null && !newUrl.isEmpty()) {
+                // 새 비디오 URL이 제공된 경우
+                if (existingUrl != null && !existingUrl.isEmpty()) {
+                    s3Service.deleteFile(existingUrl);
+                }
+                chapter.setVideoUrl(newUrl);
+                log.info("챕터 비디오 URL 업데이트: {} -> {}", chapter.getId(), newUrl);
+            } else if (existingUrl != null && !existingUrl.isEmpty()) {
+                // 새 URL이 없고 기존 URL이 있는 경우 (비디오 삭제)
+                s3Service.deleteFile(existingUrl);
+                chapter.setVideoUrl(null);
+                log.info("챕터 비디오 삭제: {}", chapter.getId());
             }
-            chapter.setVideoUrl(chapterDto.getRecordVideo());
-            log.info("챕터 비디오 URL 업데이트: {}", chapter.getId());
         }
     }
 
@@ -244,14 +307,15 @@ public class RecordedServiceImpl implements RecordedService {
         return chapter;
     }
 
+
     /**
-     * 사용자가 업로드한 강의 목록을 조회합니다.
+     * 강의를 삭제
      *
-     * @param userId 사용자 id
-     * @return 사용자가 업로드한 강의 목록 (LectureDto 리스트)
+     * @param deleteDto 삭제할 강의 ID 목록
+     * @param userId    사용자 ID
      */
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void deleteLectures(DeleteDto deleteDto, int userId) {
         log.info("이 id를 가진 강의들을 삭제: {}", deleteDto);
 
@@ -318,14 +382,14 @@ public class RecordedServiceImpl implements RecordedService {
     }
 
     /**
-     * 좋아요/좋아요 취소
+     * 강의에 대한 좋아요를 토글
      *
-     * @param recordedId 강의 id
-     * @param userId 사용자 id
-     * @return false: 좋아요 취소/ true: 좋아요 성공
+     * @param recordedId 강의 ID
+     * @param userId     사용자 ID
+     * @return 좋아요 상태 (true: 좋아요 추가, false: 좋아요 취소)
      */
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public boolean toggleLike(Long recordedId, int userId) {
         RecordedLecture lecture = recordedLectureRepository.findById(recordedId)
             .orElseThrow(() -> new RuntimeException("강의를 찾을 수 없습니다."));
@@ -432,4 +496,11 @@ public class RecordedServiceImpl implements RecordedService {
         return url;
     }
 
+    private String extractS3Key(String url) {
+        if (url.startsWith("https://")) {
+            String[] parts = url.split("/", 4);
+            return parts.length > 3 ? parts[3] : "";
+        }
+        return url;
+    }
 }

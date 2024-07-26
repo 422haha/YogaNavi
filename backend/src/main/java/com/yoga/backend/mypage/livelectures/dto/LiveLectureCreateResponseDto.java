@@ -1,4 +1,4 @@
-package com.yoga.backend.mypage.livelectures;
+package com.yoga.backend.mypage.livelectures.dto;
 
 import lombok.Getter;
 import lombok.Setter;

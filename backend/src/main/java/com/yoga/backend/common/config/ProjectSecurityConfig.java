@@ -1,20 +1,16 @@
 package com.yoga.backend.common.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yoga.backend.common.handler.CustomAuthenticationSuccessHandler;
 import com.yoga.backend.common.filter.JWTTokenValidatorFilter;
 import com.yoga.backend.common.handler.CustomLoginFailureHandler;
 import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.members.UsersRepository;
+import com.yoga.backend.members.repository.UsersRepository;
 import jakarta.servlet.http.HttpServletRequest;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Collections;
 
 
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

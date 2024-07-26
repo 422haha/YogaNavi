@@ -2,30 +2,23 @@ package com.yoga.backend.common.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yoga.backend.common.constants.SecurityConstants;
-import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.members.UsersRepository;
+import com.yoga.backend.members.repository.UsersRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import javax.crypto.SecretKey;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 
@@ -58,7 +51,7 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                     Claims claims = jwtUtil.validateToken(jwt);
                     String email = String.valueOf(claims.get("email"));
                     String authorities = (String) claims.get("role");
-                    
+
 
                     Authentication auth = new UsernamePasswordAuthenticationToken(email, null,
                         AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));

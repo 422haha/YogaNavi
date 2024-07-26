@@ -2,11 +2,7 @@ package com.yoga.backend.common.handler;
 
 import com.google.gson.Gson;
 import com.yoga.backend.common.constants.SecurityConstants;
-import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.members.UsersRepository;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;;

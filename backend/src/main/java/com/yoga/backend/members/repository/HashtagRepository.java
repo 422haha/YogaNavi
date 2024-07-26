@@ -1,4 +1,4 @@
-package com.yoga.backend.members;
+package com.yoga.backend.members.repository;
 
 import com.yoga.backend.common.entity.Hashtag;
 import java.util.Optional;

@@ -1,8 +1,7 @@
 package com.yoga.backend.common.util;
 
 import com.yoga.backend.common.constants.SecurityConstants;
-import com.yoga.backend.common.entity.Users;
-import com.yoga.backend.members.UsersRepository;
+import com.yoga.backend.members.repository.UsersRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -12,9 +11,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class JwtUtil {
@@ -32,26 +33,25 @@ public class JwtUtil {
     private final SecretKey key = Keys.hmacShaKeyFor(
         SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
 
-
-    // access token 생성
-    public String generateAccessToken(String email, String role) {
-        String token = Jwts.builder()
-            .issuer("Yoga Navi")
-            .subject("JWT Token")
-            .claim("email", email)
-            .claim("role", role)
-            .issuedAt(new Date())
-            .expiration(
-                new Date(System.currentTimeMillis() + SecurityConstants.ACCESS_TOKEN_EXPIRATION))
-            .signWith(key)
-            .compact();
-
-        // 추가
-        redisTemplate.opsForValue()
-            .set(email, token, SecurityConstants.ACCESS_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
-
-        return token;
-    }
+//    // access token 생성
+//    public String generateAccessToken(String email, String role) {
+//        String token = Jwts.builder()
+//            .issuer("Yoga Navi")
+//            .subject("JWT Token")
+//            .claim("email", email)
+//            .claim("role", role)
+//            .issuedAt(new Date())
+//            .expiration(
+//                new Date(System.currentTimeMillis() + SecurityConstants.ACCESS_TOKEN_EXPIRATION))
+//            .signWith(key)
+//            .compact();
+//
+//        // 추가
+//        redisTemplate.opsForValue()
+//            .set(email, token, SecurityConstants.ACCESS_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
+//
+//        return token;
+//    }
 
     // refresh token 생성
     public String generateRefreshToken(String email) {
@@ -99,28 +99,24 @@ public class JwtUtil {
         return claims.get("role", String.class);
     }
 
+//    // 추가
+//    public void invalidateToken(String email) {
+//        redisTemplate.delete(email);
+//    }
+//
+//    // 추가
+//    public boolean isTokenValid(String token) {
+//        try {
+//            Claims claims = validateToken(token);
+//            String email = claims.get("email", String.class);
+//            String storedToken = redisTemplate.opsForValue().get(email);
+//            return token.equals(storedToken);
+//        } catch (Exception e) {
+//            return false;
+//        }
+//    }
 
-    // 추가
-    public void invalidateToken(String email) {
-        redisTemplate.delete(email);
-    }
-
-    // 추가
-    public boolean isTokenValid(String token) {
-        try {
-            Claims claims = validateToken(token);
-            String email = claims.get("email", String.class);
-            String storedToken = redisTemplate.opsForValue().get(email);
-            return token.equals(storedToken);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /*
-    *
-    *동시성 고려한 코드
-    *
+    //=============아래로 동시성 고려
     public String generateAccessToken(String email, String role) {
         String token = Jwts.builder()
             .issuer("Yoga Navi")
@@ -128,7 +124,8 @@ public class JwtUtil {
             .claim("email", email)
             .claim("role", role)
             .issuedAt(new Date())
-            .expiration(new Date(System.currentTimeMillis() + SecurityConstants.ACCESS_TOKEN_EXPIRATION))
+            .expiration(
+                new Date(System.currentTimeMillis() + SecurityConstants.ACCESS_TOKEN_EXPIRATION))
             .signWith(key)
             .compact();
 
@@ -137,7 +134,9 @@ public class JwtUtil {
             @Override
             public Object execute(RedisOperations operations) throws DataAccessException {
                 operations.multi();
-                operations.opsForValue().set(email, token, SecurityConstants.ACCESS_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
+                operations.opsForValue()
+                    .set(email, token, SecurityConstants.ACCESS_TOKEN_EXPIRATION,
+                        TimeUnit.MILLISECONDS);
                 return operations.exec();
             }
         });
@@ -176,6 +175,5 @@ public class JwtUtil {
             return false;
         }
     }
-    */
 
 }
