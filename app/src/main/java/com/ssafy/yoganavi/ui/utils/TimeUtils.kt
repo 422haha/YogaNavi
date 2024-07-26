@@ -6,7 +6,7 @@ import java.util.Locale
 
 fun formatTime(milliseconds: Long): String {
     val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
-    val date = Date(milliseconds)
+    val date = Date(milliseconds  * 1000)
     return formatter.format(date)
 }
 

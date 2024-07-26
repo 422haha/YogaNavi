@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.ViewTreeObserver
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
@@ -45,11 +46,10 @@ class RegisterNoticeFragment :
                 }
             }
         }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.ivPhoto.visibility = View.GONE
-        binding.ivCancel.visibility = View.GONE
+        binding.btnDeletePhoto.visibility = View.GONE
         binding.btnAddPhoto.visibility = View.VISIBLE
 
         if (args.articleId != -1) {
@@ -85,7 +85,7 @@ class RegisterNoticeFragment :
             saveEditText()
             addPhoto()
         }
-        binding.ivCancel.setOnClickListener {
+        binding.btnDeletePhoto.setOnClickListener {
             saveEditText()
             viewModel.removeImage()
         }
@@ -104,16 +104,28 @@ class RegisterNoticeFragment :
                         .load(notice.imageUrl)
                         .into(binding.ivPhoto)
                     binding.ivPhoto.visibility = View.VISIBLE
-                    binding.ivCancel.visibility = View.VISIBLE
+                    binding.btnDeletePhoto.visibility = View.VISIBLE
                     binding.btnAddPhoto.visibility = View.GONE
-                } else if (notice.imageUrlPath.isNotBlank()) {
+                }
+                else if(notice.imageUrlPath.isNotBlank()){
                     binding.ivPhoto.setImageURI(notice.imageUrlPath.toUri())
                     binding.ivPhoto.visibility = View.VISIBLE
-                    binding.ivCancel.visibility = View.VISIBLE
+                    binding.btnDeletePhoto.visibility = View.VISIBLE
                     binding.btnAddPhoto.visibility = View.GONE
-                } else {
+                    binding.ivPhoto.viewTreeObserver.addOnGlobalLayoutListener(
+                        object : ViewTreeObserver.OnGlobalLayoutListener {
+                            override fun onGlobalLayout() {
+                                binding.ivPhoto.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                                binding.scRegisterNotice.post {
+                                    binding.scRegisterNotice.smoothScrollTo(0, binding.scRegisterNotice.getChildAt(0).bottom)
+                                }
+                            }
+                        }
+                    )
+                }
+                else {
                     binding.ivPhoto.visibility = View.GONE
-                    binding.ivCancel.visibility = View.GONE
+                    binding.btnDeletePhoto.visibility = View.GONE
                     binding.btnAddPhoto.visibility = View.VISIBLE
                 }
             }

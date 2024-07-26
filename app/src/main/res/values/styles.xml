@@ -92,6 +92,7 @@
     <!-- 캘린더 DatePicker 색상 변경 -->
     <style name="MySpinnerDatePickerStyle" parent="Theme.AppCompat.Light.Dialog">
         <item name="colorAccent">@color/primary</item>
+        <item name="android:windowBackground">@drawable/rounded_dialog_background</item>
         <item name="android:buttonBarPositiveButtonStyle">@style/DialogButtonStyled</item>
         <item name="android:buttonBarNegativeButtonStyle">@style/DialogButtonStyled</item>
     </style>

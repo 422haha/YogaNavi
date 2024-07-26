@@ -8,6 +8,8 @@ fun Int.toK() = if (this < 1000) {
 } else {
     "${this / 1000}K+"
 }
+fun IntToDate(year: Int, month: Int, day: Int): String = run { "$year.${month + 1}.$day" }
+fun WeeklyAndTime(weekly: String, timeStr: String): String = run { "$weekly | $timeStr" }
 
 // 통신부
 const val TIME_OUT = 5000L
@@ -52,3 +54,8 @@ const val DELETE = "삭제"
 // 캘린더, 타임 Picker
 const val START = 1
 const val END = 2
+
+// 화상강의 등록
+const val END_STR = "종료 날짜"
+const val LIMIT_STR = "무기한"
+const val LIMIT_DATE = 4102358400000 // 2099.12.31

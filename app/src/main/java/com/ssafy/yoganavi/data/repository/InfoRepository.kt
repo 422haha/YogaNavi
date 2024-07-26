@@ -34,12 +34,9 @@ interface InfoRepository {
 
     suspend fun getLive(liveId: Int): DetailResponse<LiveLectureData>
 
-    suspend fun createLive(registerLiveRequest: RegisterLiveRequest): DetailResponse<Unit>
+    suspend fun createLive(liveLectureData : LiveLectureData): DetailResponse<Unit>
 
-    suspend fun updateLive(
-        registerLiveRequest: RegisterLiveRequest,
-        liveId: Int
-    ): DetailResponse<Unit>
+    suspend fun updateLive(liveLectureData: LiveLectureData, liveId: Int): DetailResponse<Unit>
 
     suspend fun deleteLive(liveId: Int): DetailResponse<Unit>
 

@@ -5,7 +5,6 @@ import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
-import com.ssafy.yoganavi.data.source.live.RegisterLiveRequest
 import com.ssafy.yoganavi.data.source.mypage.Profile
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
@@ -51,20 +50,17 @@ interface InfoAPI {
     @GET("mypage/live-lecture-manage")
     suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>>
 
-    @GET("mypage/live-lecture/list/{live_id}")
+    @GET("mypage/live-lecture-manage/{live_id}")
     suspend fun getLive(@Path("live_id") id: Int): Response<YogaDetailResponse<LiveLectureData>>
 
     @POST("mypage/live-lecture-manage/create")
-    suspend fun createLive(@Body registerLiveRequest: RegisterLiveRequest): Response<YogaDetailResponse<Unit>>
+    suspend fun createLive(@Body liveLectureData: LiveLectureData): Response<YogaDetailResponse<Unit>>
 
     @PUT("mypage/live-lecture-manage/update/{live_id}")
-    suspend fun updateLive(
-        @Body registerLiveRequest: RegisterLiveRequest,
-        @Path("live_id") liveId: Int
-    ): Response<YogaDetailResponse<Unit>>
+    suspend fun updateLive(@Body liveLectureData: LiveLectureData, @Path("live_id") liveId: Int): Response<YogaDetailResponse<Unit>>
 
     @DELETE("mypage/live-lecture-manage/delete/{live_id}")
-    suspend fun deleteLive(liveId: Int): Response<YogaDetailResponse<Unit>>
+    suspend fun deleteLive(@Path("live_id") liveId: Int): Response<YogaDetailResponse<Unit>>
 
     @GET("mypage/notification/list")
     suspend fun getNoticeList(): Response<YogaResponse<NoticeData>>
