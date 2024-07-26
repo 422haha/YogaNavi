@@ -50,6 +50,8 @@ const val VIDEO = "videos"
 const val REGISTER = "등록"
 const val EDIT = "편집"
 const val DELETE = "삭제"
+const val MAX_HASH_TAG = 5
+const val IS_MAX_HASH_TAG = "해시태그는 5개까지만 등록하실 수 있습니다."
 
 // 캘린더, 타임 Picker
 const val START = 1

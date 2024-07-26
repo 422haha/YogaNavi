@@ -25,6 +25,8 @@ import com.ssafy.yoganavi.data.source.mypage.Profile
 import com.ssafy.yoganavi.databinding.FragmentModifyBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.modify.hashtag.HashTagAdapter
+import com.ssafy.yoganavi.ui.utils.IS_MAX_HASH_TAG
+import com.ssafy.yoganavi.ui.utils.MAX_HASH_TAG
 import com.ssafy.yoganavi.ui.utils.MODIFY
 import com.ssafy.yoganavi.ui.utils.NO_AUTH
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
@@ -149,7 +151,8 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
                 tieHashTag.text?.clear()
                 if (text.isBlank()) return@setOnEditorActionListener true
 
-                viewModel.addHashTag(text.trim())
+                if (viewModel.hashtagList.value.size >= MAX_HASH_TAG) showSnackBar(IS_MAX_HASH_TAG)
+                else viewModel.addHashTag(text.trim())
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
