@@ -55,18 +55,6 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 모든 게시글을 조회합니다.
-     *
-     * @return 게시글 리스트
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public List<Article> getAllArticles() {
-        List<Article> articles = articleRepository.findAll();
-        return applyPresignedUrlsAsync(articles);
-    }
-
-    /**
      * 특정 사용자의 모든 게시글을 조회합니다.
      *
      * @param userId 사용자 ID
