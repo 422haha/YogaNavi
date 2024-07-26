@@ -183,7 +183,7 @@
             android:layout_marginHorizontal="@dimen/padding_extra_extra_large"
             android:layout_marginTop="@dimen/padding_medium"
             app:helperText="YYYY.MM.DD"
-            app:layout_constraintBottom_toTopOf="@id/tv_time"
+            app:layout_constraintBottom_toTopOf="@id/cb_end_date_unlimited"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/til_start">
@@ -201,6 +201,17 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <CheckBox
+            android:id="@+id/cb_end_date_unlimited"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/padding_small"
+            android:text="@string/end_unlimit"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/til_end"
+            app:layout_constraintBottom_toTopOf="@id/tv_time"/>
+
         <TextView
             android:id="@+id/tv_time"
             android:layout_width="wrap_content"
@@ -213,7 +224,7 @@
             app:layout_constraintBottom_toTopOf="@id/btn_start"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/til_end" />
+            app:layout_constraintTop_toBottomOf="@id/cb_end_date_unlimited" />
 
         <Button
             android:id="@+id/btn_start"

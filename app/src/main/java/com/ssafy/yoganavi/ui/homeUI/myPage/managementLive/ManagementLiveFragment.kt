@@ -83,16 +83,11 @@ class ManagementLiveFragment :
             .setMessage("정말로 삭제하시겠습니까?")
             .setPositiveButton("확인") { _, _ ->
                 viewModel.deleteLive(liveId) {
+                    viewModel.getLiveList()
                     showSnackBar(getString(R.string.live_delete_msg))
                 }
             }
             .setNegativeButton("취소", null)
             .show()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        viewModel.getLiveList()
     }
 }

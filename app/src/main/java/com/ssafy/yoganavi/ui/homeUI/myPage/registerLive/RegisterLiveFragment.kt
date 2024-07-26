@@ -3,6 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.registerLive
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -14,7 +15,11 @@ import com.ssafy.yoganavi.databinding.FragmentRegisterLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.CREATE
 import com.ssafy.yoganavi.ui.utils.END
+import com.ssafy.yoganavi.ui.utils.END_STR
+import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.IntToDate
+import com.ssafy.yoganavi.ui.utils.LIMIT_DATE
+import com.ssafy.yoganavi.ui.utils.LIMIT_STR
 import com.ssafy.yoganavi.ui.utils.MODIFY_LIVE
 import com.ssafy.yoganavi.ui.utils.REGISTER
 import com.ssafy.yoganavi.ui.utils.REGISTER_LIVE
@@ -52,29 +57,7 @@ class RegisterLiveFragment :
             title = if (args.liveId == -1) REGISTER_LIVE else MODIFY_LIVE,
             canGoBack = true,
             menuItem = REGISTER,
-            menuListener = {
-                viewModel.liveLectureData.apply {
-                    with(binding) {
-                        liveTitle = etTitle.text.toString()
-                        liveContent = etContent.text.toString()
-
-                        // TODO 가능 요일 set
-                        availableDay = ""
-
-                        maxLiveNum = spMaxNum.selectedItemPosition+1
-                    }
-                }
-
-                if(args.state == CREATE)
-                    viewModel.createLive(::popBackStack)
-                else
-                    viewModel.updateLive(::popBackStack)
-
-            })
-    }
-
-    private suspend fun popBackStack() = withContext(Dispatchers.Main){
-        findNavController().popBackStack()
+            menuListener = { setRegister() })
     }
 
     private fun setModifyInfo() {
@@ -85,7 +68,6 @@ class RegisterLiveFragment :
                     binding.etContent.setText(viewModel.liveLectureData.liveContent)
 
                     // TODO: 가능 요일 get
-
                     binding.tieStart.setText(formatDotDate(viewModel.liveLectureData.startDate))
                     binding.tieEnd.setText(formatDotDate(viewModel.liveLectureData.endDate))
 
@@ -109,6 +91,18 @@ class RegisterLiveFragment :
             btnStart.setOnClickListener { showTimePicker(START) }
 
             btnEnd.setOnClickListener { showTimePicker(END) }
+
+            cbEndDateUnlimited.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    tieEnd.setText(LIMIT_STR)
+                    tieEnd.isEnabled = false
+                    viewModel.liveLectureData.endDate = LIMIT_DATE
+                } else {
+                    tieEnd.setText(END_STR)
+                    tieEnd.isEnabled = true
+                    viewModel.liveLectureData.endDate = 0L
+                }
+            }
         }
     }
 
@@ -192,5 +186,36 @@ class RegisterLiveFragment :
         }
 
         materialTimePicker.show(childFragmentManager, "fragment_tag")
+    }
+
+    // TODO 가능 요일 선택이 1개이상 되어있어야함
+    private fun setRegister() {
+        if(!binding.etTitle.text.isNullOrBlank() &&
+            !binding.etContent.text.isNullOrBlank() &&
+            viewModel.liveLectureData.startDate != 0L &&
+            viewModel.liveLectureData.endDate != 0L &&
+            viewModel.liveLectureData.endTime != 0L) {
+
+            viewModel.liveLectureData.apply {
+                with(binding) {
+                    liveTitle = etTitle.text.toString()
+                    liveContent = etContent.text.toString()
+
+                    // TODO 가능 요일 set
+                    availableDay = ""
+
+                    maxLiveNum = spMaxNum.selectedItemPosition + 1
+                }
+            }
+
+            if (args.state == CREATE)
+                viewModel.createLive(::popBackStack)
+            else
+                viewModel.updateLive(::popBackStack)
+        } else { showSnackBar(IS_BLANK) }
+    }
+
+    private suspend fun popBackStack() = withContext(Dispatchers.Main){
+        findNavController().popBackStack()
     }
 }
