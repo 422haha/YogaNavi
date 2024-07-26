@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.OpenableColumns
+import androidx.exifinterface.media.ExifInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -69,7 +70,14 @@ suspend fun getImagePath(
     }
 
     val bmp = BitmapFactory.decodeFile(originalFile.path) ?: return@withContext ""
-    val bitmap = Bitmap.createScaledBitmap(bmp, bmp.width / ratio, bmp.height / ratio, true)
+    val rotatedBitmap = getCorrectlyOrientedBitmap(originalFile.path, bmp)
+
+    val bitmap = Bitmap.createScaledBitmap(
+        rotatedBitmap,
+        rotatedBitmap.width / ratio,
+        rotatedBitmap.height / ratio,
+        true
+    )
 
     val webpFile = File(context.filesDir, "${name.substringBeforeLast('.')}.webp")
     try {
@@ -81,6 +89,7 @@ suspend fun getImagePath(
         return@withContext ""
     } finally {
         bitmap.recycle()
+        rotatedBitmap.recycle()
         bmp.recycle()
     }
 
@@ -89,3 +98,15 @@ suspend fun getImagePath(
     return@withContext webpFile.path
 }
 
+fun getCorrectlyOrientedBitmap(filePath: String, bitmap: Bitmap): Bitmap {
+    val exif = ExifInterface(filePath)
+    val orientation =
+        exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+    val matrix = android.graphics.Matrix()
+    when (orientation) {
+        ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+        ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+        ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+    }
+    return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+}

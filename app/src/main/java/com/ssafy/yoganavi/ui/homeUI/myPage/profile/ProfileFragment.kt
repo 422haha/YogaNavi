@@ -31,9 +31,12 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
     private suspend fun bindData(profile: Profile) = withContext(Dispatchers.Main) {
         with(binding) {
             tvName.text = profile.nickname
-            Glide.with(requireContext())
-                .load(profile.imageUrl)
-                .into(ivIcon)
+
+            if(profile.imageUrl != null){
+                Glide.with(requireContext())
+                    .load(profile.imageUrl)
+                    .into(ivIcon)
+            }
 
             if (profile.teacher) {
                 tvManagementVideo.visibility = View.VISIBLE
