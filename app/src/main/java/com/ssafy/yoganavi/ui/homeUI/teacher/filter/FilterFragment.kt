@@ -10,14 +10,15 @@ import com.google.android.material.timepicker.TimeFormat
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentFilterBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
-import com.ssafy.yoganavi.ui.core.MainActivity
+import com.ssafy.yoganavi.ui.utils.FILTER
+import timber.log.Timber
 
 class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding::inflate) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        showTimePicker()
+        setToolbar(false, FILTER,true, "초기화") { Timber.d("초기화 구현 ㄱㄱ") }
+//        showTimePicker()
     }
 
     private fun showTimePicker() {

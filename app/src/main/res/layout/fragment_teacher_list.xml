@@ -16,6 +16,7 @@
         android:focusable="true"
         android:queryHint="찾으시는 강사님이 있으신가요?"
         app:iconifiedByDefault="false"
+        app:queryBackground="@drawable/no_underline"
         app:layout_constraintBottom_toTopOf="@+id/iv_filter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

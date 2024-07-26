@@ -1,7 +1,14 @@
 package com.ssafy.yoganavi.data.source.mypage
 
 data class ProfileData(
-    val nickname: String,
-    val imageUrl: String,
-    val teacher: Boolean
+    val nickname: String = "",
+    val password: String = "",
+    val imageUrl: String? = "",
+    val hashTags: List<String> = emptyList(),
+    val teacher: Boolean = false,
+
+    @Transient
+    val logoPath: String = "",
+    @Transient
+    val logoKey: String = ""
 )
