@@ -3,7 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.registerLive
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.isVisible
+import android.widget.ToggleButton
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -25,6 +25,7 @@ import com.ssafy.yoganavi.ui.utils.REGISTER
 import com.ssafy.yoganavi.ui.utils.REGISTER_LIVE
 import com.ssafy.yoganavi.ui.utils.START
 import com.ssafy.yoganavi.ui.utils.UPDATE
+import com.ssafy.yoganavi.ui.utils.Week
 import com.ssafy.yoganavi.ui.utils.formatDotDate
 import com.ssafy.yoganavi.ui.utils.formatTime
 import com.ssafy.yoganavi.ui.utils.formatZeroDate
@@ -45,19 +46,55 @@ class RegisterLiveFragment :
     private lateinit var startDatePickerDialog: DatePickerDialog
     private lateinit var endDatePickerDialog: DatePickerDialog
 
+    private lateinit var weekToggleButtonMap: Map<Week, ToggleButton>
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initListener()
+
         if (args.state == UPDATE)
             setModifyInfo()
-
-        initListener()
 
         setToolbar(isBottomNavigationVisible = false,
             title = if (args.liveId == -1) REGISTER_LIVE else MODIFY_LIVE,
             canGoBack = true,
             menuItem = REGISTER,
             menuListener = { setRegister() })
+    }
+
+    private fun initListener() {
+        with(binding) {
+            tieStart.setOnClickListener { showCalendar(START) }
+
+            tieEnd.setOnClickListener { showCalendar(END) }
+
+            btnStart.setOnClickListener { showTimePicker(START) }
+
+            btnEnd.setOnClickListener { showTimePicker(END) }
+
+            weekToggleButtonMap = mapOf(
+                Week.MON to binding.tbMon,
+                Week.TUE to binding.tbTue,
+                Week.WED to binding.tbWed,
+                Week.THU to binding.tbThu,
+                Week.FRI to binding.tbFri,
+                Week.SAT to binding.tbSat,
+                Week.SUN to binding.tbSun
+            )
+
+            cbEndDateUnlimited.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    tieEnd.setText(LIMIT_STR)
+                    tieEnd.isEnabled = false
+                    viewModel.liveLectureData.endDate = LIMIT_DATE
+                } else {
+                    tieEnd.setText(END_STR)
+                    tieEnd.isEnabled = true
+                    viewModel.liveLectureData.endDate = 0L
+                }
+            }
+        }
     }
 
     private fun setModifyInfo() {
@@ -67,7 +104,10 @@ class RegisterLiveFragment :
                     binding.etTitle.setText(viewModel.liveLectureData.liveTitle)
                     binding.etContent.setText(viewModel.liveLectureData.liveContent)
 
-                    // TODO: 가능 요일 get
+                    viewModel.dayStatusMap.forEach { (day, isSelected) ->
+                        weekToggleButtonMap[day]?.isChecked = isSelected
+                    }
+
                     binding.tieStart.setText(formatDotDate(viewModel.liveLectureData.startDate))
                     binding.tieEnd.setText(formatDotDate(viewModel.liveLectureData.endDate))
 
@@ -82,28 +122,36 @@ class RegisterLiveFragment :
         }
     }
 
-    private fun initListener() {
-        with(binding) {
-            tieStart.setOnClickListener { showCalendar(START) }
+    private fun setRegister() {
+        hideKeyboard()
 
-            tieEnd.setOnClickListener { showCalendar(END) }
+        if(!binding.etTitle.text.isNullOrBlank() &&
+            !binding.etContent.text.isNullOrBlank() &&
+            !weekToggleButtonMap.values.all { !it.isChecked } &&
+            viewModel.liveLectureData.startDate != 0L &&
+            viewModel.liveLectureData.endDate != 0L &&
+            viewModel.liveLectureData.endTime != 0L) {
 
-            btnStart.setOnClickListener { showTimePicker(START) }
+            viewModel.liveLectureData.apply {
+                with(binding) {
+                    liveTitle = etTitle.text.toString()
+                    liveContent = etContent.text.toString()
 
-            btnEnd.setOnClickListener { showTimePicker(END) }
+                    weekToggleButtonMap.forEach { (day, toggleBtn) ->
+                        viewModel.dayStatusMap[day] = toggleBtn.isChecked
+                    }
 
-            cbEndDateUnlimited.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    tieEnd.setText(LIMIT_STR)
-                    tieEnd.isEnabled = false
-                    viewModel.liveLectureData.endDate = LIMIT_DATE
-                } else {
-                    tieEnd.setText(END_STR)
-                    tieEnd.isEnabled = true
-                    viewModel.liveLectureData.endDate = 0L
+                    availableDay = viewModel.dayStatusMap.filter { it.value }.keys.joinToString(",")
+
+                    maxLiveNum = spMaxNum.selectedItemPosition + 1
                 }
             }
-        }
+
+            if (args.state == CREATE)
+                viewModel.createLive(::popBackStack)
+            else
+                viewModel.updateLive(::popBackStack)
+        } else { showSnackBar(IS_BLANK) }
     }
 
     private fun showCalendar(state: Int) {
@@ -186,33 +234,6 @@ class RegisterLiveFragment :
         }
 
         materialTimePicker.show(childFragmentManager, "fragment_tag")
-    }
-
-    // TODO 가능 요일 선택이 1개이상 되어있어야함
-    private fun setRegister() {
-        if(!binding.etTitle.text.isNullOrBlank() &&
-            !binding.etContent.text.isNullOrBlank() &&
-            viewModel.liveLectureData.startDate != 0L &&
-            viewModel.liveLectureData.endDate != 0L &&
-            viewModel.liveLectureData.endTime != 0L) {
-
-            viewModel.liveLectureData.apply {
-                with(binding) {
-                    liveTitle = etTitle.text.toString()
-                    liveContent = etContent.text.toString()
-
-                    // TODO 가능 요일 set
-                    availableDay = ""
-
-                    maxLiveNum = spMaxNum.selectedItemPosition + 1
-                }
-            }
-
-            if (args.state == CREATE)
-                viewModel.createLive(::popBackStack)
-            else
-                viewModel.updateLive(::popBackStack)
-        } else { showSnackBar(IS_BLANK) }
     }
 
     private suspend fun popBackStack() = withContext(Dispatchers.Main){
