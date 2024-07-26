@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +22,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-
+@Slf4j
 @Service
 public class UsersServiceImpl implements UsersService {
 
@@ -222,24 +223,51 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public Users updateUser(UpdateDto updateDto, int userId) {
+        log.info("Updating user with ID: {}", userId);
+
         List<Users> users = usersRepository.findById(userId);
+
         if (!users.isEmpty()) {
             Users user = users.get(0);
+
             if (updateDto.getNickname() != null) {
+                log.debug("Updating nickname for user {}: {}", userId, updateDto.getNickname());
                 user.setNickname(updateDto.getNickname());
             }
-            if (updateDto.getImageUrl() != null) {
 
+            if (updateDto.getImageUrl() != null) {
+                String oldImageUrl = user.getProfile_image_url();
+                if (oldImageUrl != null && !oldImageUrl.equals(updateDto.getImageUrl())) {
+                    log.debug("Deleting old profile image for user {}: {}", userId, oldImageUrl);
+                    try {
+                        s3Service.deleteFile(oldImageUrl);
+                    } catch (Exception e) {
+                        log.error("Failed to delete old profile image for user {}: {}", userId,
+                            oldImageUrl, e);
+                        // 여기서 예외를 던지거나 처리하는 방식을 결정해야 합니다.
+                        // throw new RuntimeException("Failed to delete old profile image", e);
+                    }
+                }
+                log.debug("Updating profile image URL for user {}: {}", userId,
+                    updateDto.getImageUrl());
                 user.setProfile_image_url(updateDto.getImageUrl());
             }
+
             if (updateDto.getPassword() != null) {
+                log.debug("Updating password for user {}", userId);
                 user.setPwd(passwordEncoder.encode(updateDto.getPassword()));
             }
-            if (!updateDto.getHashTags().isEmpty()) {
+
+            if (updateDto.getHashTags() != null && !updateDto.getHashTags().isEmpty()) {
+                log.debug("Updating hashtags for user {}: {}", userId, updateDto.getHashTags());
                 updateUserHashtags(userId, Set.copyOf(updateDto.getHashTags()));
             }
-            return usersRepository.save(user);
+            Users updatedUser = usersRepository.save(user);
+            log.info("Successfully updated user with ID: {}", userId);
+            return updatedUser;
+
         }
+
         return null;
     }
 
@@ -265,7 +293,7 @@ public class UsersServiceImpl implements UsersService {
     /**
      * 사용자의 해시태그 업데이트.
      *
-     * @param userId 업데이트할 사용자 ID
+     * @param userId      업데이트할 사용자 ID
      * @param newHashtags 새로운 해시태그 Set
      */
     @Override
