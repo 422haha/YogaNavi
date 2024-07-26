@@ -83,34 +83,6 @@ public class ArticleController {
     }
 
     /**
-     * 모든 게시글을 조회합니다.
-     *
-     * @return 게시글 목록
-     */
-    @GetMapping("/all")
-    public ResponseEntity<Map<String, Object>> getAllArticles() {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            // 모든 게시글을 가져옵니다.
-            List<Article> articles = articleService.getAllArticles();
-
-            // 게시글을 생성일 기준으로 역순으로 정렬합니다.
-            List<Map<String, Object>> articleList = articles.stream()
-                .sorted(Comparator.comparing(Article::getCreatedAt).reversed())
-                .map(this::convertArticleToMap)
-                .collect(Collectors.toList());
-
-            response.put("message", "success");
-            response.put("data", articleList);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("message", "서버 내부 오류가 발생했습니다");
-            response.put("data", new Object[]{});
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-    }
-
-    /**
      * 특정 사용자가 작성한 모든 게시글을 조회합니다.
      *
      * @param token JWT 토큰
@@ -205,7 +177,7 @@ public class ArticleController {
                 }
 
                 Article existingArticle = optionalArticle.get();
-                if (!existingArticle.getUser().getEmail().equals(user.getEmail())) {
+                if (!existingArticle.getUser().getNickname().equals(user.getNickname())) {
                     response.put("message", "권한이 없습니다");
                     response.put("data", new Object[]{});
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
@@ -254,7 +226,7 @@ public class ArticleController {
                 }
 
                 Article existingArticle = optionalArticle.get();
-                if (!existingArticle.getUser().getEmail().equals(user.getEmail())) {
+                if (!existingArticle.getUser().getNickname().equals(user.getNickname())) {
                     response.put("message", "권한이 없습니다");
                     response.put("data", new Object[]{});
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
@@ -292,7 +264,7 @@ public class ArticleController {
         Users user = article.getUser();
         if (user != null) {
             map.put("userId", user.getId());
-            map.put("userName", user.getEmail()); // 사용자 이메일을 userName으로 사용
+            map.put("userName", user.getNickname()); // 사용자 닉네임을 userName으로 사용
             map.put("profileImageUrl", user.getProfile_image_url()); // 사용자 프로필 이미지 추가
         } else {
             map.put("userId", null);
