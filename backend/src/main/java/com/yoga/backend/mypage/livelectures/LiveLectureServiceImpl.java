@@ -1,4 +1,5 @@
 package com.yoga.backend.mypage.livelectures;
+
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
@@ -17,21 +18,27 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class LiveLectureServiceImpl implements LiveLectureService {
+
     @Autowired
     private LiveLectureRepository liveLecturesRepository;// 화상 강의 저장소
+
     @Autowired
     private UsersRepository usersRepository;// 사용자 저장소
+
     @Autowired
     private MyLiveLectureRepository myLiveLectureRepository;// 사용자의 화상 강의 목록 저장소
+
     @Autowired
     private LiveLectureRepository liveLectureRepository;
+
     @Autowired
     private JwtUtil jwtUtil;
+
     /**
      * 실시간 강의를 생성합니다.
      *
      * @param liveLectureCreateDto 실시간 강의 DTO
-     * @return 생성된 실시간 강의 응답 DTO
+     * @return 생성된 실시간 강의 엔티티
      */
     @Override
     public LiveLectureCreateResponseDto createLiveLecture(LiveLectureCreateDto liveLectureCreateDto) {
@@ -45,21 +52,26 @@ public class LiveLectureServiceImpl implements LiveLectureService {
         liveLecture.setMaxLiveNum(liveLectureCreateDto.getMaxLiveNum());
         liveLecture.setRegDate(System.currentTimeMillis());
         liveLecture.setAvailableDay(liveLectureCreateDto.getAvailableDay());
+
         if (liveLectureCreateDto.getUserId() != null) {
             Optional<Users> userOptional = usersRepository.findById(
                 (long) liveLectureCreateDto.getUserId());
             if (userOptional.isPresent()) {
                 Users user = userOptional.get();
                 liveLecture.setUser(user);
+
                 LiveLectures savedLiveLecture = liveLecturesRepository.save(liveLecture);
+
                 MyLiveLecture myLiveLecture = new MyLiveLecture();
                 myLiveLecture.setLiveLecture(savedLiveLecture);
                 myLiveLecture.setUser(user);
                 myLiveLectureRepository.save(myLiveLecture);
+
                 LiveLectureCreateResponseDto responseDto = new LiveLectureCreateResponseDto();
                 responseDto.setMessage("화상강의 생성 성공");
                 responseDto.setData(null);
                 return responseDto;
+
 //                return savedLiveLecture;
             } else {
                 // 사용자 정보가 없을 경우 처리 로직 추가 필요
@@ -69,15 +81,16 @@ public class LiveLectureServiceImpl implements LiveLectureService {
             throw new IllegalArgumentException("사용자 ID는 null일 수 없습니다");
         }
     }
+
     /**
      * 모든 실시간 강의를 조회
-     *
      * @return 모든 실시간 강의 리스트
      */
     @Override
     public List<LiveLectures> getAllLiveLectures() {
         return liveLecturesRepository.findAll();
     }
+
     /**
      * 특정 사용자 ID에 대한 나의 실시간 강의 목록을 조회
      * @param userId 사용자 ID
@@ -87,6 +100,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     public List<MyLiveLecture> getMyLiveLecturesByUserId(Integer userId) {
         return myLiveLectureRepository.findByUserId(userId);  // 특정 사용자가 등록한 화상 강의 목록을 조회
     }
+
     /**
      * 사용자 ID로 화상 강의를 조회합니다.
      *
@@ -97,6 +111,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     public List<LiveLectures> getLiveLecturesByUserId(Integer userId) {
         return liveLectureRepository.findByUserId(userId);
     }
+
     /**
      * 화상 강의를 수정합니다.
      *
@@ -107,6 +122,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     public LiveLectures updateLiveLecture(LiveLectureCreateDto liveLectureCreateDto) {
         LiveLectures liveLecture = liveLectureRepository.findById(liveLectureCreateDto.getLiveId())
             .orElseThrow(() -> new IllegalArgumentException("Invalid lecture ID"));
+
         if (liveLectureCreateDto.getLiveTitle() != null) {
             liveLecture.setLiveTitle(liveLectureCreateDto.getLiveTitle());
         }
@@ -131,8 +147,10 @@ public class LiveLectureServiceImpl implements LiveLectureService {
         if (liveLectureCreateDto.getAvailableDay() != null) {
             liveLecture.setAvailableDay(liveLectureCreateDto.getAvailableDay());
         }
+
         return liveLectureRepository.save(liveLecture);
     }
+
     /**
      * 단일 화상 강의를 조회합니다.
      *
@@ -143,6 +161,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     public LiveLectures getLiveLectureById(Integer liveId) {
         return liveLectureRepository.findById(liveId).orElse(null);
     }
+
     /**
      * 화상 강의의 소유자인지 확인합니다.
      *
@@ -155,6 +174,8 @@ public class LiveLectureServiceImpl implements LiveLectureService {
         Optional<LiveLectures> lectureOpt = liveLectureRepository.findById(liveId);
         return lectureOpt.isPresent() && Objects.equals(lectureOpt.get().getUser().getId(), userId);
     }
+
+
     /**
      * 화상 강의를 삭제합니다.
      *
@@ -165,7 +186,9 @@ public class LiveLectureServiceImpl implements LiveLectureService {
         // 먼저 my_live_lecture 테이블에서 관련 항목 삭제
         List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findByLiveLecture_LiveId(liveId);
         myLiveLectureRepository.deleteAll(myLiveLectures);
+
         // 그런 다음 live_lectures 테이블에서 항목 삭제
         liveLectureRepository.deleteById(liveId);
     }
+
 }

@@ -31,7 +31,7 @@ public class MyLiveLecture {
     private LiveLectures liveLecture; // 실시간 강의 ID (Foreign Key)
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private Users user; // 사용자 ID (Foreign Key)
 
 }
