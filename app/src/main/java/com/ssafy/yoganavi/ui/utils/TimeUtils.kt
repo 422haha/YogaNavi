@@ -39,9 +39,9 @@ fun formatZeroDate(hour: Int, minute: Int): String {
 
 fun convertDaysToHangle(days: String): String {
     val dayList = days.split(",")
-    val hangleDays = dayList.mapNotNull { day ->
+    val hangleDays = dayList.map { day ->
         try { Week.valueOf(day).hangle }
-        catch (e: IllegalArgumentException) { null }
+        finally { "" }
     }
 
     return hangleDays.joinToString(", ")
