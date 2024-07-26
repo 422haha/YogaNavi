@@ -1,9 +1,7 @@
 package com.ssafy.yoganavi.ui.loginUI.find
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -92,18 +90,6 @@ class FindFragment : BaseFragment<FragmentFindBinding>(FragmentFindBinding::infl
             binding.tiePwAgain.error = PASSWORD_DIFF
         } else {
             binding.tiePwAgain.error = null
-        }
-    }
-
-    private fun hideKeyboard() {
-        if (activity != null && requireActivity().currentFocus != null) {
-            val inputManager: InputMethodManager =
-                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-
-            inputManager.hideSoftInputFromWindow(
-                requireActivity().currentFocus?.windowToken,
-                InputMethodManager.HIDE_NOT_ALWAYS
-            )
         }
     }
 }

@@ -123,6 +123,8 @@ class RegisterLiveFragment :
     }
 
     private fun setRegister() {
+        hideKeyboard()
+
         if(!binding.etTitle.text.isNullOrBlank() &&
             !binding.etContent.text.isNullOrBlank() &&
             !weekToggleButtonMap.values.all { !it.isChecked } &&
