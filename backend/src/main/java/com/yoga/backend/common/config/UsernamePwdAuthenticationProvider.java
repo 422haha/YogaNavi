@@ -4,6 +4,7 @@ import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.repository.UsersRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -39,13 +40,13 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
         String pwd = authentication.getCredentials().toString();
 
         // 사용자 정보 조회
-        List<Users> users = usersRepository.findByEmail(username);
-        if (users.size() > 0) {
+        Optional<Users> users = usersRepository.findByEmail(username);
+        if (users.isPresent()) {
             // 비밀번호 매칭 확인
-            if (passwordEncoder.matches(pwd, users.get(0).getPwd())) {
+            if (passwordEncoder.matches(pwd, users.get().getPwd())) {
                 // 인증 성공 시 새로운 인증 객체 반환
                 return new UsernamePasswordAuthenticationToken(username, pwd,
-                    getGrantedAuthorities(users.get(0).getRole()));
+                    getGrantedAuthorities(users.get().getRole()));
             } else {
                 // 비밀번호가 일치하지 않는 경우 예외 발생
                 throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");

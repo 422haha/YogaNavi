@@ -1,6 +1,7 @@
 package com.yoga.backend.common.util;
 
 import com.yoga.backend.common.constants.SecurityConstants;
+import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.repository.UsersRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -8,6 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,7 +92,15 @@ public class JwtUtil {
     public int getUserIdFromToken(String bearerToken) {
         String token = extractToken(bearerToken);
         Claims claims = validateToken(token);
-        return userRepository.findByEmail(claims.get("email", String.class)).get(0).getId();
+        String email = claims.get("email", String.class);
+
+        Optional<Users> userOptional = userRepository.findByEmail(email);
+
+        if (userOptional.isPresent()) {
+            return userOptional.get().getId();
+        } else {
+            throw new RuntimeException("User not found for email: " + email);
+        }
     }
 
     public String getRoleFromToken(String bearerToken) {

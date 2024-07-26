@@ -14,11 +14,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UsersRepository extends CrudRepository<Users, Long> {
 
-    List<Users> findById(int id);
+    Optional<Users> findById(int id);
 
-    List<Users> findByEmail(String email);
+    Optional<Users> findByEmail(String email);
 
-    List<Users> findByNickname(String nickname);
+    Optional<Users> findByNickname(String nickname);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT u FROM Users u WHERE u.email = :email")

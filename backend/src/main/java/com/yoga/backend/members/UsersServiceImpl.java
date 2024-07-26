@@ -82,7 +82,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public boolean checkNickname(String nickname) {
-        List<Users> users = usersRepository.findByNickname(nickname);
+        Optional<Users> users = usersRepository.findByNickname(nickname);
         if (users.isEmpty()) {
             return true;
         }
@@ -98,7 +98,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public boolean checkUser(String email) {
-        List<Users> users = usersRepository.findByEmail(email);
+        Optional<Users> users = usersRepository.findByEmail(email);
         if (users.isEmpty()) {
             return true;
         }
@@ -196,10 +196,10 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Users getUserByUserId(int userId) {
-        List<Users> users = usersRepository.findById(userId);
+        Optional<Users> users = usersRepository.findById(userId);
 
-        if (!users.isEmpty()) {
-            Users user = users.get(0);
+        if (users.isPresent()) {
+            Users user = users.get();
             String profileImageUrl = user.getProfile_image_url();
             if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
                 String presignedUrl = s3Service.generatePresignedUrl(profileImageUrl,
@@ -225,10 +225,10 @@ public class UsersServiceImpl implements UsersService {
     public Users updateUser(UpdateDto updateDto, int userId) {
         log.info("Updating user with ID: {}", userId);
 
-        List<Users> users = usersRepository.findById(userId);
+        Optional<Users> users = usersRepository.findById(userId);
 
-        if (!users.isEmpty()) {
-            Users user = users.get(0);
+        if (users.isPresent()) {
+            Users user = users.get();
 
             if (updateDto.getNickname() != null) {
                 log.debug("Updating nickname for user {}: {}", userId, updateDto.getNickname());
@@ -280,9 +280,9 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Set<String> getUserHashtags(int userId) {
-        List<Users> users = usersRepository.findById(userId);
-        if (!users.isEmpty()) {
-            Users user = users.get(0);
+        Optional<Users> users = usersRepository.findById(userId);
+        if (users.isPresent()) {
+            Users user = users.get();
             return user.getHashtags().stream()
                 .map(Hashtag::getName)
                 .collect(Collectors.toSet());
@@ -299,9 +299,9 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void updateUserHashtags(int userId, Set<String> newHashtags) {
-        List<Users> users = usersRepository.findById(userId);
-        if (!users.isEmpty()) {
-            Users user = users.get(0);
+        Optional<Users> users = usersRepository.findById(userId);
+        if (users.isPresent()) {
+            Users user = users.get();
 
             if (user.getHashtags() == null) {
                 user.setHashtags(new HashSet<>());
