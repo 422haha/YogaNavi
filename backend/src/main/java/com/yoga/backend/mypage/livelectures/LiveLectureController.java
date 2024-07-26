@@ -2,7 +2,10 @@ package com.yoga.backend.mypage.livelectures;
 
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.members.UsersRepository;
+import com.yoga.backend.members.repository.UsersRepository;
+import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateDto;
+import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateResponseDto;
+import com.yoga.backend.mypage.livelectures.dto.LiveLectureResponseDto;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateDto;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateResponseDto;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureResponseDto;
