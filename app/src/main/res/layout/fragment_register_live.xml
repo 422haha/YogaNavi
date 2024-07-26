@@ -61,12 +61,12 @@
             android:textOff="@string/monday"
             android:textOn="@string/monday"
             app:layout_constraintBottom_toTopOf="@id/tv_choose_date"
-            app:layout_constraintEnd_toStartOf="@id/tb_two"
+            app:layout_constraintEnd_toStartOf="@id/tb_tue"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_choose_week" />
 
         <ToggleButton
-            android:id="@+id/tb_two"
+            android:id="@+id/tb_tue"
             style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/tuesday"
@@ -84,10 +84,10 @@
             android:text="@string/wednesday"
             android:textOff="@string/wednesday"
             android:textOn="@string/wednesday"
-            app:layout_constraintBottom_toBottomOf="@id/tb_two"
+            app:layout_constraintBottom_toBottomOf="@id/tb_tue"
             app:layout_constraintEnd_toStartOf="@id/tb_thu"
-            app:layout_constraintStart_toEndOf="@id/tb_two"
-            app:layout_constraintTop_toTopOf="@id/tb_two" />
+            app:layout_constraintStart_toEndOf="@id/tb_tue"
+            app:layout_constraintTop_toTopOf="@id/tb_tue" />
 
         <ToggleButton
             android:id="@+id/tb_thu"

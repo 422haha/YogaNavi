@@ -170,16 +170,4 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
         }
         imageUriLauncher.launch(intent)
     }
-
-    private fun hideKeyboard() {
-        if (activity != null && requireActivity().currentFocus != null) {
-            val inputManager: InputMethodManager =
-                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-
-            inputManager.hideSoftInputFromWindow(
-                requireActivity().currentFocus?.windowToken,
-                InputMethodManager.HIDE_NOT_ALWAYS
-            )
-        }
-    }
 }

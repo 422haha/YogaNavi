@@ -1,10 +1,12 @@
 package com.ssafy.yoganavi.ui.core
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -64,5 +66,17 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
         val intent = Intent(requireContext(), LoginActivity::class.java)
         startActivity(intent)
         requireActivity().finish()
+    }
+
+    fun hideKeyboard() {
+        if (activity != null && requireActivity().currentFocus != null) {
+            val inputManager: InputMethodManager =
+                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+            inputManager.hideSoftInputFromWindow(
+                requireActivity().currentFocus?.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS
+            )
+        }
     }
 }
