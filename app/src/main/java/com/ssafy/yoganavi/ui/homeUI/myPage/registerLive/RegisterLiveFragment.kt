@@ -33,6 +33,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.Calendar
 
 @AndroidEntryPoint
@@ -122,6 +123,42 @@ class RegisterLiveFragment :
         }
     }
 
+    private fun setRegister() {
+        if(!binding.etTitle.text.isNullOrBlank() &&
+            !binding.etContent.text.isNullOrBlank() &&
+            !weekToggleButtonMap.values.all { !it.isChecked } &&
+            viewModel.liveLectureData.startDate != 0L &&
+            viewModel.liveLectureData.endDate != 0L &&
+            viewModel.liveLectureData.endTime != 0L) {
+
+            viewModel.liveLectureData.apply {
+                with(binding) {
+                    liveTitle = etTitle.text.toString()
+                    liveContent = etContent.text.toString()
+
+                    weekToggleButtonMap.forEach { (day, toggleBtn) ->
+                        viewModel.dayStatusMap[day] = toggleBtn.isSelected
+                    }
+
+                    viewModel.liveLectureData.availableDay =
+                        viewModel.dayStatusMap
+                            .filter { it.value }
+                            .keys
+                            .joinToString(separator = ",")
+
+                    Timber.d("로오오그닷${viewModel.liveLectureData.availableDay}")
+
+                    maxLiveNum = spMaxNum.selectedItemPosition + 1
+                }
+            }
+
+            if (args.state == CREATE)
+                viewModel.createLive(::popBackStack)
+            else
+                viewModel.updateLive(::popBackStack)
+        } else { showSnackBar(IS_BLANK) }
+    }
+
     private fun showCalendar(state: Int) {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -202,39 +239,6 @@ class RegisterLiveFragment :
         }
 
         materialTimePicker.show(childFragmentManager, "fragment_tag")
-    }
-
-    private fun setRegister() {
-        if(!binding.etTitle.text.isNullOrBlank() &&
-            !binding.etContent.text.isNullOrBlank() &&
-            weekToggleButtonMap.values.all { !it.isChecked } &&
-            viewModel.liveLectureData.startDate != 0L &&
-            viewModel.liveLectureData.endDate != 0L &&
-            viewModel.liveLectureData.endTime != 0L) {
-
-            viewModel.liveLectureData.apply {
-                with(binding) {
-                    liveTitle = etTitle.text.toString()
-                    liveContent = etContent.text.toString()
-
-                    weekToggleButtonMap.forEach { (day, toggleBtn) ->
-                        viewModel.dayStatusMap[day] = toggleBtn.isSelected
-                    }
-
-                    viewModel.dayStatusMap
-                        .filter { it.value }
-                        .keys
-                        .joinToString(separator = ",")
-
-                    maxLiveNum = spMaxNum.selectedItemPosition + 1
-                }
-            }
-
-            if (args.state == CREATE)
-                viewModel.createLive(::popBackStack)
-            else
-                viewModel.updateLive(::popBackStack)
-        } else { showSnackBar(IS_BLANK) }
     }
 
     private suspend fun popBackStack() = withContext(Dispatchers.Main){
