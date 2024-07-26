@@ -33,7 +33,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.Calendar
 
 @AndroidEntryPoint
@@ -76,7 +75,7 @@ class RegisterLiveFragment :
 
             weekToggleButtonMap = mapOf(
                 Week.MON to binding.tbMon,
-                Week.TUE to binding.tbThu,
+                Week.TUE to binding.tbTue,
                 Week.WED to binding.tbWed,
                 Week.THU to binding.tbThu,
                 Week.FRI to binding.tbFri,
@@ -137,16 +136,10 @@ class RegisterLiveFragment :
                     liveContent = etContent.text.toString()
 
                     weekToggleButtonMap.forEach { (day, toggleBtn) ->
-                        viewModel.dayStatusMap[day] = toggleBtn.isSelected
+                        viewModel.dayStatusMap[day] = toggleBtn.isChecked
                     }
 
-                    viewModel.liveLectureData.availableDay =
-                        viewModel.dayStatusMap
-                            .filter { it.value }
-                            .keys
-                            .joinToString(separator = ",")
-
-                    Timber.d("로오오그닷${viewModel.liveLectureData.availableDay}")
+                    availableDay = viewModel.dayStatusMap.filter { it.value }.keys.joinToString(",")
 
                     maxLiveNum = spMaxNum.selectedItemPosition + 1
                 }
