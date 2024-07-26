@@ -15,6 +15,8 @@ interface InfoDataSource {
 
     suspend fun getProfile(): Response<YogaDetailResponse<Profile>>
 
+    suspend fun updateProfile(profile: Profile) : Response<YogaDetailResponse<Profile>>
+
     // LECTURE
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>
 

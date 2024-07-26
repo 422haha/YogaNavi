@@ -29,6 +29,11 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toDetailResponse()
     }
 
+    override suspend fun updateProfile(profile: Profile): DetailResponse<Profile> {
+        val response = withContext(ioDispatcher) { infoDataSource.updateProfile(profile) }
+        return response.toDetailResponse()
+    }
+
     // LECTURE
     override suspend fun getLectureList(): ListResponse<LectureData> {
         val response = withContext(ioDispatcher) { infoDataSource.getLectureList() }

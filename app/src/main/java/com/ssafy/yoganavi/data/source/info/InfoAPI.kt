@@ -22,6 +22,9 @@ interface InfoAPI {
     @GET("mypage/info")
     suspend fun getProfile(): Response<YogaDetailResponse<Profile>>
 
+    @POST("mypage/update")
+    suspend fun updateProfile(@Body profile: Profile): Response<YogaDetailResponse<Profile>>
+
     // LECTURE
     @GET("mypage/recorded-lecture/list")
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>

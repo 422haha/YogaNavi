@@ -14,6 +14,8 @@ interface InfoRepository {
 
     suspend fun getProfile(): DetailResponse<Profile>
 
+    suspend fun updateProfile(profile: Profile): DetailResponse<Profile>
+
     // LECTURE
     suspend fun getLectureList(): ListResponse<LectureData>
 
@@ -32,9 +34,12 @@ interface InfoRepository {
 
     suspend fun getLive(liveId: Int): DetailResponse<LiveLectureData>
 
-    suspend fun createLive(registerLiveRequest : RegisterLiveRequest): DetailResponse<Unit>
+    suspend fun createLive(registerLiveRequest: RegisterLiveRequest): DetailResponse<Unit>
 
-    suspend fun updateLive(registerLiveRequest: RegisterLiveRequest, liveId: Int): DetailResponse<Unit>
+    suspend fun updateLive(
+        registerLiveRequest: RegisterLiveRequest,
+        liveId: Int
+    ): DetailResponse<Unit>
 
     suspend fun deleteLive(liveId: Int): DetailResponse<Unit>
 
