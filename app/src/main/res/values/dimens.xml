@@ -11,6 +11,7 @@
 
     <dimen name="dialog_padding_medium">40dp</dimen>
     <dimen name="live_padding">150dp</dimen>
+    <dimen name="bottom_button_padding">80dp</dimen>
 
 
     <!-- EditText -->
