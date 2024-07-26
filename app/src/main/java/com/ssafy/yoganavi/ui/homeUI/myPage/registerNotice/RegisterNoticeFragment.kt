@@ -3,11 +3,8 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.registerNotice
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.View
 import android.view.ViewTreeObserver
-import android.widget.ScrollView
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
@@ -39,9 +36,13 @@ class RegisterNoticeFragment :
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data ?: return@registerForActivityResult
-                val imagePath = getImagePath(requireContext(), imageUri)
-                if (imagePath.isNotBlank()) {
-                    viewModel.addImage(imagePath)
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                    val imagePath = getImagePath(requireContext(), imageUri)
+                    if (imagePath.isNotBlank()) {
+                        withContext(Dispatchers.Main) {
+                            viewModel.addImage(imagePath)
+                        }
+                    }
                 }
             }
         }
@@ -130,6 +131,7 @@ class RegisterNoticeFragment :
             }
         }
     }
+
     private fun addPhoto() {
         val intent = Intent().apply {
             type = "image/*"

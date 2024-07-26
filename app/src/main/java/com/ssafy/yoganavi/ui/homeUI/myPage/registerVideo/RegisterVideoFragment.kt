@@ -45,12 +45,14 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data ?: return@registerForActivityResult
-                val imagePath = getImagePath(requireContext(), imageUri)
-                if (imagePath.isNotBlank()) {
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                    val imagePath = getImagePath(requireContext(), imageUri)
                     val uri = Uri.parse(imagePath)
-                    binding.ivVideo.setImageURI(uri)
-                    binding.tvAddThumbnail.visibility = View.GONE
-                    viewModel.setThumbnail(path = imagePath)
+                    withContext(Dispatchers.Main) {
+                        binding.ivVideo.setImageURI(uri)
+                        binding.tvAddThumbnail.visibility = View.GONE
+                        viewModel.setThumbnail(path = imagePath)
+                    }
                 }
             }
         }

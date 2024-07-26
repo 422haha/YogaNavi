@@ -34,12 +34,12 @@ class LoginViewModel @Inject constructor(
         val request = UserRequest(email = email, password = password)
         runCatching { userRepository.logIn(request) }
             .onSuccess { emitResponse(it) }
-            .onFailure { emitError(NO_RESPONSE) }
+            .onFailure { emitError(it.message ?: NO_RESPONSE) }
     }
 
     private suspend fun emitResponse(response: DetailResponse<Boolean>) = when (response) {
         is DetailResponse.Success -> emitSuccess(response)
-        is DetailResponse.Error -> emitError(NO_RESPONSE)
+        is DetailResponse.Error -> emitError(response.message)
         is DetailResponse.AuthError -> emitError(NO_AUTH)
     }
 

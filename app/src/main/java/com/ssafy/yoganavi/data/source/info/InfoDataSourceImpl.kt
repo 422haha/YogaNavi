@@ -5,7 +5,7 @@ import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
-import com.ssafy.yoganavi.data.source.mypage.ProfileData
+import com.ssafy.yoganavi.data.source.mypage.Profile
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import retrofit2.Response
@@ -15,8 +15,11 @@ import javax.inject.Singleton
 @Singleton
 class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : InfoDataSource {
 
-    override suspend fun getProfile(): Response<YogaDetailResponse<ProfileData>> =
+    override suspend fun getProfile(): Response<YogaDetailResponse<Profile>> =
         infoAPI.getProfile()
+
+    override suspend fun updateProfile(profile: Profile): Response<YogaDetailResponse<Profile>> =
+        infoAPI.updateProfile(profile)
 
     // LECTURE
     override suspend fun getLectureList(): Response<YogaResponse<LectureData>> =
