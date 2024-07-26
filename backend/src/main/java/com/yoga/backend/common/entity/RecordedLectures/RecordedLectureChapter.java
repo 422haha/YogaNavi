@@ -20,7 +20,7 @@ public class RecordedLectureChapter {
     @Column(nullable = false)
     private int chapterNumber;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lecture_id")
     private RecordedLecture lecture;
 

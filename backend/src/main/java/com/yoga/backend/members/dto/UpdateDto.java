@@ -1,5 +1,6 @@
 package com.yoga.backend.members.dto;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,4 +13,5 @@ public class UpdateDto {
     private boolean isTeacher;
     private int authnumber;
     private String imageUrl;
+    private List<String> hashTags;
 }

@@ -29,7 +29,7 @@ public class RecordedLecture {
 
     private String thumbnail;
 
-    @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<RecordedLectureChapter> chapters;
 
     private long likeCount = 0;

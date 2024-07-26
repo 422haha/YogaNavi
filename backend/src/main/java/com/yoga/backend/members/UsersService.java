@@ -4,6 +4,9 @@ import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.dto.RegisterDto;
 import com.yoga.backend.members.dto.UpdateDto;
 import java.util.List;
+import java.util.Set;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface UsersService {
 
@@ -21,8 +24,13 @@ public interface UsersService {
 
     String resetPassword(String email, String newPassword);
 
-    Users getUserByEmail(String email);
+    Users getUserByUserId(int userId);
 
+    Users updateUser(UpdateDto updateDto, int userId);
 
-    Users updateUser(UpdateDto updateDto, String email);
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+    Set<String> getUserHashtags(int userId);
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    void updateUserHashtags(int userId, Set<String> newHashtags);
 }

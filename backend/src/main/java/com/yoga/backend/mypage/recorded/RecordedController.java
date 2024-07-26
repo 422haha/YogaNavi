@@ -1,7 +1,8 @@
 package com.yoga.backend.mypage.recorded;
 
 import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.members.UsersRepository;
+import com.yoga.backend.members.repository.UsersRepository;
+import com.yoga.backend.mypage.recorded.dto.ChapterDto;
 import com.yoga.backend.mypage.recorded.dto.DeleteDto;
 import com.yoga.backend.mypage.recorded.dto.LectureDto;
 import java.util.HashMap;
@@ -122,6 +123,7 @@ public class RecordedController {
         Map<String, Object> response = new HashMap<>();
         int userId = jwtUtil.getUserIdFromToken(token);
         LectureDto lectureDto = recordedService.getLectureDetails(recorded_id, userId);
+        System.out.println("================="+lectureDto.getRecordedLectureChapters().get(0).getId());
         if (lectureDto != null) {
             response.put("message", "녹화강의 조회 성공");
             response.put("data", lectureDto);
@@ -146,6 +148,10 @@ public class RecordedController {
         @RequestBody LectureDto lectureDto) {
         Map<String, Object> response = new HashMap<>();
         lectureDto.setRecordedId(recordedId);
+
+        for(ChapterDto ctr:lectureDto.getRecordedLectureChapters()){
+            System.out.println(ctr.getId()+"      =======        "+ctr.getRecordVideo());
+        }
 
         log.info("강의 수정 ID: {}", recordedId);
         log.debug("LectureDto: {}", lectureDto);

@@ -36,7 +36,7 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     @Column
     private String resetToken;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
         name = "user_hashtags",
         joinColumns = @JoinColumn(name = "user_id"),

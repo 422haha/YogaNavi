@@ -23,6 +23,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
@@ -161,25 +162,38 @@ public class S3Service {
 
 
     public String generatePresignedUrl(String key, long expirationInSeconds) {
-        // 키에서 버킷 이름을 제거 (만약 포함되어 있다면)
-        if (key.startsWith(bucketName + "/")) {
-            key = key.substring(bucketName.length() + 1);
+        try {
+            // BASE_URL로 시작하는 전체 URL이 넘어올 경우를 처리
+            if (key.startsWith(BASE_URL)) {
+                key = key.substring(BASE_URL.length());
+            }
+            // 버킷 이름으로 시작하는 경우 처리
+            else if (key.startsWith(bucketName + "/")) {
+                key = key.substring(bucketName.length() + 1);
+            }
+
+            log.debug("Generating presigned URL for key: {}", key);
+
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+
+            GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofSeconds(expirationInSeconds))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+            PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(getObjectPresignRequest);
+            String presignedUrl = presignedGetObjectRequest.url().toString();
+
+            log.debug("Generated presigned URL: {}", presignedUrl);
+
+            return normalizeUrl(presignedUrl);
+        } catch (S3Exception e) {
+            log.error("Error generating presigned URL for key: {}. Error: {}", key, e.getMessage());
+            throw new RuntimeException("Failed to generate presigned URL", e);
         }
-
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-            .bucket(bucketName)
-            .key(key)
-            .build();
-
-        GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
-            .signatureDuration(Duration.ofSeconds(expirationInSeconds))
-            .getObjectRequest(getObjectRequest)
-            .build();
-
-        PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(getObjectPresignRequest);
-        String presignedUrl = presignedGetObjectRequest.url().toString();
-
-        return normalizeUrl(presignedUrl);
     }
 
     private String normalizeUrl(String url) {

@@ -2,7 +2,7 @@ package com.yoga.backend.mypage.article;
 
 import com.yoga.backend.common.entity.Article;
 import com.yoga.backend.common.entity.Users;
-import com.yoga.backend.members.UsersRepository;
+import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.common.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

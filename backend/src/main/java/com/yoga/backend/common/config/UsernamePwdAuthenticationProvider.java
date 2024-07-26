@@ -1,7 +1,7 @@
 package com.yoga.backend.common.config;
 
 import com.yoga.backend.common.entity.Users;
-import com.yoga.backend.members.UsersRepository;
+import com.yoga.backend.members.repository.UsersRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

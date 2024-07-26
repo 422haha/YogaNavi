@@ -4,7 +4,7 @@ import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.members.UsersRepository;
+import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateDto;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateResponseDto;
 import java.util.List;
@@ -38,7 +38,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * 실시간 강의를 생성합니다.
      *
      * @param liveLectureCreateDto 실시간 강의 DTO
-     * @return 생성된 실시간 강의 응답 DTO
+     * @return 생성된 실시간 강의 엔티티
      */
     @Override
     public LiveLectureCreateResponseDto createLiveLecture(LiveLectureCreateDto liveLectureCreateDto) {
@@ -84,7 +84,6 @@ public class LiveLectureServiceImpl implements LiveLectureService {
 
     /**
      * 모든 실시간 강의를 조회
-     *
      * @return 모든 실시간 강의 리스트
      */
     @Override

@@ -36,6 +36,7 @@ public class MyLikeLectureListRepository {
             ))
             .from(lecture)
             .join(like).on(like.lecture.eq(lecture).and(like.userId.eq(userId)))
+            .orderBy(lecture.createdDate.desc())
             .fetch();
     }
 }
