@@ -24,13 +24,14 @@ import java.util.List;
 @RequestMapping("/mypage/recorded-lecture")
 public class RecordedController {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final RecordedService recordedService;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    private RecordedService recordedService;
-    @Autowired
-    private UsersRepository usersRepository;
+    public RecordedController(RecordedService recordedService, JwtUtil jwtUtil) {
+        this.recordedService = recordedService;
+        this.jwtUtil = jwtUtil;
+    }
 
 
     /**
