@@ -54,16 +54,20 @@ class RegisterNoticeViewModel @Inject constructor(
 
     fun insertNotice(content: String, onSuccess: suspend () -> Unit) =
         viewModelScope.launch(Dispatchers.IO) {
-
             val imageUrlKey = "$NOTICE/${UUID.randomUUID()}"
             val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
 
-            val noticeFile = File(notice.value.imageUrlPath)
-            val metadata = ObjectMetadata().apply { contentType = "image/webp" }
-            transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile, metadata)
+            if(notice.value.imageUrlPath.isNotBlank()){
 
-            val request = RegisterNoticeRequest(content = content, imageUrl = imageUrl.toString())
+                val noticeFile = File(notice.value.imageUrlPath)
+                val metadata = ObjectMetadata().apply { contentType = "image/webp" }
+                transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile, metadata)
+            }
 
+            var request = RegisterNoticeRequest(content = content, imageUrl = imageUrl.toString())
+            if(notice.value.imageUrlPath.isBlank()) {
+                request = RegisterNoticeRequest(content=content, imageUrl = "")
+            }
             runCatching { infoRepository.insertNotice(request) }
                 .onSuccess { onSuccess() }
                 .onFailure { it.printStackTrace() }
