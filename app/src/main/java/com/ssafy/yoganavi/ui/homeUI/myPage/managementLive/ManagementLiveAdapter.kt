@@ -10,9 +10,9 @@ import com.ssafy.yoganavi.databinding.ListItemLiveBinding
 import com.ssafy.yoganavi.ui.utils.LIMIT_DATE
 import com.ssafy.yoganavi.ui.utils.UPDATE
 import com.ssafy.yoganavi.ui.utils.WeeklyAndTime
+import com.ssafy.yoganavi.ui.utils.convertDaysToHangle
 import com.ssafy.yoganavi.ui.utils.formatDotDate
 import com.ssafy.yoganavi.ui.utils.formatTime
-import timber.log.Timber
 
 class ManagementLiveAdapter(
     private val navigateToLiveFragment: (Int) -> Unit,
@@ -47,9 +47,11 @@ class ManagementLiveAdapter(
 
                 tvLectureTitle.text = item.liveTitle
 
-                val time = "${formatTime(item.startTime)}~${formatTime(item.endTime)}"
+                val weekData = convertDaysToHangle(item.availableDay)
 
-                tvLectureTime.text = WeeklyAndTime(item.availableDay, time)
+                val timeData = "${formatTime(item.startTime)}~${formatTime(item.endTime)}"
+
+                tvLectureTime.text = WeeklyAndTime(weekData, timeData)
 
                 vEnterBtn.setOnClickListener { navigateToLiveFragment(item.liveId) }
 

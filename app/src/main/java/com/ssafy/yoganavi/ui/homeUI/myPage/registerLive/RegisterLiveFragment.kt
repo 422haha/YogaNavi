@@ -3,7 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.registerLive
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.isVisible
+import android.widget.ToggleButton
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -25,6 +25,7 @@ import com.ssafy.yoganavi.ui.utils.REGISTER
 import com.ssafy.yoganavi.ui.utils.REGISTER_LIVE
 import com.ssafy.yoganavi.ui.utils.START
 import com.ssafy.yoganavi.ui.utils.UPDATE
+import com.ssafy.yoganavi.ui.utils.Week
 import com.ssafy.yoganavi.ui.utils.formatDotDate
 import com.ssafy.yoganavi.ui.utils.formatTime
 import com.ssafy.yoganavi.ui.utils.formatZeroDate
@@ -45,41 +46,21 @@ class RegisterLiveFragment :
     private lateinit var startDatePickerDialog: DatePickerDialog
     private lateinit var endDatePickerDialog: DatePickerDialog
 
+    private lateinit var weekToggleButtonMap: Map<Week, ToggleButton>
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initListener()
+
         if (args.state == UPDATE)
             setModifyInfo()
-
-        initListener()
 
         setToolbar(isBottomNavigationVisible = false,
             title = if (args.liveId == -1) REGISTER_LIVE else MODIFY_LIVE,
             canGoBack = true,
             menuItem = REGISTER,
             menuListener = { setRegister() })
-    }
-
-    private fun setModifyInfo() {
-        viewModel.getLive(args.liveId) {
-            lifecycleScope.launch {
-                withContext(Dispatchers.Main) {
-                    binding.etTitle.setText(viewModel.liveLectureData.liveTitle)
-                    binding.etContent.setText(viewModel.liveLectureData.liveContent)
-
-                    // TODO: 가능 요일 get
-                    binding.tieStart.setText(formatDotDate(viewModel.liveLectureData.startDate))
-                    binding.tieEnd.setText(formatDotDate(viewModel.liveLectureData.endDate))
-
-                    binding.btnStart.text = formatTime(viewModel.liveLectureData.startTime)
-                    binding.btnEnd.text = formatTime(viewModel.liveLectureData.endTime)
-
-                    val size = resources.getStringArray(R.array.maxnum_array).size
-                    if (viewModel.liveLectureData.maxLiveNum in 1..size)
-                        binding.spMaxNum.setSelection(viewModel.liveLectureData.maxLiveNum - 1)
-                }
-            }
-        }
     }
 
     private fun initListener() {
@@ -92,6 +73,16 @@ class RegisterLiveFragment :
 
             btnEnd.setOnClickListener { showTimePicker(END) }
 
+            weekToggleButtonMap = mapOf(
+                Week.MON to binding.tbMon,
+                Week.TUE to binding.tbThu,
+                Week.WED to binding.tbWed,
+                Week.THU to binding.tbThu,
+                Week.FRI to binding.tbFri,
+                Week.SAT to binding.tbSat,
+                Week.SUN to binding.tbSun
+            )
+
             cbEndDateUnlimited.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     tieEnd.setText(LIMIT_STR)
@@ -101,6 +92,31 @@ class RegisterLiveFragment :
                     tieEnd.setText(END_STR)
                     tieEnd.isEnabled = true
                     viewModel.liveLectureData.endDate = 0L
+                }
+            }
+        }
+    }
+
+    private fun setModifyInfo() {
+        viewModel.getLive(args.liveId) {
+            lifecycleScope.launch {
+                withContext(Dispatchers.Main) {
+                    binding.etTitle.setText(viewModel.liveLectureData.liveTitle)
+                    binding.etContent.setText(viewModel.liveLectureData.liveContent)
+
+                    viewModel.dayStatusMap.forEach { (day, isSelected) ->
+                        weekToggleButtonMap[day]?.isChecked = isSelected
+                    }
+
+                    binding.tieStart.setText(formatDotDate(viewModel.liveLectureData.startDate))
+                    binding.tieEnd.setText(formatDotDate(viewModel.liveLectureData.endDate))
+
+                    binding.btnStart.text = formatTime(viewModel.liveLectureData.startTime)
+                    binding.btnEnd.text = formatTime(viewModel.liveLectureData.endTime)
+
+                    val size = resources.getStringArray(R.array.maxnum_array).size
+                    if (viewModel.liveLectureData.maxLiveNum in 1..size)
+                        binding.spMaxNum.setSelection(viewModel.liveLectureData.maxLiveNum - 1)
                 }
             }
         }
@@ -188,10 +204,10 @@ class RegisterLiveFragment :
         materialTimePicker.show(childFragmentManager, "fragment_tag")
     }
 
-    // TODO 가능 요일 선택이 1개이상 되어있어야함
     private fun setRegister() {
         if(!binding.etTitle.text.isNullOrBlank() &&
             !binding.etContent.text.isNullOrBlank() &&
+            weekToggleButtonMap.values.all { !it.isChecked } &&
             viewModel.liveLectureData.startDate != 0L &&
             viewModel.liveLectureData.endDate != 0L &&
             viewModel.liveLectureData.endTime != 0L) {
@@ -201,8 +217,14 @@ class RegisterLiveFragment :
                     liveTitle = etTitle.text.toString()
                     liveContent = etContent.text.toString()
 
-                    // TODO 가능 요일 set
-                    availableDay = ""
+                    weekToggleButtonMap.forEach { (day, toggleBtn) ->
+                        viewModel.dayStatusMap[day] = toggleBtn.isSelected
+                    }
+
+                    viewModel.dayStatusMap
+                        .filter { it.value }
+                        .keys
+                        .joinToString(separator = ",")
 
                     maxLiveNum = spMaxNum.selectedItemPosition + 1
                 }
