@@ -49,4 +49,6 @@ fun convertDaysToHangle(days: String): String {
 
 fun IntToDate(year: Int, month: Int, day: Int): String = run { "$year.${month + 1}.$day" }
 
-fun WeeklyAndTime(weekly: String, timeStr: String): String = run { "$weekly | $timeStr" }
+fun StartVerticalEnd(start: String, end: String): String = run { "$start | $end" }
+
+fun StartTildeEnd(start: String, end: String) = "$start~$end"
