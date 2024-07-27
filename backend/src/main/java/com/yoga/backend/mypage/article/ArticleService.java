@@ -17,13 +17,6 @@ public interface ArticleService {
     void saveArticle(Article article);
 
     /**
-     * 모든 게시글을 조회합니다.
-     *
-     * @return 게시글 목록
-     */
-    List<Article> getAllArticles();
-
-    /**
      * 특정 사용자가 작성한 게시글을 조회합니다.
      *
      * @param userId 사용자 ID
