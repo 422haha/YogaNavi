@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.homeUI.teacher.filter.FilterFragment">
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -396,9 +395,10 @@
     </ScrollView>
 
     <TextView
+        android:id="@+id/btn_filter_save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="검색"
+        android:text="@string/save"
         android:gravity="center"
         style="@style/RegisterButton"
         app:layout_constraintBottom_toBottomOf="parent"/>
