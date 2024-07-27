@@ -1,13 +1,11 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.modify
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -47,13 +45,13 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
             val imageUri = result.data?.data ?: return@registerForActivityResult
 
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                val imagePath = getImagePath(requireContext(), imageUri, 10)
+                val (imagePath, miniPath) = getImagePath(requireContext(), imageUri)
                 if (imagePath.isBlank()) return@launch
                 val uri = Uri.parse(imagePath)
 
                 withContext(Dispatchers.Main) {
                     binding.ivIcon.setImageURI(uri)
-                    viewModel.setThumbnail(path = imagePath)
+                    viewModel.setThumbnail(path = imagePath, miniPath = miniPath)
                 }
             }
         }
@@ -89,9 +87,9 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
         with(binding) {
             tieNn.setText(data.nickname)
 
-            if (data.imageUrl?.isNotBlank() == true) {
+            if (data.imageUrlSmall?.isNotBlank() == true) {
                 Glide.with(requireContext())
-                    .load(data.imageUrl)
+                    .load(data.imageUrlSmall)
                     .into(ivIcon)
             }
 

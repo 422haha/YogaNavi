@@ -12,90 +12,77 @@ import java.io.File
 import java.io.FileOutputStream
 
 fun getVideoPath(context: Context, uri: Uri): String {
-    val returnCursor = context.contentResolver.query(uri, null, null, null, null)
-    val nameIndex = returnCursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME) ?: -1
-    returnCursor?.moveToFirst()
-    val name = returnCursor?.getString(nameIndex) ?: ""
-    val file = File(context.filesDir, name)
-    returnCursor?.close()
+    val fileName = context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        cursor.moveToFirst()
+        cursor.getString(nameIndex)
+    } ?: ""
 
-    try {
-        context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            FileOutputStream(file).use { outputStream ->
-                val maxBufferSize = 1024 * 1024
-                val buffer = ByteArray(maxBufferSize)
-                var bytesRead: Int
+    if (fileName.isBlank()) return ""
+    val file = File(context.cacheDir, fileName)
+    file.createNewFile()
 
-                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                    outputStream.write(buffer, 0, bytesRead)
-                }
-            }
+    context.contentResolver.openInputStream(uri)?.use { inputStream ->
+        FileOutputStream(file).use { outputStream ->
+            inputStream.copyTo(outputStream)
         }
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
+    } ?: return ""
 
     return file.path
 }
 
 suspend fun getImagePath(
     context: Context,
-    uri: Uri,
-    ratio: Int = 1
-): String = withContext(Dispatchers.IO) {
+    uri: Uri
+): Pair<String, String> = withContext(Dispatchers.IO) {
     val contentResolver = context.contentResolver
-    val returnCursor = contentResolver.query(uri, null, null, null, null)
 
-    val name = returnCursor?.use {
-        val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        it.moveToFirst()
-        it.getString(nameIndex)
-    } ?: return@withContext ""
+    // 파일 이름 가져오기
+    val fileName = contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        cursor.moveToFirst()
+        cursor.getString(nameIndex)
+    } ?: ""
+    if (fileName.isBlank()) return@withContext Pair("", "")
 
-    val originalFile = File(context.filesDir, name)
+    // 임시 파일 생성
+    val tempFile = File(context.cacheDir, fileName)
+    tempFile.createNewFile()
 
-    try {
-        contentResolver.openInputStream(uri)?.use { inputStream ->
-            FileOutputStream(originalFile).use { outputStream ->
-                val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-                var bytesRead: Int
-                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                    outputStream.write(buffer, 0, bytesRead)
-                }
-            }
+    contentResolver.openInputStream(uri)?.use { inputStream ->
+        tempFile.outputStream().use { outputStream ->
+            inputStream.copyTo(outputStream)
         }
-    } catch (e: Exception) {
-        e.printStackTrace()
-        return@withContext ""
-    }
+    } ?: return@withContext Pair("", "")
 
-    val bmp = BitmapFactory.decodeFile(originalFile.path) ?: return@withContext ""
-    val rotatedBitmap = getCorrectlyOrientedBitmap(originalFile.path, bmp)
+    val originalPath = tempFile.absolutePath
 
-    val bitmap = Bitmap.createScaledBitmap(
+    val bmp = BitmapFactory.decodeFile(originalPath) ?: return@withContext Pair("", "")
+    val rotatedBitmap = getCorrectlyOrientedBitmap(originalPath, bmp)
+
+    // 미니 이미지 생성 및 저장
+    val miniBitmap = Bitmap.createScaledBitmap(
         rotatedBitmap,
-        rotatedBitmap.width / ratio,
-        rotatedBitmap.height / ratio,
+        rotatedBitmap.width / 6,
+        rotatedBitmap.height / 6,
         true
     )
 
-    val webpFile = File(context.filesDir, "${name.substringBeforeLast('.')}.webp")
+    val miniWebpFile = File(context.filesDir, "${fileName.substringBeforeLast('.')}_mini.webp")
     try {
-        FileOutputStream(webpFile).use { outputStream ->
-            bitmap.compress(Bitmap.CompressFormat.WEBP, 70, outputStream)
+        FileOutputStream(miniWebpFile).use { outputStream ->
+            miniBitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
         }
     } catch (e: Exception) {
         e.printStackTrace()
-        return@withContext ""
+        return@withContext Pair("", "")
     } finally {
-        bitmap.recycle()
+        miniBitmap.recycle()
         rotatedBitmap.recycle()
         bmp.recycle()
     }
 
-    originalFile.delete()
-
-    return@withContext webpFile.path
+    return@withContext Pair(originalPath, miniWebpFile.path)
 }
 
 fun getCorrectlyOrientedBitmap(filePath: String, bitmap: Bitmap): Bitmap {
