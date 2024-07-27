@@ -31,6 +31,9 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     @Column
     private String profile_image_url;
 
+    @Column
+    private String profile_image_url_small;
+
     @Column(nullable = false)
     private String role;
 
@@ -87,6 +90,14 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
 
     public void setProfile_image_url(String profile_image_url) {
         this.profile_image_url = profile_image_url;
+    }
+
+    public String getProfile_image_url_small() {
+        return profile_image_url_small;
+    }
+
+    public void setProfile_image_url_small(String profile_image_url_small) {
+        this.profile_image_url_small = profile_image_url_small;
     }
 
     public String getRole() {

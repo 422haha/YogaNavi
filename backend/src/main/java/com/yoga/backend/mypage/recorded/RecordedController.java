@@ -1,7 +1,6 @@
 package com.yoga.backend.mypage.recorded;
 
 import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.recorded.dto.ChapterDto;
 import com.yoga.backend.mypage.recorded.dto.DeleteDto;
 import com.yoga.backend.mypage.recorded.dto.LectureDto;
@@ -21,7 +20,7 @@ import java.util.List;
  * */
 @Slf4j
 @RestController
-@RequestMapping("/mypage/recorded-lecture")
+@RequestMapping("/")
 public class RecordedController {
 
     private final RecordedService recordedService;
@@ -40,7 +39,7 @@ public class RecordedController {
      * @param token jwt
      * @return 사용자가 업로드한 강의 목록과 관련된 정보가 포함된 ResponseEntity 객체
      */
-    @GetMapping("/list")
+    @GetMapping("/mypage/recorded-lecture/list")
     public ResponseEntity<Map<String, Object>> getMyLectures(
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
@@ -66,7 +65,7 @@ public class RecordedController {
      * @param token jwt
      * @return 사용자가 업로드한 강의 목록과 관련된 정보가 포함된 ResponseEntity 객체
      */
-    @GetMapping("/likelist")
+    @GetMapping("/mypage/recorded-lecture/likelist")
     public ResponseEntity<Map<String, Object>> getLikeLectures(
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
@@ -92,7 +91,7 @@ public class RecordedController {
      * @param lectureDto 강의 정보
      * @return sessionId
      */
-    @PostMapping("/create")
+    @PostMapping("/mypage/recorded-lecture/create")
     public ResponseEntity<Map<String, Object>> createLecture(
         @RequestHeader("Authorization") String token,
         @RequestBody LectureDto lectureDto) {
@@ -118,13 +117,12 @@ public class RecordedController {
      * @param recorded_id 강의 id
      * @return 강의 상세 정보
      */
-    @GetMapping("/detail/{recorded_id}")
+    @GetMapping("/mypage/recorded-lecture/detail/{recorded_id}")
     public ResponseEntity<Map<String, Object>> getLectureDetails(
         @RequestHeader("Authorization") String token, @PathVariable long recorded_id) {
         Map<String, Object> response = new HashMap<>();
         int userId = jwtUtil.getUserIdFromToken(token);
         LectureDto lectureDto = recordedService.getLectureDetails(recorded_id, userId);
-        System.out.println("================="+lectureDto.getRecordedLectureChapters().get(0).getId());
         if (lectureDto != null) {
             response.put("message", "녹화강의 조회 성공");
             response.put("data", lectureDto);
@@ -138,11 +136,12 @@ public class RecordedController {
 
     /**
      * 강의의 정보 수정
+     *
      * @param token      jwt 토큰
      * @param lectureDto 수정된 강의 dto
      * @return 강의 수정 성공/실패 응답
      */
-    @PutMapping("/update/{recordedId}")
+    @PutMapping("/mypage/recorded-lecture/update/{recordedId}")
     public ResponseEntity<Map<String, Object>> updateLecture(
         @RequestHeader("Authorization") String token,
         @PathVariable Long recordedId,
@@ -150,8 +149,8 @@ public class RecordedController {
         Map<String, Object> response = new HashMap<>();
         lectureDto.setRecordedId(recordedId);
 
-        for(ChapterDto ctr:lectureDto.getRecordedLectureChapters()){
-            System.out.println(ctr.getId()+"      =======        "+ctr.getRecordVideo());
+        for (ChapterDto ctr : lectureDto.getRecordedLectureChapters()) {
+            System.out.println(ctr.getId() + "      =======        " + ctr.getRecordVideo());
         }
 
         log.info("강의 수정 ID: {}", recordedId);
@@ -184,16 +183,16 @@ public class RecordedController {
     /**
      * 강의 삭제 요청
      *
-     * @param token      jwt 토큰
-     * @param deleteDto  삭제할 강의 ID 리스트를 포함한 DTO
+     * @param token     jwt 토큰
+     * @param deleteDto 삭제할 강의 ID 리스트를 포함한 DTO
      * @return 강의 삭제 성공/실패 응답
      */
-    @PostMapping("/delete")
+    @PostMapping("/mypage/recorded-lecture/delete")
     public ResponseEntity<Map<String, Object>> deleteLectures(
         @RequestHeader("Authorization") String token,
         @RequestBody DeleteDto deleteDto) {
 
-        for(Long l: deleteDto.getLectureIds()){
+        for (Long l : deleteDto.getLectureIds()) {
             log.debug("삭제할 강의 ID: {}", l); // 삭제할 강의 ID를 로그에 기록
         }
 
@@ -229,7 +228,7 @@ public class RecordedController {
      * @param recordedId 강의 id
      * @return 좋아요/취소 성공/실패 응답
      */
-    @PostMapping("/like/{recordedId}")
+    @PostMapping("/recorded-lecture/like/{recordedId}")
     public ResponseEntity<Map<String, Object>> like(@RequestHeader("Authorization") String token,
         @PathVariable Long recordedId) {
         Map<String, Object> response = new HashMap<>();
@@ -241,11 +240,34 @@ public class RecordedController {
             response.put("data", isLiked);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
-            log.error("Error processing like/unlike for lecture {} by user {}", recordedId, userId, e);
+            log.error("Error processing like/unlike for lecture {} by user {}", recordedId, userId,
+                e);
             response.put("message", "오류가 발생했습니다: " + e.getMessage());
             response.put("data", false);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
+    @GetMapping("/recorded-lecture/sort/{sort}")
+    public ResponseEntity<Map<String, Object>> getAllLectures(
+        @RequestHeader("Authorization") String token,
+        @PathVariable String sort,
+        @RequestParam(defaultValue = "0") int page
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        int userId = jwtUtil.getUserIdFromToken(token);
+        int size = 21;
+        log.info("사용자 ID: {}", userId);
+        List<LectureDto> lectureList = recordedService.getAllLectures(userId, page, size, sort);
+
+        if (!lectureList.isEmpty()) {
+            response.put("message", "녹화강의 조회 성공");
+            response.put("data", lectureList);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            response.put("message", "녹화강의 없음");
+            response.put("data", new Object[]{});
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
 }

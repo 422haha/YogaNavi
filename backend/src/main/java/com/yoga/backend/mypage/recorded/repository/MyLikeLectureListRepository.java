@@ -28,7 +28,7 @@ public class MyLikeLectureListRepository {
             .select(constructor(LectureDto.class,
                 Expressions.as(lecture.id, "recordedId"),
                 Expressions.as(lecture.title, "recordTitle"),
-                Expressions.as(lecture.thumbnail, "recordThumbnail"),
+                Expressions.as(lecture.thumbnailSmall, "recordThumbnailSmall"),
                 Expressions.as(JPAExpressions.select(like.id.count())
                     .from(like)
                     .where(like.lecture.eq(lecture)), "likeCount"),
@@ -39,4 +39,5 @@ public class MyLikeLectureListRepository {
             .orderBy(lecture.createdDate.desc())
             .fetch();
     }
+
 }

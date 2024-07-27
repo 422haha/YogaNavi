@@ -9,7 +9,6 @@ import com.yoga.backend.members.repository.HashtagRepository;
 import com.yoga.backend.members.repository.UsersRepository;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -201,12 +200,20 @@ public class UsersServiceImpl implements UsersService {
         if (users.isPresent()) {
             Users user = users.get();
             String profileImageUrl = user.getProfile_image_url();
+            String profileImageUrlSmall = user.getProfile_image_url_small();
             if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
                 String presignedUrl = s3Service.generatePresignedUrl(profileImageUrl,
                     URL_EXPIRATION_SECONDS);
                 user.setProfile_image_url(presignedUrl);
             } else {
                 user.setProfile_image_url(null);
+            }
+            if (profileImageUrlSmall != null && !profileImageUrlSmall.isEmpty()) {
+                String presignedUrlSmall = s3Service.generatePresignedUrl(profileImageUrlSmall,
+                    URL_EXPIRATION_SECONDS);
+                user.setProfile_image_url_small(presignedUrlSmall);
+            } else {
+                user.setProfile_image_url_small(null);
             }
             return user;
         }
@@ -223,7 +230,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public Users updateUser(UpdateDto updateDto, int userId) {
-        log.info("Updating user with ID: {}", userId);
+        log.info("사용자 {}의 정보 변경", userId);
 
         Optional<Users> users = usersRepository.findById(userId);
 
@@ -231,39 +238,57 @@ public class UsersServiceImpl implements UsersService {
             Users user = users.get();
 
             if (updateDto.getNickname() != null) {
-                log.debug("Updating nickname for user {}: {}", userId, updateDto.getNickname());
+                log.debug("사용자 {}의 닉네임 변경: {}", userId, updateDto.getNickname());
                 user.setNickname(updateDto.getNickname());
             }
 
             if (updateDto.getImageUrl() != null) {
                 String oldImageUrl = user.getProfile_image_url();
                 if (oldImageUrl != null && !oldImageUrl.equals(updateDto.getImageUrl())) {
-                    log.debug("Deleting old profile image for user {}: {}", userId, oldImageUrl);
+                    log.debug("사용자 {}의 프로필 이미지 삭제: {}", userId, oldImageUrl);
                     try {
                         s3Service.deleteFile(oldImageUrl);
                     } catch (Exception e) {
-                        log.error("Failed to delete old profile image for user {}: {}", userId,
+                        log.error("사용자 {}의 프로필 이미지 삭제 불가: {}", userId,
                             oldImageUrl, e);
-                        // 여기서 예외를 던지거나 처리하는 방식을 결정해야 합니다.
-                        // throw new RuntimeException("Failed to delete old profile image", e);
+
+                        throw new RuntimeException("이전 프로필 이미지 삭제 불가", e);
                     }
                 }
-                log.debug("Updating profile image URL for user {}: {}", userId,
+                log.debug("사용자 {}의 프로필 이미지를 변경: {}", userId,
                     updateDto.getImageUrl());
                 user.setProfile_image_url(updateDto.getImageUrl());
             }
 
+            if (updateDto.getImageUrlSmall() != null) {
+                String oldImageUrlSmall = user.getProfile_image_url_small();
+                if (oldImageUrlSmall != null && !oldImageUrlSmall.equals(updateDto.getImageUrlSmall())) {
+                    log.debug("사용자 {}의 소형 프로필 이미지 삭제: {}", userId, oldImageUrlSmall);
+                    try {
+                        s3Service.deleteFile(oldImageUrlSmall);
+                    } catch (Exception e) {
+                        log.error("사용자 {}의 소형 프로필 이미지 삭제 불가: {}", userId,
+                            oldImageUrlSmall, e);
+
+                        throw new RuntimeException("이전 소형 프로필 이미지 삭제 불가", e);
+                    }
+                }
+                log.debug("사용자 {}의 소형 프로필 이미지를 변경: {}", userId,
+                    updateDto.getImageUrl());
+                user.setProfile_image_url_small(updateDto.getImageUrlSmall());
+            }
+
             if (updateDto.getPassword() != null) {
-                log.debug("Updating password for user {}", userId);
+                log.debug("사용자 {}의 비밀번호 수정", userId);
                 user.setPwd(passwordEncoder.encode(updateDto.getPassword()));
             }
 
             if (updateDto.getHashTags() != null && !updateDto.getHashTags().isEmpty()) {
-                log.debug("Updating hashtags for user {}: {}", userId, updateDto.getHashTags());
+                log.debug("사용자 {}의 해시태그 수정: {}", userId, updateDto.getHashTags());
                 updateUserHashtags(userId, Set.copyOf(updateDto.getHashTags()));
             }
             Users updatedUser = usersRepository.save(user);
-            log.info("Successfully updated user with ID: {}", userId);
+            log.info("사용자 {}의 정보 수정", userId);
             return updatedUser;
 
         }

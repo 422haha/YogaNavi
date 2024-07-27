@@ -29,6 +29,8 @@ public class RecordedLecture {
 
     private String thumbnail;
 
+    private String thumbnailSmall;
+
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<RecordedLectureChapter> chapters;
 
@@ -98,6 +100,14 @@ public class RecordedLecture {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public String getThumbnailSmall() {
+        return thumbnailSmall;
+    }
+
+    public void setThumbnailSmall(String thumbnailSmall) {
+        this.thumbnailSmall = thumbnailSmall;
     }
 
     public List<RecordedLectureChapter> getChapters() {

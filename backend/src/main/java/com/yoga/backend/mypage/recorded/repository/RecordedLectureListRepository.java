@@ -26,7 +26,7 @@ public class RecordedLectureListRepository {
             .select(Projections.constructor(LectureDto.class,
                 lecture.id.as("recordedId"),
                 lecture.title.as("recordTitle"),
-                lecture.thumbnail.as("recordThumbnail"),
+                lecture.thumbnailSmall.as("recordThumbnailSmall"),
                 lecture.likeCount.as("likeCount"),
                 JPAExpressions.selectOne()
                     .from(like)

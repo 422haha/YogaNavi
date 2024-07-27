@@ -10,4 +10,6 @@ public class ArticleDto {
 
     private String content; // 게시글 내용
     private String imageUrl; // 이미지 URL
+    private String imageUrlSmall;
+
 }
