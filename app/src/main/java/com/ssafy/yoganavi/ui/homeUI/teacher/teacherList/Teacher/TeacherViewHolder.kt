@@ -15,6 +15,7 @@ class TeacherViewHolder(
         tvTeacherNickname.text = item.teacherName
         tvCount.text = item.likes.toK()
         tvHashtag.text = item.hashtags.joinToString(" ", "#")
+        // TODO: small버전 프로필 먼저 띄우기 
         Glide.with(binding.root)
             .load(item.teacherProfile)
             .into(binding.ivProfile)
