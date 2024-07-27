@@ -22,12 +22,10 @@ class ChapterViewHolder(
             clearVideo()
         }
 
-        val uri = if (data.recordPath.isNotBlank()) {
-            data.recordPath
-        } else if (data.recordVideo.isNotBlank()) {
-            data.recordVideo
-        } else {
-            ""
+        val uri = when {
+            data.recordPath.isNotBlank() -> data.recordPath
+            data.recordVideo.isNotBlank() -> data.recordVideo
+            else -> ""
         }
 
         if (uri.isNotBlank()) addVideo(uri)

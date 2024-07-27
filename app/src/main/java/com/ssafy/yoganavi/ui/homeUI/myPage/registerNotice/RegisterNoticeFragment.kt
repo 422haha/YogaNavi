@@ -37,7 +37,7 @@ class RegisterNoticeFragment :
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data ?: return@registerForActivityResult
                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                    val imagePath = getImagePath(requireContext(), imageUri)
+                    val (imagePath, _) = getImagePath(requireContext(), imageUri)
                     if (imagePath.isNotBlank()) {
                         withContext(Dispatchers.Main) {
                             viewModel.addImage(imagePath)
@@ -46,6 +46,7 @@ class RegisterNoticeFragment :
                 }
             }
         }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.ivPhoto.visibility = View.GONE
@@ -106,8 +107,7 @@ class RegisterNoticeFragment :
                     binding.ivPhoto.visibility = View.VISIBLE
                     binding.btnDeletePhoto.visibility = View.VISIBLE
                     binding.btnAddPhoto.visibility = View.GONE
-                }
-                else if(notice.imageUrlPath.isNotBlank()){
+                } else if (notice.imageUrlPath.isNotBlank()) {
                     binding.ivPhoto.setImageURI(notice.imageUrlPath.toUri())
                     binding.ivPhoto.visibility = View.VISIBLE
                     binding.btnDeletePhoto.visibility = View.VISIBLE
@@ -117,13 +117,15 @@ class RegisterNoticeFragment :
                             override fun onGlobalLayout() {
                                 binding.ivPhoto.viewTreeObserver.removeOnGlobalLayoutListener(this)
                                 binding.scRegisterNotice.post {
-                                    binding.scRegisterNotice.smoothScrollTo(0, binding.scRegisterNotice.getChildAt(0).bottom)
+                                    binding.scRegisterNotice.smoothScrollTo(
+                                        0,
+                                        binding.scRegisterNotice.getChildAt(0).bottom
+                                    )
                                 }
                             }
                         }
                     )
-                }
-                else {
+                } else {
                     binding.ivPhoto.visibility = View.GONE
                     binding.btnDeletePhoto.visibility = View.GONE
                     binding.btnAddPhoto.visibility = View.VISIBLE

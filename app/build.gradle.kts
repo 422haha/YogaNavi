@@ -52,8 +52,11 @@ android {
 }
 
 dependencies {
+    // Paging3
+    implementation(libs.androidx.paging.runtime)
+
     //Flexible RecyclerView
-    implementation (libs.google.flexbox)
+    implementation(libs.google.flexbox)
 
     // Exo Player
     implementation(libs.androidx.media3.exoplayer)

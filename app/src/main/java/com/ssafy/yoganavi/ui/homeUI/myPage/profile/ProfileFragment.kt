@@ -32,9 +32,9 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
         with(binding) {
             tvName.text = profile.nickname
 
-            if(profile.imageUrl != null){
+            if(profile.imageUrlSmall != null){
                 Glide.with(requireContext())
-                    .load(profile.imageUrl)
+                    .load(profile.imageUrlSmall)
                     .into(ivIcon)
             }
 
