@@ -8,6 +8,7 @@ import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.mypage.ProfileData
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
+import com.ssafy.yoganavi.data.source.teacher.TeacherData
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -20,6 +21,10 @@ interface InfoAPI {
 
     @GET("mypage")
     suspend fun getProfile(): Response<YogaDetailResponse<ProfileData>>
+
+    //TEACHER
+    @GET("teacher")
+    suspend fun getTeacherList(): Response<YogaResponse<TeacherData>>
 
     // LECTURE
     @GET("mypage/recorded-lecture/list")
@@ -54,7 +59,10 @@ interface InfoAPI {
     suspend fun createLive(@Body liveLectureData: LiveLectureData): Response<YogaDetailResponse<Unit>>
 
     @PUT("mypage/live-lecture-manage/update/{live_id}")
-    suspend fun updateLive(@Body liveLectureData: LiveLectureData, @Path("live_id") liveId: Int): Response<YogaDetailResponse<Unit>>
+    suspend fun updateLive(
+        @Body liveLectureData: LiveLectureData,
+        @Path("live_id") liveId: Int
+    ): Response<YogaDetailResponse<Unit>>
 
     @DELETE("mypage/live-lecture-manage/delete/{live_id}")
     suspend fun deleteLive(@Path("live_id") liveId: Int): Response<YogaDetailResponse<Unit>>

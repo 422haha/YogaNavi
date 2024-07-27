@@ -8,6 +8,7 @@ import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.mypage.ProfileData
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
+import com.ssafy.yoganavi.data.source.teacher.TeacherData
 import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,6 +18,9 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
 
     override suspend fun getProfile(): Response<YogaDetailResponse<ProfileData>> =
         infoAPI.getProfile()
+
+    override suspend fun getTeacherList(): Response<YogaResponse<TeacherData>> =
+        infoAPI.getTeacherList()
 
     // LECTURE
     override suspend fun getLectureList(): Response<YogaResponse<LectureData>> =
@@ -47,7 +51,10 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun createLive(liveLectureData: LiveLectureData): Response<YogaDetailResponse<Unit>> =
         infoAPI.createLive(liveLectureData)
 
-    override suspend fun updateLive(liveLectureData: LiveLectureData, liveId: Int): Response<YogaDetailResponse<Unit>> =
+    override suspend fun updateLive(
+        liveLectureData: LiveLectureData,
+        liveId: Int
+    ): Response<YogaDetailResponse<Unit>> =
         infoAPI.updateLive(liveLectureData, liveId)
 
     override suspend fun deleteLive(liveId: Int): Response<YogaDetailResponse<Unit>> =

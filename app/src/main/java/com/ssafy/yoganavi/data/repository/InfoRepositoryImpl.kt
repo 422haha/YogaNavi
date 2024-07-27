@@ -11,6 +11,7 @@ import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.mypage.ProfileData
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
+import com.ssafy.yoganavi.data.source.teacher.TeacherData
 import com.ssafy.yoganavi.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -26,6 +27,11 @@ class InfoRepositoryImpl @Inject constructor(
     override suspend fun getProfile(): DetailResponse<ProfileData> {
         val response = withContext(ioDispatcher) { infoDataSource.getProfile() }
         return response.toDetailResponse()
+    }
+
+    override suspend fun getTeacherList(): ListResponse<TeacherData> {
+        val response = withContext(ioDispatcher) { infoDataSource.getTeacherList() }
+        return response.toListResponse()
     }
 
     // LECTURE
@@ -71,8 +77,12 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toDetailResponse()
     }
 
-    override suspend fun updateLive(liveLectureData: LiveLectureData, liveId: Int): DetailResponse<Unit> {
-        val response = withContext(ioDispatcher) { infoDataSource.updateLive(liveLectureData, liveId) }
+    override suspend fun updateLive(
+        liveLectureData: LiveLectureData,
+        liveId: Int
+    ): DetailResponse<Unit> {
+        val response =
+            withContext(ioDispatcher) { infoDataSource.updateLive(liveLectureData, liveId) }
         return response.toDetailResponse()
     }
 
