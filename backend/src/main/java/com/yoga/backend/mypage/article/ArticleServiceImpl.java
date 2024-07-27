@@ -57,6 +57,18 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
+     * 모든 게시글을 조회합니다.
+     *
+     * @return 게시글 리스트
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Article> getAllArticles() {
+        List<Article> articles = articleRepository.findAllWithUser();
+        return applyPresignedUrlsAsync(articles);
+    }
+
+    /**
      * 특정 사용자의 모든 게시글을 조회합니다.
      *
      * @param userId 사용자 ID
@@ -65,7 +77,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional(readOnly = true)
     public List<Article> getArticlesByUserId(int userId) {
-        List<Article> articles = articleRepository.findByUserId(userId);
+        List<Article> articles = articleRepository.findByUserIdWithUser(userId);
         return applyPresignedUrlsAsync(articles);
     }
 
@@ -78,7 +90,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Article> getArticleById(Long id) {
-        Optional<Article> articleOpt = articleRepository.findById(id);
+        Optional<Article> articleOpt = articleRepository.findByIdWithUser(id);
         return articleOpt.map(this::applyPresignedUrl);
     }
 

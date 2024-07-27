@@ -1,7 +1,10 @@
 package com.yoga.backend.mypage.article;
 
 import com.yoga.backend.common.entity.Article;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,4 +30,13 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
      * @return 게시글 목록
      */
     List<Article> findByContent(String content);
+
+    @Query("SELECT a FROM Article a JOIN FETCH a.user WHERE a.user.id = :userId")
+    List<Article> findByUserIdWithUser(@Param("userId") int userId);
+
+    @Query("SELECT a FROM Article a JOIN FETCH a.user")
+    List<Article> findAllWithUser();
+
+    @Query("SELECT a FROM Article a JOIN FETCH a.user WHERE a.articleId = :id")
+    Optional<Article> findByIdWithUser(@Param("id") Long id);
 }
