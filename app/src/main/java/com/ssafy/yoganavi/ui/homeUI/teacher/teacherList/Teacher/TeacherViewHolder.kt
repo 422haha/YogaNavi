@@ -15,9 +15,8 @@ class TeacherViewHolder(
         tvTeacherNickname.text = item.teacherName
         tvCount.text = item.likes.toK()
         tvHashtag.text = item.hashtags.joinToString(" ", "#")
-        // TODO: small버전 프로필 먼저 띄우기 
         Glide.with(binding.root)
-            .load(item.teacherProfile)
+            .load(item.teacherSmallProfile)
             .into(binding.ivProfile)
         if (item.isLiked) {
             binding.ivFavoriteColor.isVisible = true
