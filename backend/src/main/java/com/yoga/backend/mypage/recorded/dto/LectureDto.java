@@ -20,6 +20,7 @@ public class LectureDto {
     private String recordTitle;
     private String recordContent;
     private String recordThumbnail;
+    private String recordThumbnailSmall;
     private List<ChapterDto> recordedLectureChapters;
     private long likeCount;
     private boolean myLike;

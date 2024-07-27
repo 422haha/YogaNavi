@@ -8,6 +8,7 @@ public class UpdateDto {
     private boolean teacher;
     private int authnumber;
     private String imageUrl;
+    private String imageUrlSmall;
     private List<String> hashTags;
 
 
@@ -49,6 +50,14 @@ public class UpdateDto {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getImageUrlSmall() {
+        return imageUrlSmall;
+    }
+
+    public void setImageUrlSmall(String imageUrlSmall) {
+        this.imageUrlSmall = imageUrlSmall;
     }
 
     public List<String> getHashTags() {

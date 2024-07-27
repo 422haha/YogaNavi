@@ -7,6 +7,7 @@ import com.yoga.backend.common.entity.RecordedLectures.RecordedLectureLike;
 import com.yoga.backend.mypage.recorded.dto.ChapterDto;
 import com.yoga.backend.mypage.recorded.dto.DeleteDto;
 import com.yoga.backend.mypage.recorded.dto.LectureDto;
+import com.yoga.backend.mypage.recorded.repository.AllRecordedLecturesRepository;
 import com.yoga.backend.mypage.recorded.repository.MyLikeLectureListRepository;
 import com.yoga.backend.mypage.recorded.repository.RecordedLectureLikeRepository;
 import com.yoga.backend.mypage.recorded.repository.RecordedLectureListRepository;
@@ -44,18 +45,22 @@ public class RecordedServiceImpl implements RecordedService {
     private final RecordedLectureListRepository recordedLectureListRepository;
     private final MyLikeLectureListRepository myLikeLectureListRepository;
     private final RecordedLectureLikeRepository lectureLikeRepository;
+    private final AllRecordedLecturesRepository allRecordedLecturesRepository;
 
     @Autowired
     public RecordedServiceImpl(S3Service s3Service,
         RecordedLectureRepository recordedLectureRepository,
         RecordedLectureListRepository recordedLectureListRepository,
         MyLikeLectureListRepository myLikeLectureListRepository,
-        RecordedLectureLikeRepository lectureLikeRepository) {
+        RecordedLectureLikeRepository lectureLikeRepository,
+        AllRecordedLecturesRepository allRecordedLecturesRepository
+    ) {
         this.s3Service = s3Service;
         this.recordedLectureRepository = recordedLectureRepository;
         this.recordedLectureListRepository = recordedLectureListRepository;
         this.myLikeLectureListRepository = myLikeLectureListRepository;
         this.lectureLikeRepository = lectureLikeRepository;
+        this.allRecordedLecturesRepository = allRecordedLecturesRepository;
     }
 
     /**
@@ -96,6 +101,7 @@ public class RecordedServiceImpl implements RecordedService {
         lecture.setTitle(lectureDto.getRecordTitle());
         lecture.setContent(lectureDto.getRecordContent());
         lecture.setThumbnail(lectureDto.getRecordThumbnail());
+        lecture.setThumbnailSmall(lectureDto.getRecordThumbnailSmall());
 
         List<RecordedLectureChapter> chapters = new ArrayList<>();
         for (ChapterDto chapterDto : lectureDto.getRecordedLectureChapters()) {
@@ -192,6 +198,15 @@ public class RecordedServiceImpl implements RecordedService {
             // 새 썸네일 설정
             lecture.setThumbnail(lectureDto.getRecordThumbnail());
             log.info("강의 썸네일 업데이트: {}", lectureDto.getRecordThumbnail());
+        }
+
+        // 작은 썸네일 업데이트 (변경된 경우)
+        if (!lecture.getThumbnailSmall().equals(lectureDto.getRecordThumbnailSmall())) {
+            // 기존 저용량 썸네일 삭제
+            s3Service.deleteFile(lecture.getThumbnailSmall());
+            // 새 저용량 썸네일 설정
+            lecture.setThumbnailSmall(lectureDto.getRecordThumbnailSmall());
+            log.info("강의 소형 썸네일 업데이트: {}", lectureDto.getRecordThumbnail());
         }
     }
 
@@ -373,6 +388,10 @@ public class RecordedServiceImpl implements RecordedService {
                 s3Service.deleteFile(lecture.getThumbnail());
             }
 
+            if (lecture.getThumbnailSmall() != null && !lecture.getThumbnailSmall().isEmpty()) {
+                s3Service.deleteFile(lecture.getThumbnailSmall());
+            }
+
             for (RecordedLectureChapter chapter : lecture.getChapters()) {
                 if (chapter.getVideoUrl() != null && !chapter.getVideoUrl().isEmpty()) {
                     log.info("챕터의 비디오 삭제 {} 강의 번호 {}: {}",
@@ -415,6 +434,13 @@ public class RecordedServiceImpl implements RecordedService {
         }
     }
 
+    @Override
+    public List<LectureDto> getAllLectures(int userId, int page, int size, String sort) {
+        List<LectureDto> lectures = allRecordedLecturesRepository.findAllLectures(userId, page,
+            size, sort);
+        return generatePresignedUrlsLike(lectures);
+    }
+
     private LectureDto convertToDto(RecordedLecture lecture) {
         LectureDto dto = new LectureDto();
         dto.setRecordedId(lecture.getId());
@@ -422,6 +448,7 @@ public class RecordedServiceImpl implements RecordedService {
         dto.setRecordTitle(lecture.getTitle());
         dto.setRecordContent(lecture.getContent());
         dto.setRecordThumbnail(lecture.getThumbnail());
+        dto.setRecordThumbnailSmall(lecture.getThumbnailSmall());
         dto.setLikeCount(lecture.getLikeCount());
         dto.setMyLike(false); // 이 값은 나중에 설정됩니다.
 
@@ -454,6 +481,8 @@ public class RecordedServiceImpl implements RecordedService {
         for (LectureDto lecture : lectures) {
             lecture.setRecordThumbnail(
                 getPresignedUrl(lecture.getRecordThumbnail(), presignedUrls));
+            lecture.setRecordThumbnailSmall(
+                getPresignedUrl(lecture.getRecordThumbnailSmall(), presignedUrls));
             if (lecture.getRecordedLectureChapters() != null) {
                 for (ChapterDto chapter : lecture.getRecordedLectureChapters()) {
                     chapter.setRecordVideo(
@@ -461,7 +490,6 @@ public class RecordedServiceImpl implements RecordedService {
                 }
             }
         }
-
         return lectures;
     }
 
@@ -470,6 +498,7 @@ public class RecordedServiceImpl implements RecordedService {
 
         for (LectureDto lecture : lectures) {
             addKeyIfNeeded(keysToGenerate, lecture.getRecordThumbnail());
+            addKeyIfNeeded(keysToGenerate, lecture.getRecordThumbnailSmall());
             if (lecture.getRecordedLectureChapters() != null) {
                 for (ChapterDto chapter : lecture.getRecordedLectureChapters()) {
                     addKeyIfNeeded(keysToGenerate, chapter.getRecordVideo());

@@ -24,6 +24,7 @@ public class Article {
     private LocalDateTime createdAt; // 생성일자
     private LocalDateTime updatedAt; // 수정일자
     private String imageUrl; // 이미지 URL
+    private String imageUrlSmall;
 
     @Version
     private Integer version; // 낙관적 락을 위한 버전 필드

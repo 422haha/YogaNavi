@@ -200,6 +200,7 @@ public class UserController {
                 UpdateDto responseDto = new UpdateDto();
                 boolean isTeacher = jwtUtil.getRoleFromToken(token).equals("TEACHER");
                 responseDto.setImageUrl(user.getProfile_image_url());
+                responseDto.setImageUrlSmall(user.getProfile_image_url_small());
                 responseDto.setNickname(user.getNickname());
                 responseDto.setTeacher(isTeacher);
 
@@ -209,16 +210,16 @@ public class UserController {
                     responseDto.setHashTags(tags);
                 }
 
-                response.put("message", "success");
+                response.put("message", "조회 성공");
                 response.put("data", responseDto);
                 return ResponseEntity.ok(response);
             } else {
-                response.put("message", "User not found");
+                response.put("message", "사용자 찾을 수 없음");
                 response.put("data", new Object[]{});
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
         } catch (Exception e) {
-            response.put("message", "Error retrieving user information: " + e.getMessage());
+            response.put("message", "내 정보 조회 중 오류 발생: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -241,6 +242,7 @@ public class UserController {
                 UpdateDto responseDto = new UpdateDto();
                 boolean isTeacher = jwtUtil.getRoleFromToken(token).equals("TEACHER");
                 responseDto.setImageUrl(user.getProfile_image_url());
+                responseDto.setImageUrlSmall(user.getProfile_image_url_small());
                 responseDto.setNickname(user.getNickname());
                 responseDto.setTeacher(isTeacher);
 
@@ -250,16 +252,16 @@ public class UserController {
                     responseDto.setHashTags(tags);
                 }
 
-                response.put("message", "success");
+                response.put("message", "수정 완료");
                 response.put("data", responseDto);
                 return ResponseEntity.ok(response);
             } else {
-                response.put("message", "User not found");
+                response.put("message", "사용자 찾을 수 없음");
                 response.put("data", new Object[]{});
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
         } catch (Exception e) {
-            response.put("message", "Error retrieving user information: " + e.getMessage());
+            response.put("message", "수정 중 오류 발생: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
