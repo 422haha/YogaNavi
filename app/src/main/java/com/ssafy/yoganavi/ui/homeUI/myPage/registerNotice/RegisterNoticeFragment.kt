@@ -13,7 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentRegisterNoticeBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
@@ -21,6 +20,7 @@ import com.ssafy.yoganavi.ui.utils.MANAGEMENT_INSERT
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_UPDATE
 import com.ssafy.yoganavi.ui.utils.REGISTER
 import com.ssafy.yoganavi.ui.utils.getImagePath
+import com.ssafy.yoganavi.ui.utils.loadImageSequentially
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -34,16 +34,12 @@ class RegisterNoticeFragment :
     private val viewModel: RegisterNoticeViewModel by viewModels()
     private val imageUriLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val imageUri = result.data?.data ?: return@registerForActivityResult
-                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                    val (imagePath, _) = getImagePath(requireContext(), imageUri)
-                    if (imagePath.isNotBlank()) {
-                        withContext(Dispatchers.Main) {
-                            viewModel.addImage(imagePath)
-                        }
-                    }
-                }
+            if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
+            val imageUri = result.data?.data ?: return@registerForActivityResult
+
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                val (imagePath, miniPath) = getImagePath(requireContext(), imageUri)
+                viewModel.addImage(imagePath, miniPath)
             }
         }
 
@@ -57,24 +53,16 @@ class RegisterNoticeFragment :
             viewModel.getNotice(args.articleId)
             setToolbar(false, MANAGEMENT_UPDATE, true, REGISTER) {
                 val notice = binding.etNotice.text.toString()
-                if (notice.isBlank()) {
-                    showSnackBar(R.string.notice_info)
-                } else {
-                    viewModel.updateNotice(notice) {
-                        goBackStack()
-                    }
-                }
+
+                if (notice.isBlank()) showSnackBar(R.string.notice_info)
+                else viewModel.updateNotice(notice, ::goBackStack)
             }
         } else {
             setToolbar(false, MANAGEMENT_INSERT, true, REGISTER) {
                 val notice = binding.etNotice.text.toString()
-                if (notice.isBlank()) {
-                    showSnackBar(R.string.notice_info)
-                } else {
-                    viewModel.insertNotice(notice) {
-                        goBackStack()
-                    }
-                }
+
+                if (notice.isBlank()) showSnackBar(R.string.notice_info)
+                else viewModel.insertNotice(notice, ::goBackStack)
             }
         }
         initCollect()
@@ -100,10 +88,8 @@ class RegisterNoticeFragment :
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.notice.collectLatest { notice ->
                 binding.etNotice.setText(notice.content)
-                if (notice.imageUrl.isNotBlank()) {
-                    Glide.with(requireActivity())
-                        .load(notice.imageUrl)
-                        .into(binding.ivPhoto)
+                if (notice.imageUrl?.isNotBlank() == true && notice.imageUrlSmall?.isNotBlank() == true) {
+                    binding.ivPhoto.loadImageSequentially(notice.imageUrl, notice.imageUrlSmall)
                     binding.ivPhoto.visibility = View.VISIBLE
                     binding.btnDeletePhoto.visibility = View.VISIBLE
                     binding.btnAddPhoto.visibility = View.GONE
@@ -126,7 +112,7 @@ class RegisterNoticeFragment :
                         }
                     )
                 } else {
-                    binding.ivPhoto.visibility = View.GONE
+                    binding.ivPhoto.visibility = View.INVISIBLE
                     binding.btnDeletePhoto.visibility = View.GONE
                     binding.btnAddPhoto.visibility = View.VISIBLE
                 }

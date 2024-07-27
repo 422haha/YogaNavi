@@ -9,6 +9,7 @@ import com.ssafy.yoganavi.data.repository.InfoRepository
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
+import com.ssafy.yoganavi.ui.utils.MINI
 import com.ssafy.yoganavi.ui.utils.NOTICE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -38,52 +39,95 @@ class RegisterNoticeViewModel @Inject constructor(
     }
 
     fun removeImage() = viewModelScope.launch(Dispatchers.IO) {
-        _notice.emit(notice.value.copy(imageUrl = "", imageUrlPath = "", imageUrlKey = ""))
+        val newNotice = notice.value.copy(
+            imageUrl = "",
+            imageUrlPath = "",
+            imageUrlKey = "",
+            imageUrlSmall = "",
+            imageUrlSmallPath = "",
+            imageUrlSmallKey = ""
+        )
+        _notice.emit(newNotice)
     }
 
-    fun addImage(url: String) = viewModelScope.launch(Dispatchers.IO) {
-        _notice.emit(notice.value.copy(imageUrl = "", imageUrlPath = url, imageUrlKey = ""))
+    fun addImage(path: String, smallPath: String) = viewModelScope.launch(Dispatchers.IO) {
+        val newNotice = notice.value.copy(
+            imageUrl = "",
+            imageUrlPath = path,
+            imageUrlKey = "",
+            imageUrlSmall = "",
+            imageUrlSmallPath = smallPath,
+            imageUrlSmallKey = ""
+        )
+        _notice.emit(newNotice)
     }
 
     fun setContent(content: String) = viewModelScope.launch(Dispatchers.IO) {
         _notice.emit(notice.value.copy(content = content))
     }
 
-    fun insertNotice(content: String, onSuccess: suspend () -> Unit) =
+    fun insertNotice(content: String, goBackStack: suspend () -> Unit) =
         viewModelScope.launch(Dispatchers.IO) {
-
-            val imageUrlKey = "$NOTICE/${UUID.randomUUID()}"
+            val uuid = UUID.randomUUID()
+            val imageUrlKey = "$NOTICE/$uuid"
+            val imageUrlSmallKey = "$NOTICE/$MINI/$uuid"
             val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
+            val imageUrlSmall = s3Client.getUrl(BUCKET_NAME, imageUrlSmallKey)
 
             val noticeFile = File(notice.value.imageUrlPath)
+            val miniFile = File(notice.value.imageUrlSmallPath)
+
             val metadata = ObjectMetadata().apply { contentType = "image/webp" }
             transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile, metadata)
+            transferUtility.upload(BUCKET_NAME, imageUrlSmallKey, miniFile, metadata)
 
-            val request = RegisterNoticeRequest(content = content, imageUrl = imageUrl.toString())
+            val request = RegisterNoticeRequest(
+                content = content,
+                imageUrl = imageUrl.toString(),
+                imageUrlSmall = imageUrlSmall.toString()
+            )
 
             runCatching { infoRepository.insertNotice(request) }
-                .onSuccess { onSuccess() }
+                .onSuccess { goBackStack() }
                 .onFailure { it.printStackTrace() }
         }
 
-    fun updateNotice(content: String, onSuccess: suspend () -> Unit) =
+    fun updateNotice(content: String, goBackStack: suspend () -> Unit) =
         viewModelScope.launch(Dispatchers.IO) {
-            val imageUrlKey = "$NOTICE/${UUID.randomUUID()}"
+            val uuid = UUID.randomUUID()
+            val imageUrlKey = "$NOTICE/$uuid"
+            val imageUrlSmallKey = "$NOTICE/$MINI/$uuid"
             val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
+            val imageUrlSmall = s3Client.getUrl(BUCKET_NAME, imageUrlSmallKey)
 
             if (notice.value.imageUrlPath.isNotBlank()) {
                 val noticeFile = File(notice.value.imageUrlPath)
+                val miniFile = File(notice.value.imageUrlSmallPath)
                 val metadata = ObjectMetadata().apply { contentType = "image/webp" }
+
                 transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile, metadata)
-                _notice.emit(notice.value.copy(imageUrl = imageUrl.toString()))
+                transferUtility.upload(BUCKET_NAME, imageUrlSmallKey, miniFile, metadata)
+
+                val newNotice = notice.value.copy(
+                    imageUrl = imageUrl.toString(),
+                    imageUrlSmall = imageUrlSmall.toString(),
+                )
+                _notice.emit(newNotice)
             } else {
-                val imageUrl2 = notice.value.imageUrl.substringBefore("?")
-                _notice.emit(notice.value.copy(imageUrl = imageUrl2))
+                val prevUrl = notice.value.imageUrl?.substringBefore("?")
+                val prevUrlSmall = notice.value.imageUrlSmall?.substringBefore("?")
+                val newNotice = notice.value.copy(imageUrl = prevUrl, imageUrlSmall = prevUrlSmall)
+                _notice.emit(newNotice)
             }
-            val request = RegisterNoticeRequest(content = content, imageUrl = notice.value.imageUrl)
+
+            val request = RegisterNoticeRequest(
+                content = content,
+                imageUrl = notice.value.imageUrl,
+                imageUrlSmall = notice.value.imageUrlSmall
+            )
 
             runCatching { infoRepository.updateNotice(request, notice.value.articleId) }
-                .onSuccess { onSuccess() }
+                .onSuccess { goBackStack() }
                 .onFailure { it.printStackTrace() }
         }
 }
