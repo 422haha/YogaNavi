@@ -35,6 +35,7 @@ const val REGISTER_LIVE = "화상 강의 생성"
 const val MODIFY_LIVE = "화상 강의 수정"
 const val MANAGEMENT_LIVE = "화상 강의 관리"
 const val MODIFY = "정보 수정"
+const val HOME = "요가 할 일"
 
 // 이름 
 const val CREATE = "생성"
