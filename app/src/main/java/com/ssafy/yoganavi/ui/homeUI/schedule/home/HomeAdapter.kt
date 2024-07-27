@@ -12,9 +12,11 @@ import com.ssafy.yoganavi.databinding.ListItemHomeBinding
 import com.ssafy.yoganavi.ui.utils.StartTildeEnd
 import com.ssafy.yoganavi.ui.utils.formatDashDate
 import com.ssafy.yoganavi.ui.utils.formatTime
+import timber.log.Timber
 
-class HomeAdapter(private val alertLiveDetailDialog: (id: Int, imageUri: String, title: String, content: String) -> Unit):
-    ListAdapter<LiveLectureData, HomeAdapter.ViewHolder>(HomeDiffCallback()) {
+class HomeAdapter(
+    private val alertLiveDetailDialog: (id: Int, imageUri: String, title: String, content: String) -> Unit
+): ListAdapter<LiveLectureData, HomeAdapter.ViewHolder>(HomeDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent, alertLiveDetailDialog)
@@ -24,9 +26,10 @@ class HomeAdapter(private val alertLiveDetailDialog: (id: Int, imageUri: String,
         holder.bind(currentList[position])
     }
 
-    class ViewHolder(private val binding: ListItemHomeBinding,
-                     private val alertLiveDetailDialog: (id: Int, imageUri: String, title: String, content: String) -> Unit):
-        RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(
+        private val binding: ListItemHomeBinding,
+        private val alertLiveDetailDialog: (id: Int, imageUri: String, title: String, content: String) -> Unit
+    ): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: LiveLectureData) {
             with(binding) {
                 val circularProgressDrawable = CircularProgressDrawable(binding.root.context).apply {
@@ -35,16 +38,17 @@ class HomeAdapter(private val alertLiveDetailDialog: (id: Int, imageUri: String,
                 }
                 circularProgressDrawable.start()
 
-                // small size Image
-                Glide.with(binding.root)
-                    .load(item.teacherProfile)
-                    .placeholder(circularProgressDrawable)
-                    .into(ivProfile)
+                if(!item.teacherMiniProfile.isNullOrBlank()) {
+                    Glide.with(binding.root)
+                        .load(item.teacherMiniProfile)
+                        .placeholder(circularProgressDrawable)
+                        .into(ivProfile)
+                }
 
                 tvTeacherNickname.text = item.teacherName
 
-                // 기간에 존재 하는 요일 별 수업 -> ex.2024-07-11 목
-                // 요일을 뒤에 덧붙여야함
+                // TODO. 기간에 존재 하는 요일 별 수업 -> ex.2024-07-11 목
+                // 요일을 뒤에 덧붙여야 함
                 binding.tvDate.text = formatDashDate(item.startDate)
 
                 tvLectureTitle.text = item.liveTitle
@@ -52,7 +56,9 @@ class HomeAdapter(private val alertLiveDetailDialog: (id: Int, imageUri: String,
                 val timeData = StartTildeEnd(formatTime(item.startTime), formatTime(item.endTime))
                 tvLectureTime.text = timeData
 
-                clDetail.setOnClickListener { alertLiveDetailDialog(item.liveId, item.teacherProfile, item.liveTitle, item.liveContent) }
+                clDetail.setOnClickListener {
+                    alertLiveDetailDialog(item.liveId, item.teacherProfile ?: "", item.liveTitle, item.liveContent)
+                }
             }
         }
 

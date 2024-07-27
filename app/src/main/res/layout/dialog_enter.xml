@@ -2,18 +2,33 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/rounded_dialog_background"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/iv_enter"
+        android:id="@+id/iv_profile"
         android:layout_width="0dp"
         android:layout_height="250dp"
         android:scaleType="centerCrop"
+        android:background="@drawable/rounded_dialog_background"
+        android:src="@color/gray_20"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tv_title"
         tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/iv_cancel"
+        android:layout_width="@dimen/icon_little_medium"
+        android:layout_height="@dimen/icon_little_medium"
+        android:layout_marginTop="@dimen/padding_medium"
+        android:layout_marginEnd="@dimen/padding_medium"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/baseline_cancel_24"
+        />
 
     <TextView
         android:id="@+id/tv_title"
@@ -21,12 +36,13 @@
         android:layout_height="wrap_content"
         tools:text="TextView"
         android:gravity="center"
-        android:paddingHorizontal="@dimen/padding_extra_large"
         style="@style/BoldLargeText"
-        android:layout_margin="@dimen/padding_medium"
+        android:layout_marginTop="@dimen/padding_medium"
+        android:paddingHorizontal="@dimen/padding_extra_large"
+        app:layout_constraintBottom_toTopOf="@id/tv_teacher"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv_enter" />
+        app:layout_constraintTop_toBottomOf="@+id/iv_profile" />
 
     <TextView
         android:id="@+id/tv_teacher"
@@ -36,7 +52,7 @@
         android:gravity="center"
         style="@style/commonText"
         android:paddingHorizontal="@dimen/padding_extra_large"
-        android:layout_margin="@dimen/padding_small"
+        app:layout_constraintBottom_toTopOf="@id/tv_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_title" />
@@ -50,14 +66,15 @@
         style="@style/commonText"
         android:scrollbars="vertical"
         android:maxLines="6"
-        android:layout_margin="@dimen/padding_small"
+        android:layout_marginTop="@dimen/padding_small"
+        app:layout_constraintBottom_toTopOf="@id/btn_enter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_teacher" />
 
     <Button
         android:id="@+id/btn_enter"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/enter"
         android:textColor="@color/black"
