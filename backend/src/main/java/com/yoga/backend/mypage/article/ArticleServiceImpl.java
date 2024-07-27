@@ -2,6 +2,8 @@ package com.yoga.backend.mypage.article;
 
 import com.yoga.backend.common.entity.Article;
 import com.yoga.backend.common.awsS3.S3Service;
+import com.yoga.backend.common.entity.Users;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -90,29 +92,18 @@ public class ArticleServiceImpl implements ArticleService {
      */
     @Override
     @Transactional
-    public Article updateArticle(Long articleId, String newContent, String newImage) {
+    public Article updateArticle(Long articleId, String newContent, String newImage,
+        String newImageSmall) {
         try {
             Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다. ID: " + articleId));
 
             article.setContent(newContent);
 
-            // 새 이미지가 제공되었고, 기존 이미지와 다른 경우에만 이미지 업데이트
-            if (newImage.isBlank()) {
-                article.setImageUrl("");
-            } else if (!extractKeyFromUrl(newImage).equals(extractKeyFromUrl(article.getImage()))) {
-                String oldImage = article.getImage();
-                article.setImage(newImage);
+            // 이미지 URL 업데이트
+            updateImageUrl(article, newImage, article::getImage, article::setImage);
+            updateImageUrl(article, newImageSmall, article::getImageUrlSmall, article::setImageUrlSmall);
 
-                // 기존 이미지가 있고, 새 이미지와 다른 경우에만 기존 이미지 삭제
-                if (!oldImage.isBlank() && !extractKeyFromUrl(oldImage).equals(
-                    extractKeyFromUrl(newImage))) {
-                    String oldKey = extractKeyFromUrl(oldImage);
-                    if (oldKey != null) {
-                        s3Service.deleteFile(oldKey);
-                    }
-                }
-            }
             article.setUpdatedAt(LocalDateTime.now());
             article = articleRepository.save(article);
 
@@ -122,6 +113,24 @@ public class ArticleServiceImpl implements ArticleService {
             throw new RuntimeException("게시글 업데이트 중 충돌이 발생했습니다. 다시 시도해 주세요.", e);
         } catch (Exception e) {
             throw new RuntimeException("게시글 업데이트 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
+    }
+
+    private void updateImageUrl(Article article, String newImage, java.util.function.Supplier<String> getter, java.util.function.Consumer<String> setter) {
+        if (newImage != null) {
+            if (newImage.isBlank()) {
+                setter.accept("");
+            } else if (!extractKeyFromUrl(newImage).equals(extractKeyFromUrl(getter.get()))) {
+                String oldImage = getter.get();
+                setter.accept(newImage);
+
+                if (oldImage != null && !oldImage.isBlank() && !extractKeyFromUrl(oldImage).equals(extractKeyFromUrl(newImage))) {
+                    String oldKey = extractKeyFromUrl(oldImage);
+                    if (oldKey != null) {
+                        s3Service.deleteFile(oldKey);
+                    }
+                }
+            }
         }
     }
 
@@ -137,18 +146,23 @@ public class ArticleServiceImpl implements ArticleService {
             Optional<Article> articleOpt = articleRepository.findById(id);
             if (articleOpt.isPresent()) {
                 Article article = articleOpt.get();
-                if (article.getImage() != null) {
-                    String key = extractKeyFromUrl(article.getImage());
-                    if (key != null) {
-                        s3Service.deleteFile(key);
-                    }
-                }
+                deleteImageIfExists(article.getImage());
+                deleteImageIfExists(article.getImageUrlSmall());
                 articleRepository.deleteById(id);
             } else {
                 throw new RuntimeException("게시글을 찾을 수 없습니다.");
             }
         } catch (OptimisticLockingFailureException e) {
             throw new RuntimeException("게시글 삭제 중 충돌이 발생했습니다. 다시 시도해 주세요.", e);
+        }
+    }
+
+    private void deleteImageIfExists(String imageUrl) {
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            String key = extractKeyFromUrl(imageUrl);
+            if (key != null) {
+                s3Service.deleteFile(key);
+            }
         }
     }
 
@@ -173,7 +187,12 @@ public class ArticleServiceImpl implements ArticleService {
      */
     private List<Article> applyPresignedUrlsAsync(List<Article> articles) {
         Set<String> keysToGenerate = articles.stream()
-            .map(Article::getImage)
+            .flatMap(article -> Stream.of(
+                article.getImage(),
+                article.getImageUrlSmall(),
+                article.getUser().getProfile_image_url(),
+                article.getUser().getProfile_image_url_small()
+            ))
             .filter(Objects::nonNull)
             .map(this::extractKeyFromUrl)
             .filter(Objects::nonNull)
@@ -187,20 +206,43 @@ public class ArticleServiceImpl implements ArticleService {
             Map<String, String> presignedUrls = generatePresignedUrlsAsync(keysToGenerate).get();
             return articles.stream()
                 .map(article -> {
-                    String imageUrl = article.getImage();
-                    if (imageUrl != null) {
-                        String key = extractKeyFromUrl(imageUrl);
-                        if (key != null) {
-                            String presignedUrl = presignedUrls.getOrDefault(key, imageUrl);
-                            article.setImage(normalizeUrl(presignedUrl));
-                        }
-                    }
-                    return article;
+                    Article newArticle = new Article();
+                    newArticle.setArticleId(article.getArticleId());
+                    newArticle.setUser(article.getUser());
+                    newArticle.setContent(article.getContent());
+                    newArticle.setImage(getPresignedUrl(article.getImage(), presignedUrls));
+                    newArticle.setImageUrlSmall(getPresignedUrl(article.getImageUrlSmall(), presignedUrls));
+                    newArticle.setCreatedAt(article.getCreatedAt());
+                    newArticle.setUpdatedAt(article.getUpdatedAt());
+
+                    // 사용자 정보를 복사하되, 프로필 이미지 URL만 presigned URL로 변경
+                    Users originalUser = article.getUser();
+                    Users newUser = new Users();
+                    newUser.setId(originalUser.getId());
+                    newUser.setEmail(originalUser.getEmail());
+                    newUser.setNickname(originalUser.getNickname());
+                    newUser.setProfile_image_url(getPresignedUrl(originalUser.getProfile_image_url(), presignedUrls));
+                    newUser.setProfile_image_url_small(getPresignedUrl(originalUser.getProfile_image_url_small(), presignedUrls));
+
+                    newArticle.setUser(newUser);
+
+                    return newArticle;
                 })
                 .collect(Collectors.toList());
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException("Presigned URL 생성 중 오류 발생", e);
         }
+    }
+
+
+    private String getPresignedUrl(String imageUrl, Map<String, String> presignedUrls) {
+        if (imageUrl != null) {
+            String key = extractKeyFromUrl(imageUrl);
+            if (key != null) {
+                return normalizeUrl(presignedUrls.getOrDefault(key, imageUrl));
+            }
+        }
+        return imageUrl;
     }
 
     /**
@@ -210,18 +252,21 @@ public class ArticleServiceImpl implements ArticleService {
      * @return Presigned URL이 적용된 게시글 객체
      */
     private Article applyPresignedUrl(Article article) {
-        String imageUrl = article.getImage();
+        article.setImage(generatePresignedUrlIfNeeded(article.getImage()));
+        article.setImageUrlSmall(generatePresignedUrlIfNeeded(article.getImageUrlSmall()));
+        return article;
+    }
 
+    private String generatePresignedUrlIfNeeded(String imageUrl) {
         if (imageUrl != null) {
             String key = extractKeyFromUrl(imageUrl);
             if (key != null) {
                 String presignedUrl = s3Service.generatePresignedUrl(key, URL_EXPIRATION_SECONDS);
-                article.setImage(normalizeUrl(presignedUrl));
+                return normalizeUrl(presignedUrl);
             }
         }
-        return article;
+        return imageUrl;
     }
-
     /**
      * URL에서 S3 키를 추출합니다.
      *

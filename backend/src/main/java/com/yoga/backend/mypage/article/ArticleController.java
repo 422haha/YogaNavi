@@ -52,8 +52,8 @@ public class ArticleController {
         @RequestHeader("Authorization") String token, @RequestBody ArticleDto articleDto) {
         Map<String, Object> response = new HashMap<>();
         try {
-            int userId = jwtUtil.getUserIdFromToken(token); // JWT 토큰에서 사용자 ID 추출
-            Optional<Users> optionalUser = usersRepository.findById((long) userId);
+            int userId = jwtUtil.getUserIdFromToken(token);
+            Optional<Users> optionalUser = usersRepository.findById(userId);
 
             if (optionalUser.isPresent()) {
                 Users user = optionalUser.get();
@@ -61,10 +61,10 @@ public class ArticleController {
                 article.setUser(user);
                 article.setContent(articleDto.getContent());
                 article.setImage(articleDto.getImageUrl());
+                article.setImageUrlSmall(articleDto.getImageUrlSmall());
                 article.setCreatedAt(LocalDateTime.now());
                 article.setUpdatedAt(LocalDateTime.now());
 
-                // 게시글을 저장합니다.
                 articleService.saveArticle(article);
 
                 response.put("message", "게시글 작성 성공");
@@ -93,21 +93,20 @@ public class ArticleController {
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
         try {
-            int userId = jwtUtil.getUserIdFromToken(token); // JWT 토큰에서 사용자 ID 추출
-            Optional<Users> optionalUser = usersRepository.findById((long) userId);
+            int userId = jwtUtil.getUserIdFromToken(token);
+            Optional<Users> optionalUser = usersRepository.findById(userId);
 
             if (optionalUser.isPresent()) {
                 Users user = optionalUser.get();
                 List<Article> articles = articleService.getArticlesByUserId(user.getId());
 
-                // 게시글을 생성일 기준으로 역순으로 정렬합니다.
-                List<Map<String, Object>> articleList = articles.stream()
+                List<ArticleDto> articleDtos = articles.stream()
                     .sorted(Comparator.comparing(Article::getCreatedAt).reversed())
-                    .map(this::convertArticleToMap)
+                    .map(this::convertArticleToDto)
                     .collect(Collectors.toList());
 
                 response.put("message", "success");
-                response.put("data", articleList);
+                response.put("data", articleDtos);
                 return ResponseEntity.ok(response);
             } else {
                 response.put("message", "권한이 없습니다");
@@ -120,7 +119,6 @@ public class ArticleController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
     /**
      * 특정 게시글을 조회합니다.
      *
@@ -164,8 +162,8 @@ public class ArticleController {
         @RequestBody ArticleDto articleDto) {
         Map<String, Object> response = new HashMap<>();
         try {
-            int userId = jwtUtil.getUserIdFromToken(token); // JWT 토큰에서 사용자 ID 추출
-            Optional<Users> optionalUser = usersRepository.findById((long) userId);
+            int userId = jwtUtil.getUserIdFromToken(token);
+            Optional<Users> optionalUser = usersRepository.findById(userId);
 
             if (optionalUser.isPresent()) {
                 Users user = optionalUser.get();
@@ -183,9 +181,8 @@ public class ArticleController {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
                 }
 
-                // 게시글 내용을 업데이트합니다.
                 Article updatedArticle = articleService.updateArticle(id, articleDto.getContent(),
-                    articleDto.getImageUrl());
+                    articleDto.getImageUrl(), articleDto.getImageUrlSmall());
                 response.put("message", "게시글 수정 성공");
                 response.put("data", convertArticleToMap(updatedArticle));
                 return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -201,6 +198,7 @@ public class ArticleController {
         }
     }
 
+
     /**
      * 특정 게시글을 삭제합니다.
      *
@@ -214,7 +212,7 @@ public class ArticleController {
         Map<String, Object> response = new HashMap<>();
         try {
             int userId = jwtUtil.getUserIdFromToken(token); // JWT 토큰에서 사용자 ID 추출
-            Optional<Users> optionalUser = usersRepository.findById((long) userId);
+            Optional<Users> optionalUser = usersRepository.findById(userId);
 
             if (optionalUser.isPresent()) {
                 Users user = optionalUser.get();
@@ -260,12 +258,11 @@ public class ArticleController {
         Map<String, Object> map = new HashMap<>();
         map.put("articleId", article.getArticleId());
 
-        // 작성자 정보가 null인지 확인합니다.
         Users user = article.getUser();
         if (user != null) {
             map.put("userId", user.getId());
-            map.put("userName", user.getNickname()); // 사용자 닉네임을 userName으로 사용
-            map.put("profileImageUrl", user.getProfile_image_url()); // 사용자 프로필 이미지 추가
+            map.put("userName", user.getEmail());
+            map.put("profileImageUrl", user.getProfile_image_url());
         } else {
             map.put("userId", null);
             map.put("userName", null);
@@ -273,11 +270,28 @@ public class ArticleController {
         }
 
         map.put("content", article.getContent());
-        map.put("createdAt",
-            article.getCreatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
-        map.put("updatedAt",
-            article.getUpdatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
+        map.put("createdAt", article.getCreatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
+        map.put("updatedAt", article.getUpdatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
         map.put("imageUrl", article.getImage());
+        map.put("imageUrlSmall", article.getImageUrlSmall());
         return map;
+    }
+    private ArticleDto convertArticleToDto(Article article) {
+        ArticleDto dto = new ArticleDto();
+        dto.setArticleId(article.getArticleId());
+        dto.setContent(article.getContent());
+        dto.setImageUrl(article.getImage());
+        dto.setImageUrlSmall(article.getImageUrlSmall());
+        dto.setCreatedAt(article.getCreatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
+        dto.setUpdatedAt(article.getUpdatedAt().atZone(ZoneOffset.ofHours(9)).toInstant().toEpochMilli());
+
+        Users author = article.getUser();
+        if (author != null) {
+            dto.setUserName(author.getNickname());
+            dto.setProfileImageUrl(author.getProfile_image_url());
+            dto.setProfileImageSmallUrl(author.getProfile_image_url_small());
+        }
+
+        return dto;
     }
 }
