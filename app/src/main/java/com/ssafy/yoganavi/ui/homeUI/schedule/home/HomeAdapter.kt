@@ -9,10 +9,11 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.databinding.ListItemHomeBinding
-import com.ssafy.yoganavi.ui.utils.StartTildeEnd
+import com.ssafy.yoganavi.ui.utils.startTildeEnd
+import com.ssafy.yoganavi.ui.utils.convertLongToHangle
 import com.ssafy.yoganavi.ui.utils.formatDashDate
 import com.ssafy.yoganavi.ui.utils.formatTime
-import timber.log.Timber
+import com.ssafy.yoganavi.ui.utils.startSpaceEnd
 
 class HomeAdapter(
     private val alertLiveDetailDialog: (id: Int, imageUri: String, title: String, content: String) -> Unit
@@ -47,13 +48,11 @@ class HomeAdapter(
 
                 tvTeacherNickname.text = item.teacherName
 
-                // TODO. 기간에 존재 하는 요일 별 수업 -> ex.2024-07-11 목
-                // 요일을 뒤에 덧붙여야 함
-                binding.tvDate.text = formatDashDate(item.startDate)
+                binding.tvDate.text = startSpaceEnd(formatDashDate(item.startDate),convertLongToHangle(item.startDate))
 
                 tvLectureTitle.text = item.liveTitle
 
-                val timeData = StartTildeEnd(formatTime(item.startTime), formatTime(item.endTime))
+                val timeData = startTildeEnd(formatTime(item.startTime), formatTime(item.endTime))
                 tvLectureTime.text = timeData
 
                 clDetail.setOnClickListener {
