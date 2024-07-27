@@ -16,14 +16,16 @@ public class Article {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long articleId; // 게시글 ID
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private Users user; // 작성자 (강사)
+    private Users user;  // 작성자 (강사)
 
     private String content; // 게시글 내용
     private LocalDateTime createdAt; // 생성일자
     private LocalDateTime updatedAt; // 수정일자
+    @Column(length = 512)
     private String imageUrl; // 이미지 URL
+    @Column(length = 512)
     private String imageUrlSmall;
 
     @Version

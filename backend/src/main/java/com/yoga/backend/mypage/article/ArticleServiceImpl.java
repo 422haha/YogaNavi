@@ -64,7 +64,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional(readOnly = true)
     public List<Article> getAllArticles() {
-        List<Article> articles = articleRepository.findAll();
+        List<Article> articles = articleRepository.findAllWithUser();
         return applyPresignedUrlsAsync(articles);
     }
 
@@ -77,7 +77,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional(readOnly = true)
     public List<Article> getArticlesByUserId(int userId) {
-        List<Article> articles = articleRepository.findByUserId(userId);
+        List<Article> articles = articleRepository.findByUserIdWithUser(userId);
         return applyPresignedUrlsAsync(articles);
     }
 
@@ -90,7 +90,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Article> getArticleById(Long id) {
-        Optional<Article> articleOpt = articleRepository.findById(id);
+        Optional<Article> articleOpt = articleRepository.findByIdWithUser(id);
         return articleOpt.map(this::applyPresignedUrl);
     }
 

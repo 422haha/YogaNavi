@@ -14,7 +14,7 @@ public class RecordedLectureChapter {
 
     private String description;
 
-    @Column(nullable = false)
+    @Column(nullable = false ,length = 512)
     private String videoUrl;
 
     @Column(nullable = false)

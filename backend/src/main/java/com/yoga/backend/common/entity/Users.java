@@ -4,7 +4,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -28,10 +30,10 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     @Column(unique = true, nullable = false)
     private String nickname;
 
-    @Column
+    @Column(length = 512)
     private String profile_image_url;
 
-    @Column
+    @Column(length = 512)
     private String profile_image_url_small;
 
     @Column(nullable = false)
@@ -47,6 +49,9 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
         inverseJoinColumns = @JoinColumn(name = "hashtag_id")
     )
     private Set<Hashtag> hashtags = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Article> articles = new ArrayList<>();
 
     public String getResetToken() {
         return resetToken;
@@ -132,5 +137,23 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     public void removeHashtag(Hashtag hashtag) {
         this.hashtags.remove(hashtag);
         hashtag.getUsers().remove(this);
+    }
+
+    public List<Article> getArticles() {
+        return articles;
+    }
+
+    public void setArticles(List<Article> articles) {
+        this.articles = articles;
+    }
+
+    public void addArticle(Article article) {
+        articles.add(article);
+        article.setUser(this);
+    }
+
+    public void removeArticle(Article article) {
+        articles.remove(article);
+        article.setUser(null);
     }
 }

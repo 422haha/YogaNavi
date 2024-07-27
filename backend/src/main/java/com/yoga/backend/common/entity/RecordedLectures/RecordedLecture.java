@@ -27,8 +27,10 @@ public class RecordedLecture {
     @Column(name = "record_content", nullable = false)
     private String content;
 
+    @Column(length = 512)
     private String thumbnail;
 
+    @Column(length = 512)
     private String thumbnailSmall;
 
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
