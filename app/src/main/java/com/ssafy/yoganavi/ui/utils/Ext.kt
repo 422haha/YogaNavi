@@ -8,8 +8,6 @@ fun Int.toK() = if (this < 1000) {
 } else {
     "${this / 1000}K+"
 }
-fun IntToDate(year: Int, month: Int, day: Int): String = run { "$year.${month + 1}.$day" }
-fun WeeklyAndTime(weekly: String, timeStr: String): String = run { "$weekly | $timeStr" }
 
 // 통신부
 const val TIME_OUT = 5000L
