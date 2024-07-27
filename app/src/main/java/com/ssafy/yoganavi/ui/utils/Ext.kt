@@ -26,6 +26,8 @@ const val PASSWORD_DIFF = "비밀번호가 일치하지 않습니다."
 
 // 타이틀
 const val MY_PAGE = "마이 페이지"
+const val TEACHER = "요가 강사"
+const val FILTER = "필터"
 const val REGISTER_VIDEO = "녹화 강의 생성"
 const val MANAGEMENT_VIDEO = "녹화 강의 관리"
 const val MANAGEMENT_NOTICE = "공지 관리"
@@ -34,6 +36,8 @@ const val MANAGEMENT_UPDATE = "공지 수정"
 const val REGISTER_LIVE = "화상 강의 생성"
 const val MODIFY_LIVE = "화상 강의 수정"
 const val MANAGEMENT_LIVE = "화상 강의 관리"
+const val TEACHER_DETAIL = "강사"
+const val RESERVE = "예약하기"
 const val MODIFY = "정보 수정"
 const val HOME = "요가 할 일"
 

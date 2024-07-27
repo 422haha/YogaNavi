@@ -73,20 +73,23 @@ class RegisterNoticeViewModel @Inject constructor(
             val imageUrlSmallKey = "$NOTICE/$MINI/$uuid"
             val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
             val imageUrlSmall = s3Client.getUrl(BUCKET_NAME, imageUrlSmallKey)
+            if (notice.value.imageUrlPath.isNotBlank()) {
 
-            val noticeFile = File(notice.value.imageUrlPath)
-            val miniFile = File(notice.value.imageUrlSmallPath)
+                val noticeFile = File(notice.value.imageUrlPath)
+                val miniFile = File(notice.value.imageUrlSmallPath)
 
-            val metadata = ObjectMetadata().apply { contentType = "image/webp" }
-            transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile, metadata)
-            transferUtility.upload(BUCKET_NAME, imageUrlSmallKey, miniFile, metadata)
-
-            val request = RegisterNoticeRequest(
+                val metadata = ObjectMetadata().apply { contentType = "image/webp" }
+                transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile, metadata)
+                transferUtility.upload(BUCKET_NAME, imageUrlSmallKey, miniFile, metadata)
+            }
+            var request = RegisterNoticeRequest(
                 content = content,
                 imageUrl = imageUrl.toString(),
                 imageUrlSmall = imageUrlSmall.toString()
             )
-
+            if(notice.value.imageUrlPath.isBlank()) {
+                request = RegisterNoticeRequest(content=content, imageUrl = "")
+            }
             runCatching { infoRepository.insertNotice(request) }
                 .onSuccess { goBackStack() }
                 .onFailure { it.printStackTrace() }
