@@ -11,6 +11,7 @@ import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
 import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
+import com.ssafy.yoganavi.ui.utils.MINI
 import com.ssafy.yoganavi.ui.utils.NO_AUTH
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.THUMBNAIL
@@ -63,14 +64,20 @@ class RegisterVideoViewModel @Inject constructor(
         _chapterList.emit(list)
     }
 
-    fun setThumbnail(path: String) = viewModelScope.launch(Dispatchers.IO) {
-        val thumbnailKey = "$THUMBNAIL/${UUID.randomUUID()}"
+    fun setThumbnail(path: String, miniPath: String) = viewModelScope.launch(Dispatchers.IO) {
+        val uuid = UUID.randomUUID()
+        val thumbnailKey = "$THUMBNAIL/${uuid}"
+        val miniKey = "$THUMBNAIL/$MINI/${uuid}"
         val recordThumbnail = s3Client.getUrl(BUCKET_NAME, thumbnailKey)
+        val miniThumbnail = s3Client.getUrl(BUCKET_NAME, miniKey)
 
         lectureDetailData = lectureDetailData.copy(
             recordThumbnail = recordThumbnail.toString(),
+            recordThumbnailSmall = miniThumbnail.toString(),
             recordThumbnailPath = path,
-            thumbnailKey = thumbnailKey
+            thumbnailKey = thumbnailKey,
+            miniThumbnailPath = miniPath,
+            miniThumbnailKey = miniKey
         )
     }
 
@@ -113,6 +120,7 @@ class RegisterVideoViewModel @Inject constructor(
             val chapterList = mutableListOf<VideoChapterData>()
             for (index in titleList.indices) {
                 val data = VideoChapterData(
+                    id = lectureDetailData.recordedLectureChapters[index].id,
                     chapterTitle = titleList[index],
                     chapterDescription = contentList[index],
                     recordVideo = lectureDetailData.recordedLectureChapters[index].recordVideo,
@@ -130,16 +138,33 @@ class RegisterVideoViewModel @Inject constructor(
 
             if (lectureDetailData.recordThumbnailPath.isNotBlank()) {
                 val thumbnailFile = File(lectureDetailData.recordThumbnailPath)
+                val miniFile = File(lectureDetailData.miniThumbnailPath)
+
                 val metadata = ObjectMetadata().apply { contentType = "image/webp" }
+
                 transferUtility.upload(
                     BUCKET_NAME,
                     lectureDetailData.thumbnailKey,
                     thumbnailFile,
                     metadata
                 )
+
+                transferUtility.upload(
+                    BUCKET_NAME,
+                    lectureDetailData.miniThumbnailKey,
+                    miniFile,
+                    metadata
+                )
+
             } else {
                 val thumbnailUrl = lectureDetailData.recordThumbnail.substringBefore("?")
-                lectureDetailData = lectureDetailData.copy(recordThumbnail = thumbnailUrl)
+                val miniUrl = lectureDetailData.recordThumbnailSmall.substringBefore("?")
+
+                lectureDetailData = lectureDetailData.copy(
+                    recordedId = id,
+                    recordThumbnail = thumbnailUrl,
+                    recordThumbnailSmall = miniUrl
+                )
             }
 
             lectureDetailData.recordedLectureChapters.forEachIndexed { index, chapter ->

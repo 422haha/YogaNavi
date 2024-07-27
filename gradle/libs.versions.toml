@@ -4,6 +4,7 @@ awsAndroidSdkMobileClient = "2.73.0"
 datastorePreferences = "1.1.1"
 fragmentKtx = "1.8.1"
 glide = "5.0.0-rc01"
+googleFlexbox = "3.0.0"
 gson = "2.11.0"
 hiltAndroid = "2.51.1"
 kotlin = "1.9.0"
@@ -19,6 +20,7 @@ materialCalendarview = "2.0.1"
 media3Exoplayer = "1.3.1"
 navigationFragmentKtx = "2.7.7"
 okhttp = "4.12.0"
+pagingRuntime = "3.3.1"
 retrofit = "2.11.0"
 ksp = "1.9.22-1.0.16"
 swiperefreshlayout = "1.1.0"
@@ -36,11 +38,13 @@ androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "medi
 androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-safe-args-gradle-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationFragmentKtx" }
+androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "pagingRuntime" }
 androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
 aws-android-sdk-mobile-client = { module = "com.amazonaws:aws-android-sdk-mobile-client", version.ref = "awsAndroidSdkMobileClient" }
 aws-android-sdk-s3 = { module = "com.amazonaws:aws-android-sdk-s3", version.ref = "awsAndroidSdkMobileClient" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+google-flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "googleFlexbox" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }

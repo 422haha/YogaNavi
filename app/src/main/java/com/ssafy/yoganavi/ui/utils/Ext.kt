@@ -40,6 +40,8 @@ const val MODIFY_LIVE = "화상 강의 수정"
 const val MANAGEMENT_LIVE = "화상 강의 관리"
 const val TEACHER_DETAIL = "강사"
 const val RESERVE = "예약하기"
+const val MODIFY = "정보 수정"
+const val HOME = "요가 할 일"
 
 // 이름 
 const val CREATE = "생성"
@@ -47,11 +49,15 @@ const val UPDATE = "수정"
 const val SAVE = "저장 완료"
 const val BUCKET_NAME = "yoga-navi"
 const val THUMBNAIL = "thumbnails"
+const val MINI = "mini"
+const val LOGO = "logo"
 const val NOTICE = "notices"
 const val VIDEO = "videos"
 const val REGISTER = "등록"
 const val EDIT = "편집"
 const val DELETE = "삭제"
+const val MAX_HASH_TAG = 5
+const val IS_MAX_HASH_TAG = "해시태그는 5개까지만 등록하실 수 있습니다."
 
 // 캘린더, 타임 Picker
 const val START = 1
@@ -61,3 +67,12 @@ const val END = 2
 const val END_STR = "종료 날짜"
 const val LIMIT_STR = "무기한"
 const val LIMIT_DATE = 4102358400000 // 2099.12.31
+enum class Week(val hangle: String) {
+    MON("월"),
+    TUE("화"),
+    WED("수"),
+    THU("목"),
+    FRI("금"),
+    SAT("토"),
+    SUN("일") }
+data class DayStatus(val day: Week, var isSelected: Boolean)

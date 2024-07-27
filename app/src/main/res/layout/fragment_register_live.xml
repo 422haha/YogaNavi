@@ -48,94 +48,80 @@
             android:text="@string/choose_week"
             android:textSize="@dimen/text_medium_large"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/tb_mon"
+            app:layout_constraintBottom_toTopOf="@id/cb_mon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/et_content" />
 
-        <ToggleButton
-            android:id="@+id/tb_mon"
+        <CheckBox
+            android:id="@+id/cb_mon"
             style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/monday"
-            android:textOff="@string/monday"
-            android:textOn="@string/monday"
             app:layout_constraintBottom_toTopOf="@id/tv_choose_date"
-            app:layout_constraintEnd_toStartOf="@id/tb_two"
+            app:layout_constraintEnd_toStartOf="@id/cb_tue"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_choose_week" />
 
-        <ToggleButton
-            android:id="@+id/tb_two"
+        <CheckBox
+            android:id="@+id/cb_tue"
             style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/tuesday"
-            android:textOff="@string/tuesday"
-            android:textOn="@string/tuesday"
-            app:layout_constraintBottom_toBottomOf="@id/tb_mon"
-            app:layout_constraintEnd_toStartOf="@id/tb_wed"
-            app:layout_constraintStart_toEndOf="@id/tb_mon"
-            app:layout_constraintTop_toTopOf="@id/tb_mon" />
+            app:layout_constraintBottom_toBottomOf="@id/cb_mon"
+            app:layout_constraintEnd_toStartOf="@id/cb_wed"
+            app:layout_constraintStart_toEndOf="@id/cb_mon"
+            app:layout_constraintTop_toTopOf="@id/cb_mon" />
 
-        <ToggleButton
-            android:id="@+id/tb_wed"
+        <CheckBox
+            android:id="@+id/cb_wed"
             style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/wednesday"
-            android:textOff="@string/wednesday"
-            android:textOn="@string/wednesday"
-            app:layout_constraintBottom_toBottomOf="@id/tb_two"
-            app:layout_constraintEnd_toStartOf="@id/tb_thu"
-            app:layout_constraintStart_toEndOf="@id/tb_two"
-            app:layout_constraintTop_toTopOf="@id/tb_two" />
+            app:layout_constraintBottom_toBottomOf="@id/cb_tue"
+            app:layout_constraintEnd_toStartOf="@id/cb_thu"
+            app:layout_constraintStart_toEndOf="@id/cb_tue"
+            app:layout_constraintTop_toTopOf="@id/cb_tue" />
 
-        <ToggleButton
-            android:id="@+id/tb_thu"
+        <CheckBox
+            android:id="@+id/cb_thu"
             style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/thursday"
-            android:textOff="@string/thursday"
-            android:textOn="@string/thursday"
-            app:layout_constraintBottom_toBottomOf="@id/tb_wed"
-            app:layout_constraintEnd_toStartOf="@id/tb_fri"
-            app:layout_constraintStart_toEndOf="@id/tb_wed"
-            app:layout_constraintTop_toTopOf="@id/tb_wed" />
+            app:layout_constraintBottom_toBottomOf="@id/cb_wed"
+            app:layout_constraintEnd_toStartOf="@id/cb_fri"
+            app:layout_constraintStart_toEndOf="@id/cb_wed"
+            app:layout_constraintTop_toTopOf="@id/cb_wed" />
 
-        <ToggleButton
-            android:id="@+id/tb_fri"
+        <CheckBox
+            android:id="@+id/cb_fri"
             style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/friday"
-            android:textOff="@string/friday"
-            android:textOn="@string/friday"
-            app:layout_constraintBottom_toBottomOf="@id/tb_thu"
-            app:layout_constraintEnd_toStartOf="@id/tb_sat"
-            app:layout_constraintStart_toEndOf="@id/tb_thu"
-            app:layout_constraintTop_toTopOf="@id/tb_thu" />
+            app:layout_constraintBottom_toBottomOf="@id/cb_thu"
+            app:layout_constraintEnd_toStartOf="@id/cb_sat"
+            app:layout_constraintStart_toEndOf="@id/cb_thu"
+            app:layout_constraintTop_toTopOf="@id/cb_thu" />
 
-        <ToggleButton
-            android:id="@+id/tb_sat"
+        <CheckBox
+            android:id="@+id/cb_sat"
             style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/saturday"
-            android:textOff="@string/saturday"
-            android:textOn="@string/saturday"
-            app:layout_constraintBottom_toBottomOf="@id/tb_fri"
-            app:layout_constraintEnd_toStartOf="@id/tb_sun"
-            app:layout_constraintStart_toEndOf="@id/tb_fri"
-            app:layout_constraintTop_toTopOf="@id/tb_fri" />
+            app:layout_constraintBottom_toBottomOf="@id/cb_fri"
+            app:layout_constraintEnd_toStartOf="@id/cb_sun"
+            app:layout_constraintStart_toEndOf="@id/cb_fri"
+            app:layout_constraintTop_toTopOf="@id/cb_fri" />
 
-        <ToggleButton
-            android:id="@+id/tb_sun"
+        <CheckBox
+            android:id="@+id/cb_sun"
             style="@style/WeeklyButton"
             android:background="@drawable/toggle_button_background"
             android:text="@string/sunday"
-            android:textOff="@string/sunday"
-            android:textOn="@string/sunday"
-            app:layout_constraintBottom_toBottomOf="@id/tb_sat"
+            app:layout_constraintBottom_toBottomOf="@id/cb_sat"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/tb_sat"
-            app:layout_constraintTop_toTopOf="@id/tb_sat" />
+            app:layout_constraintStart_toEndOf="@id/cb_sat"
+            app:layout_constraintTop_toTopOf="@id/cb_sat" />
 
         <TextView
             android:id="@+id/tv_choose_date"
@@ -149,7 +135,7 @@
             app:layout_constraintBottom_toTopOf="@id/til_start"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tb_mon" />
+            app:layout_constraintTop_toBottomOf="@id/cb_mon" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til_start"

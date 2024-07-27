@@ -39,7 +39,7 @@
     <string name="write_info">글을 작성하는 공간입니다.</string>
     <string name="logout">로그아웃</string>
     <string name="save">저장</string>
-
+    <string name="hash_tag">해시 태그</string>
 
     <string name="choose_week">가능 요일 선택</string>
     <string name="choose_date">날짜 선택</string>

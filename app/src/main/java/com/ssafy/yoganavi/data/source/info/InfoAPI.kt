@@ -5,7 +5,7 @@ import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
-import com.ssafy.yoganavi.data.source.mypage.ProfileData
+import com.ssafy.yoganavi.data.source.mypage.Profile
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.teacher.TeacherData
@@ -19,8 +19,11 @@ import retrofit2.http.Path
 
 interface InfoAPI {
 
-    @GET("mypage")
-    suspend fun getProfile(): Response<YogaDetailResponse<ProfileData>>
+    @GET("mypage/info")
+    suspend fun getProfile(): Response<YogaDetailResponse<Profile>>
+
+    @POST("mypage/update")
+    suspend fun updateProfile(@Body profile: Profile): Response<YogaDetailResponse<Profile>>
 
     //TEACHER
     @GET("teacher")
@@ -45,7 +48,7 @@ interface InfoAPI {
     @POST("mypage/recorded-lecture/delete")
     suspend fun deleteLectures(@Body body: HashMap<String, List<Long>>): Response<YogaDetailResponse<Boolean>>
 
-    @POST("mypage/recorded-lecture/like/{recorded_id}")
+    @POST("recorded-lecture/like/{recorded_id}")
     suspend fun likeLecture(@Path("recorded_id") id: Long): Response<YogaDetailResponse<Boolean>>
 
     // Live

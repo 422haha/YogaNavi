@@ -5,14 +5,16 @@ import com.ssafy.yoganavi.data.repository.response.ListResponse
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
-import com.ssafy.yoganavi.data.source.mypage.ProfileData
+import com.ssafy.yoganavi.data.source.mypage.Profile
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.teacher.TeacherData
 
 interface InfoRepository {
 
-    suspend fun getProfile(): DetailResponse<ProfileData>
+    suspend fun getProfile(): DetailResponse<Profile>
+
+    suspend fun updateProfile(profile: Profile): DetailResponse<Profile>
 
     //TEACHER
     suspend fun getTeacherList(): ListResponse<TeacherData>

@@ -36,3 +36,19 @@ fun formatZeroDate(hour: Int, minute: Int): String {
 
     return "$hourStr:$minuteStr"
 }
+
+fun convertDaysToHangle(days: String): String {
+    val dayList = days.split(",")
+    val hangleDays = dayList.map { day ->
+        try { Week.valueOf(day).hangle }
+        finally { "" }
+    }
+
+    return hangleDays.joinToString(", ")
+}
+
+fun IntToDate(year: Int, month: Int, day: Int): String = run { "$year.${month + 1}.$day" }
+
+fun StartVerticalEnd(start: String, end: String): String = run { "$start | $end" }
+
+fun StartTildeEnd(start: String, end: String) = "$start~$end"

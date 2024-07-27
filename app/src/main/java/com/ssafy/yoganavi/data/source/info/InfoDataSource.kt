@@ -5,7 +5,7 @@ import com.ssafy.yoganavi.data.source.YogaResponse
 import com.ssafy.yoganavi.data.source.lecture.LectureData
 import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
-import com.ssafy.yoganavi.data.source.mypage.ProfileData
+import com.ssafy.yoganavi.data.source.mypage.Profile
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.teacher.TeacherData
@@ -13,7 +13,9 @@ import retrofit2.Response
 
 interface InfoDataSource {
 
-    suspend fun getProfile(): Response<YogaDetailResponse<ProfileData>>
+    suspend fun getProfile(): Response<YogaDetailResponse<Profile>>
+
+    suspend fun updateProfile(profile: Profile) : Response<YogaDetailResponse<Profile>>
 
     //TEACHER
     suspend fun getTeacherList(): Response<YogaResponse<TeacherData>>
