@@ -30,11 +30,11 @@ public class RecordedLectureListRepository {
                 lecture.likeCount.as("likeCount"),
                 JPAExpressions.selectOne()
                     .from(like)
-                    .where(like.lecture.eq(lecture).and(like.userId.eq(userId)))
+                    .where(like.lecture.eq(lecture).and(like.user.id.eq(userId)))
                     .exists().as("myLike")
             ))
             .from(lecture)
-            .where(lecture.userId.eq(userId))
+            .where(lecture.user.id.eq(userId))
             .fetch();
     }
 }

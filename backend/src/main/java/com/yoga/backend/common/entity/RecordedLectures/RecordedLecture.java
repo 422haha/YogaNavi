@@ -1,8 +1,10 @@
 package com.yoga.backend.common.entity.RecordedLectures;
 
+import com.yoga.backend.common.entity.Users;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,7 +22,9 @@ public class RecordedLecture {
     @Version
     private Long version;
 
-    private int userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
+    private Users user;
 
     private String title;
 
@@ -45,6 +49,9 @@ public class RecordedLecture {
     @LastModifiedDate
     @Column(name = "last_modified_at", nullable = false)
     private LocalDateTime lastModifiedDate;
+
+    @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<RecordedLectureLike> likes = new ArrayList<>();
 
     public void incrementLikeCount() {
         this.likeCount++;
@@ -72,12 +79,12 @@ public class RecordedLecture {
         this.version = version;
     }
 
-    public int getUserId() {
-        return userId;
+    public Users getUser() {
+        return user;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser(Users user) {
+        this.user = user;
     }
 
     public String getTitle() {

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
@@ -19,8 +20,15 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class JwtUtil {
+
+    public enum TokenStatus {
+        VALID,
+        INVALID,
+        NOT_FOUND
+    }
 
     private final UsersRepository userRepository;
 
@@ -34,26 +42,6 @@ public class JwtUtil {
 
     private final SecretKey key = Keys.hmacShaKeyFor(
         SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
-
-//    // access token 생성
-//    public String generateAccessToken(String email, String role) {
-//        String token = Jwts.builder()
-//            .issuer("Yoga Navi")
-//            .subject("JWT Token")
-//            .claim("email", email)
-//            .claim("role", role)
-//            .issuedAt(new Date())
-//            .expiration(
-//                new Date(System.currentTimeMillis() + SecurityConstants.ACCESS_TOKEN_EXPIRATION))
-//            .signWith(key)
-//            .compact();
-//
-//        // 추가
-//        redisTemplate.opsForValue()
-//            .set(email, token, SecurityConstants.ACCESS_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
-//
-//        return token;
-//    }
 
     // refresh token 생성
     public String generateRefreshToken(String email) {
@@ -109,22 +97,6 @@ public class JwtUtil {
         return claims.get("role", String.class);
     }
 
-//    // 추가
-//    public void invalidateToken(String email) {
-//        redisTemplate.delete(email);
-//    }
-//
-//    // 추가
-//    public boolean isTokenValid(String token) {
-//        try {
-//            Claims claims = validateToken(token);
-//            String email = claims.get("email", String.class);
-//            String storedToken = redisTemplate.opsForValue().get(email);
-//            return token.equals(storedToken);
-//        } catch (Exception e) {
-//            return false;
-//        }
-//    }
 
     //=============아래로 동시성 고려
     public String generateAccessToken(String email, String role) {
@@ -166,24 +138,61 @@ public class JwtUtil {
         });
     }
 
-    public boolean isTokenValid(String token) {
+
+    public TokenStatus isTokenValid(String token) {
         try {
             Claims claims = validateToken(token);
             String email = claims.get("email", String.class);
 
             // Redis에서 토큰 확인 (동시성 고려)
-            return redisTemplate.execute(new SessionCallback<Boolean>() {
+            return redisTemplate.execute(new SessionCallback<TokenStatus>() {
                 @Override
-                public Boolean execute(RedisOperations operations) throws DataAccessException {
+                public TokenStatus execute(RedisOperations operations) throws DataAccessException {
                     operations.multi();
                     String storedToken = (String) operations.opsForValue().get(email);
                     List<Object> results = operations.exec();
-                    return token.equals(results.get(0));
+                    if (results != null && !results.isEmpty()) {
+                        String retrievedToken = (String) results.get(0);
+                        if (retrievedToken == null) {
+                            return TokenStatus.NOT_FOUND;
+                        }
+                        return token.equals(retrievedToken) ? TokenStatus.VALID
+                            : TokenStatus.INVALID;
+                    }
+                    return TokenStatus.NOT_FOUND;
                 }
             });
         } catch (Exception e) {
-            return false;
+            return TokenStatus.INVALID;
         }
     }
 
+    public boolean logout(String token) {
+        try {
+            String email = getEmailFromToken(token);
+            log.info("Logging out user: {}", email);
+
+            Long result = redisTemplate.execute(new SessionCallback<Long>() {
+                @Override
+                public Long execute(RedisOperations operations) throws DataAccessException {
+                    operations.multi();
+                    operations.delete(email);
+                    List<Object> results = operations.exec();
+                    return (Long) results.get(0);
+                }
+            });
+
+            if (result != null && result > 0) {
+                log.info("Successfully logged out user: {}" + email);
+                return true;
+            } else {
+                log.warn(
+                    "Failed to logout user: {}. Token might not exist in Redis." + email);
+                return false;
+            }
+        } catch (Exception e) {
+            log.error("Error during logout: " + e);
+            return false;
+        }
+    }
 }

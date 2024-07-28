@@ -265,4 +265,58 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+    /**
+     * 로그아웃
+     *
+     * @param token 사용자 인증 토큰
+     * @return 로그아웃 처리 결과
+     */
+    @PostMapping("/mylogout")
+    public ResponseEntity<Map<String, Object>> logout(@RequestHeader("Authorization") String token) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            log.info("로그아웃 요청");
+            boolean logoutSuccess = jwtUtil.logout(token);
+            if (logoutSuccess) {
+                log.info("로그아웃 성공");
+                response.put("message", "로그아웃 성공");
+                response.put("data", new Object[]{});
+                return ResponseEntity.ok(response);
+            } else {
+                log.warn("로그아웃 실패");
+                response.put("message", "로그아웃 실패");
+                response.put("data", new Object[]{});
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+        } catch (Exception e) {
+            log.error("로그아웃중 에러 발생: "+ e);
+            response.put("message", "로그아웃 처리 중 오류 발생");
+            response.put("data", new Object[]{});
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * 사용자 탈퇴
+     *
+     * @param token 사용자 인증 토큰
+     * @return 삭제 요청 처리 결과
+     */
+    @PostMapping("/delete")
+    public ResponseEntity<Map<String, Object>> requestDeleteUser(@RequestHeader("Authorization") String token) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            int userId = jwtUtil.getUserIdFromToken(token);
+            usersService.requestDeleteUser(userId);
+            jwtUtil.logout(token);  // 회원 탈퇴 시 로그아웃 처리
+            response.put("message", "탈퇴 요청이 성공적으로 처리되었습니다. 7일 후에 계정이 삭제됩니다. 7일 이내에 로그인 시 자동으로 탈퇴가 취소됩니다.");
+            response.put("data", new Object[]{});
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("message", "탈퇴 요청 처리 중 오류 발생");
+            response.put("data", new Object[]{});
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 }

@@ -40,19 +40,31 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
         String pwd = authentication.getCredentials().toString();
 
         // 사용자 정보 조회
-        Optional<Users> users = usersRepository.findByEmail(username);
-        if (users.isPresent()) {
-            // 비밀번호 매칭 확인
-            if (passwordEncoder.matches(pwd, users.get().getPwd())) {
-                // 인증 성공 시 새로운 인증 객체 반환
+        Optional<Users> userOpt = usersRepository.findByEmail(username);
+        if (userOpt.isPresent()) {
+            Users user = userOpt.get();
+
+            // 탈퇴 진행 중인 사용자 확인
+            if (user.getDeletedAt() != null) {
+                // 비밀번호 확인
+                if (passwordEncoder.matches(pwd, user.getPwd())) {
+                    // 계정 복구
+                    user.setDeletedAt(null);
+                    usersRepository.save(user);
+                    // 로그 추가
+                    System.out.println("사용자 계정이 복구됨. 사용자 email: " + user.getEmail());
+                } else {
+                    throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
+                }
+            }
+
+            if (passwordEncoder.matches(pwd, user.getPwd())) {
                 return new UsernamePasswordAuthenticationToken(username, pwd,
-                    getGrantedAuthorities(users.get().getRole()));
+                    getGrantedAuthorities(user.getRole()));
             } else {
-                // 비밀번호가 일치하지 않는 경우 예외 발생
                 throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
             }
         } else {
-            // 사용자가 존재하지 않는 경우 예외 발생
             throw new BadCredentialsException("사용자가 존재하지 않습니다.");
         }
     }

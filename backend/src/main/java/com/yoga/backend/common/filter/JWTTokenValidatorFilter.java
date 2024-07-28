@@ -44,23 +44,23 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
         if (null != jwt && jwt.startsWith("Bearer ")) {
             jwt = jwtUtil.extractToken(jwt);
             try {
-
-                // 추가 if~else
-                if (jwtUtil.isTokenValid(jwt)) {
-
-                    Claims claims = jwtUtil.validateToken(jwt);
-                    String email = String.valueOf(claims.get("email"));
-                    String authorities = (String) claims.get("role");
-
-
-                    Authentication auth = new UsernamePasswordAuthenticationToken(email, null,
-                        AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                    filterChain.doFilter(request, response);
-                }else {
-                    // 토큰이 유효하지 않은 경우 (다른 기기에서 로그인)
-                    sendUnauthorizedResponse(response, "다른 기기에서 로그인되어 세션이 만료되었습니다.");
-                    return;
+                JwtUtil.TokenStatus tokenStatus = jwtUtil.isTokenValid(jwt);
+                switch (tokenStatus) {
+                    case VALID:
+                        Claims claims = jwtUtil.validateToken(jwt);
+                        String email = String.valueOf(claims.get("email"));
+                        String authorities = (String) claims.get("role");
+                        Authentication auth = new UsernamePasswordAuthenticationToken(email, null,
+                            AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                        filterChain.doFilter(request, response);
+                        break;
+                    case INVALID:
+                        sendUnauthorizedResponse(response, "다른 기기에서 로그인되어 세션이 만료되었습니다.");
+                        break;
+                    case NOT_FOUND:
+                        sendUnauthorizedResponse(response, "세션이 만료되었습니다. 다시 로그인해주세요.");
+                        break;
                 }
 
             } catch (ExpiredJwtException e) {

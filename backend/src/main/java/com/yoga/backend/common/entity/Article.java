@@ -40,6 +40,16 @@ public class Article {
         this.version = 0;
     }
 
+    public void setUser(Users user) {
+        if (this.user != null) {
+            this.user.getArticles().remove(this);
+        }
+        this.user = user;
+        if (user != null) {
+            user.getArticles().add(this);
+        }
+    }
+
     /**
      * 게시글 수정 전에 호출되어 수정일자를 설정합니다.
      */
