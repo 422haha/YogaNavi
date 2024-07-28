@@ -1,388 +1,405 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.homeUI.teacher.filter.FilterFragment">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/bottom_button_padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <!-- 정렬 -->
-        <TextView
-            android:id="@+id/tv_align"
-            style="@style/BoldLargeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_extra_large"
-            android:layout_marginBottom="@dimen/padding_medium"
-            android:text="@string/align"
-            app:layout_constraintBottom_toTopOf="@id/rg_align"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <RadioGroup
-            android:id="@+id/rg_align"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@id/tv_time"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_align">
-
-            <Space
-                android:layout_width="0dp"
+            <!-- 정렬 -->
+            <TextView
+                android:id="@+id/tv_align"
+                style="@style/BoldLargeText"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <RadioButton
-                android:id="@+id/rb_recent"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:background="@drawable/selector_radio_button"
-                android:button="@null"
-                android:checked="true"
-                android:gravity="center"
-                android:text="@string/recent"
-                android:textSize="@dimen/text_medium_large"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/rb_popular"
-                app:layout_constraintHorizontal_chainStyle="spread"
+                android:layout_marginTop="@dimen/padding_extra_large"
+                android:layout_marginBottom="@dimen/padding_medium"
+                android:text="@string/align"
+                app:layout_constraintBottom_toTopOf="@id/rg_align"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-
-            <RadioButton
-                android:id="@+id/rb_popular"
+            <RadioGroup
+                android:id="@+id/rg_align"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:background="@drawable/selector_radio_button"
-                android:button="@null"
-                android:gravity="center"
-                android:text="@string/popular"
-                android:textSize="@dimen/text_medium_large"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toTopOf="@id/tv_time"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/rb_recent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-        </RadioGroup>
-
-        <!-- 시간 -->
-        <TextView
-            android:id="@+id/tv_time"
-            style="@style/BoldLargeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_extra_large"
-            android:text="@string/time"
-            app:layout_constraintBottom_toTopOf="@id/btn_start_time"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rg_align" />
-
-        <Button
-            android:id="@+id/btn_start_time"
-            android:layout_width="140dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_medium"
-            android:text="@string/init_time"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toStartOf="@id/tv_from_time"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_time" />
-
-        <TextView
-            android:id="@+id/tv_from_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/padding_medium"
-            android:text="@string/from"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="@id/btn_start_time"
-            app:layout_constraintEnd_toStartOf="@id/btn_end_time"
-            app:layout_constraintStart_toEndOf="@id/btn_start_time"
-            app:layout_constraintTop_toTopOf="@id/btn_start_time" />
-
-        <Button
-            android:id="@+id/btn_end_time"
-            android:layout_width="140dp"
-            android:layout_height="wrap_content"
-            android:text="@string/init_time"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="@id/btn_start_time"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/tv_from_time"
-            app:layout_constraintTop_toBottomOf="@id/tv_time"
-            app:layout_constraintTop_toTopOf="@id/btn_start_time" />
-
-        <!-- 요일 선택 -->
-        <TextView
-            android:id="@+id/tv_select_day"
-            style="@style/BoldLargeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_extra_large"
-            android:text="요일 선택"
-            app:layout_constraintBottom_toTopOf="@id/ibtn_mon"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_start_time" />
-
-        <CheckBox
-            android:id="@+id/ibtn_mon"
-            style="@style/WeeklyButton"
-            android:layout_marginStart="@dimen/padding_small"
-            android:layout_marginTop="@dimen/padding_medium"
-            android:background="@drawable/toggle_button_background"
-            android:text="@string/monday"
-            app:layout_constraintEnd_toStartOf="@id/ibtn_tue"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_select_day" />
-
-        <CheckBox
-            android:id="@+id/ibtn_tue"
-            style="@style/WeeklyButton"
-            android:background="@drawable/toggle_button_background"
-            android:text="@string/tuesday"
-            app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
-            app:layout_constraintEnd_toStartOf="@id/ibtn_wed"
-            app:layout_constraintStart_toEndOf="@id/ibtn_mon"
-            app:layout_constraintTop_toTopOf="@id/ibtn_mon" />
-
-        <CheckBox
-            android:id="@+id/ibtn_wed"
-            style="@style/WeeklyButton"
-            android:background="@drawable/toggle_button_background"
-            android:text="@string/wednesday"
-            app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
-            app:layout_constraintEnd_toStartOf="@id/ibtn_thu"
-            app:layout_constraintStart_toEndOf="@id/ibtn_tue"
-            app:layout_constraintTop_toTopOf="@id/ibtn_mon" />
-
-        <CheckBox
-            android:id="@+id/ibtn_thu"
-            style="@style/WeeklyButton"
-            android:background="@drawable/toggle_button_background"
-            android:text="@string/thursday"
-            app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
-            app:layout_constraintEnd_toStartOf="@id/ibtn_fri"
-            app:layout_constraintStart_toEndOf="@id/ibtn_wed"
-            app:layout_constraintTop_toTopOf="@id/ibtn_mon" />
-
-        <CheckBox
-            android:id="@+id/ibtn_fri"
-            style="@style/WeeklyButton"
-            android:background="@drawable/toggle_button_background"
-            android:text="@string/friday"
-            app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
-            app:layout_constraintEnd_toStartOf="@id/ibtn_sat"
-            app:layout_constraintStart_toEndOf="@id/ibtn_thu"
-            app:layout_constraintTop_toTopOf="@id/ibtn_mon" />
-
-        <CheckBox
-            android:id="@+id/ibtn_sat"
-            style="@style/WeeklyButton"
-            android:background="@drawable/toggle_button_background"
-            android:text="@string/saturday"
-            app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
-            app:layout_constraintEnd_toStartOf="@id/ibtn_sun"
-            app:layout_constraintStart_toEndOf="@id/ibtn_fri"
-            app:layout_constraintTop_toTopOf="@id/ibtn_mon" />
-
-        <CheckBox
-            android:id="@+id/ibtn_sun"
-            style="@style/WeeklyButton"
-            android:layout_marginEnd="@dimen/padding_small"
-            android:background="@drawable/toggle_button_background"
-            android:text="@string/sunday"
-            app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/ibtn_sat"
-            app:layout_constraintTop_toTopOf="@id/ibtn_mon" />
-
-        <!-- 기간 선택 -->
-        <TextView
-            android:id="@+id/tv_select_term"
-            style="@style/BoldLargeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_extra_large"
-            android:text="@string/select_term"
-            app:layout_constraintBottom_toTopOf="@id/rg_term"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ibtn_mon" />
-
-        <RadioGroup
-            android:id="@+id/rg_term"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_medium"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_select_term">
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <RadioButton
-                android:id="@+id/rb_week"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:background="@drawable/selector_radio_button"
-                android:button="@null"
-                android:checked="true"
-                android:gravity="center"
-                android:text="@string/week"
-                android:textSize="@dimen/text_medium_large"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/rb_month"
-                app:layout_constraintHorizontal_chainStyle="spread"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/tv_align">
 
-            <RadioButton
-                android:id="@+id/rb_month"
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <RadioButton
+                    android:id="@+id/rb_recent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:background="@drawable/selector_radio_button"
+                    android:button="@null"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:text="@string/recent"
+                    android:textSize="@dimen/text_medium_large"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/rb_popular"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <RadioButton
+                    android:id="@+id/rb_popular"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:background="@drawable/selector_radio_button"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="@string/popular"
+                    android:textSize="@dimen/text_medium_large"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/rb_recent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+            </RadioGroup>
+
+            <!-- 시간 -->
+            <TextView
+                android:id="@+id/tv_time"
+                style="@style/BoldLargeText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:background="@drawable/selector_radio_button"
-                android:button="@null"
-                android:gravity="center"
-                android:text="@string/month"
-                android:textSize="@dimen/text_medium_large"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/rb_three_month"
-                app:layout_constraintStart_toEndOf="@id/rb_week"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <RadioButton
-                android:id="@+id/rb_three_month"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:background="@drawable/selector_radio_button"
-                android:button="@null"
-                android:gravity="center"
-                android:text="@string/three_months"
-                android:textSize="@dimen/text_medium_large"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/rb_year"
-                app:layout_constraintStart_toEndOf="@id/rb_month"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <RadioButton
-                android:id="@+id/rb_year"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:background="@drawable/selector_radio_button"
-                android:button="@null"
-                android:gravity="center"
-                android:text="@string/year"
-                android:textSize="@dimen/text_medium_large"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginTop="@dimen/padding_extra_large"
+                android:text="@string/time"
+                app:layout_constraintBottom_toTopOf="@id/btn_start_time"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/rb_three_month"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-        </RadioGroup>
-
-        <!-- 수업 방식 -->
-        <TextView
-            android:id="@+id/tv_select_class_method"
-            style="@style/BoldLargeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_extra_large"
-            android:layout_marginBottom="@dimen/padding_medium"
-            android:text="@string/class_method"
-            app:layout_constraintBottom_toTopOf="@id/rg_class"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rg_term" />
-
-        <RadioGroup
-            android:id="@+id/rg_class"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="@dimen/padding_large"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_select_class_method">
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-
-            <RadioButton
-                android:id="@+id/rb_one_to_one"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:background="@drawable/selector_radio_button"
-                android:button="@null"
-                android:checked="true"
-                android:gravity="center"
-                android:text="@string/one_to_one"
-                android:textSize="@dimen/text_medium_large"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/rb_one_to_multi"
-                app:layout_constraintHorizontal_chainStyle="spread"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/rg_align" />
 
-            <RadioButton
-                android:id="@+id/rb_one_to_multi"
+            <Button
+                android:id="@+id/btn_start_time"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_medium"
+                android:text="@string/init_time"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toStartOf="@id/tv_from_time"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_time" />
+
+            <TextView
+                android:id="@+id/tv_from_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/padding_medium"
+                android:text="@string/from"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@id/btn_start_time"
+                app:layout_constraintEnd_toStartOf="@id/btn_end_time"
+                app:layout_constraintStart_toEndOf="@id/btn_start_time"
+                app:layout_constraintTop_toTopOf="@id/btn_start_time" />
+
+            <Button
+                android:id="@+id/btn_end_time"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:text="@string/init_time"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@id/btn_start_time"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tv_from_time"
+                app:layout_constraintTop_toBottomOf="@id/tv_time"
+                app:layout_constraintTop_toTopOf="@id/btn_start_time" />
+
+            <!-- 요일 선택 -->
+            <TextView
+                android:id="@+id/tv_select_day"
+                style="@style/BoldLargeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_extra_large"
+                android:text="요일 선택"
+                app:layout_constraintBottom_toTopOf="@id/ibtn_mon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_start_time" />
+
+            <CheckBox
+                android:id="@+id/ibtn_mon"
+                style="@style/WeeklyButton"
+                android:layout_marginStart="@dimen/padding_small"
+                android:layout_marginTop="@dimen/padding_medium"
+                android:background="@drawable/toggle_button_background"
+                android:text="@string/monday"
+                app:layout_constraintEnd_toStartOf="@id/ibtn_tue"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_select_day" />
+
+            <CheckBox
+                android:id="@+id/ibtn_tue"
+                style="@style/WeeklyButton"
+                android:background="@drawable/toggle_button_background"
+                android:text="@string/tuesday"
+                app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
+                app:layout_constraintEnd_toStartOf="@id/ibtn_wed"
+                app:layout_constraintStart_toEndOf="@id/ibtn_mon"
+                app:layout_constraintTop_toTopOf="@id/ibtn_mon" />
+
+            <CheckBox
+                android:id="@+id/ibtn_wed"
+                style="@style/WeeklyButton"
+                android:background="@drawable/toggle_button_background"
+                android:text="@string/wednesday"
+                app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
+                app:layout_constraintEnd_toStartOf="@id/ibtn_thu"
+                app:layout_constraintStart_toEndOf="@id/ibtn_tue"
+                app:layout_constraintTop_toTopOf="@id/ibtn_mon" />
+
+            <CheckBox
+                android:id="@+id/ibtn_thu"
+                style="@style/WeeklyButton"
+                android:background="@drawable/toggle_button_background"
+                android:text="@string/thursday"
+                app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
+                app:layout_constraintEnd_toStartOf="@id/ibtn_fri"
+                app:layout_constraintStart_toEndOf="@id/ibtn_wed"
+                app:layout_constraintTop_toTopOf="@id/ibtn_mon" />
+
+            <CheckBox
+                android:id="@+id/ibtn_fri"
+                style="@style/WeeklyButton"
+                android:background="@drawable/toggle_button_background"
+                android:text="@string/friday"
+                app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
+                app:layout_constraintEnd_toStartOf="@id/ibtn_sat"
+                app:layout_constraintStart_toEndOf="@id/ibtn_thu"
+                app:layout_constraintTop_toTopOf="@id/ibtn_mon" />
+
+            <CheckBox
+                android:id="@+id/ibtn_sat"
+                style="@style/WeeklyButton"
+                android:background="@drawable/toggle_button_background"
+                android:text="@string/saturday"
+                app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
+                app:layout_constraintEnd_toStartOf="@id/ibtn_sun"
+                app:layout_constraintStart_toEndOf="@id/ibtn_fri"
+                app:layout_constraintTop_toTopOf="@id/ibtn_mon" />
+
+            <CheckBox
+                android:id="@+id/ibtn_sun"
+                style="@style/WeeklyButton"
+                android:layout_marginEnd="@dimen/padding_small"
+                android:background="@drawable/toggle_button_background"
+                android:text="@string/sunday"
+                app:layout_constraintBottom_toBottomOf="@id/ibtn_mon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/ibtn_sat"
+                app:layout_constraintTop_toTopOf="@id/ibtn_mon" />
+
+            <!-- 기간 선택 -->
+            <TextView
+                android:id="@+id/tv_select_term"
+                style="@style/BoldLargeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_extra_large"
+                android:text="@string/select_term"
+                app:layout_constraintBottom_toTopOf="@id/rg_term"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ibtn_mon" />
+
+            <RadioGroup
+                android:id="@+id/rg_term"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="1dp"
-                android:layout_weight="2"
-                android:background="@drawable/selector_radio_button"
-                android:button="@null"
-                android:gravity="center"
-                android:text="@string/one_to_multiple"
-                android:textSize="@dimen/text_medium_large"
+                android:layout_marginTop="@dimen/padding_medium"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_select_term">
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <RadioButton
+                    android:id="@+id/rb_week"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:background="@drawable/selector_radio_button"
+                    android:button="@null"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:text="@string/week"
+                    android:textSize="@dimen/text_medium_large"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/rb_month"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <RadioButton
+                    android:id="@+id/rb_month"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:background="@drawable/selector_radio_button"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="@string/month"
+                    android:textSize="@dimen/text_medium_large"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/rb_three_month"
+                    app:layout_constraintStart_toEndOf="@id/rb_week"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <RadioButton
+                    android:id="@+id/rb_three_month"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:background="@drawable/selector_radio_button"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="@string/three_months"
+                    android:textSize="@dimen/text_medium_large"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/rb_year"
+                    app:layout_constraintStart_toEndOf="@id/rb_month"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <RadioButton
+                    android:id="@+id/rb_year"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:background="@drawable/selector_radio_button"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="@string/year"
+                    android:textSize="@dimen/text_medium_large"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/rb_three_month"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+            </RadioGroup>
+
+            <!-- 수업 방식 -->
+            <TextView
+                android:id="@+id/tv_select_class_method"
+                style="@style/BoldLargeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_extra_large"
+                android:layout_marginBottom="@dimen/padding_medium"
+                android:text="@string/class_method"
+                app:layout_constraintBottom_toTopOf="@id/rg_class"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rg_term" />
+
+            <RadioGroup
+                android:id="@+id/rg_class"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/padding_large"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/rb_one_to_one"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_select_class_method">
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
 
-        </RadioGroup>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <RadioButton
+                    android:id="@+id/rb_one_to_one"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:background="@drawable/selector_radio_button"
+                    android:button="@null"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:text="@string/one_to_one"
+                    android:textSize="@dimen/text_medium_large"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/rb_one_to_multi"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-</ScrollView>
+                <RadioButton
+                    android:id="@+id/rb_one_to_multi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="1dp"
+                    android:layout_weight="2"
+                    android:background="@drawable/selector_radio_button"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="@string/one_to_multiple"
+                    android:textSize="@dimen/text_medium_large"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/rb_one_to_one"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+            </RadioGroup>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/btn_filter_save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/save"
+        android:gravity="center"
+        style="@style/RegisterButton"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,6 +10,7 @@ import com.ssafy.yoganavi.data.repository.response.DetailResponse
 import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
 import com.ssafy.yoganavi.ui.utils.LOGO
+import com.ssafy.yoganavi.ui.utils.MINI
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +40,7 @@ class ModifyViewModel @Inject constructor(
                 profile = profile.copy(
                     nickname = data.nickname,
                     imageUrl = data.imageUrl,
+                    imageUrlSmall = data.imageUrlSmall,
                     teacher = data.teacher
                 )
                 _hashtagList.emit(data.hashTags)
@@ -74,17 +76,30 @@ class ModifyViewModel @Inject constructor(
 
         if (profile.logoPath.isNotBlank()) {
             val thumbnailFile = File(profile.logoPath)
+            val miniFile = File(profile.logoSmallPath)
             val metadata = ObjectMetadata().apply { contentType = "image/webp" }
+
             transferUtility.upload(
                 BUCKET_NAME,
                 profile.logoKey,
                 thumbnailFile,
                 metadata
             )
+
+            transferUtility.upload(
+                BUCKET_NAME,
+                profile.logoSmallKey,
+                miniFile,
+                metadata
+            )
+
         } else {
             val url = profile.imageUrl?.substringBefore("?")
+            val urlSmall = profile.imageUrlSmall?.substringBefore("?")
+
             profile = profile.copy(
-                imageUrl = url
+                imageUrl = url,
+                imageUrlSmall = urlSmall
             )
         }
 
@@ -93,14 +108,20 @@ class ModifyViewModel @Inject constructor(
             .onFailure { it.printStackTrace() }
     }
 
-    fun setThumbnail(path: String) = viewModelScope.launch(Dispatchers.IO) {
-        val logoKey = "$LOGO/${UUID.randomUUID()}"
+    fun setThumbnail(path: String, miniPath: String) = viewModelScope.launch(Dispatchers.IO) {
+        val uuid = UUID.randomUUID()
+        val logoKey = "$LOGO/$uuid"
         val imageUrl = s3Client.getUrl(BUCKET_NAME, logoKey)
+        val miniKey = "$LOGO/$MINI/$uuid"
+        val miniUrl = s3Client.getUrl(BUCKET_NAME, miniKey)
 
         profile = profile.copy(
             imageUrl = imageUrl.toString(),
+            imageUrlSmall = miniUrl.toString(),
             logoPath = path,
-            logoKey = logoKey
+            logoKey = logoKey,
+            logoSmallPath = miniPath,
+            logoSmallKey = miniKey
         )
     }
 }

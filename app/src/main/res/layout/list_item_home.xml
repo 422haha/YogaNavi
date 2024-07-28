@@ -50,10 +50,8 @@
         android:background="@color/gray_20"
         app:layout_constraintBottom_toTopOf="@id/cv_content"
         app:layout_constraintEnd_toEndOf="@id/iv_profile"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@id/iv_profile"
-        app:layout_constraintTop_toBottomOf="@id/iv_profile"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@id/iv_profile" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cv_content"
@@ -61,6 +59,7 @@
         android:layout_height="wrap_content"
         app:cardCornerRadius="12dp"
         app:cardElevation="0dp"
+        app:cardBackgroundColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -69,6 +68,7 @@
         app:strokeWidth="1dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="2dp"
@@ -99,6 +99,7 @@
                 android:layout_height="@dimen/padding_extra_extra_large"
                 android:background="@android:color/transparent"
                 android:src="@drawable/baseline_arrow_forward_24"
+                android:clickable="false"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

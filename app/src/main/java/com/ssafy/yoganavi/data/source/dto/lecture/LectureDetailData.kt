@@ -5,10 +5,17 @@ data class LectureDetailData(
     val recordTitle: String = "",
     val recordContent: String = "",
     val recordThumbnail: String = "",
+    val recordThumbnailSmall: String = "",
     val recordedLectureChapters: MutableList<VideoChapterData> = mutableListOf(),
 
     @Transient
     val recordThumbnailPath: String = "",
     @Transient
-    val thumbnailKey: String = ""
+    val thumbnailKey: String = "",
+
+    @Transient
+    val miniThumbnailPath: String = "",
+    @Transient
+    val miniThumbnailKey: String = ""
+
 )

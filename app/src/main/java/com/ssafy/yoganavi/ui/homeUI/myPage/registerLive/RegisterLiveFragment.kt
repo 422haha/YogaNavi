@@ -3,7 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.registerLive
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
-import android.widget.ToggleButton
+import android.widget.CheckBox
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -17,7 +17,7 @@ import com.ssafy.yoganavi.ui.utils.CREATE
 import com.ssafy.yoganavi.ui.utils.END
 import com.ssafy.yoganavi.ui.utils.END_STR
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
-import com.ssafy.yoganavi.ui.utils.IntToDate
+import com.ssafy.yoganavi.ui.utils.intToDate
 import com.ssafy.yoganavi.ui.utils.LIMIT_DATE
 import com.ssafy.yoganavi.ui.utils.LIMIT_STR
 import com.ssafy.yoganavi.ui.utils.MODIFY_LIVE
@@ -46,7 +46,7 @@ class RegisterLiveFragment :
     private lateinit var startDatePickerDialog: DatePickerDialog
     private lateinit var endDatePickerDialog: DatePickerDialog
 
-    private lateinit var weekToggleButtonMap: Map<Week, ToggleButton>
+    private lateinit var weekToggleButtonMap: Map<Week, CheckBox>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -74,13 +74,13 @@ class RegisterLiveFragment :
             btnEnd.setOnClickListener { showTimePicker(END) }
 
             weekToggleButtonMap = mapOf(
-                Week.MON to binding.tbMon,
-                Week.TUE to binding.tbTue,
-                Week.WED to binding.tbWed,
-                Week.THU to binding.tbThu,
-                Week.FRI to binding.tbFri,
-                Week.SAT to binding.tbSat,
-                Week.SUN to binding.tbSun
+                Week.MON to binding.cbMon,
+                Week.TUE to binding.cbTue,
+                Week.WED to binding.cbWed,
+                Week.THU to binding.cbThu,
+                Week.FRI to binding.cbFri,
+                Week.SAT to binding.cbSat,
+                Week.SUN to binding.cbSun
             )
 
             cbEndDateUnlimited.setOnCheckedChangeListener { _, isChecked ->
@@ -168,11 +168,11 @@ class RegisterLiveFragment :
                     calendar.set(sYear, sMonth, sDay)
 
                     with(viewModel.liveLectureData) {
-                        binding.tieStart.setText(IntToDate(sYear, sMonth, sDay))
+                        binding.tieStart.setText(intToDate(sYear, sMonth, sDay))
                         startDate = calendar.timeInMillis
 
                         if (endDate < startDate && endDate != 0L) {
-                            binding.tieEnd.setText(IntToDate(sYear, sMonth, sDay))
+                            binding.tieEnd.setText(intToDate(sYear, sMonth, sDay))
                             endDate = calendar.timeInMillis
                         }
                     }
@@ -185,7 +185,7 @@ class RegisterLiveFragment :
                 { _, sYear, sMonth, sDay ->
                     calendar.set(sYear, sMonth, sDay)
 
-                    binding.tieEnd.setText(IntToDate(sYear, sMonth, sDay))
+                    binding.tieEnd.setText(intToDate(sYear, sMonth, sDay))
                     viewModel.liveLectureData.endDate = calendar.timeInMillis
                 }, year, month, day
             ).apply {

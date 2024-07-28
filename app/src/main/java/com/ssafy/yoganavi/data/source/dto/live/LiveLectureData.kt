@@ -8,8 +8,10 @@ data class LiveLectureData(
     val teacherId: Int = 0,
     @SerializedName("nickname")
     val teacherName: String = "",
+    @SerializedName("profileImageSmallUrl")
+    val teacherSmallProfile: String?,
     @SerializedName("profileImageUrl")
-    val teacherProfile: String = "",
+    val teacherProfile: String?,
     var liveTitle: String = "",
     var liveContent : String = "",
     var availableDay: String = "",

@@ -38,6 +38,8 @@
     <string name="delete_photo"> 사진 삭제하기</string>
     <string name="write_info">글을 작성하는 공간입니다.</string>
     <string name="logout">로그아웃</string>
+    <string name="quit">회원 탈퇴</string>
+    <string name="save">저장</string>
     <string name="hash_tag">해시 태그</string>
 
     <string name="choose_week">가능 요일 선택</string>
@@ -54,7 +56,6 @@
     <string name="click_thumbnail_info">클릭해서 썸네일을 추가하세요</string>
     <string name="click_video_info">클릭해서 영상을 추가하세요</string>
     <string name="notice_info">공지를 입력하세요</string>
-
 
 
     <!-- 필터 시작 -->

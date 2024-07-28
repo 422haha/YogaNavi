@@ -21,4 +21,8 @@ interface UserDataSource {
     suspend fun registerPassword(userRequest: UserRequest): Response<YogaResponse<Unit>>
 
     suspend fun isServerOn(): Response<YogaResponse<Unit>>
+
+    suspend fun logout(): Response<YogaResponse<Unit>>
+
+    suspend fun quit(): Response<YogaResponse<Unit>>
 }

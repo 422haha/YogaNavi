@@ -13,8 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
-import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.dto.lecture.VideoChapterData
@@ -27,12 +25,12 @@ import com.ssafy.yoganavi.ui.utils.SAVE
 import com.ssafy.yoganavi.ui.utils.UPDATE
 import com.ssafy.yoganavi.ui.utils.getImagePath
 import com.ssafy.yoganavi.ui.utils.getVideoPath
+import com.ssafy.yoganavi.ui.utils.loadImageSequentially
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
 
 @AndroidEntryPoint
 class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
@@ -43,16 +41,16 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
     private val chapterAdapter by lazy { ChapterAdapter(::addVideo, ::deleteChapter) }
     private val imageUriLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val imageUri = result.data?.data ?: return@registerForActivityResult
-                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                    val imagePath = getImagePath(requireContext(), imageUri)
-                    val uri = Uri.parse(imagePath)
-                    withContext(Dispatchers.Main) {
-                        binding.ivVideo.setImageURI(uri)
-                        binding.tvAddThumbnail.visibility = View.GONE
-                        viewModel.setThumbnail(path = imagePath)
-                    }
+            if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
+            val imageUri = result.data?.data ?: return@registerForActivityResult
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                val (imagePath, miniPath) = getImagePath(requireContext(), imageUri)
+                val originUri = Uri.parse(imagePath)
+
+                withContext(Dispatchers.Main) {
+                    binding.ivVideo.setImageURI(originUri)
+                    binding.tvAddThumbnail.visibility = View.GONE
+                    viewModel.setThumbnail(path = imagePath, miniPath = miniPath)
                 }
             }
         }
@@ -103,18 +101,8 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
             etTitle.setText(data.recordTitle)
             etContent.setText(data.recordContent)
 
-            val circularProgressDrawable = CircularProgressDrawable(requireContext()).apply {
-                strokeWidth = 5f
-                centerRadius = 30f
-            }
-            circularProgressDrawable.start()
-
-            if (data.recordThumbnail.isNotBlank()) {
-                Glide.with(requireContext())
-                    .load(data.recordThumbnail)
-                    .placeholder(circularProgressDrawable)
-                    .into(ivVideo)
-
+            if (data.recordThumbnailSmall.isNotBlank()) {
+                ivVideo.loadImageSequentially(data.recordThumbnailSmall, data.recordThumbnail)
                 tvAddThumbnail.visibility = View.GONE
             }
         }
@@ -179,4 +167,5 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
 
     private fun addChapter() = viewModel.addChapter()
     private fun deleteChapter(data: VideoChapterData) = viewModel.deleteChapter(data)
+
 }
