@@ -57,4 +57,14 @@ class UserRepositoryImpl @Inject constructor(
         val response = withContext(ioDispatcher) { userDataSource.isServerOn() }
         return response.toListResponse()
     }
+
+    override suspend fun logout(): ListResponse<Unit> {
+        val response = withContext(ioDispatcher) { userDataSource.logout() }
+        return response.toListResponse()
+    }
+
+    override suspend fun quit(): ListResponse<Unit> {
+        val response = withContext(ioDispatcher) { userDataSource.quit() }
+        return response.toListResponse()
+    }
 }

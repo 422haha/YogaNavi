@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.profile
 
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -32,7 +33,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
         with(binding) {
             tvName.text = profile.nickname
 
-            if(profile.imageUrlSmall != null){
+            if (profile.imageUrlSmall != null) {
                 Glide.with(requireContext())
                     .load(profile.imageUrlSmall)
                     .into(ivIcon)
@@ -56,6 +57,14 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
             tvManagementVideo.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_managementVideoFragment) }
             tvRegisterNotice.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_noticeFragment) }
             tvLogout.setOnClickListener { viewModel.clearUserData(::logout) }
+            tvQuit.setOnClickListener { viewModel.quitUser(::quitDialog) }
         }
+    }
+
+    private suspend fun quitDialog(message: String) = withContext(Dispatchers.Main) {
+        AlertDialog.Builder(requireContext())
+            .setMessage(message)
+            .setPositiveButton(getString(R.string.check)) { _, _ -> logout() }
+            .show()
     }
 }

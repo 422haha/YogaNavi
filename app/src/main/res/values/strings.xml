@@ -38,6 +38,7 @@
     <string name="delete_photo"> 사진 삭제하기</string>
     <string name="write_info">글을 작성하는 공간입니다.</string>
     <string name="logout">로그아웃</string>
+    <string name="quit">회원 탈퇴</string>
     <string name="save">저장</string>
     <string name="hash_tag">해시 태그</string>
 

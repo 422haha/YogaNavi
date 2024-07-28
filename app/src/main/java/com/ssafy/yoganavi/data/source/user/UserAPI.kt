@@ -37,4 +37,10 @@ interface UserAPI {
 
     @POST("is-on")
     suspend fun isServerOn(): Response<YogaResponse<Unit>>
+
+    @POST("mylogout")
+    suspend fun logout(): Response<YogaResponse<Unit>>
+
+    @POST("delete")
+    suspend fun quit(): Response<YogaResponse<Unit>>
 }
