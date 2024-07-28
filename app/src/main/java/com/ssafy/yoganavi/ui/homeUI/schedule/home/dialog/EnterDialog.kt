@@ -14,8 +14,8 @@ import com.ssafy.yoganavi.ui.utils.loadImageSequentially
 class EnterDialog(
     context: Context,
     private val id: Int,
-    private val smallImageUri: String,
-    private val imageUri: String,
+    private val smallImageUri: String?,
+    private val imageUri: String?,
     private val title: String,
     private val content: String,
     private val okCallback: (Int) -> Unit,
@@ -44,8 +44,8 @@ class EnterDialog(
         window?.setBackgroundDrawableResource(R.drawable.rounded_dialog_background)
 
         with(binding) {
-            if (imageUri.isNotBlank() && smallImageUri.isNotBlank())
-                ivProfile.loadImageSequentially(imageUri, smallImageUri)
+            if (!imageUri.isNullOrBlank())
+                ivProfile.loadImageSequentially(imageUri, smallImageUri ?: "")
 
             tvTitle.text = title
 
