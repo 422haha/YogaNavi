@@ -9,10 +9,12 @@ import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.DialogEnterBinding
+import com.ssafy.yoganavi.ui.utils.loadImageSequentially
 
 class EnterDialog(
     context: Context,
     private val id: Int,
+    private val smallImageUri: String,
     private val imageUri: String,
     private val title: String,
     private val content: String,
@@ -42,11 +44,8 @@ class EnterDialog(
         window?.setBackgroundDrawableResource(R.drawable.rounded_dialog_background)
 
         with(binding) {
-            if(imageUri.isNotBlank()) {
-                Glide.with(binding.root)
-                    .load(imageUri)
-                    .into(ivProfile)
-            }
+            if (imageUri.isNotBlank() && smallImageUri.isNotBlank())
+                ivProfile.loadImageSequentially(imageUri, smallImageUri)
 
             tvTitle.text = title
 

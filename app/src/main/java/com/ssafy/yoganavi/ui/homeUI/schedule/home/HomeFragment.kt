@@ -43,8 +43,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         }
     }
 
-    private fun alertLiveDetailDialog(id: Int, imageUri: String, title: String, content: String) {
-        EnterDialog(requireContext(), id, imageUri, title, content) {
+    private fun alertLiveDetailDialog(id: Int, smallImageUri: String, imageUri: String, title: String, content: String) {
+        EnterDialog(requireContext(), id, smallImageUri, imageUri, title, content) {
             val directions = HomeFragmentDirections
                 .actionHomeFragmentToLiveFragment(it)
 

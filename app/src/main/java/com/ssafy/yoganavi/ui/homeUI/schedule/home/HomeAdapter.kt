@@ -16,7 +16,7 @@ import com.ssafy.yoganavi.ui.utils.formatTime
 import com.ssafy.yoganavi.ui.utils.startSpaceEnd
 
 class HomeAdapter(
-    private val alertLiveDetailDialog: (id: Int, imageUri: String, title: String, content: String) -> Unit
+    private val alertLiveDetailDialog: (id: Int, smallImageUri: String, imageUri: String, title: String, content: String) -> Unit
 ): ListAdapter<LiveLectureData, HomeAdapter.ViewHolder>(HomeDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -29,7 +29,7 @@ class HomeAdapter(
 
     class ViewHolder(
         private val binding: ListItemHomeBinding,
-        private val alertLiveDetailDialog: (id: Int, imageUri: String, title: String, content: String) -> Unit
+        private val alertLiveDetailDialog: (id: Int, smallImageUri: String, imageUri: String, title: String, content: String) -> Unit
     ): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: LiveLectureData) {
             with(binding) {
@@ -39,9 +39,9 @@ class HomeAdapter(
                 }
                 circularProgressDrawable.start()
 
-                if(!item.teacherMiniProfile.isNullOrBlank()) {
+                if(!item.teacherSmallProfile.isNullOrBlank()) {
                     Glide.with(binding.root)
-                        .load(item.teacherMiniProfile)
+                        .load(item.teacherSmallProfile)
                         .placeholder(circularProgressDrawable)
                         .into(ivProfile)
                 }
@@ -56,14 +56,14 @@ class HomeAdapter(
                 tvLectureTime.text = timeData
 
                 clDetail.setOnClickListener {
-                    alertLiveDetailDialog(item.liveId, item.teacherProfile ?: "", item.liveTitle, item.liveContent)
+                    alertLiveDetailDialog(item.liveId, item.teacherSmallProfile ?: "",item.teacherProfile ?: "", item.liveTitle, item.liveContent)
                 }
             }
         }
 
         companion object {
             fun from(parent: ViewGroup,
-                     alertLiveDetailDialog: (id: Int, imageUri: String, title: String, content: String) -> Unit): ViewHolder {
+                     alertLiveDetailDialog: (id: Int, smallImageUri: String, imageUri: String, title: String, content: String) -> Unit): ViewHolder {
                 return ViewHolder(ListItemHomeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
                     alertLiveDetailDialog = alertLiveDetailDialog)
             }

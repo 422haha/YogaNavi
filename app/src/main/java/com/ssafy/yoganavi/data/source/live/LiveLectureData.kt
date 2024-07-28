@@ -9,7 +9,7 @@ data class LiveLectureData(
     @SerializedName("nickname")
     val teacherName: String = "",
     @SerializedName("profileImageSmallUrl")
-    val teacherMiniProfile: String? = "",
+    val teacherSmallProfile: String? = "",
     @SerializedName("profileImageUrl")
     val teacherProfile: String? = "",
     var liveTitle: String = "",
