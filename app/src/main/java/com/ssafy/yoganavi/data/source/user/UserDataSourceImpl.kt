@@ -32,4 +32,11 @@ class UserDataSourceImpl @Inject constructor(private val userAPI: UserAPI) : Use
 
     override suspend fun isServerOn(): Response<YogaResponse<Unit>> =
         userAPI.isServerOn()
+
+    override suspend fun logout(): Response<YogaResponse<Unit>> =
+        userAPI.logout()
+
+    override suspend fun quit(): Response<YogaResponse<Unit>> =
+        userAPI.quit()
+
 }

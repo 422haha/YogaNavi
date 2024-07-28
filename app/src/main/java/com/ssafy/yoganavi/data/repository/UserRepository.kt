@@ -21,4 +21,8 @@ interface UserRepository {
     suspend fun registerPassword(userRequest: UserRequest): ListResponse<Unit>
 
     suspend fun isServerOn(): ListResponse<Unit>
+
+    suspend fun logout(): ListResponse<Unit>
+
+    suspend fun quit(): ListResponse<Unit>
 }
