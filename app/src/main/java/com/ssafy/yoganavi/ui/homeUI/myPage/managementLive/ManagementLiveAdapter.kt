@@ -8,9 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.databinding.ListItemLiveBinding
 import com.ssafy.yoganavi.ui.utils.LIMIT_DATE
-import com.ssafy.yoganavi.ui.utils.StartTildeEnd
+import com.ssafy.yoganavi.ui.utils.startTildeEnd
 import com.ssafy.yoganavi.ui.utils.UPDATE
-import com.ssafy.yoganavi.ui.utils.StartVerticalEnd
+import com.ssafy.yoganavi.ui.utils.startVerticalEnd
 import com.ssafy.yoganavi.ui.utils.convertDaysToHangle
 import com.ssafy.yoganavi.ui.utils.formatDotDate
 import com.ssafy.yoganavi.ui.utils.formatTime
@@ -50,9 +50,9 @@ class ManagementLiveAdapter(
 
                 val weekData = convertDaysToHangle(item.availableDay)
 
-                val timeData = StartTildeEnd(formatTime(item.startTime), formatTime(item.endTime))
+                val timeData = startTildeEnd(formatTime(item.startTime), formatTime(item.endTime))
 
-                tvLectureTime.text = StartVerticalEnd(weekData, timeData)
+                tvLectureTime.text = startVerticalEnd(weekData, timeData)
 
                 vEnterBtn.setOnClickListener { navigateToLiveFragment(item.liveId) }
 

@@ -17,7 +17,7 @@ import com.ssafy.yoganavi.ui.utils.CREATE
 import com.ssafy.yoganavi.ui.utils.END
 import com.ssafy.yoganavi.ui.utils.END_STR
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
-import com.ssafy.yoganavi.ui.utils.IntToDate
+import com.ssafy.yoganavi.ui.utils.intToDate
 import com.ssafy.yoganavi.ui.utils.LIMIT_DATE
 import com.ssafy.yoganavi.ui.utils.LIMIT_STR
 import com.ssafy.yoganavi.ui.utils.MODIFY_LIVE
@@ -168,11 +168,11 @@ class RegisterLiveFragment :
                     calendar.set(sYear, sMonth, sDay)
 
                     with(viewModel.liveLectureData) {
-                        binding.tieStart.setText(IntToDate(sYear, sMonth, sDay))
+                        binding.tieStart.setText(intToDate(sYear, sMonth, sDay))
                         startDate = calendar.timeInMillis
 
                         if (endDate < startDate && endDate != 0L) {
-                            binding.tieEnd.setText(IntToDate(sYear, sMonth, sDay))
+                            binding.tieEnd.setText(intToDate(sYear, sMonth, sDay))
                             endDate = calendar.timeInMillis
                         }
                     }
@@ -185,7 +185,7 @@ class RegisterLiveFragment :
                 { _, sYear, sMonth, sDay ->
                     calendar.set(sYear, sMonth, sDay)
 
-                    binding.tieEnd.setText(IntToDate(sYear, sMonth, sDay))
+                    binding.tieEnd.setText(intToDate(sYear, sMonth, sDay))
                     viewModel.liveLectureData.endDate = calendar.timeInMillis
                 }, year, month, day
             ).apply {
