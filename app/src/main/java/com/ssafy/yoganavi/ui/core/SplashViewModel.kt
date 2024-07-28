@@ -12,18 +12,21 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
-    private val userRepository: UserRepository,
-    private val dataStoreRepository: DataStoreRepository
+class SplashViewModel @Inject constructor(
+    private val dataStoreRepository: DataStoreRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
-    fun autoLogin(login: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+    var isSuccess = false
+
+    fun autoLogin() = viewModelScope.launch(Dispatchers.IO) {
         runCatching {
             val token = dataStoreRepository.accessToken.firstOrNull() ?: return@launch
             if (token.isBlank()) return@launch
 
             val response = userRepository.isServerOn()
             if (response !is ListResponse.Success) return@launch
-        }.onSuccess { login() }
+        }.onSuccess { isSuccess = true }
     }
+
 }
