@@ -35,16 +35,17 @@
         app:layout_constraintTop_toBottomOf="@id/sv_search">
 
         <RadioButton
-            android:id="@+id/radioButton"
+            android:id="@+id/rb_popular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/padding_medium"
             android:text="@string/popular" />
 
         <RadioButton
-            android:id="@+id/radioButton2"
+            android:id="@+id/rb_recent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="true"
             android:text="@string/recent" />
 
     </RadioGroup>

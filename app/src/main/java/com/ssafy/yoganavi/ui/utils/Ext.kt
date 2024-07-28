@@ -16,6 +16,8 @@ const val TOKEN = "Authorization"
 const val REFRESH_TOKEN = "Refresh-Token"
 const val NEED_REFRESH_TOKEN = "refresh_token_required"
 const val TOKEN_REQUIRED = "token_required"
+const val PAGE_SIZE = 30
+
 
 // 수신부
 const val FORBIDDEN = 403
@@ -50,6 +52,9 @@ const val EDIT = "편집"
 const val DELETE = "삭제"
 const val MAX_HASH_TAG = 5
 const val IS_MAX_HASH_TAG = "해시태그는 5개까지만 등록하실 수 있습니다."
+const val LECTURE_LIST = "강의 찾기"
+const val FAME = "fame"
+const val DATE = "date"
 
 // 캘린더, 타임 Picker
 const val START = 1

@@ -6,6 +6,7 @@ import com.google.gson.Strictness
 import com.ssafy.yoganavi.data.auth.AuthInterceptor
 import com.ssafy.yoganavi.data.repository.DataStoreRepository
 import com.ssafy.yoganavi.data.source.info.InfoAPI
+import com.ssafy.yoganavi.data.source.lecture.LectureAPI
 import com.ssafy.yoganavi.data.source.user.UserAPI
 import com.ssafy.yoganavi.ui.utils.TIME_OUT
 import dagger.Module
@@ -46,7 +47,8 @@ object NetworkModule {
     @Provides
     fun provideUserRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit = Retrofit.Builder()
 //        .baseUrl("http://i11d210.p.ssafy.io:8080")
-        .baseUrl("http://192.168.100.99:8080")
+//        .baseUrl("http://192.168.100.99:8080")
+        .baseUrl("http://119.56.158.40:8080")
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
@@ -59,4 +61,7 @@ object NetworkModule {
     @Provides
     fun provideInfoAPI(retrofit: Retrofit): InfoAPI = retrofit.create()
 
+    @Singleton
+    @Provides
+    fun provideLectureAPI(retrofit: Retrofit): LectureAPI = retrofit.create()
 }
