@@ -2,9 +2,12 @@ package com.yoga.backend.common.config;
 
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.repository.UsersRepository;
+import com.yoga.backend.members.service.UsersService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,11 +22,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class UsernamePwdAuthenticationProvider implements AuthenticationProvider {
 
-    @Autowired
-    private UsersRepository usersRepository; // 사용자 정보를 가져오는 리포지토리
+    private static final Logger log = LoggerFactory.getLogger(
+        UsernamePwdAuthenticationProvider.class);
 
-    @Autowired
-    private PasswordEncoder passwordEncoder; // BCryptPasswordEncoder
+    private final UsersRepository usersRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UsersService usersService;
+
+    public UsernamePwdAuthenticationProvider(UsersRepository usersRepository,
+        PasswordEncoder passwordEncoder,
+        UsersService usersService) {
+        this.usersRepository = usersRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.usersService = usersService;
+    }// BCryptPasswordEncoder
 
     /**
      * 사용자 인증을 수행하는 메서드
@@ -44,15 +56,20 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
         if (userOpt.isPresent()) {
             Users user = userOpt.get();
 
+            if (user.getIsDeleted()) {
+                throw new BadCredentialsException("계정이 삭제되었습니다.");
+            }
+
             // 탈퇴 진행 중인 사용자 확인
             if (user.getDeletedAt() != null) {
                 // 비밀번호 확인
                 if (passwordEncoder.matches(pwd, user.getPwd())) {
-                    // 계정 복구
-                    user.setDeletedAt(null);
-                    usersRepository.save(user);
+                    usersService.recoverAccount(user);
+
+                    user = usersRepository.findById(user.getId())
+                        .orElseThrow(() -> new RuntimeException("User not found after recovery"));
                     // 로그 추가
-                    System.out.println("사용자 계정이 복구됨. 사용자 email: " + user.getEmail());
+                    log.info("사용자 계정이 복구됨. 사용자 email: {}", user.getEmail());
                 } else {
                     throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
                 }

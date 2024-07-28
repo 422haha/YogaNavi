@@ -1,4 +1,4 @@
-package com.yoga.backend.members;
+package com.yoga.backend.members.service;
 
 import com.yoga.backend.common.awsS3.S3Service;
 import com.yoga.backend.common.entity.Hashtag;
@@ -7,6 +7,8 @@ import com.yoga.backend.members.dto.RegisterDto;
 import com.yoga.backend.members.dto.UpdateDto;
 import com.yoga.backend.members.repository.HashtagRepository;
 import com.yoga.backend.members.repository.UsersRepository;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -17,7 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,22 +30,27 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UsersServiceImpl implements UsersService {
 
-    private static final long DELETE_DELAY_HOURS = 1;
-    private static final long DELETE_DELAY_MINUTES = 1;
+    private static final ZoneId KOREA_ZONE_ID = ZoneId.of("Asia/Seoul");
+//    private static final Duration DELETE_DELAY = Duration.ofDays(7);
+    private static final Duration DELETE_DELAY = Duration.ofMinutes(2);
     public static final long URL_EXPIRATION_SECONDS = 86400; // 1 hour
 
-    @Autowired
-    private S3Service s3Service;
-
-    @Autowired
-    private JavaMailSender emailSender;
-
+    private final S3Service s3Service;
+    private final UserDeletionService userDeletionService;
+    private final JavaMailSender emailSender;
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
-    private HashtagRepository hashtagRepository;
+    private final HashtagRepository hashtagRepository;
 
-    public UsersServiceImpl(UsersRepository usersRepository, PasswordEncoder passwordEncoder,
+    public UsersServiceImpl(S3Service s3Service,
+        UserDeletionService userDeletionService,
+        JavaMailSender emailSender,
+        UsersRepository usersRepository,
+        PasswordEncoder passwordEncoder,
         HashtagRepository hashtagRepository) {
+        this.s3Service = s3Service;
+        this.userDeletionService = userDeletionService;
+        this.emailSender = emailSender;
         this.usersRepository = usersRepository;
         this.passwordEncoder = passwordEncoder;
         this.hashtagRepository = hashtagRepository;
@@ -68,6 +74,7 @@ public class UsersServiceImpl implements UsersService {
         users.setPwd(registerDto.getPassword());
         users.setEmail(registerDto.getEmail());
         users.setNickname(registerDto.getNickname());
+        users.setIsDeleted(false);
 
         if (registerDto.isTeacher()) {
             users.setRole("TEACHER");
@@ -79,6 +86,29 @@ public class UsersServiceImpl implements UsersService {
     }
 
     /**
+     * 사용자 계정 복구
+     *
+     * @param user 사용자 엔티티
+     */
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public void recoverAccount(Users user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
+        Users managedUser = usersRepository.findById(user.getId())
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        managedUser.setDeletedAt(null);
+        managedUser.setIsDeleted(false);
+
+        usersRepository.save(managedUser);
+
+        log.info("사용자 계정 복구 성공. 사용자 ID: {}, 이메일: {}", managedUser.getId(), managedUser.getEmail());
+    }
+
+    /**
      * 닉네임의 중복 여부를 확인
      *
      * @param nickname 확인할 닉네임
@@ -87,6 +117,9 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public boolean checkNickname(String nickname) {
+        if (nickname.startsWith("삭제된 사용자")) {
+            return false; // "삭제된 사용자"로 시작하는 닉네임은 사용 불가
+        }
         Optional<Users> users = usersRepository.findByNickname(nickname);
         if (users.isEmpty()) {
             return true;
@@ -201,7 +234,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Users getUserByUserId(int userId) {
-        Optional<Users> users = usersRepository.findById(userId);
+        Optional<Users> users = usersRepository.findByIdAndIsDeletedFalse(userId);
 
         if (users.isPresent()) {
             Users user = users.get();
@@ -359,46 +392,38 @@ public class UsersServiceImpl implements UsersService {
         }
     }
 
+
+    /**
+     * 회원 삭제 요청
+     *
+     * @param userId 사용자 id
+     */
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void requestDeleteUser(int userId) {
         Users user = usersRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
-        ZonedDateTime koreaTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
-        LocalDateTime deletionTime = koreaTime.plusHours(DELETE_DELAY_HOURS).toLocalDateTime();
-        user.setDeletedAt(deletionTime);
+        ZonedDateTime now = ZonedDateTime.now(KOREA_ZONE_ID);
+        ZonedDateTime deletionTime = now.plus(DELETE_DELAY);
+        user.setDeletedAt(deletionTime.toInstant());
         usersRepository.save(user);
         log.info("사용자 {} 삭제 예정: {}", userId, deletionTime);
     }
 
     @Override
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional
     public void processDeletedUsers() {
-        ZonedDateTime koreaTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
-        //LocalDateTime expirationTime = LocalDateTime.now().minusHours(DELETE_DELAY_HOURS);
-        LocalDateTime expirationTime = koreaTime.minusMinutes(DELETE_DELAY_MINUTES)
-            .toLocalDateTime();
-        List<Users> usersToDelete = usersRepository.findByDeletedAtBeforeAndDeletedAtIsNotNull(
-            expirationTime);
+        ZonedDateTime now = ZonedDateTime.now(KOREA_ZONE_ID);
+        Instant expirationTime = now.toInstant();
+
+        List<Users> usersToDelete = usersRepository.findByDeletedAtBeforeAndIsDeletedFalse(expirationTime);
         for (Users user : usersToDelete) {
             try {
-
-                anonymizeUserData(user);
-
-                log.info("사용자 {}가 영구적으로 삭제됨", user.getId());
+                userDeletionService.processDeletedUser(user);
             } catch (Exception e) {
                 log.error("사용자 {} 삭제중 에러 발생: {}", user.getId(), e);
-                throw new RuntimeException("사용자 삭제 중 오류 발생", e);
             }
         }
-    }
-
-    private void anonymizeUserData(Users user) {
-        user.setEmail("deleted_" + user.getId() + "@yoganavi.com");
-        user.setNickname("삭제된 사용자"+ user.getId());
-        user.setProfile_image_url(null);
-        user.setProfile_image_url_small(null);
-        usersRepository.save(user);
     }
 }

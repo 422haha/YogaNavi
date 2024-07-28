@@ -1,9 +1,8 @@
-package com.yoga.backend.members;
+package com.yoga.backend.members.service;
 
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.dto.RegisterDto;
 import com.yoga.backend.members.dto.UpdateDto;
-import java.util.List;
 import java.util.Set;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 public interface UsersService {
 
     Users registerUser(RegisterDto registerDto);
+
+    @Transactional
+    void recoverAccount(Users user);
 
     boolean checkNickname(String nickname);
 

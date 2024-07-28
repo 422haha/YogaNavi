@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -71,7 +72,7 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     private List<RecordedLectureLike> recordedLectureLikes = new ArrayList<>();
 
     @Column
-    private LocalDateTime deletedAt;
+    private Instant deletedAt;
 
     @Column(nullable = false)
     private Boolean isDeleted = false;
@@ -220,11 +221,11 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
         this.recordedLectureLikes = recordedLectureLikes;
     }
 
-    public LocalDateTime getDeletedAt() {
+    public Instant  getDeletedAt() {
         return deletedAt;
     }
 
-    public void setDeletedAt(LocalDateTime deletedAt) {
+    public void setDeletedAt(Instant deletedAt) {
         this.deletedAt = deletedAt;
     }
 
