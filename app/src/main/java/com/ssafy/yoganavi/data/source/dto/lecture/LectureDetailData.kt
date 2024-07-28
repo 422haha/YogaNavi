@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.data.source.lecture
+package com.ssafy.yoganavi.data.source.dto.lecture
 
 data class LectureDetailData(
     val recordedId: Long = 0,

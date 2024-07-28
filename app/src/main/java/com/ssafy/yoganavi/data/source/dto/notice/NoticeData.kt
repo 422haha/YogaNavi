@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.data.source.notice
+package com.ssafy.yoganavi.data.source.dto.notice
 
 data class NoticeData(
     val articleId: Int = -1,

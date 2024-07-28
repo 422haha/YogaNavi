@@ -1,13 +1,11 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.modify
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -21,7 +19,7 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.ssafy.yoganavi.data.repository.response.DetailResponse
-import com.ssafy.yoganavi.data.source.mypage.Profile
+import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.databinding.FragmentModifyBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.modify.hashtag.HashTagAdapter

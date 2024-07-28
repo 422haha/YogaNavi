@@ -4,7 +4,7 @@ import android.view.View
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
+import com.ssafy.yoganavi.data.source.dto.lecture.VideoChapterData
 import com.ssafy.yoganavi.databinding.CustomChapterViewBinding
 
 class ChapterViewHolder(

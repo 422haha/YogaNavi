@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.DataStoreRepository
 import com.ssafy.yoganavi.data.repository.InfoRepository
-import com.ssafy.yoganavi.data.source.mypage.Profile
+import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -2,12 +2,12 @@ package com.ssafy.yoganavi.data.repository
 
 import com.ssafy.yoganavi.data.repository.response.DetailResponse
 import com.ssafy.yoganavi.data.repository.response.ListResponse
-import com.ssafy.yoganavi.data.source.lecture.LectureData
-import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
-import com.ssafy.yoganavi.data.source.live.LiveLectureData
-import com.ssafy.yoganavi.data.source.mypage.Profile
-import com.ssafy.yoganavi.data.source.notice.NoticeData
-import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
+import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
+import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
+import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
+import com.ssafy.yoganavi.data.source.dto.mypage.Profile
+import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
+import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 
 interface InfoRepository {
 

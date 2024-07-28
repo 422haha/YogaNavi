@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.data.source.live
+package com.ssafy.yoganavi.data.source.dto.live
 
 import com.google.gson.annotations.SerializedName
 
