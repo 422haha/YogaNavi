@@ -1,13 +1,17 @@
 package com.yoga.backend.common.entity;
 
+import com.yoga.backend.common.entity.RecordedLectures.RecordedLecture;
+import com.yoga.backend.common.entity.RecordedLectures.RecordedLectureLike;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
@@ -42,6 +46,15 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     @Column
     private String resetToken;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Article> articles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<LiveLectures> liveLectures = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<MyLiveLecture> myLiveLectures = new ArrayList<>();
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
         name = "user_hashtags",
@@ -50,22 +63,26 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     )
     private Set<Hashtag> hashtags = new HashSet<>();
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
+    private List<RecordedLecture> recordedLectures = new ArrayList<>();
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Article> articles = new ArrayList<>();
+    private List<RecordedLectureLike> recordedLectureLikes = new ArrayList<>();
 
-    public String getResetToken() {
-        return resetToken;
-    }
+    @Column
+    private LocalDateTime deletedAt;
 
-    public void setResetToken(String resetToken) {
-        this.resetToken = resetToken;
-    }
+    @Column(nullable = false)
+    private Boolean isDeleted = false;
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) { this.id = id; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getPwd() {
         return pwd;
@@ -115,6 +132,14 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
         this.role = role;
     }
 
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
     public Set<Hashtag> getHashtags() {
         return hashtags;
     }
@@ -152,8 +177,63 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
         article.setUser(this);
     }
 
+    public void removeAllArticles() {
+        for (Article article : new ArrayList<>(articles)) {
+            removeArticle(article);
+        }
+    }
+
     public void removeArticle(Article article) {
         articles.remove(article);
         article.setUser(null);
     }
+
+    public List<LiveLectures> getLiveLectures() {
+        return liveLectures;
+    }
+
+    public void setLiveLectures(List<LiveLectures> liveLectures) {
+        this.liveLectures = liveLectures;
+    }
+
+    public List<MyLiveLecture> getMyLiveLectures() {
+        return myLiveLectures;
+    }
+
+    public void setMyLiveLectures(List<MyLiveLecture> myLiveLectures) {
+        this.myLiveLectures = myLiveLectures;
+    }
+
+    public List<RecordedLecture> getRecordedLectures() {
+        return recordedLectures;
+    }
+
+    public void setRecordedLectures(List<RecordedLecture> recordedLectures) {
+        this.recordedLectures = recordedLectures;
+    }
+
+    public List<RecordedLectureLike> getRecordedLectureLikes() {
+        return recordedLectureLikes;
+    }
+
+    public void setRecordedLectureLikes(List<RecordedLectureLike> recordedLectureLikes) {
+        this.recordedLectureLikes = recordedLectureLikes;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
 }

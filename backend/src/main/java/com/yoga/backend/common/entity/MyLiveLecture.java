@@ -2,6 +2,7 @@ package com.yoga.backend.common.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,7 +31,7 @@ public class MyLiveLecture {
     @JoinColumn(name = "live_id", nullable = false)
     private LiveLectures liveLecture; // 실시간 강의 ID (Foreign Key)
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private Users user; // 사용자 ID (Foreign Key)
 

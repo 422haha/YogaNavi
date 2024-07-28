@@ -33,4 +33,9 @@ public interface UsersService {
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     void updateUserHashtags(int userId, Set<String> newHashtags);
+
+    void requestDeleteUser(int userId);
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    void processDeletedUsers();
 }

@@ -4,6 +4,8 @@ import com.yoga.backend.common.awsS3.S3Service;
 import com.yoga.backend.common.entity.RecordedLectures.RecordedLecture;
 import com.yoga.backend.common.entity.RecordedLectures.RecordedLectureChapter;
 import com.yoga.backend.common.entity.RecordedLectures.RecordedLectureLike;
+import com.yoga.backend.common.entity.Users;
+import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.recorded.dto.ChapterDto;
 import com.yoga.backend.mypage.recorded.dto.DeleteDto;
 import com.yoga.backend.mypage.recorded.dto.LectureDto;
@@ -41,6 +43,7 @@ public class RecordedServiceImpl implements RecordedService {
     private static final String S3_BASE_URL = "https://yoga-navi.s3.ap-northeast-2.amazonaws.com/";
 
     private final S3Service s3Service;
+    private UsersRepository usersRepository;
     private final RecordedLectureRepository recordedLectureRepository;
     private final RecordedLectureListRepository recordedLectureListRepository;
     private final MyLikeLectureListRepository myLikeLectureListRepository;
@@ -49,6 +52,7 @@ public class RecordedServiceImpl implements RecordedService {
 
     @Autowired
     public RecordedServiceImpl(S3Service s3Service,
+        UsersRepository usersRepository,
         RecordedLectureRepository recordedLectureRepository,
         RecordedLectureListRepository recordedLectureListRepository,
         MyLikeLectureListRepository myLikeLectureListRepository,
@@ -56,6 +60,7 @@ public class RecordedServiceImpl implements RecordedService {
         AllRecordedLecturesRepository allRecordedLecturesRepository
     ) {
         this.s3Service = s3Service;
+        this.usersRepository = usersRepository;
         this.recordedLectureRepository = recordedLectureRepository;
         this.recordedLectureListRepository = recordedLectureListRepository;
         this.myLikeLectureListRepository = myLikeLectureListRepository;
@@ -96,8 +101,11 @@ public class RecordedServiceImpl implements RecordedService {
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void saveLecture(LectureDto lectureDto) {
+        Users user = usersRepository.findById(lectureDto.getUserId())
+            .orElseThrow(() -> new RuntimeException("사용자 찾을 수 없음"));
+
         RecordedLecture lecture = new RecordedLecture();
-        lecture.setUserId(lectureDto.getUserId());
+        lecture.setUser(user);
         lecture.setTitle(lectureDto.getRecordTitle());
         lecture.setContent(lectureDto.getRecordContent());
         lecture.setThumbnail(lectureDto.getRecordThumbnail());
@@ -130,9 +138,12 @@ public class RecordedServiceImpl implements RecordedService {
         RecordedLecture lecture = recordedLectureRepository.findById(recordedId)
             .orElseThrow(() -> new RuntimeException("강의 찾을 수 없음"));
 
+        Users user = usersRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("사용자 찾을 수 없음"));
+
         LectureDto dto = convertToDto(lecture);
         dto.setLikeCount(lecture.getLikeCount());
-        dto.setMyLike(lectureLikeRepository.existsByLectureIdAndUserId(recordedId, userId));
+        dto.setMyLike(lectureLikeRepository.existsByLectureAndUser(lecture, user));
 
         // Presigned URL 생성 및 적용
         return applyPresignedUrls(Collections.singletonList(dto)).get(0);
@@ -153,7 +164,7 @@ public class RecordedServiceImpl implements RecordedService {
                 .orElseThrow(() -> new RuntimeException("강의를 찾을 수 없습니다."));
 
             // 사용자 권한 확인
-            if (lecture.getUserId() != lectureDto.getUserId()) {
+            if (lecture.getUser().getId() != lectureDto.getUserId()) {
                 throw new RuntimeException("해당 강의를 수정할 권한이 없습니다.");
             }
 
@@ -356,7 +367,7 @@ public class RecordedServiceImpl implements RecordedService {
             List<Long> notFoundLectureIds = new ArrayList<>(deleteDto.getLectureIds());
 
             for (RecordedLecture lecture : lectures) {
-                if (lecture.getUserId() != userId) {
+                if (lecture.getUser().getId() != userId) {
                     log.error("사용자 {} 는 이 강의를 삭제할 권한이 없음 {}", userId, lecture.getId());
                     throw new RuntimeException("강의 ID " + lecture.getId() + "에 대한 삭제 권한이 없습니다.");
                 }
@@ -416,17 +427,19 @@ public class RecordedServiceImpl implements RecordedService {
     public boolean toggleLike(Long recordedId, int userId) {
         RecordedLecture lecture = recordedLectureRepository.findById(recordedId)
             .orElseThrow(() -> new RuntimeException("강의를 찾을 수 없습니다."));
+        Users user = usersRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        boolean exists = lectureLikeRepository.existsByLectureIdAndUserId(recordedId, userId);
+        boolean exists = lectureLikeRepository.existsByLectureAndUser(lecture, user);
         if (exists) {
-            lectureLikeRepository.deleteByLectureIdAndUserId(recordedId, userId);
+            lectureLikeRepository.deleteByLectureAndUser(lecture, user);
             lecture.decrementLikeCount();
             log.info("강의 {}의 좋아요가 사용자 {}에 의해 취소됨", recordedId, userId);
             return false;
         } else {
             RecordedLectureLike like = new RecordedLectureLike();
             like.setLecture(lecture);
-            like.setUserId(userId);
+            like.setUser(user);
             lectureLikeRepository.save(like);
             lecture.incrementLikeCount();
             log.info("강의 {}의 좋아요가 사용자 {}에 의해 추가됨", recordedId, userId);
@@ -444,7 +457,7 @@ public class RecordedServiceImpl implements RecordedService {
     private LectureDto convertToDto(RecordedLecture lecture) {
         LectureDto dto = new LectureDto();
         dto.setRecordedId(lecture.getId());
-        dto.setUserId(lecture.getUserId());
+        dto.setUserId(lecture.getUser().getId());
         dto.setRecordTitle(lecture.getTitle());
         dto.setRecordContent(lecture.getContent());
         dto.setRecordThumbnail(lecture.getThumbnail());

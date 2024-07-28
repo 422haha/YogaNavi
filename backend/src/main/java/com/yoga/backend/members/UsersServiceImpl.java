@@ -7,8 +7,12 @@ import com.yoga.backend.members.dto.RegisterDto;
 import com.yoga.backend.members.dto.UpdateDto;
 import com.yoga.backend.members.repository.HashtagRepository;
 import com.yoga.backend.members.repository.UsersRepository;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UsersServiceImpl implements UsersService {
 
+    private static final long DELETE_DELAY_HOURS = 1;
+    private static final long DELETE_DELAY_MINUTES = 1;
     public static final long URL_EXPIRATION_SECONDS = 86400; // 1 hour
 
     @Autowired
@@ -262,7 +268,8 @@ public class UsersServiceImpl implements UsersService {
 
             if (updateDto.getImageUrlSmall() != null) {
                 String oldImageUrlSmall = user.getProfile_image_url_small();
-                if (oldImageUrlSmall != null && !oldImageUrlSmall.equals(updateDto.getImageUrlSmall())) {
+                if (oldImageUrlSmall != null && !oldImageUrlSmall.equals(
+                    updateDto.getImageUrlSmall())) {
                     log.debug("사용자 {}의 소형 프로필 이미지 삭제: {}", userId, oldImageUrlSmall);
                     try {
                         s3Service.deleteFile(oldImageUrlSmall);
@@ -352,4 +359,46 @@ public class UsersServiceImpl implements UsersService {
         }
     }
 
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public void requestDeleteUser(int userId) {
+        Users user = usersRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+        ZonedDateTime koreaTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        LocalDateTime deletionTime = koreaTime.plusHours(DELETE_DELAY_HOURS).toLocalDateTime();
+        user.setDeletedAt(deletionTime);
+        usersRepository.save(user);
+        log.info("사용자 {} 삭제 예정: {}", userId, deletionTime);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public void processDeletedUsers() {
+        ZonedDateTime koreaTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        //LocalDateTime expirationTime = LocalDateTime.now().minusHours(DELETE_DELAY_HOURS);
+        LocalDateTime expirationTime = koreaTime.minusMinutes(DELETE_DELAY_MINUTES)
+            .toLocalDateTime();
+        List<Users> usersToDelete = usersRepository.findByDeletedAtBeforeAndDeletedAtIsNotNull(
+            expirationTime);
+        for (Users user : usersToDelete) {
+            try {
+
+                anonymizeUserData(user);
+
+                log.info("사용자 {}가 영구적으로 삭제됨", user.getId());
+            } catch (Exception e) {
+                log.error("사용자 {} 삭제중 에러 발생: {}", user.getId(), e);
+                throw new RuntimeException("사용자 삭제 중 오류 발생", e);
+            }
+        }
+    }
+
+    private void anonymizeUserData(Users user) {
+        user.setEmail("deleted_" + user.getId() + "@yoganavi.com");
+        user.setNickname("삭제된 사용자"+ user.getId());
+        user.setProfile_image_url(null);
+        user.setProfile_image_url_small(null);
+        usersRepository.save(user);
+    }
 }

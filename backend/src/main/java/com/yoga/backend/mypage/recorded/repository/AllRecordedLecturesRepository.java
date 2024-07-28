@@ -36,7 +36,7 @@ public class AllRecordedLecturesRepository {
                     JPAExpressions
                         .selectOne()
                         .from(like)
-                        .where(like.lecture.eq(lecture).and(like.userId.eq(userId))),
+                        .where(like.lecture.eq(lecture).and(like.user.id.eq(userId))),
                     "isLiked"
                 )
             ))

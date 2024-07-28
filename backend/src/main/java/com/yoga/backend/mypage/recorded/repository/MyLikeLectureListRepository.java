@@ -35,9 +35,8 @@ public class MyLikeLectureListRepository {
                 Expressions.as(Expressions.constant(true), "myLike")
             ))
             .from(lecture)
-            .join(like).on(like.lecture.eq(lecture).and(like.userId.eq(userId)))
+            .join(like).on(like.lecture.eq(lecture).and(like.user.id.eq(userId)))
             .orderBy(lecture.createdDate.desc())
             .fetch();
     }
-
 }

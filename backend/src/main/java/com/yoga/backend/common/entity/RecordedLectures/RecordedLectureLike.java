@@ -1,6 +1,7 @@
 package com.yoga.backend.common.entity.RecordedLectures;
 
 
+import com.yoga.backend.common.entity.Users;
 import jakarta.persistence.*;
 
 @Entity
@@ -15,8 +16,9 @@ public class RecordedLectureLike {
     @JoinColumn(name = "lecture_id")
     private RecordedLecture lecture;
 
-    @Column(nullable = false)
-    private int userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Users user;
 
     // getters and setters
 
@@ -36,11 +38,11 @@ public class RecordedLectureLike {
         this.lecture = lecture;
     }
 
-    public int getUserId() {
-        return userId;
+    public Users getUser() {
+        return user;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser(Users user) {
+        this.user = user;
     }
 }
