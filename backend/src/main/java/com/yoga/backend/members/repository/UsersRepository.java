@@ -1,6 +1,7 @@
 package com.yoga.backend.members.repository;
 
 import jakarta.persistence.LockModeType;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,7 +19,10 @@ public interface UsersRepository extends CrudRepository<Users, Long> {
 
     Optional<Users> findById(int id);
 
-    Optional<Users> findByEmail(String email);
+    Optional<Users> findByIdAndIsDeletedFalse(int id);
+
+    @Query("SELECT u FROM Users u WHERE u.email = :email AND u.isDeleted = false")
+    Optional<Users> findByEmail(@Param("email") String email);
 
     Optional<Users> findByNickname(String nickname);
 
@@ -29,6 +33,6 @@ public interface UsersRepository extends CrudRepository<Users, Long> {
     @Query("SELECT u FROM Users u JOIN FETCH u.hashtags h WHERE h.name = :hashtagName")
     List<Users> findUsersByHashtag(@Param("hashtagName") String hashtagName);
 
-    List<Users> findByDeletedAtBeforeAndDeletedAtIsNotNull(LocalDateTime now);
+    List<Users> findByDeletedAtBeforeAndIsDeletedFalse(Instant dateTime);
 
 }

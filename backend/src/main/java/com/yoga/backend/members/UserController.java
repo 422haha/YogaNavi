@@ -4,6 +4,7 @@ import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.util.JwtUtil;
 import com.yoga.backend.members.dto.RegisterDto;
 import com.yoga.backend.members.dto.UpdateDto;
+import com.yoga.backend.members.service.UsersService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -1,5 +1,6 @@
 package com.yoga.backend.members;
 
+import com.yoga.backend.members.service.UsersService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
