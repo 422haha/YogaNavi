@@ -27,9 +27,23 @@ public class TeacherController {
      * @return 강사 목록
      */
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getAllTeachers() {
+    public ResponseEntity<Map<String, Object>> getAllTeachers(
+        @RequestHeader(value = "sorting", defaultValue = "0") int sorting,
+        @RequestHeader(value = "startTime", defaultValue = "0") long startTime,
+        @RequestHeader(value = "endTime", defaultValue = "86400000") long endTime,
+        @RequestHeader(value = "day", defaultValue = "MON, TUE, WED, THU, FRI, SAT, SUN") String day,
+        @RequestHeader(value = "period", defaultValue = "3") int period,
+        @RequestHeader(value = "maxLiveNum", defaultValue = "1") int maxLiveNum) {
+        TeacherFilter filter = new TeacherFilter();
+        filter.setSorting(sorting);
+        filter.setStartTime(startTime);
+        filter.setEndTime(endTime);
+        filter.setDay(day);
+        filter.setPeriod(period);
+        filter.setMaxLiveNum(maxLiveNum);
+
         try {
-            List<TeacherDto> teachers = teacherService.getAllTeachers();
+            List<TeacherDto> teachers = teacherService.getAllTeachers(filter);
             Map<String, Object> response = new HashMap<>();
             response.put("message", "success");
             response.put("data", teachers);
