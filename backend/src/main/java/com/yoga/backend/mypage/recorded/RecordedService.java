@@ -26,4 +26,6 @@ public interface RecordedService {
     boolean toggleLike(Long recordedId, int userId);
 
     List<LectureDto> getAllLectures(int userId, int page, int size, String sort);
+
+    List<LectureDto> searchLectures(int userId, String keyword, String sort, int page, int size, boolean title, boolean content);
 }

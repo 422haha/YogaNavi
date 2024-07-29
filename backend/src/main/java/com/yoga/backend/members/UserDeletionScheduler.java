@@ -17,5 +17,4 @@ public class UserDeletionScheduler {
     public void processDeletedUsers() {
         usersService.processDeletedUsers();
     }
-
 }

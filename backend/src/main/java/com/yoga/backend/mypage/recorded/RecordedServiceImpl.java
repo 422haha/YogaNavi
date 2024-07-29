@@ -451,7 +451,13 @@ public class RecordedServiceImpl implements RecordedService {
     public List<LectureDto> getAllLectures(int userId, int page, int size, String sort) {
         List<LectureDto> lectures = allRecordedLecturesRepository.findAllLectures(userId, page,
             size, sort);
-        return generatePresignedUrlsLike(lectures);
+        return applyPresignedUrls(lectures);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LectureDto> searchLectures(int userId, String keyword, String sort, int page, int size, boolean searchTitle, boolean searchContent) {
+        List<LectureDto> lectures = recordedLectureListRepository.searchLectures(userId, keyword, sort, page, size, searchTitle, searchContent);
+        return applyPresignedUrls(lectures);
     }
 
     private LectureDto convertToDto(RecordedLecture lecture) {

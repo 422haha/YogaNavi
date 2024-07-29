@@ -9,7 +9,6 @@ import com.yoga.backend.members.repository.HashtagRepository;
 import com.yoga.backend.members.repository.UsersRepository;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
@@ -31,8 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UsersServiceImpl implements UsersService {
 
     private static final ZoneId KOREA_ZONE_ID = ZoneId.of("Asia/Seoul");
-//    private static final Duration DELETE_DELAY = Duration.ofDays(7);
-    private static final Duration DELETE_DELAY = Duration.ofMinutes(2);
+    private static final Duration DELETE_DELAY = Duration.ofDays(7);
+//    private static final Duration DELETE_DELAY = Duration.ofMinutes(2); // 시험용
     public static final long URL_EXPIRATION_SECONDS = 86400; // 1 hour
 
     private final S3Service s3Service;
@@ -404,18 +403,18 @@ public class UsersServiceImpl implements UsersService {
         Users user = usersRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
-        ZonedDateTime now = ZonedDateTime.now(KOREA_ZONE_ID);
-        ZonedDateTime deletionTime = now.plus(DELETE_DELAY);
-        user.setDeletedAt(deletionTime.toInstant());
+        ZonedDateTime nowSeoul = ZonedDateTime.now(KOREA_ZONE_ID);
+        ZonedDateTime deletionTimeSeoul = nowSeoul.plus(DELETE_DELAY);
+        user.setDeletedAt(deletionTimeSeoul.toInstant());
         usersRepository.save(user);
-        log.info("사용자 {} 삭제 예정: {}", userId, deletionTime);
+        log.info("사용자 {} 삭제 예정: {}", userId, deletionTimeSeoul);
     }
 
     @Override
     @Transactional
     public void processDeletedUsers() {
-        ZonedDateTime now = ZonedDateTime.now(KOREA_ZONE_ID);
-        Instant expirationTime = now.toInstant();
+        ZonedDateTime nowSeoul = ZonedDateTime.now(KOREA_ZONE_ID);
+        Instant expirationTime = nowSeoul.toInstant();
 
         List<Users> usersToDelete = usersRepository.findByDeletedAtBeforeAndIsDeletedFalse(expirationTime);
         for (Users user : usersToDelete) {

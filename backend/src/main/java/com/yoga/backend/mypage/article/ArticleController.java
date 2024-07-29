@@ -83,34 +83,6 @@ public class ArticleController {
     }
 
     /**
-     * 모든 게시글을 조회합니다.
-     *
-     * @return 게시글 목록
-     */
-    @GetMapping("/all")
-    public ResponseEntity<Map<String, Object>> getAllArticles() {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            // 모든 게시글을 가져옵니다.
-            List<Article> articles = articleService.getAllArticles();
-
-            // 게시글을 생성일 기준으로 역순으로 정렬합니다.
-            List<Map<String, Object>> articleList = articles.stream()
-                .sorted(Comparator.comparing(Article::getCreatedAt).reversed())
-                .map(this::convertArticleToMap)
-                .collect(Collectors.toList());
-
-            response.put("message", "success");
-            response.put("data", articleList);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("message", "서버 내부 오류가 발생했습니다");
-            response.put("data", new Object[]{});
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-    }
-
-    /**
      * 특정 사용자가 작성한 모든 게시글을 조회합니다.
      *
      * @param token JWT 토큰
