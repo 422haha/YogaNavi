@@ -7,7 +7,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.R
-import com.ssafy.yoganavi.data.source.mypage.Profile
+import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.databinding.FragmentProfileBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.MY_PAGE

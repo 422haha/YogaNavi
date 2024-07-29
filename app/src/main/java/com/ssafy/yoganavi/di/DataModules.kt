@@ -2,6 +2,8 @@ package com.ssafy.yoganavi.di
 
 import com.ssafy.yoganavi.data.repository.InfoRepository
 import com.ssafy.yoganavi.data.repository.InfoRepositoryImpl
+import com.ssafy.yoganavi.data.repository.LectureRepository
+import com.ssafy.yoganavi.data.repository.LectureRepositoryImpl
 import com.ssafy.yoganavi.data.repository.UserRepository
 import com.ssafy.yoganavi.data.repository.UserRepositoryImpl
 import com.ssafy.yoganavi.data.source.info.InfoDataSource
@@ -25,6 +27,10 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindInfoRepository(infoRepositoryImpl: InfoRepositoryImpl): InfoRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindLectureRepository(lectureRepositoryImpl: LectureRepositoryImpl): LectureRepository
 }
 
 @Module

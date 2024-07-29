@@ -8,6 +8,29 @@
     tools:context=".ui.homeUI.lecture.lectureList.LectureListFragment">
 
 
+    <CheckBox
+        android:id="@+id/cb_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_medium"
+        android:checked="true"
+        android:text="@string/title"
+        app:layout_constraintBottom_toTopOf="@id/sv_search"
+        app:layout_constraintEnd_toStartOf="@id/cb_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <CheckBox
+        android:id="@+id/cb_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_small"
+        android:checked="true"
+        android:text="@string/content"
+        app:layout_constraintBottom_toTopOf="@id/sv_search"
+        app:layout_constraintStart_toEndOf="@id/cb_title"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.appcompat.widget.SearchView
         android:id="@+id/sv_search"
         android:layout_width="match_parent"
@@ -17,11 +40,11 @@
         android:focusable="true"
         android:queryHint="찾으시는 강사님이 있으신가요?"
         app:iconifiedByDefault="false"
-        app:queryBackground="@drawable/no_underline"
         app:layout_constraintBottom_toTopOf="@id/radioGroup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/cb_title"
+        app:queryBackground="@drawable/no_underline" />
 
     <RadioGroup
         android:id="@+id/radioGroup"
@@ -36,16 +59,17 @@
         app:layout_constraintTop_toBottomOf="@id/sv_search">
 
         <RadioButton
-            android:id="@+id/radioButton"
+            android:id="@+id/rb_popular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/padding_medium"
             android:text="@string/popular" />
 
         <RadioButton
-            android:id="@+id/radioButton2"
+            android:id="@+id/rb_recent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="true"
             android:text="@string/recent" />
 
     </RadioGroup>

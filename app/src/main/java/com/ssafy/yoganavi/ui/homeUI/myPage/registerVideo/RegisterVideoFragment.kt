@@ -14,8 +14,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.ssafy.yoganavi.R
-import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
-import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
+import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
+import com.ssafy.yoganavi.data.source.dto.lecture.VideoChapterData
 import com.ssafy.yoganavi.databinding.FragmentRegisterVideoBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.ChapterAdapter

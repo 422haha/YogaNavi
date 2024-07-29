@@ -3,7 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
+import com.ssafy.yoganavi.data.source.dto.lecture.VideoChapterData
 import com.ssafy.yoganavi.databinding.CustomChapterViewBinding
 
 class ChapterAdapter(

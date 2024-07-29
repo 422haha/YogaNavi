@@ -3,7 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.schedule.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.InfoRepository
-import com.ssafy.yoganavi.data.source.live.LiveLectureData
+import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -6,6 +6,7 @@ import com.google.gson.Strictness
 import com.ssafy.yoganavi.data.auth.AuthInterceptor
 import com.ssafy.yoganavi.data.repository.DataStoreRepository
 import com.ssafy.yoganavi.data.source.info.InfoAPI
+import com.ssafy.yoganavi.data.source.lecture.LectureAPI
 import com.ssafy.yoganavi.data.source.user.UserAPI
 import com.ssafy.yoganavi.ui.utils.TIME_OUT
 import dagger.Module
@@ -59,4 +60,7 @@ object NetworkModule {
     @Provides
     fun provideInfoAPI(retrofit: Retrofit): InfoAPI = retrofit.create()
 
+    @Singleton
+    @Provides
+    fun provideLectureAPI(retrofit: Retrofit): LectureAPI = retrofit.create()
 }
