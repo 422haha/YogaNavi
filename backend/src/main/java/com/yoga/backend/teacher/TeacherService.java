@@ -13,9 +13,10 @@ public interface TeacherService {
     /**
      * 모든 강사 정보를 조회합니다.
      *
+     * @param filter 필터 조건
      * @return 강사 정보 리스트
      */
-    List<TeacherDto> getAllTeachers();
+    List<TeacherDto> getAllTeachers(TeacherFilter filter);
 
     /**
      * ID로 특정 강사 정보를 조회합니다.
