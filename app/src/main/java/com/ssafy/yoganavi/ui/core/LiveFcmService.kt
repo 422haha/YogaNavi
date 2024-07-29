@@ -13,6 +13,9 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.repository.DataStoreRepository
+import com.ssafy.yoganavi.ui.utils.CHANNEL_DESCRIPTION
+import com.ssafy.yoganavi.ui.utils.CHANNEL_ID
+import com.ssafy.yoganavi.ui.utils.CHANNEL_NAME
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,23 +37,26 @@ class LiveFcmService: FirebaseMessagingService() {
 //        return googleCredentials.getAccessToken().getTokenValue()
 //    }
 
-    override fun onCreate() {
-        super.onCreate()
-        createNotificationChannel()
-    }
-
+    // 토큰 만들기
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-
-        Timber.d("로오오그 토큰 $token")
 
         CoroutineScope(Dispatchers.IO).launch {
             dataStoreRepository.setAccessToken(token)
         }
     }
 
-    private fun sendRegistrationToServer(token: String) {
+    // 토큰 가져오기
+    fun getFirebaseToken() {
+        //비동기 방식
+        FirebaseMessaging.getInstance().token.addOnSuccessListener {
+            Timber.d("token=${it}")
+        }
+    }
 
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel()
     }
     
     // 백그라운드 data 처리
@@ -63,9 +69,9 @@ class LiveFcmService: FirebaseMessagingService() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = "YogaNaviChannelId"
-            val channelName = "YogaNavi"
-            val channelDescription = "YogaNavi Live Notification"
+            val channelId = CHANNEL_ID
+            val channelName = CHANNEL_NAME
+            val channelDescription = CHANNEL_DESCRIPTION
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(channelId, channelName, importance).apply {
                 description = channelDescription
@@ -76,7 +82,7 @@ class LiveFcmService: FirebaseMessagingService() {
     }
 
     private fun sendNotification(remoteMessage: RemoteMessage) {
-        val channelId = "YogaNaviChannelId"
+        val channelId = CHANNEL_ID
         val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -103,13 +109,6 @@ class LiveFcmService: FirebaseMessagingService() {
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 중요도 (HIGH: 상단바 표시 가능)
 
         notificationManager.notify(uniId, notificationBuilder.build())
-    }
-
-    fun getFirebaseToken() {
-        //비동기 방식
-        FirebaseMessaging.getInstance().token.addOnSuccessListener {
-            Timber.d("token=${it}")
-        }
     }
 }
 

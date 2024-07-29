@@ -80,3 +80,8 @@ enum class Week(val hangle: String) {
     SAT("토"),
     SUN("일") }
 data class DayStatus(val day: Week, var isSelected: Boolean)
+
+// FCM
+const val CHANNEL_ID = "YogaNaviChannelId"
+const val CHANNEL_NAME = "YogaNavi"
+const val CHANNEL_DESCRIPTION = "YogaNavi Live Notification"
