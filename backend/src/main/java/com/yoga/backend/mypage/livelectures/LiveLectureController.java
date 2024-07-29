@@ -190,6 +190,7 @@ public class LiveLectureController {
             lectureData.put("userId", lecture.getUser().getId());
             lectureData.put("nickname", lecture.getUser().getNickname());
             lectureData.put("profileImageUrl", lecture.getUser().getProfile_image_url());
+            lectureData.put("profileImageUrlSmall", lecture.getUser().getProfile_image_url_small());
             lectureData.put("liveTitle", lecture.getLiveTitle());
             lectureData.put("liveContent", lecture.getLiveContent());
             lectureData.put("availableDay", lecture.getAvailableDay());
