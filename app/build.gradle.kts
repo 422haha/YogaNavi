@@ -115,4 +115,8 @@ dependencies {
     implementation (libs.firebase.messaging.ktx)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+
+    // 구글 로그인 없이 OAuth 2.0 사용 
+    implementation ("com.google.auth:google-auth-library-oauth2-http:1.3.0")
+    implementation ("com.squareup.okhttp3:okhttp:4.9.1")
 }

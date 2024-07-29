@@ -28,26 +28,22 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
 
-    private lateinit var permissionHandler: PermissionHandler
-
     private val requestPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
-            when {
-                isGranted -> { } // 권한을 허용 했을 때
-                else -> {
-                    Snackbar.make(binding.root, "실시간 강의 알림은 권한이 필요합니다.\n설정 화면에서 알림 권한을 허용해주세요.", Snackbar.LENGTH_SHORT).show()
-                }
-            }
+            if(!isGranted)
+                Snackbar.make(binding.root, "실시간 강의 알림은 권한이 필요합니다.\n설정 화면에서 알림 권한을 허용해주세요.", Snackbar.LENGTH_SHORT).show()
         }
+
+    private val permissionHandler: PermissionHandler by lazy { PermissionHandler(this, requestPermissionLauncher) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        permissionHandler = PermissionHandler(this, requestPermissionLauncher)
+        LiveFcmService().getFirebaseToken()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
             permissionHandler.branchPermission(Manifest.permission.POST_NOTIFICATIONS, "알림")
