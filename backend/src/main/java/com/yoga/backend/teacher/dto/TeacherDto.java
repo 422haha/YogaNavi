@@ -16,7 +16,7 @@ public class TeacherDto {
     private String email;
     private String nickname;
     private String profileImageUrl;
-    private String profileImageUrlSmall; // 필드 추가
+    private String profileImageUrlSmall;
     private String content;
     private Set<String> hashtags;
     private boolean liked;
@@ -46,79 +46,6 @@ public class TeacherDto {
         this.content = content;
         this.hashtags = hashtags;
         this.liked = liked;
-        this.likeCount = likeCount;
-    }
-
-    // Getters and Setters
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public String getProfileImageUrl() {
-        return profileImageUrl;
-    }
-
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-    }
-
-    public String getProfileImageUrlSmall() {
-        return profileImageUrlSmall;
-    }
-
-    public void setProfileImageUrlSmall(String profileImageUrlSmall) {
-        this.profileImageUrlSmall = profileImageUrlSmall;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Set<String> getHashtags() {
-        return hashtags;
-    }
-
-    public void setHashtags(Set<String> hashtags) {
-        this.hashtags = hashtags;
-    }
-
-    public boolean isLiked() {
-        return liked;
-    }
-
-    public void setLiked(boolean liked) {
-        this.liked = liked;
-    }
-
-    public int getLikeCount() {
-        return likeCount;
-    }
-
-    public void setLikeCount(int likeCount) {
         this.likeCount = likeCount;
     }
 }
