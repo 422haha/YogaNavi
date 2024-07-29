@@ -7,7 +7,7 @@ import com.ssafy.yoganavi.databinding.ListItemLectureBinding
 class LectureDetailItemViewHolder(
     private val binding: ListItemLectureBinding,
     private val bindVideoInfo: (uri: String, binding: ListItemLectureBinding) -> Unit,
-    private val goChapterVideo: (String) -> Unit
+    private val goChapterVideo: (Int) -> Unit
 ) : ViewHolder(binding.root) {
 
     fun bind(data: VideoChapterData) = with(binding) {
@@ -21,6 +21,6 @@ class LectureDetailItemViewHolder(
         }
         if (uri.isNotBlank()) bindVideoInfo(uri, binding)
 
-        itemView.setOnClickListener { goChapterVideo(uri) }
+        itemView.setOnClickListener { goChapterVideo(layoutPosition) }
     }
 }

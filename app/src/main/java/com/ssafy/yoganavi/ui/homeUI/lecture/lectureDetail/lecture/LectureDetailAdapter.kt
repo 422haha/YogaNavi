@@ -11,7 +11,7 @@ import com.ssafy.yoganavi.ui.utils.ITEM
 
 class LectureDetailAdapter(
     private val bindVideoInfo: (uri: String, binding: ListItemLectureBinding) -> Unit,
-    private val goChapterVideo: (String) -> Unit
+    private val goChapterVideo: (Int) -> Unit
 ) : ListAdapter<LectureDetailItem, ViewHolder>(LectureDetailItemItemCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

@@ -164,9 +164,8 @@
         android:label="fragment_lecture_video"
         tools:layout="@layout/fragment_lecture_video" >
         <argument
-            android:name="videoUri"
-            android:defaultValue=""
-            app:argType="string" />
+            android:name="uriList"
+            app:argType="string[]" />
     </fragment>
     <fragment
         android:id="@+id/likeTeacherFragment"

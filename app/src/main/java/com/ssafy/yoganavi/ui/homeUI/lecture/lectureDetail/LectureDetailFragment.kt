@@ -79,9 +79,17 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
         }
     }
 
-    private fun moveToVideo(uri: String) {
-        val directions = LectureDetailFragmentDirections
-            .actionLectureDetailFragmentToLectureVideoFragment(uri)
+    private fun moveToVideo(start: Int) {
+        val uriList = lectureDetailAdapter.currentList
+            .asSequence()
+            .drop(start)
+            .map { it as LectureDetailItem.Item }
+            .map { it.chapterData.recordVideo }
+            .toList()
+            .toTypedArray()
+
+        val directions =LectureDetailFragmentDirections
+            .actionLectureDetailFragmentToLectureVideoFragment(uriList = uriList)
 
         findNavController().navigate(directions)
     }
