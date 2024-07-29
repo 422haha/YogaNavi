@@ -8,9 +8,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.yoganavi.databinding.FragmentLectureListBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.lecture.lectureList.lecture.LectureAdapter
+import com.ssafy.yoganavi.ui.utils.ANY_CHECK_BOX
 import com.ssafy.yoganavi.ui.utils.DATE
 import com.ssafy.yoganavi.ui.utils.FAME
 import com.ssafy.yoganavi.ui.utils.LECTURE_LIST
@@ -38,12 +40,31 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
             canGoBack = false
         )
 
-        binding.rvLecture.adapter = lectureAdapter
+        initAdapter()
         initListener()
         initCollect()
     }
 
+    private fun initAdapter() = with(binding.rvLecture) {
+        adapter = lectureAdapter.apply {
+            registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                    scrollToPosition(0)
+                    super.onItemRangeChanged(positionStart, itemCount)
+                }
+            })
+        }
+    }
+
     private fun initListener() = with(binding) {
+        cbTitle.setOnClickListener {
+            viewModel.updateSortAndKeyword(searchInTitle = cbTitle.isChecked)
+        }
+
+        cbContent.setOnClickListener {
+            viewModel.updateSortAndKeyword(searchInContent = cbContent.isChecked)
+        }
+
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 rbPopular.id -> viewModel.updateSortAndKeyword(sort = FAME)
@@ -53,14 +74,20 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
 
         svSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                if (query.isNullOrBlank()) return false
+                if (!anyCheck() && !query.isNullOrBlank()) {
+                    showSnackBar(ANY_CHECK_BOX)
+                    return false
+                }
 
-                viewModel.updateSortAndKeyword(keyword = query)
-                binding.rvLecture.scrollToPosition(0)
+                if (query.isNullOrBlank()) viewModel.updateSortAndKeyword(keyword = null)
+                else viewModel.updateSortAndKeyword(keyword = query)
                 return false
             }
 
-            override fun onQueryTextChange(newText: String?): Boolean = true
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText.isNullOrBlank()) onQueryTextSubmit("")
+                return false
+            }
         })
     }
 
@@ -70,6 +97,10 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
                 lectureAdapter.submitData(pagingData)
             }
         }
+    }
+
+    private fun anyCheck(): Boolean = with(binding) {
+        return@with cbTitle.isChecked || cbContent.isChecked
     }
 
     private fun navigateToLectureDetailFragment(recordedId: Long = -1L) {

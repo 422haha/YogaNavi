@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,6 +49,7 @@ class LectureListViewModel @Inject constructor(
         searchInContent: Boolean = _sortAndKeyword.value.searchInContent,
     ) {
         val newValue = SortAndKeyword(sort, keyword, searchInTitle, searchInContent)
+        Timber.d("NEW VALUE : ${newValue}")
         _sortAndKeyword.value = newValue
     }
 }

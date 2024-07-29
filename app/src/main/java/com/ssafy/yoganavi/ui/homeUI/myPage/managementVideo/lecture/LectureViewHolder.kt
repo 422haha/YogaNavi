@@ -29,7 +29,7 @@ class LectureViewHolder(
         circularProgressDrawable.start()
 
         Glide.with(binding.root)
-            .load(data.recordSmallThumbnail)
+            .load(data.recordThumbnailSmall)
             .placeholder(circularProgressDrawable)
             .into(ivThumbnail)
 
