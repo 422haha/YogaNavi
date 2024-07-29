@@ -14,11 +14,13 @@ class TeacherViewHolder(
     fun bind(item: TeacherData) = with(binding) {
         tvTeacherNickname.text = item.teacherName
         tvCount.text = item.likes.toK()
-        tvHashtag.text = item.hashtags.joinToString(" ", "#")
+        if(item.hashtags.isNotEmpty()){
+            tvHashtag.text = item.hashtags.joinToString(" ", "#")
+        }
         Glide.with(binding.root)
             .load(item.teacherSmallProfile)
             .into(binding.ivProfile)
-        if (item.isLiked) {
+        if (item.liked) {
             binding.ivFavoriteColor.isVisible = true
             binding.ivFavorite.isVisible = false
         } else {

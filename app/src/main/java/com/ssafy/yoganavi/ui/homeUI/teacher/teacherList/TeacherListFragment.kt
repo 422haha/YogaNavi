@@ -16,10 +16,12 @@ import com.ssafy.yoganavi.databinding.FragmentTeacherListBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.teacher.teacherList.Teacher.TeacherAdapter
 import com.ssafy.yoganavi.ui.utils.TEACHER
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+@AndroidEntryPoint
 class TeacherListFragment :
     BaseFragment<FragmentTeacherListBinding>(FragmentTeacherListBinding::inflate) {
 
@@ -42,7 +44,8 @@ class TeacherListFragment :
         )
         Timber.d("싸피 arguments : ${args.filter ?: FilterData()}")
         initListener()
-//        initCollect()
+        initCollect()
+        viewModel.getTeacherList(args.filter ?: FilterData())
     }
 
     fun initListener() {

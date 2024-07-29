@@ -8,6 +8,7 @@ import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.mypage.Profile
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
+import com.ssafy.yoganavi.data.source.teacher.FilterData
 import com.ssafy.yoganavi.data.source.teacher.TeacherData
 import retrofit2.Response
 import retrofit2.http.Body
@@ -27,6 +28,7 @@ interface InfoAPI {
 
     //TEACHER
     @GET("teacher")
+//    suspend fun getTeacherList(@Body filter:FilterData): Response<YogaResponse<TeacherData>>
     suspend fun getTeacherList(): Response<YogaResponse<TeacherData>>
 
     // LECTURE

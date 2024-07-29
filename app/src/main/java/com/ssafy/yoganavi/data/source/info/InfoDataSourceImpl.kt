@@ -8,6 +8,7 @@ import com.ssafy.yoganavi.data.source.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.mypage.Profile
 import com.ssafy.yoganavi.data.source.notice.NoticeData
 import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
+import com.ssafy.yoganavi.data.source.teacher.FilterData
 import com.ssafy.yoganavi.data.source.teacher.TeacherData
 import retrofit2.Response
 import javax.inject.Inject
@@ -19,7 +20,8 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun getProfile(): Response<YogaDetailResponse<Profile>> =
         infoAPI.getProfile()
 
-    override suspend fun getTeacherList(): Response<YogaResponse<TeacherData>> =
+    override suspend fun getTeacherList(filter: FilterData): Response<YogaResponse<TeacherData>> =
+//        infoAPI.getTeacherList(filter)
         infoAPI.getTeacherList()
 
     override suspend fun updateProfile(profile: Profile): Response<YogaDetailResponse<Profile>> =
