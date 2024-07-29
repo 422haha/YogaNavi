@@ -164,6 +164,13 @@ public class LiveLectureController {
      * @param token  인증 토큰
      * @return 조회 결과 응답
      */
+    /**
+     * 특정 강의를 조회하는 API 엔드포인트.
+     *
+     * @param liveId 조회할 강의 ID
+     * @param token  인증 토큰
+     * @return 조회 결과 응답
+     */
     @GetMapping("/{live_id}")
     public ResponseEntity<Map<String, Object>> getLiveLectureById(
         @PathVariable("live_id") Integer liveId,
@@ -184,24 +191,24 @@ public class LiveLectureController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
             }
 
-            Map<String, Object> lectureData = new HashMap<>();
-            lectureData.put("liveId", lecture.getLiveId());
-            lectureData.put("regDate", lecture.getRegDate());
-            lectureData.put("userId", lecture.getUser().getId());
-            lectureData.put("nickname", lecture.getUser().getNickname());
-            lectureData.put("profileImageUrl", lecture.getUser().getProfile_image_url());
-            lectureData.put("profileImageUrlSmall", lecture.getUser().getProfile_image_url_small());
-            lectureData.put("liveTitle", lecture.getLiveTitle());
-            lectureData.put("liveContent", lecture.getLiveContent());
-            lectureData.put("availableDay", lecture.getAvailableDay());
-            lectureData.put("startDate", lecture.getStartDate());
-            lectureData.put("startTime", lecture.getStartTime());
-            lectureData.put("endDate", lecture.getEndDate());
-            lectureData.put("endTime", lecture.getEndTime());
-            lectureData.put("maxLiveNum", lecture.getMaxLiveNum());
+            LiveLectureResponseDto dto = new LiveLectureResponseDto();
+            dto.setLiveId(lecture.getLiveId());
+            dto.setRegDate(lecture.getRegDate());
+            dto.setUserId(lecture.getUser().getId());
+            dto.setNickname(lecture.getUser().getNickname());
+            dto.setProfileImageUrl(lecture.getUser().getProfile_image_url());
+            dto.setProfileImageUrlSmall(lecture.getUser().getProfile_image_url_small());
+            dto.setLiveTitle(lecture.getLiveTitle());
+            dto.setLiveContent(lecture.getLiveContent());
+            dto.setAvailableDay(lecture.getAvailableDay());
+            dto.setStartDate(lecture.getStartDate());
+            dto.setStartTime(lecture.getStartTime());
+            dto.setEndDate(lecture.getEndDate());
+            dto.setEndTime(lecture.getEndTime());
+            dto.setMaxLiveNum(lecture.getMaxLiveNum());
 
             response.put("message", "조회에 성공했습니다");
-            response.put("data", lectureData);
+            response.put("data", dto);
 
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
