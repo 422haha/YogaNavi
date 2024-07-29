@@ -47,6 +47,9 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     @Column
     private String resetToken;
 
+    @Column(length = 100)
+    private String content; // 강사 소개 내용
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Article> articles = new ArrayList<>();
 
@@ -139,6 +142,15 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
 
     public void setResetToken(String resetToken) {
         this.resetToken = resetToken;
+    }
+
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public Set<Hashtag> getHashtags() {
