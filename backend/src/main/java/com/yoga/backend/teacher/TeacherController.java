@@ -27,12 +27,18 @@ public class TeacherController {
      * @return 강사 목록
      */
     @GetMapping
-    public ResponseEntity<List<TeacherDto>> getAllTeachers() {
+    public ResponseEntity<Map<String, Object>> getAllTeachers() {
         try {
             List<TeacherDto> teachers = teacherService.getAllTeachers();
-            return ResponseEntity.ok(teachers);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "success");
+            response.put("data", teachers);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "서버 내부 오류가 발생했습니다");
+            errorResponse.put("data", null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 

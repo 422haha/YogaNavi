@@ -2,12 +2,20 @@ package com.yoga.backend.teacher;
 
 import com.yoga.backend.common.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 /**
- * 강사 리포지토리 인터페이스
+ * 강사 리포지토리
  */
-@Repository
 public interface TeacherRepository extends JpaRepository<Users, Integer> {
-    // 필요한 추가 메서드 정의 가능
+
+    /**
+     * 모든 강사 정보를 조회합니다.
+     *
+     * @return 강사 리스트
+     */
+    @Query("SELECT u FROM Users u WHERE u.role = 'TEACHER'")
+    List<Users> findAllTeachers();
 }
