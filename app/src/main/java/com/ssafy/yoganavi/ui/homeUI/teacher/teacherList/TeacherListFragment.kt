@@ -47,7 +47,9 @@ class TeacherListFragment :
 
     fun initListener() {
         binding.ivFilter.setOnClickListener {
-            findNavController().navigate(R.id.action_teacherListFragment_to_filterFragment)
+            val directions = TeacherListFragmentDirections
+                .actionTeacherListFragmentToFilterFragment(args.filter)
+            findNavController().navigate(directions)
         }
     }
 
