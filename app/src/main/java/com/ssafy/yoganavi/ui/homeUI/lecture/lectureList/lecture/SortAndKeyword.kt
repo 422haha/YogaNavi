@@ -6,5 +6,6 @@ data class SortAndKeyword(
     val sort: String = DATE,
     val keyword: String? = null,
     val searchInTitle: Boolean = true,
-    val searchInContent: Boolean = true
+    val searchInContent: Boolean = true,
+    val likeChange: Boolean = false
 )

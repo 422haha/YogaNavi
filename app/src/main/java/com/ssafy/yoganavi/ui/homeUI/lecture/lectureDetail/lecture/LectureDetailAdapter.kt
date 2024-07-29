@@ -2,7 +2,6 @@ package com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail.lecture
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ssafy.yoganavi.databinding.ListItemLectureBinding
@@ -11,7 +10,7 @@ import com.ssafy.yoganavi.ui.utils.HEADER
 import com.ssafy.yoganavi.ui.utils.ITEM
 
 class LectureDetailAdapter(
-    private val lifecycleCoroutineScope: LifecycleCoroutineScope,
+    private val bindVideoInfo: (uri: String, binding: ListItemLectureBinding) -> Unit,
     private val goChapterVideo: (String) -> Unit
 ) : ListAdapter<LectureDetailItem, ViewHolder>(LectureDetailItemItemCallBack()) {
 
@@ -52,6 +51,6 @@ class LectureDetailAdapter(
         parent: ViewGroup
     ): LectureDetailItemViewHolder {
         val binding = ListItemLectureBinding.inflate(inflater, parent, false)
-        return LectureDetailItemViewHolder(binding, lifecycleCoroutineScope, goChapterVideo)
+        return LectureDetailItemViewHolder(binding, bindVideoInfo, goChapterVideo)
     }
 }
