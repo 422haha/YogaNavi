@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.InfoRepository
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
+import com.ssafy.yoganavi.data.source.teacher.FilterData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
