@@ -1,8 +1,8 @@
 package com.ssafy.yoganavi.data.repository.response
 
 import com.google.gson.Gson
-import com.ssafy.yoganavi.data.source.YogaDetailResponse
-import com.ssafy.yoganavi.data.source.YogaResponse
+import com.ssafy.yoganavi.data.source.response.YogaDetailResponse
+import com.ssafy.yoganavi.data.source.response.YogaResponse
 import com.ssafy.yoganavi.ui.utils.FORBIDDEN
 import com.ssafy.yoganavi.ui.utils.NO_AUTH
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE

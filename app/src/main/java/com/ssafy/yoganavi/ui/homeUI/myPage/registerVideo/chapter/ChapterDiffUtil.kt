@@ -1,7 +1,7 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter
 
 import androidx.recyclerview.widget.DiffUtil
-import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
+import com.ssafy.yoganavi.data.source.dto.lecture.VideoChapterData
 
 class ChapterDiffUtil : DiffUtil.ItemCallback<VideoChapterData>() {
 

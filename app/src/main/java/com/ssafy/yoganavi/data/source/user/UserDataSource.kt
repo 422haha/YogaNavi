@@ -1,7 +1,7 @@
 package com.ssafy.yoganavi.data.source.user
 
-import com.ssafy.yoganavi.data.source.YogaDetailResponse
-import com.ssafy.yoganavi.data.source.YogaResponse
+import com.ssafy.yoganavi.data.source.response.YogaDetailResponse
+import com.ssafy.yoganavi.data.source.response.YogaResponse
 import retrofit2.Response
 
 interface UserDataSource {

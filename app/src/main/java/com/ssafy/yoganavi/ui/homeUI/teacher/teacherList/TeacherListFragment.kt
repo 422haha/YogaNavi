@@ -14,7 +14,7 @@ import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.teacher.FilterData
 import com.ssafy.yoganavi.databinding.FragmentTeacherListBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
-import com.ssafy.yoganavi.ui.homeUI.teacher.teacherList.Teacher.TeacherAdapter
+import com.ssafy.yoganavi.ui.homeUI.teacher.teacherList.teacher.TeacherAdapter
 import com.ssafy.yoganavi.ui.utils.TEACHER
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest

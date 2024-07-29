@@ -1,15 +1,14 @@
 package com.ssafy.yoganavi.data.source.info
 
-import com.ssafy.yoganavi.data.source.YogaDetailResponse
-import com.ssafy.yoganavi.data.source.YogaResponse
-import com.ssafy.yoganavi.data.source.lecture.LectureData
-import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
-import com.ssafy.yoganavi.data.source.live.LiveLectureData
-import com.ssafy.yoganavi.data.source.mypage.Profile
-import com.ssafy.yoganavi.data.source.notice.NoticeData
-import com.ssafy.yoganavi.data.source.notice.RegisterNoticeRequest
-import com.ssafy.yoganavi.data.source.teacher.FilterData
-import com.ssafy.yoganavi.data.source.teacher.TeacherData
+import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
+import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
+import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
+import com.ssafy.yoganavi.data.source.dto.mypage.Profile
+import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
+import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
+import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
+import com.ssafy.yoganavi.data.source.response.YogaDetailResponse
+import com.ssafy.yoganavi.data.source.response.YogaResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE

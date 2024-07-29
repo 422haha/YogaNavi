@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.data.source.schedule
+package com.ssafy.yoganavi.data.source.dto.schedule
 
 data class ScheduleData(
     val liveId:Int,

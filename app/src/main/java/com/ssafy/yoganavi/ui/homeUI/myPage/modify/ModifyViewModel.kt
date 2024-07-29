@@ -7,7 +7,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.ObjectMetadata
 import com.ssafy.yoganavi.data.repository.InfoRepository
 import com.ssafy.yoganavi.data.repository.response.DetailResponse
-import com.ssafy.yoganavi.data.source.mypage.Profile
+import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
 import com.ssafy.yoganavi.ui.utils.LOGO
 import com.ssafy.yoganavi.ui.utils.MINI

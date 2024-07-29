@@ -2,6 +2,7 @@
 agp = "8.5.1"
 awsAndroidSdkMobileClient = "2.73.0"
 datastorePreferences = "1.1.1"
+firebaseBom = "33.1.2"
 fragmentKtx = "1.8.1"
 glide = "5.0.0-rc01"
 googleFlexbox = "3.0.0"
@@ -43,6 +44,9 @@ androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefre
 aws-android-sdk-mobile-client = { module = "com.amazonaws:aws-android-sdk-mobile-client", version.ref = "awsAndroidSdkMobileClient" }
 aws-android-sdk-s3 = { module = "com.amazonaws:aws-android-sdk-s3", version.ref = "awsAndroidSdkMobileClient" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 google-flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "googleFlexbox" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }

@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.data.source.teacher
+package com.ssafy.yoganavi.data.source.dto.teacher
 
 import com.google.gson.annotations.SerializedName
 

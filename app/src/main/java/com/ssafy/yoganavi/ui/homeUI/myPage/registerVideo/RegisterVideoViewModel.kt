@@ -7,8 +7,8 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.ObjectMetadata
 import com.ssafy.yoganavi.data.repository.InfoRepository
 import com.ssafy.yoganavi.data.repository.response.DetailResponse
-import com.ssafy.yoganavi.data.source.lecture.LectureDetailData
-import com.ssafy.yoganavi.data.source.lecture.VideoChapterData
+import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
+import com.ssafy.yoganavi.data.source.dto.lecture.VideoChapterData
 import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.MINI
