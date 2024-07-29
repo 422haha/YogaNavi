@@ -2,10 +2,12 @@ package com.yoga.backend.members.service;
 
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.repository.UsersRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 public class UserDeletionService {
 
@@ -28,5 +30,6 @@ public class UserDeletionService {
         user.setProfile_image_url(null);
         user.setProfile_image_url_small(null);
         usersRepository.save(user);
+        log.info("사용자 {} 익명화 완료",user.getId());
     }
 }

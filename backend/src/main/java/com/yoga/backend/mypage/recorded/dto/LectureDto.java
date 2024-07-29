@@ -11,7 +11,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class LectureDto {
 
@@ -29,12 +28,44 @@ public class LectureDto {
     private LocalDateTime lastModifiedDate;
 
     // QueryDSL용 생성자 수정
-    public LectureDto(Long recordedId, String recordTitle, String recordThumbnail,
-        long likeCount, boolean myLike) {
+    //
+    public LectureDto(Long recordedId, String recordTitle, String recordContent,
+        String recordThumbnailSmall, Long likeCount,
+        LocalDateTime createdDate, LocalDateTime lastModifiedDate,
+        Boolean myLike) {
         this.recordedId = recordedId;
         this.recordTitle = recordTitle;
-        this.recordThumbnail = recordThumbnail;
+        this.recordContent = recordContent;
+        this.recordThumbnailSmall = recordThumbnailSmall;
         this.likeCount = likeCount;
+        this.createdDate = createdDate;
+        this.lastModifiedDate = lastModifiedDate;
+        this.myLike = myLike != null && myLike;
+    }
+
+    // findAllLectures
+    public LectureDto(Long recordedId, String recordTitle, String recordThumbnailSmall,
+        String recordThumbnail, Long likeCount, Boolean myLike) {
+        this.recordedId = recordedId;
+        this.recordTitle = recordTitle;
+        this.recordThumbnailSmall = recordThumbnailSmall;
+        this.recordThumbnail = recordThumbnail;
+        this.likeCount = likeCount != null ? likeCount : 0L;
+        this.myLike = myLike != null && myLike;
+    }
+
+    public LectureDto(Long recordedId, String recordTitle, String recordContent,
+        String recordThumbnail, String recordThumbnailSmall,
+        Long likeCount, LocalDateTime createdDate, LocalDateTime lastModifiedDate,
+        Boolean myLike) {
+        this.recordedId = recordedId;
+        this.recordTitle = recordTitle;
+        this.recordContent = recordContent;
+        this.recordThumbnail = recordThumbnail;
+        this.recordThumbnailSmall = recordThumbnailSmall;
+        this.likeCount = likeCount;
+        this.createdDate = createdDate;
+        this.lastModifiedDate = lastModifiedDate;
         this.myLike = myLike;
     }
 
@@ -44,7 +75,10 @@ public class LectureDto {
         this.recordTitle = recordTitle;
         this.recordThumbnail = recordThumbnail;
         this.likeCount = likeCount;
-        this.myLike = myLike;
+        this.myLike = myLike != null && myLike;
         this.creationStatus = creationStatus;
+    }
+
+    public LectureDto() {
     }
 }

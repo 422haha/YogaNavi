@@ -1,6 +1,5 @@
 package com.yoga.backend.mypage.recorded.repository;
 
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
@@ -28,17 +27,16 @@ public class AllRecordedLecturesRepository {
                 lecture.id,
                 lecture.title,
                 lecture.content,
+                lecture.thumbnail,
                 lecture.thumbnailSmall,
                 lecture.likeCount,
                 lecture.createdDate,
                 lecture.lastModifiedDate,
-                ExpressionUtils.as(
-                    JPAExpressions
-                        .selectOne()
-                        .from(like)
-                        .where(like.lecture.eq(lecture).and(like.user.id.eq(userId))),
-                    "isLiked"
-                )
+                JPAExpressions
+                    .selectOne()
+                    .from(like)
+                    .where(like.lecture.eq(lecture).and(like.user.id.eq(userId)))
+                    .exists()
             ))
             .from(lecture);
 

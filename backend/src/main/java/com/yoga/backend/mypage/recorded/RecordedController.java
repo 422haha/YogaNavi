@@ -252,13 +252,19 @@ public class RecordedController {
     public ResponseEntity<Map<String, Object>> getAllLectures(
         @RequestHeader("Authorization") String token,
         @PathVariable String sort,
-        @RequestParam(defaultValue = "0") int page
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "21") int size
     ) {
         Map<String, Object> response = new HashMap<>();
         int userId = jwtUtil.getUserIdFromToken(token);
-        int size = 21;
         log.info("사용자 ID: {}", userId);
         List<LectureDto> lectureList = recordedService.getAllLectures(userId, page, size, sort);
+
+        for(LectureDto lecture : lectureList) {
+            System.out.println(lecture.getRecordThumbnailSmall());
+            System.out.println(lecture.getRecordThumbnail());
+            System.out.println(lecture.getRecordTitle());
+        }
 
         if (!lectureList.isEmpty()) {
             response.put("message", "녹화강의 조회 성공");
@@ -270,4 +276,30 @@ public class RecordedController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
+
+    @GetMapping("/recorded-lecture/search/{keyword}/sort/{sort}")
+    public ResponseEntity<Map<String, Object>> searchLectures(
+        @RequestHeader("Authorization") String token,
+        @PathVariable String keyword,
+        @PathVariable String sort,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "21") int size,
+        @RequestParam(defaultValue = "false") boolean title,
+        @RequestParam(defaultValue = "false") boolean content
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        int userId = jwtUtil.getUserIdFromToken(token);
+        List<LectureDto> lectureList = recordedService.searchLectures(userId, keyword, sort, page, size, title, content);
+
+        if (!lectureList.isEmpty()) {
+            response.put("message", "강의 검색 성공");
+            response.put("data", lectureList);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            response.put("message", "검색 결과 없음");
+            response.put("data", new Object[]{});
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
 }
