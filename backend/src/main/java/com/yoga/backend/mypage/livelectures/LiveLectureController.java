@@ -45,9 +45,6 @@ public class LiveLectureController {
     @Autowired
     private UsersRepository usersRepository; // 사용자 저장소
 
-//    @PersistenceContext
-//    private EntityManager entityManager; // 엔티티 관리자
-
     /**
      * 실시간 강의를 생성하는 API 엔드포인트
      *
@@ -61,11 +58,20 @@ public class LiveLectureController {
         HttpServletRequest request) {
 //        1. 토큰을 받아온다.
         String token = request.getHeader("Authorization");
-        System.out.println(token);
 //        2. 토큰값을 JwtUtil을 이용해서 Id으로 바꾼다.
         Integer userid = jwtUtil.getUserIdFromToken(token);
 //        3. userId를 liveLectureDto에 설정
         liveLectureCreateDto.setUserId(userid);
+        // 4. 사용자 역할을 확인한다.
+        String userRole = usersRepository.findById(liveLectureCreateDto.getUserId()).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.")).getRole();
+
+        if (!"TEACHER".equals(userRole)) {
+            // 5. 역할이 TEACHER가 아닌 경우
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "권한이 없습니다");
+            response.put("data", null);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
 
         LiveLectureCreateResponseDto responseDto = liveLectureService.createLiveLecture(
             liveLectureCreateDto);
@@ -99,6 +105,7 @@ public class LiveLectureController {
             dto.setUserId(lecture.getUser().getId());
             dto.setNickname(lecture.getUser().getNickname());
             dto.setProfileImageUrl(lecture.getUser().getProfile_image_url());
+            dto.setProfileImageUrlSmall(lecture.getUser().getProfile_image_url_small());
             dto.setLiveTitle(lecture.getLiveTitle());
             dto.setLiveContent(lecture.getLiveContent());
             dto.setAvailableDay(lecture.getAvailableDay());

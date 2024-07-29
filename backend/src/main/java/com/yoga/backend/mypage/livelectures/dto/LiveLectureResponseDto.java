@@ -21,6 +21,7 @@ public class LiveLectureResponseDto {
 
     private String nickname; // 강사 이름
     private String profileImageUrl; // 강사 프로필 이미지 URL
+    private String profileImageUrlSmall;  // 강사 프로필 이미지 URL 작은 사이즈
 
     @NotNull
     private String liveTitle; // 강의 제목
