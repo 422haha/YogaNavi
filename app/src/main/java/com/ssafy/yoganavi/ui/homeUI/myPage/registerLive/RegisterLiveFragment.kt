@@ -17,7 +17,6 @@ import com.ssafy.yoganavi.ui.utils.CREATE
 import com.ssafy.yoganavi.ui.utils.END
 import com.ssafy.yoganavi.ui.utils.END_STR
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
-import com.ssafy.yoganavi.ui.utils.intToDate
 import com.ssafy.yoganavi.ui.utils.LIMIT_DATE
 import com.ssafy.yoganavi.ui.utils.LIMIT_STR
 import com.ssafy.yoganavi.ui.utils.MODIFY_LIVE
@@ -29,6 +28,7 @@ import com.ssafy.yoganavi.ui.utils.Week
 import com.ssafy.yoganavi.ui.utils.formatDotDate
 import com.ssafy.yoganavi.ui.utils.formatTime
 import com.ssafy.yoganavi.ui.utils.formatZeroDate
+import com.ssafy.yoganavi.ui.utils.intToDate
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -202,10 +202,10 @@ class RegisterLiveFragment :
         else if(state == END) viewModel.liveLectureData.endTime
         else 0
 
-        val prevHour: Int = if (prevTime > 0L) (prevTime / 3600).toInt()
+        val prevHour: Int = if (prevTime > 0L) (prevTime / (3600 * 1000)).toInt()
         else 0
 
-        val prevMinute: Int = if (prevTime > 0L && ((prevTime % 3600) > 0L)) ((prevTime % 3600) / 60).toInt()
+        val prevMinute: Int = if (prevTime > 0L && ((prevTime % (3600 * 1000)) > 0L)) ((prevTime % (3600 * 1000)) / (60 * 1000)).toInt()
         else 0
 
         val materialTimePicker = MaterialTimePicker.Builder()
@@ -222,7 +222,7 @@ class RegisterLiveFragment :
         materialTimePicker.addOnPositiveButtonClickListener {
             val timeStr: String = formatZeroDate(materialTimePicker.hour, materialTimePicker.minute)
             val pickTime: Long =
-                ((materialTimePicker.hour * 3600) + (materialTimePicker.minute * 60)).toLong()
+                ((materialTimePicker.hour * 3600 * 1000) + (materialTimePicker.minute * 60 * 1000)).toLong()
 
             if(state == START) {
                 binding.btnStart.text = timeStr
