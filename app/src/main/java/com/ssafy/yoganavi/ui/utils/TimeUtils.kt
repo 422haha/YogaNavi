@@ -65,3 +65,9 @@ fun convertLongToHangle(dateInMillis: Long): String {
 
     return dayOfWeekFormat.format(calendar.time)
 }
+
+fun Long.msToDuration(): String {
+    val minutes = (this / 1000) / 60
+    val seconds = (this / 1000) % 60
+    return String.format(Locale.KOREA, "%d:%02d", minutes, seconds)
+}
