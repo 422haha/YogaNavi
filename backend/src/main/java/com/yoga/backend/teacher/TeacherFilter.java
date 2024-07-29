@@ -1,6 +1,7 @@
 package com.yoga.backend.teacher;
 
 public class TeacherFilter {
+
     private int sorting;
     private long startTime;
     private long endTime;
