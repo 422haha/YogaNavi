@@ -19,7 +19,7 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.ssafy.yoganavi.data.repository.response.DetailResponse
-import com.ssafy.yoganavi.data.source.mypage.Profile
+import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.databinding.FragmentModifyBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.modify.hashtag.HashTagAdapter

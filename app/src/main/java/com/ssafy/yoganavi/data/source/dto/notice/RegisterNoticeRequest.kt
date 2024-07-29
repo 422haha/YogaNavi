@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.data.source.notice
+package com.ssafy.yoganavi.data.source.dto.notice
 
 data class RegisterNoticeRequest(
     val content: String = "",

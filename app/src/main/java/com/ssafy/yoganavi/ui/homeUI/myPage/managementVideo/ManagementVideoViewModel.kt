@@ -3,7 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.InfoRepository
-import com.ssafy.yoganavi.data.source.lecture.LectureData
+import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

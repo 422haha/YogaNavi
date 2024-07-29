@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.data.source.mypage
+package com.ssafy.yoganavi.data.source.dto.mypage
 
 data class Profile(
     val nickname: String = "",

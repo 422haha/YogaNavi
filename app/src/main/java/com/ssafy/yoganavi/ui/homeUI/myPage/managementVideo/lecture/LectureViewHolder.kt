@@ -3,13 +3,14 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.lecture
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
-import com.ssafy.yoganavi.data.source.lecture.LectureData
+import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.databinding.ListItemLectureThumbnailBinding
 import com.ssafy.yoganavi.ui.utils.toK
 
 class LectureViewHolder(
     private val binding: ListItemLectureThumbnailBinding,
-    private val navigateToRegisterVideoFragment: (Long) -> Unit,
+    private val navigateToLectureDetailFragment: ((Long) -> Unit)? = null,
+    private val navigateToRegisterVideoFragment: ((Long) -> Unit)? = null,
     private val sendLikeLecture: (Long) -> Unit
 ) : ViewHolder(binding.root) {
 
@@ -28,7 +29,7 @@ class LectureViewHolder(
         circularProgressDrawable.start()
 
         Glide.with(binding.root)
-            .load(data.recordThumbnail)
+            .load(data.recordThumbnailSmall)
             .placeholder(circularProgressDrawable)
             .into(ivThumbnail)
 
@@ -45,7 +46,8 @@ class LectureViewHolder(
         }
 
         ivThumbnail.setOnClickListener {
-            navigateToRegisterVideoFragment(data.recordedId)
+            navigateToRegisterVideoFragment?.invoke(data.recordedId)
+            navigateToLectureDetailFragment?.invoke(data.recordedId)
         }
     }
 }

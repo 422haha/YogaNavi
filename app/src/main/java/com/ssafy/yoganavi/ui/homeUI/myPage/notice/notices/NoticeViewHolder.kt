@@ -2,7 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.notice.notices
 
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
-import com.ssafy.yoganavi.data.source.notice.NoticeData
+import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.databinding.ListItemNoticeBinding
 import com.ssafy.yoganavi.ui.utils.formatDashWeekDate
 import com.ssafy.yoganavi.ui.utils.loadImageSequentially
