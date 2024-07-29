@@ -3,12 +3,14 @@ package com.yoga.backend.teacher;
 import com.yoga.backend.common.awsS3.S3Service;
 import com.yoga.backend.common.entity.Hashtag;
 import com.yoga.backend.common.entity.Users;
+import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.teacher.dto.DetailedTeacherDto;
 import com.yoga.backend.teacher.dto.TeacherDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,9 +33,55 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TeacherDto> getAllTeachers() {
+    public List<TeacherDto> getAllTeachers(TeacherFilter filter) {
         List<Users> users = teacherRepository.findAllTeachers();
+        LocalDate now = LocalDate.now();
+
         return users.stream()
+            .filter(user -> {
+                // 필터 조건에 맞는 강의가 있는지 확인
+                boolean hasValidLecture = user.getLiveLectures().stream().anyMatch(lecture -> {
+                    // 시작 시간과 종료 시간 필터링
+                    boolean isValidTime = lecture.getStartTime() >= filter.getStartTime() &&
+                        lecture.getEndTime() <= filter.getEndTime();
+
+                    // 요일 필터링
+                    boolean isValidDay = true;
+                    if (!filter.getDay().equals("MON, TUE, WED, THU, FRI, SAT, SUN")) {
+                        for (String day : filter.getDay().split(", ")) {
+                            if (!lecture.getAvailableDay().contains(day.trim())) {
+                                isValidDay = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    // 기간 필터링
+                    boolean isValidPeriod = switch (filter.getPeriod()) {
+                        case 0 -> lecture.getEndDate() > now.plusWeeks(1).toEpochDay(); // 일주일
+                        case 1 -> lecture.getEndDate() > now.plusMonths(1).toEpochDay(); // 한달
+                        case 2 -> lecture.getEndDate() > now.plusMonths(3).toEpochDay(); // 세달
+                        case 3 -> true; // 무기한
+                        default -> false;
+                    };
+
+                    return isValidTime && isValidDay && isValidPeriod;
+                });
+
+                // maxLiveNum 필터링
+                boolean isValidMaxLiveNum = filter.getMaxLiveNum() == 1 ||
+                    user.getLiveLectures().stream().anyMatch(lecture -> lecture.getMaxLiveNum() == filter.getMaxLiveNum());
+
+                return hasValidLecture && isValidMaxLiveNum;
+            })
+            .sorted((user1, user2) -> {
+                if (filter.getSorting() == 0) {
+                    return Integer.compare(user2.getId(), user1.getId()); // 최신순
+                } else {
+                    // Like count 필드가 없어서 임시로 이메일 길이로 비교
+                    return Integer.compare(user2.getEmail().length(), user1.getEmail().length()); // 인기순
+                }
+            })
             .map(user -> {
                 String profileImageUrl = null;
                 String profileImageUrlSmall = null;
@@ -76,16 +124,18 @@ public class TeacherServiceImpl implements TeacherService {
             if (user.getProfile_image_url() != null) {
                 profileImageUrl = s3Service.generatePresignedUrl(user.getProfile_image_url(),
                     URL_EXPIRATION_SECONDS);
+                System.out.println("생성된 profileImageUrl: " + profileImageUrl);
             }
             if (user.getProfile_image_url_small() != null) {
                 profileImageUrlSmall = s3Service.generatePresignedUrl(
                     user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
+                System.out.println("생성된 profileImageUrlSmall: " + profileImageUrlSmall);
             }
         } catch (Exception e) {
             System.err.println("Presigned URL 생성 오류: " + e.getMessage());
         }
 
-        DetailedTeacherDto detailedTeacher = DetailedTeacherDto.builder()
+        return DetailedTeacherDto.builder()
             .id(user.getId())
             .email(user.getEmail())
             .nickname(user.getNickname())
@@ -99,8 +149,7 @@ public class TeacherServiceImpl implements TeacherService {
                     .lectureTitle(lecture.getTitle())
                     .lectureDescription(lecture.getContent())
                     .likes((int) lecture.getLikeCount())
-                    .likedByUser(
-                        false) // This is a placeholder, you should implement the actual logic
+                    .likedByUser(false)
                     .build()
             ).collect(Collectors.toList()))
             .notices(user.getArticles().stream().map(article -> {
@@ -110,13 +159,15 @@ public class TeacherServiceImpl implements TeacherService {
                     if (article.getImageUrl() != null) {
                         noticeImage = s3Service.generatePresignedUrl(article.getImageUrl(),
                             URL_EXPIRATION_SECONDS);
+                        System.out.println("생성된 noticeImage: " + noticeImage);
                     }
                     if (article.getImageUrlSmall() != null) {
                         noticeImageSmall = s3Service.generatePresignedUrl(
                             article.getImageUrlSmall(), URL_EXPIRATION_SECONDS);
+                        System.out.println("생성된 noticeImageSmall: " + noticeImageSmall);
                     }
                 } catch (Exception e) {
-                    System.err.println("Notice Presigned URL 생성 오류: " + e.getMessage());
+                    System.err.println("공지 Presigned URL 생성 오류: " + e.getMessage());
                 }
 
                 return DetailedTeacherDto.NoticeDto.builder()
@@ -127,7 +178,5 @@ public class TeacherServiceImpl implements TeacherService {
                     .build();
             }).collect(Collectors.toList()))
             .build();
-
-        return detailedTeacher;
     }
 }
