@@ -1,14 +1,14 @@
 package com.yoga.backend.teacher;
 
+import com.yoga.backend.common.awsS3.S3Service;
+import com.yoga.backend.common.entity.Hashtag;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.teacher.dto.DetailedTeacherDto;
 import com.yoga.backend.teacher.dto.TeacherDto;
-import com.yoga.backend.teacher.dto.DetailedTeacherDto.LectureDto;
-import com.yoga.backend.teacher.dto.DetailedTeacherDto.NoticeDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,62 +18,116 @@ import java.util.stream.Collectors;
 @Service
 public class TeacherServiceImpl implements TeacherService {
 
+    private static final long URL_EXPIRATION_SECONDS = 86400; // 24시간
+
+    private final TeacherRepository teacherRepository;
+    private final S3Service s3Service;
+
     @Autowired
-    private TeacherRepository teacherRepository;
+    public TeacherServiceImpl(TeacherRepository teacherRepository, S3Service s3Service) {
+        this.teacherRepository = teacherRepository;
+        this.s3Service = s3Service;
+    }
 
     @Override
+    @Transactional(readOnly = true)
     public List<TeacherDto> getAllTeachers() {
-        List<Users> teachers = teacherRepository.findAll();
-        return teachers.stream()
-            .filter(teacher -> "TEACHER".equals(teacher.getRole()))
-            .map(this::convertToDto)
+        List<Users> users = teacherRepository.findAllTeachers();
+        return users.stream()
+            .map(user -> {
+                String profileImageUrl = null;
+                String profileImageUrlSmall = null;
+                try {
+                    if (user.getProfile_image_url() != null) {
+                        profileImageUrl = s3Service.generatePresignedUrl(
+                            user.getProfile_image_url(), URL_EXPIRATION_SECONDS);
+                    }
+                    if (user.getProfile_image_url_small() != null) {
+                        profileImageUrlSmall = s3Service.generatePresignedUrl(
+                            user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Presigned URL 생성 오류: " + e.getMessage());
+                }
+
+                return TeacherDto.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .nickname(user.getNickname())
+                    .profileImageUrl(profileImageUrl)
+                    .profileImageUrlSmall(profileImageUrlSmall)
+                    .content(user.getContent())
+                    .hashtags(user.getHashtags().stream().map(Hashtag::getName)
+                        .collect(Collectors.toSet()))
+                    .build();
+            })
             .collect(Collectors.toList());
     }
 
     @Override
-    public DetailedTeacherDto getTeacherById(int id) {
-        Users teacher = teacherRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Teacher not found with id: " + id));
+    @Transactional(readOnly = true)
+    public DetailedTeacherDto getTeacherById(int teacherId) {
+        Users user = teacherRepository.findById(teacherId)
+            .orElseThrow(() -> new RuntimeException("강사를 찾을 수 없습니다."));
 
-        List<LectureDto> recordedLectures = teacher.getRecordedLectures().stream()
-            .map(lecture -> new LectureDto(
-                String.valueOf(lecture.getId()),
-                lecture.getTitle(),
-                lecture.getContent(),
-                (int) lecture.getLikeCount(),
-                false // 필요에 따라 사용자에 의한 좋아요 여부를 설정
-            )).collect(Collectors.toList());
+        String profileImageUrl = null;
+        String profileImageUrlSmall = null;
+        try {
+            if (user.getProfile_image_url() != null) {
+                profileImageUrl = s3Service.generatePresignedUrl(user.getProfile_image_url(),
+                    URL_EXPIRATION_SECONDS);
+            }
+            if (user.getProfile_image_url_small() != null) {
+                profileImageUrlSmall = s3Service.generatePresignedUrl(
+                    user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
+            }
+        } catch (Exception e) {
+            System.err.println("Presigned URL 생성 오류: " + e.getMessage());
+        }
 
-        List<NoticeDto> notices = teacher.getArticles().stream()
-            .sorted(Comparator.comparing(notice -> notice.getArticleId(), Comparator.reverseOrder()))
-            .map(notice -> new NoticeDto(
-                String.valueOf(notice.getArticleId()),
-                "Notice Title", // 필요에 따라 공지 제목 설정
-                notice.getContent()
-            )).collect(Collectors.toList());
+        DetailedTeacherDto detailedTeacher = DetailedTeacherDto.builder()
+            .id(user.getId())
+            .email(user.getEmail())
+            .nickname(user.getNickname())
+            .profileImageUrl(profileImageUrl)
+            .profileImageUrlSmall(profileImageUrlSmall)
+            .content(user.getContent())
+            .hashtags(user.getHashtags().stream().map(Hashtag::getName).collect(Collectors.toSet()))
+            .recordedLectures(user.getRecordedLectures().stream().map(lecture ->
+                DetailedTeacherDto.LectureDto.builder()
+                    .lectureId(lecture.getId().toString())
+                    .lectureTitle(lecture.getTitle())
+                    .lectureDescription(lecture.getContent())
+                    .likes((int) lecture.getLikeCount())
+                    .likedByUser(
+                        false) // This is a placeholder, you should implement the actual logic
+                    .build()
+            ).collect(Collectors.toList()))
+            .notices(user.getArticles().stream().map(article -> {
+                String noticeImage = null;
+                String noticeImageSmall = null;
+                try {
+                    if (article.getImageUrl() != null) {
+                        noticeImage = s3Service.generatePresignedUrl(article.getImageUrl(),
+                            URL_EXPIRATION_SECONDS);
+                    }
+                    if (article.getImageUrlSmall() != null) {
+                        noticeImageSmall = s3Service.generatePresignedUrl(
+                            article.getImageUrlSmall(), URL_EXPIRATION_SECONDS);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Notice Presigned URL 생성 오류: " + e.getMessage());
+                }
 
-        return new DetailedTeacherDto(
-            teacher.getId(),
-            teacher.getEmail(),
-            teacher.getNickname(),
-            teacher.getProfile_image_url(),
-            teacher.getContent(),
-            teacher.getHashtags().stream().map(hashtag -> hashtag.getName()).collect(Collectors.toSet()),
-            recordedLectures,
-            notices
-        );
-    }
+                return DetailedTeacherDto.NoticeDto.builder()
+                    .noticeId(article.getArticleId().toString())
+                    .noticeContent(article.getContent())
+                    .noticeImage(noticeImage)
+                    .noticeImageSmall(noticeImageSmall)
+                    .build();
+            }).collect(Collectors.toList()))
+            .build();
 
-    private TeacherDto convertToDto(Users teacher) {
-        return new TeacherDto(
-            teacher.getId(),
-            teacher.getEmail(),
-            teacher.getNickname(),
-            teacher.getProfile_image_url(),
-            teacher.getContent(),
-            teacher.getHashtags().stream().map(hashtag -> hashtag.getName()).collect(Collectors.toSet()),
-            false,  // 필요에 따라 좋아요 여부를 설정
-            0       // 필요에 따라 좋아요 수를 설정
-        );
+        return detailedTeacher;
     }
 }
