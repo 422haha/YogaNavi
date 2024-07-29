@@ -17,7 +17,7 @@ public class DetailedTeacherDto {
     private String email;
     private String nickname;
     private String profileImageUrl;
-    private String profileImageUrlSmall; // 필드 추가
+    private String profileImageUrlSmall;
     private String content;
     private Set<String> hashtags;
     private List<LectureDto> recordedLectures;
@@ -47,79 +47,6 @@ public class DetailedTeacherDto {
         this.content = content;
         this.hashtags = hashtags;
         this.recordedLectures = recordedLectures;
-        this.notices = notices;
-    }
-
-    // Getters and Setters
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public String getProfileImageUrl() {
-        return profileImageUrl;
-    }
-
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-    }
-
-    public String getProfileImageUrlSmall() {
-        return profileImageUrlSmall;
-    }
-
-    public void setProfileImageUrlSmall(String profileImageUrlSmall) {
-        this.profileImageUrlSmall = profileImageUrlSmall;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Set<String> getHashtags() {
-        return hashtags;
-    }
-
-    public void setHashtags(Set<String> hashtags) {
-        this.hashtags = hashtags;
-    }
-
-    public List<LectureDto> getRecordedLectures() {
-        return recordedLectures;
-    }
-
-    public void setRecordedLectures(List<LectureDto> recordedLectures) {
-        this.recordedLectures = recordedLectures;
-    }
-
-    public List<NoticeDto> getNotices() {
-        return notices;
-    }
-
-    public void setNotices(List<NoticeDto> notices) {
         this.notices = notices;
     }
 
@@ -164,8 +91,8 @@ public class DetailedTeacherDto {
 
         private String noticeId;
         private String noticeContent;
-        private String noticeImage;  // 공지 이미지 URL
-        private String noticeImageSmall; // 공지 작은 이미지 URL
+        private String noticeImage;
+        private String noticeImageSmall;
 
         /**
          * NoticeDto 생성자
