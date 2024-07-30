@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
+import java.time.ZoneId;
 import java.util.stream.Collectors;
 
 /**
@@ -44,11 +44,10 @@ public class TeacherServiceImpl implements TeacherService {
 
         return users.stream()
             .filter(user -> {
-                // 필터 조건에 맞는 강의가 있는지 확인
                 boolean hasValidLecture = user.getLiveLectures().stream().anyMatch(lecture -> {
                     // 시작 시간과 종료 시간 필터링
-                    boolean isValidTime = lecture.getStartTime() >= filter.getStartTime() &&
-                        lecture.getEndTime() <= filter.getEndTime();
+                    boolean isValidTime = lecture.getStartTime().toEpochMilli() >= filter.getStartTime() &&
+                        lecture.getEndTime().toEpochMilli() <= filter.getEndTime();
 
                     // 요일 필터링
                     boolean isValidDay = true;
@@ -63,9 +62,9 @@ public class TeacherServiceImpl implements TeacherService {
 
                     // 기간 필터링
                     boolean isValidPeriod = switch (filter.getPeriod()) {
-                        case 0 -> lecture.getEndDate() > now.plusWeeks(1).toEpochDay(); // 일주일
-                        case 1 -> lecture.getEndDate() > now.plusMonths(1).toEpochDay(); // 한달
-                        case 2 -> lecture.getEndDate() > now.plusMonths(3).toEpochDay(); // 세달
+                        case 0 -> lecture.getEndDate().toEpochMilli() > now.plusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+                        case 1 -> lecture.getEndDate().toEpochMilli() > now.plusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+                        case 2 -> lecture.getEndDate().toEpochMilli() > now.plusMonths(3).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
                         case 3 -> true; // 무기한
                         default -> false;
                     };

@@ -9,6 +9,7 @@
     import jakarta.persistence.JoinColumn;
     import jakarta.persistence.ManyToOne;
     import jakarta.persistence.Table;
+    import java.time.Instant;
     import lombok.Getter;
     import lombok.Setter;
     import org.hibernate.annotations.GenericGenerator;
@@ -26,7 +27,7 @@
 
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Integer liveId; // 강의 ID (Primary Key)
+        private Long liveId; // 강의 ID (Primary Key)
 
         @Column(length = 30, nullable = false)
         private String liveTitle; // 강의 제목
@@ -35,22 +36,22 @@
         private String liveContent; // 강의 내용
 
         @Column(nullable = false)
-        private Long startDate; // 시작 날짜
+        private Instant startDate; // 시작 날짜
 
         @Column(nullable = false)
-        private Long endDate; // 종료 날짜
+        private Instant endDate; // 종료 날짜
 
         @Column(nullable = false)
-        private Long startTime; // 강의 시작 시간
+        private Instant startTime; // 강의 시작 시간
 
         @Column(nullable = false)
-        private Long endTime; // 강의 종료 시간
+        private Instant endTime; // 강의 종료 시간
 
         @Column(nullable = false)
         private Integer maxLiveNum; // 최대 수강자 수
 
         @Column(nullable = false)
-        private Long regDate; // 강의 등록 시간
+        private Instant regDate; // 강의 등록 시간
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "user_id")

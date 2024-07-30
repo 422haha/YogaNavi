@@ -30,7 +30,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     private final JwtUtil jwtUtil;
     private final UsersRepository usersRepository;
 
-    public CustomAuthenticationSuccessHandler(JwtUtil jwtUtil , UsersRepository usersRepository) {
+    public CustomAuthenticationSuccessHandler(JwtUtil jwtUtil, UsersRepository usersRepository) {
         this.jwtUtil = jwtUtil;
         this.usersRepository = usersRepository;
     }
@@ -47,11 +47,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             .orElse("");
 
         jwtUtil.invalidateToken(email);
-
-        System.out.println("fcmToken ================= "+fcmToken);
-        Optional<Users> users=usersRepository.findByEmail(email);
-        if(users.isPresent()){
-            Users user=users.get();
+        Optional<Users> users = usersRepository.findByEmail(email);
+        if (users.isPresent() && fcmToken != null && !fcmToken.isEmpty()) {
+            Users user = users.get();
             user.setFcmToken(fcmToken);
             usersRepository.save(user);
         }

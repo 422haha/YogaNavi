@@ -3,63 +3,41 @@ package com.yoga.backend.mypage.livelectures;
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
-import com.yoga.backend.common.util.JwtUtil;
 import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateDto;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateResponseDto;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
-/**
- * 실시간 강의 서비스 구현 클래스입니다.
- * 실시간 강의 관련 비즈니스 로직을 구현합니다.
- */
 @Service
 public class LiveLectureServiceImpl implements LiveLectureService {
 
     @Autowired
-    private LiveLectureRepository liveLecturesRepository;// 화상 강의 저장소
-
+    private LiveLectureRepository liveLecturesRepository;
     @Autowired
-    private UsersRepository usersRepository;// 사용자 저장소
-
+    private UsersRepository usersRepository;
     @Autowired
-    private MyLiveLectureRepository myLiveLectureRepository;// 사용자의 화상 강의 목록 저장소
+    private MyLiveLectureRepository myLiveLectureRepository;
 
-    @Autowired
-    private LiveLectureRepository liveLectureRepository;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    /**
-     * 실시간 강의를 생성합니다.
-     *
-     * @param liveLectureCreateDto 실시간 강의 DTO
-     * @return 생성된 실시간 강의 엔티티
-     */
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public LiveLectureCreateResponseDto createLiveLecture(LiveLectureCreateDto liveLectureCreateDto) {
         LiveLectures liveLecture = new LiveLectures();
         liveLecture.setLiveTitle(liveLectureCreateDto.getLiveTitle());
         liveLecture.setLiveContent(liveLectureCreateDto.getLiveContent());
-        liveLecture.setStartDate(liveLectureCreateDto.getStartDate());
-        liveLecture.setEndDate(liveLectureCreateDto.getEndDate());
-        liveLecture.setStartTime(liveLectureCreateDto.getStartTime());
-        liveLecture.setEndTime(liveLectureCreateDto.getEndTime());
+        liveLecture.setStartDate(Instant.ofEpochMilli(liveLectureCreateDto.getStartDate()));
+        liveLecture.setEndDate(Instant.ofEpochMilli(liveLectureCreateDto.getEndDate()));
+        liveLecture.setStartTime(Instant.ofEpochMilli(liveLectureCreateDto.getStartTime()));
+        liveLecture.setEndTime(Instant.ofEpochMilli(liveLectureCreateDto.getEndTime()));
         liveLecture.setMaxLiveNum(liveLectureCreateDto.getMaxLiveNum());
-        liveLecture.setRegDate(System.currentTimeMillis());
+        liveLecture.setRegDate(Instant.now());
         liveLecture.setAvailableDay(liveLectureCreateDto.getAvailableDay());
 
-        if (liveLectureCreateDto.getUserId() != null) {
-            Optional<Users> userOptional = usersRepository.findById(
-                (long) liveLectureCreateDto.getUserId());
+        if (liveLectureCreateDto.getUserId() != 0) {
+            Optional<Users> userOptional = usersRepository.findById(liveLectureCreateDto.getUserId());
             if (userOptional.isPresent()) {
                 Users user = userOptional.get();
                 liveLecture.setUser(user);
@@ -75,17 +53,31 @@ public class LiveLectureServiceImpl implements LiveLectureService {
                 responseDto.setMessage("화상강의 생성 성공");
                 responseDto.setData(null);
                 return responseDto;
-
-//                return savedLiveLecture;
             } else {
-                // 사용자 정보가 없을 경우 처리 로직 추가 필요
                 throw new IllegalArgumentException("사용자를 찾을 수 없습니다");
             }
         } else {
-            throw new IllegalArgumentException("사용자 ID는 null일 수 없습니다");
+            throw new IllegalArgumentException("사용자 ID는 0일 수 없습니다");
         }
     }
+    /**
+     * 모든 실시간 강의를 조회
+     * @return 모든 실시간 강의 리스트
+     */
+    @Override
+    public List<LiveLectures> getAllLiveLectures() {
+        return liveLecturesRepository.findAll();
+    }
 
+    /**
+     * 특정 사용자 ID에 대한 나의 실시간 강의 목록을 조회
+     * @param userId 사용자 ID
+     * @return 나의 실시간 강의 리스트
+     */
+    @Override
+    public List<MyLiveLecture> getMyLiveLecturesByUserId(int userId) {
+        return myLiveLectureRepository.findByUserId(userId);
+    }
 
     /**
      * 사용자 ID로 화상 강의를 조회합니다.
@@ -94,10 +86,10 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * @return 해당 사용자의 실시간 강의 리스트
      */
     @Override
-    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public List<LiveLectures> getLiveLecturesByUserId(Integer userId) {
-        return liveLectureRepository.findByUserId(userId);
+    public List<LiveLectures> getLiveLecturesByUserId(int userId) {
+        return liveLecturesRepository.findByUserId(userId);
     }
+
 
     /**
      * 화상 강의를 수정합니다.
@@ -106,9 +98,8 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * @return 수정된 화상 강의 엔티티
      */
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public LiveLectures updateLiveLecture(LiveLectureCreateDto liveLectureCreateDto) {
-        LiveLectures liveLecture = liveLectureRepository.findById(liveLectureCreateDto.getLiveId())
+        LiveLectures liveLecture = liveLecturesRepository.findById(liveLectureCreateDto.getLiveId())
             .orElseThrow(() -> new IllegalArgumentException("Invalid lecture ID"));
 
         if (liveLectureCreateDto.getLiveTitle() != null) {
@@ -118,16 +109,16 @@ public class LiveLectureServiceImpl implements LiveLectureService {
             liveLecture.setLiveContent(liveLectureCreateDto.getLiveContent());
         }
         if (liveLectureCreateDto.getStartDate() != null) {
-            liveLecture.setStartDate(liveLectureCreateDto.getStartDate());
+            liveLecture.setStartDate(Instant.ofEpochMilli(liveLectureCreateDto.getStartDate()));
         }
         if (liveLectureCreateDto.getEndDate() != null) {
-            liveLecture.setEndDate(liveLectureCreateDto.getEndDate());
+            liveLecture.setEndDate(Instant.ofEpochMilli(liveLectureCreateDto.getEndDate()));
         }
         if (liveLectureCreateDto.getStartTime() != null) {
-            liveLecture.setStartTime(liveLectureCreateDto.getStartTime());
+            liveLecture.setStartTime(Instant.ofEpochMilli(liveLectureCreateDto.getStartTime()));
         }
         if (liveLectureCreateDto.getEndTime() != null) {
-            liveLecture.setEndTime(liveLectureCreateDto.getEndTime());
+            liveLecture.setEndTime(Instant.ofEpochMilli(liveLectureCreateDto.getEndTime()));
         }
         if (liveLectureCreateDto.getMaxLiveNum() != null) {
             liveLecture.setMaxLiveNum(liveLectureCreateDto.getMaxLiveNum());
@@ -136,7 +127,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
             liveLecture.setAvailableDay(liveLectureCreateDto.getAvailableDay());
         }
 
-        return liveLectureRepository.save(liveLecture);
+        return liveLecturesRepository.save(liveLecture);
     }
 
     /**
@@ -146,9 +137,8 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * @return 해당 화상 강의 엔티티
      */
     @Override
-    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public LiveLectures getLiveLectureById(Integer liveId) {
-        return liveLectureRepository.findById(liveId).orElse(null);
+    public LiveLectures getLiveLectureById(Long liveId) {
+        return liveLecturesRepository.findById(liveId).orElse(null);
     }
 
     /**
@@ -159,9 +149,8 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * @return 소유자 여부
      */
     @Override
-    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public boolean isLectureOwner(Integer liveId, Integer userId) {
-        Optional<LiveLectures> lectureOpt = liveLectureRepository.findById(liveId);
+    public boolean isLectureOwner(Long liveId, int userId) {
+        Optional<LiveLectures> lectureOpt = liveLecturesRepository.findById(liveId);
         return lectureOpt.isPresent() && Objects.equals(lectureOpt.get().getUser().getId(), userId);
     }
 
@@ -172,14 +161,10 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * @param liveId 화상 강의 ID
      */
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void deleteLiveLectureById(Integer liveId) {
-        // 먼저 my_live_lecture 테이블에서 관련 항목 삭제
+    public void deleteLiveLectureById(Long liveId) {
         List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findByLiveLecture_LiveId(liveId);
         myLiveLectureRepository.deleteAll(myLiveLectures);
-
-        // 그런 다음 live_lectures 테이블에서 항목 삭제
-        liveLectureRepository.deleteById(liveId);
+        liveLecturesRepository.deleteById(liveId);
     }
 
 }

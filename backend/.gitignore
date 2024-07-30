@@ -4,8 +4,6 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 application.properties
-**/src/main/resources/firebase-service-account.json
-
 
 ### STS ###
 .apt_generated
