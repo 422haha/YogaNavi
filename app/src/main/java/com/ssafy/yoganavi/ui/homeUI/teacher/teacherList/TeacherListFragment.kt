@@ -33,13 +33,13 @@ class TeacherListFragment :
         )
     }
     private val args by navArgs<TeacherListFragmentArgs>()
-
+    private var filter = FilterData()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setToolbar(true, TEACHER, false)
-
+        filter = args.filter ?: FilterData()
         if (args.isInit) {
             viewModel.setIsInit()
             binding.ivFilter.isVisible = true
@@ -60,10 +60,10 @@ class TeacherListFragment :
         initListener()
         initCollect()
         if (args.sorting == 0) {
-            viewModel.setSorting(0, args.filter ?: FilterData())
+            viewModel.setSorting(0, filter)
             binding.rbRecent.isChecked = true
         } else {
-            viewModel.setSorting(1, args.filter ?: FilterData())
+            viewModel.setSorting(1, filter)
             binding.rbPopular.isChecked = true
         }
     }
@@ -80,7 +80,7 @@ class TeacherListFragment :
         }
         binding.svSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                viewModel.setSearchKeyword(args.filter ?: FilterData(), query)
+                viewModel.setSearchKeyword(filter, query)
                 return false
             }
 
@@ -90,10 +90,10 @@ class TeacherListFragment :
             }
         })
         binding.rbRecent.setOnClickListener {
-            viewModel.setSorting(0, args.filter ?: FilterData())
+            viewModel.setSorting(0, filter)
         }
         binding.rbPopular.setOnClickListener {
-            viewModel.setSorting(1, args.filter ?: FilterData())
+            viewModel.setSorting(1, filter)
         }
     }
 
@@ -112,6 +112,6 @@ class TeacherListFragment :
     }
 
     private fun teacherLikeToggle(teacherId: Int = -1) {
-        viewModel.teacherLikeToggle(args.filter ?: FilterData(), teacherId)
+        viewModel.teacherLikeToggle(filter, teacherId)
     }
 }
