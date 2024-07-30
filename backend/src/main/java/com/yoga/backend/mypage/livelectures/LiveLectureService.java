@@ -19,19 +19,19 @@ public interface LiveLectureService {
      */
     LiveLectureCreateResponseDto createLiveLecture(LiveLectureCreateDto liveLectureCreateDto);
 
-    /**
-     * 모든 실시간 강의를 조회
-     * @return 모든 실시간 강의 리스트
-     */
-    List<LiveLectures> getAllLiveLectures();
+//    /**
+//     * 모든 실시간 강의를 조회
+//     * @return 모든 실시간 강의 리스트
+//     */
+//    List<LiveLectures> getAllLiveLectures();
 
-    /**
-     * 특정 사용자 ID에 대한 나의 실시간 강의 목록을 조회.
-     *
-     * @param userId 사용자 ID
-     * @return 나의 실시간 강의 리스트
-     */
-    List<MyLiveLecture> getMyLiveLecturesByUserId(Integer userId);
+//    /**
+//     * 특정 사용자 ID에 대한 나의 실시간 강의 목록을 조회.
+//     *
+//     * @param userId 사용자 ID
+//     * @return 나의 실시간 강의 리스트
+//     */
+//    List<MyLiveLecture> getMyLiveLecturesByUserId(Integer userId);
 
     // 사용자 ID로 화상 강의를 조회하는 메서드 추가
     /**

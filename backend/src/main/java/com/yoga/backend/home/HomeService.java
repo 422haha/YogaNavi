@@ -2,7 +2,6 @@ package com.yoga.backend.home;
 
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
-import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.util.JwtUtil;
 import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.livelectures.LiveLectureRepository;
@@ -19,7 +18,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
