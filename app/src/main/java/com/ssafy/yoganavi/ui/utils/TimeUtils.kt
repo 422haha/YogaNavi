@@ -1,7 +1,6 @@
 package com.ssafy.yoganavi.ui.utils
 
 import android.icu.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -55,13 +54,3 @@ fun startVerticalEnd(start: String, end: String): String = run { "$start | $end"
 fun startTildeEnd(start: String, end: String) = "$start~$end"
 
 fun startSpaceEnd(start: String, end: String) = "$start $end"
-
-fun convertLongToHangle(dateInMillis: Long): String {
-    val calendar = Calendar.getInstance().apply {
-        timeInMillis = dateInMillis
-    }
-
-    val dayOfWeekFormat = SimpleDateFormat("E", Locale.KOREAN)
-
-    return dayOfWeekFormat.format(calendar.time)
-}

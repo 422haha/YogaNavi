@@ -1,5 +1,6 @@
 package com.ssafy.yoganavi.data.source.info
 
+import com.ssafy.yoganavi.data.source.dto.home.HomeData
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
@@ -87,4 +88,8 @@ interface InfoAPI {
 
     @DELETE("mypage/notification/delete/{article_id}")
     suspend fun deleteNotice(@Path("article_id") id: Int): Response<YogaDetailResponse<Unit>>
+
+    // Home
+    @GET("home")
+    suspend fun getHomeList(): Response<YogaResponse<HomeData>>
 }

@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.data.repository
 
 import com.ssafy.yoganavi.data.repository.response.DetailResponse
 import com.ssafy.yoganavi.data.repository.response.ListResponse
+import com.ssafy.yoganavi.data.source.dto.home.HomeData
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
@@ -56,4 +57,7 @@ interface InfoRepository {
     ): DetailResponse<Unit>
 
     suspend fun deleteNotice(articleId: Int): DetailResponse<Unit>
+
+    // Home
+    suspend fun getHomeList(): ListResponse<HomeData>
 }
