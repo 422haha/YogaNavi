@@ -31,6 +31,9 @@ interface InfoAPI {
     @GET("teacher")
     suspend fun getTeacherList(@Query("filter") filter: FilterData): Response<YogaResponse<TeacherData>>
 
+    @POST("teacher/like/{teacher_id}")
+    suspend fun teacherLikeToggle(@Path("teacher_id") teacherId: Int): Response<YogaDetailResponse<Boolean>>
+
     // LECTURE
     @GET("recorded-lecture/mypage/list")
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>

@@ -15,5 +15,6 @@ data class TeacherData(
     @SerializedName("hashtags")
     val hashtags: List<String>,
     val liked: Boolean,
+    @SerializedName("likeCount")
     val likes: Int,
 )

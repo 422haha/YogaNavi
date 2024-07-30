@@ -26,7 +26,12 @@ class TeacherListFragment :
     BaseFragment<FragmentTeacherListBinding>(FragmentTeacherListBinding::inflate) {
 
     private val viewModel: TeacherListViewModel by viewModels()
-    private val noticeAdapter by lazy { TeacherAdapter(::navigateToTeacherFragment) }
+    private val noticeAdapter by lazy {
+        TeacherAdapter(
+            ::navigateToTeacherFragment,
+            ::teacherLikeToggle
+        )
+    }
     private val args by navArgs<TeacherListFragmentArgs>()
 
 
@@ -68,5 +73,9 @@ class TeacherListFragment :
         val directions = TeacherListFragmentDirections
             .actionTeacherListFragmentToTeacherDetailFragment(userId)
         findNavController().navigate(directions)
+    }
+
+    private fun teacherLikeToggle(teacherId: Int = -1) {
+        viewModel.teacherLikeToggle(teacherId)
     }
 }
