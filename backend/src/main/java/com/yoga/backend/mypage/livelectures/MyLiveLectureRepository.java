@@ -2,6 +2,8 @@ package com.yoga.backend.mypage.livelectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
 /**
  * 나의 실시간 강의 리포지토리 인터페이스 데이터베이스와의 상호작용을 정의
  */
@@ -12,6 +14,7 @@ public interface MyLiveLectureRepository extends JpaRepository<MyLiveLecture, In
      * @param userId 사용자 ID
      * @return 나의 실시간 강의 리스트
      */
+    @Query("SELECT mll FROM MyLiveLecture mll JOIN FETCH mll.liveLecture WHERE mll.user.id = :userId")
     List<MyLiveLecture> findByUserId(Integer userId);
     /**
      * 특정 화상 강의 ID에 대한 나의 실시간 강의 목록을 조회
@@ -19,12 +22,13 @@ public interface MyLiveLectureRepository extends JpaRepository<MyLiveLecture, In
      * @param liveId 화상 강의 ID
      * @return 나의 실시간 강의 리스트
      */
+    @Query("SELECT mll FROM MyLiveLecture mll JOIN FETCH mll.liveLecture WHERE mll.liveLecture.liveId = :liveId")
     List<MyLiveLecture> findByLiveLecture_LiveId(Integer liveId);
-    /**
-     * 특정 사용자 ID에 대한 나의 실시간 강의 목록을 조회
-     *
-     * @param userId 사용자 ID
-     * @return 나의 실시간 강의 리스트
-     */
-    List<MyLiveLecture> findByUserId(int userId);
+//    /**
+//     * 특정 사용자 ID에 대한 나의 실시간 강의 목록을 조회
+//     *
+//     * @param userId 사용자 ID
+//     * @return 나의 실시간 강의 리스트
+//     */
+//    List<MyLiveLecture> findByUserId(int userId);
 }
