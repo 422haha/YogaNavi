@@ -1,8 +1,8 @@
-package com.ssafy.yoganavi.data.source.dto.live
+package com.ssafy.yoganavi.data.source.dto.home
 
 import com.google.gson.annotations.SerializedName
 
-data class LiveLectureData(
+data class HomeData(
     val liveId:Int = 0,
     @SerializedName("userId")
     val teacherId: Int = 0,
@@ -14,9 +14,8 @@ data class LiveLectureData(
     val teacherProfile: String?,
     var liveTitle: String = "",
     var liveContent : String = "",
-    var availableDay: String = "",
-    var startDate: Long = 0L,
-    var endDate: Long = 0L,
+    var lectureDay: String = "",
+    var lectureDate: Long = 0L,
     var startTime: Long = 0L,
     var endTime: Long = 0L,
     var regDate: Long = 0L,

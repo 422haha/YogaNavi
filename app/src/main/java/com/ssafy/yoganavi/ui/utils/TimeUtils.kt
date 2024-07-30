@@ -56,14 +56,12 @@ fun startTildeEnd(start: String, end: String) = "$start~$end"
 
 fun startSpaceEnd(start: String, end: String) = "$start $end"
 
-fun convertLongToHangle(dateInMillis: Long): String {
-    val calendar = Calendar.getInstance().apply {
-        timeInMillis = dateInMillis
-    }
+fun addYear(currentMillis: Long): Long {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = currentMillis
+    calendar.add(Calendar.YEAR, 1)
 
-    val dayOfWeekFormat = SimpleDateFormat("E", Locale.KOREAN)
-
-    return dayOfWeekFormat.format(calendar.time)
+    return calendar.timeInMillis
 }
 
 fun Long.msToDuration(): String {

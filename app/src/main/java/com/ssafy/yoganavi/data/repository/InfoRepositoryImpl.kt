@@ -4,6 +4,7 @@ import com.ssafy.yoganavi.data.repository.response.DetailResponse
 import com.ssafy.yoganavi.data.repository.response.ListResponse
 import com.ssafy.yoganavi.data.repository.response.toDetailResponse
 import com.ssafy.yoganavi.data.repository.response.toListResponse
+import com.ssafy.yoganavi.data.source.dto.home.HomeData
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
@@ -142,5 +143,10 @@ class InfoRepositoryImpl @Inject constructor(
     override suspend fun deleteNotice(articleId: Int): DetailResponse<Unit> {
         val response = withContext(ioDispatcher) { infoDataSource.deleteNotice(articleId) }
         return response.toDetailResponse()
+    }
+
+    override suspend fun getHomeList(): ListResponse<HomeData> {
+        val response = withContext(ioDispatcher) { infoDataSource.getHomeList() }
+        return response.toListResponse()
     }
 }
