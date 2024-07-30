@@ -24,12 +24,16 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
     val viewModel: FilterViewModel by viewModels()
     private lateinit var weekToggleButtonMap: Map<Week, CheckBox>
     private val args by navArgs<FilterFragmentArgs>()
+    private var isInit: Boolean = true
+    private var sorting: Int = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setToolbar(false, FILTER, true, "초기화") {
-            binding.rbRecent.isChecked = true
-            // TODO: 시간 설정
+            binding.btnStartTime.text = "00:00"
+            viewModel.filter.startTime = 0L
+            binding.btnEndTime.text = "23:59"
+            viewModel.filter.startTime = 86340000L
             binding.ibtnMon.isChecked = true
             binding.ibtnTue.isChecked = true
             binding.ibtnWed.isChecked = true
@@ -39,6 +43,10 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
             binding.ibtnSun.isChecked = true
             binding.rbTotal.isChecked = true
             binding.rbOneToMulti.isChecked = true
+            isInit = true
+            val directions = FilterFragmentDirections
+                .actionFilterFragmentToTeacherListFragment(viewModel.filter, isInit, sorting)
+            findNavController().navigate(directions)
         }
         // CheckBox마다 요일을 바인딩
         weekToggleButtonMap = mapOf(
@@ -51,20 +59,13 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
             Week.SUN to binding.ibtnSun
         )
         initView()
-
         initListener()
     }
 
     private fun initView() {
         viewModel.filter = args.filter ?: FilterData()
-        if (viewModel.filter.sorting == 0) {
-            binding.rbRecent.isChecked = true
-            binding.rbPopular.isChecked = false
-        } else {
-            binding.rbPopular.isChecked = true
-            binding.rbRecent.isChecked = false
-        }
-
+        isInit = args.isInit
+        sorting = args.sorting
         binding.btnStartTime.text =
             (if (viewModel.filter.startTime > 0L) (viewModel.filter.startTime / 3600000).toInt()
                 .toString() else "00") + ":" + if (viewModel.filter.startTime > 0L && ((viewModel.filter.startTime % 3600000) > 0L)) ((viewModel.filter.startTime % 3600000) / 60000).toInt()
@@ -121,7 +122,7 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
         materialTimePicker.addOnPositiveButtonClickListener {
             val timeStr: String = formatZeroDate(materialTimePicker.hour, materialTimePicker.minute)
             val pickTime: Long =
-                ((materialTimePicker.hour * 3600) + (materialTimePicker.minute * 60)).toLong()*1000
+                ((materialTimePicker.hour * 3600) + (materialTimePicker.minute * 60)).toLong() * 1000
 
             if (state == START) {
                 binding.btnStartTime.text = timeStr
@@ -152,11 +153,6 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
     }
 
     private fun goBackStack() {
-        if (binding.rbRecent.isChecked) {
-            viewModel.filter.sorting = 0
-        } else {
-            viewModel.filter.sorting = 1
-        }
 
         weekToggleButtonMap.forEach { (day, toggleBtn) ->
             viewModel.dayStatusMap[day] = toggleBtn.isChecked
@@ -179,8 +175,9 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
         } else {
             viewModel.filter.maxLiveNum = 1
         }
+        isInit = false
         val directions = FilterFragmentDirections
-            .actionFilterFragmentToTeacherListFragment(viewModel.filter)
+            .actionFilterFragmentToTeacherListFragment(viewModel.filter, isInit, sorting)
 
         findNavController().navigate(directions)
     }

@@ -41,6 +41,14 @@
             android:defaultValue="@null"
             app:argType="com.ssafy.yoganavi.data.source.teacher.FilterData"
             app:nullable="true" />
+        <argument
+            android:name="isInit"
+            android:defaultValue="true"
+            app:argType="boolean" />
+        <argument
+            android:name="sorting"
+            android:defaultValue="0"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/lectureListFragment"
@@ -123,6 +131,14 @@
             android:defaultValue="@null"
             app:argType="com.ssafy.yoganavi.data.source.teacher.FilterData"
             app:nullable="true" />
+        <argument
+            android:name="isInit"
+            android:defaultValue="true"
+            app:argType="boolean" />
+        <argument
+            android:name="sorting"
+            android:defaultValue="0"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/teacherDetailFragment"

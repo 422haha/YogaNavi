@@ -11,8 +11,8 @@ import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
-import com.ssafy.yoganavi.data.source.teacher.FilterData
 import com.ssafy.yoganavi.data.source.info.InfoDataSource
+import com.ssafy.yoganavi.data.source.teacher.FilterData
 import com.ssafy.yoganavi.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -35,13 +35,32 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toDetailResponse()
     }
 
-    override suspend fun getTeacherList(filter: FilterData): ListResponse<TeacherData> {
-        val response = withContext(ioDispatcher) { infoDataSource.getTeacherList(filter) }
+    override suspend fun getAllTeacherList(
+        sorting: Int,
+        searchKeyword: String
+    ): ListResponse<TeacherData> {
+        val response =
+            withContext(ioDispatcher) { infoDataSource.getAllTeacherList(sorting, searchKeyword) }
+        return response.toListResponse()
+    }
+
+    override suspend fun getTeacherList(
+        sorting: Int,
+        filter: FilterData,
+        searchKeyword: String
+    ): ListResponse<TeacherData> {
+        val response = withContext(ioDispatcher) {
+            infoDataSource.getTeacherList(
+                sorting,
+                filter,
+                searchKeyword
+            )
+        }
         return response.toListResponse()
     }
 
     override suspend fun teacherLikeToggle(teacherId: Int): DetailResponse<Boolean> {
-        val response = withContext(ioDispatcher){infoDataSource.teacherLikeToggle(teacherId)}
+        val response = withContext(ioDispatcher) { infoDataSource.teacherLikeToggle(teacherId) }
         return response.toDetailResponse()
     }
 

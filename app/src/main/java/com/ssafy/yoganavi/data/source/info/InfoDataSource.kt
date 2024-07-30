@@ -19,9 +19,18 @@ interface InfoDataSource {
     suspend fun updateProfile(profile: Profile): Response<YogaDetailResponse<Profile>>
 
     //TEACHER
-    suspend fun getTeacherList(filter : FilterData): Response<YogaResponse<TeacherData>>
+    suspend fun getAllTeacherList(
+        sorting: Int,
+        searchKeyword: String
+    ): Response<YogaResponse<TeacherData>>
 
-    suspend fun teacherLikeToggle(teacherId: Int):Response<YogaDetailResponse<Boolean>>
+    suspend fun getTeacherList(
+        sorting: Int,
+        filter: FilterData,
+        searchKeyword: String
+    ): Response<YogaResponse<TeacherData>>
+
+    suspend fun teacherLikeToggle(teacherId: Int): Response<YogaDetailResponse<Boolean>>
 
     // LECTURE
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>

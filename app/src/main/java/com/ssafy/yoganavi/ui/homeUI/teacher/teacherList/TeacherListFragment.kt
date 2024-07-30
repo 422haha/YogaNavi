@@ -2,6 +2,8 @@ package com.ssafy.yoganavi.ui.homeUI.teacher.teacherList
 
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -10,7 +12,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.teacher.FilterData
 import com.ssafy.yoganavi.databinding.FragmentTeacherListBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
@@ -19,7 +20,6 @@ import com.ssafy.yoganavi.ui.utils.TEACHER
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class TeacherListFragment :
@@ -40,6 +40,15 @@ class TeacherListFragment :
 
         setToolbar(true, TEACHER, false)
 
+        if (args.isInit) {
+            viewModel.setIsInit()
+            binding.ivFilter.isVisible = true
+            binding.ivFilterSet.isVisible = false
+        } else {
+            viewModel.setIsntInit()
+            binding.ivFilter.isVisible = false
+            binding.ivFilterSet.isVisible = true
+        }
         binding.rvTeacherList.adapter = noticeAdapter
         binding.rvTeacherList.addItemDecoration(
             DividerItemDecoration(
@@ -47,17 +56,44 @@ class TeacherListFragment :
                 LinearLayoutManager.VERTICAL
             )
         )
-        Timber.d("싸피 arguments : ${args.filter ?: FilterData()}")
+        binding.svSearch.setQuery(viewModel.getSearchKeyword(), false)
         initListener()
         initCollect()
-        viewModel.getTeacherList(args.filter ?: FilterData())
+        if (args.sorting == 0) {
+            viewModel.setSorting(0, args.filter ?: FilterData())
+            binding.rbRecent.isChecked = true
+        } else {
+            viewModel.setSorting(1, args.filter ?: FilterData())
+            binding.rbPopular.isChecked = true
+        }
     }
 
     fun initListener() {
-        binding.ivFilter.setOnClickListener {
+        binding.lyFilter.setOnClickListener {
             val directions = TeacherListFragmentDirections
-                .actionTeacherListFragmentToFilterFragment(args.filter)
+                .actionTeacherListFragmentToFilterFragment(
+                    args.filter,
+                    viewModel.getIsInit(),
+                    viewModel.getSorting()
+                )
             findNavController().navigate(directions)
+        }
+        binding.svSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.setSearchKeyword(args.filter ?: FilterData(), query)
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                onQueryTextSubmit(newText)
+                return false
+            }
+        })
+        binding.rbRecent.setOnClickListener {
+            viewModel.setSorting(0, args.filter ?: FilterData())
+        }
+        binding.rbPopular.setOnClickListener {
+            viewModel.setSorting(1, args.filter ?: FilterData())
         }
     }
 
@@ -76,6 +112,6 @@ class TeacherListFragment :
     }
 
     private fun teacherLikeToggle(teacherId: Int = -1) {
-        viewModel.teacherLikeToggle(teacherId)
+        viewModel.teacherLikeToggle(args.filter ?: FilterData(), teacherId)
     }
 }
