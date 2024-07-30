@@ -121,7 +121,7 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
         materialTimePicker.addOnPositiveButtonClickListener {
             val timeStr: String = formatZeroDate(materialTimePicker.hour, materialTimePicker.minute)
             val pickTime: Long =
-                ((materialTimePicker.hour * 3600) + (materialTimePicker.minute * 60)).toLong()
+                ((materialTimePicker.hour * 3600) + (materialTimePicker.minute * 60)).toLong()*1000
 
             if (state == START) {
                 binding.btnStartTime.text = timeStr
