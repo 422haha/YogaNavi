@@ -16,7 +16,7 @@ class TeacherViewHolder(
         tvCount.text = item.likes.toK()
         var count = item.likes
         if (item.hashtags.isNotEmpty()) {
-            tvHashtag.text = item.hashtags.joinToString(" ", "#")
+            tvHashtag.text = item.hashtags.joinToString(" #", "#")
         }
         Glide.with(binding.root)
             .load(item.teacherSmallProfile)

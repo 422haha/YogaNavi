@@ -21,8 +21,26 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun getProfile(): Response<YogaDetailResponse<Profile>> =
         infoAPI.getProfile()
 
-    override suspend fun getTeacherList(filter: FilterData): Response<YogaResponse<TeacherData>> =
-        infoAPI.getTeacherList(filter)
+    override suspend fun getAllTeacherList(
+        sorting: Int,
+        searchKeyword: String
+    ): Response<YogaResponse<TeacherData>> =
+        infoAPI.getAllTeacherList(sorting, searchKeyword)
+
+    override suspend fun getTeacherList(
+        sorting: Int,
+        filter: FilterData,
+        searchKeyword: String
+    ): Response<YogaResponse<TeacherData>> =
+        infoAPI.getTeacherList(
+            sorting,
+            filter.startTime,
+            filter.endTime,
+            filter.day,
+            filter.period,
+            filter.maxLiveNum,
+            searchKeyword
+        )
 
     override suspend fun teacherLikeToggle(teacherId: Int): Response<YogaDetailResponse<Boolean>> =
         infoAPI.teacherLikeToggle(teacherId)

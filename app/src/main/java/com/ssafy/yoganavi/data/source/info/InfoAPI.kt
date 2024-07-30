@@ -29,8 +29,23 @@ interface InfoAPI {
     suspend fun updateProfile(@Body profile: Profile): Response<YogaDetailResponse<Profile>>
 
     //TEACHER
+    @GET("teacher/sort/{sorting_id}")
+    suspend fun getAllTeacherList(
+        @Path("sorting_id") sorting: Int,
+        @Query("searchKeyword") searchKeyword: String
+    ): Response<YogaResponse<TeacherData>>
+
+
     @GET("teacher")
-    suspend fun getTeacherList(@Query("filter") filter: FilterData): Response<YogaResponse<TeacherData>>
+    suspend fun getTeacherList(
+        @Query("sorting") sorting: Int,
+        @Query("startTime") startTime: Long,
+        @Query("endTime") endTime: Long,
+        @Query("day") day: String,
+        @Query("period") period: Int,
+        @Query("maxLiveNum") maxLiveNum: Int,
+        @Query("searchKeyword") searchKeyword: String
+    ): Response<YogaResponse<TeacherData>>
 
     @POST("teacher/like/{teacher_id}")
     suspend fun teacherLikeToggle(@Path("teacher_id") teacherId: Int): Response<YogaDetailResponse<Boolean>>

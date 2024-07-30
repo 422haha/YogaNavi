@@ -16,21 +16,86 @@
         android:focusable="true"
         android:queryHint="찾으시는 강사님이 있으신가요?"
         app:iconifiedByDefault="false"
-        app:queryBackground="@drawable/no_underline"
-        app:layout_constraintBottom_toTopOf="@+id/iv_filter"
+        app:layout_constraintBottom_toTopOf="@+id/ly_filter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:queryBackground="@drawable/no_underline" />
 
-    <ImageView
-        android:id="@+id/iv_filter"
-        android:layout_width="@dimen/icon_small"
-        android:layout_height="@dimen/icon_small"
-        android:layout_marginVertical="@dimen/padding_small"
-        android:src="@drawable/baseline_filter_empty_24"
+    <RadioGroup
+        android:id="@+id/rg_align"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/padding_medium"
+        app:layout_constraintBottom_toTopOf="@+id/rv_teacher_list"
+        app:layout_constraintEnd_toStartOf="@id/ly_filter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sv_search">
+
+
+        <RadioButton
+            android:id="@+id/rb_recent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/padding_medium"
+            android:text="@string/recent"
+            android:textSize="@dimen/text_medium_large"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/rb_popular"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <RadioButton
+            android:id="@+id/rb_popular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/padding_medium"
+            android:text="@string/popular"
+            android:textSize="@dimen/text_medium_large"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/rb_recent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </RadioGroup>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ly_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/rv_teacher_list"
         app:layout_constraintEnd_toEndOf="@id/sv_search"
-        app:layout_constraintTop_toBottomOf="@id/sv_search" />
+        app:layout_constraintTop_toBottomOf="@id/sv_search">
+
+        <ImageView
+            android:id="@+id/iv_filter"
+            android:layout_width="@dimen/icon_small"
+            android:layout_height="@dimen/icon_small"
+            android:layout_marginVertical="@dimen/padding_small"
+            android:src="@drawable/baseline_filter_empty_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_filter_set"
+            android:layout_width="@dimen/icon_medium40"
+            android:layout_height="@dimen/icon_medium40"
+            android:layout_marginEnd="-4dp"
+            android:src="@drawable/baseline_filter_alt_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_teacher_list"
@@ -40,7 +105,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_filter"
+        app:layout_constraintTop_toBottomOf="@id/ly_filter"
         tools:listitem="@layout/list_item_teacher" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
