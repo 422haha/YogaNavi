@@ -18,9 +18,10 @@ interface InfoRepository {
     suspend fun updateProfile(profile: Profile): DetailResponse<Profile>
 
     //TEACHER
-    suspend fun getTeacherList(filter : FilterData): ListResponse<TeacherData>
+    suspend fun getTeacherList(filter: FilterData): ListResponse<TeacherData>
 
-    suspend fun teacherLikeToggle(teacherId : Int):DetailResponse<Boolean>
+    suspend fun teacherLikeToggle(teacherId: Int): DetailResponse<Boolean>
+
     // LECTURE
     suspend fun getLectureList(): ListResponse<LectureData>
 
