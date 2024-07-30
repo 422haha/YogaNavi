@@ -1,5 +1,6 @@
 package com.ssafy.yoganavi.ui.homeUI.lecture.lectureVideo
 
+import android.Manifest
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Build
@@ -8,6 +9,11 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import androidx.activity.OnBackPressedCallback
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.fragment.app.viewModels
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
@@ -16,7 +22,9 @@ import androidx.navigation.fragment.navArgs
 import com.ssafy.yoganavi.databinding.FragmentLectureVideoBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.core.MainActivity
+import com.ssafy.yoganavi.ui.utils.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.concurrent.Executors
 
 @AndroidEntryPoint
 class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
@@ -25,8 +33,13 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
     private val args by navArgs<LectureVideoFragmentArgs>()
     private val viewModel: LectureVideoViewModel by viewModels()
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        PermissionHelper(this, arrayOf(Manifest.permission.CAMERA))
+            .launchPermission()
+
+        initCamera()
         setVideo()
         setFullscreen()
 
@@ -82,4 +95,33 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
         supportActionBar?.show()
     }
 
+    private fun initCamera() {
+        val cameraProvider = ProcessCameraProvider
+            .getInstance(requireContext())
+            .get()
+
+        val cameraSelector = CameraSelector
+            .Builder()
+            .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
+            .build()
+
+        val resolutionSelector = ResolutionSelector
+            .Builder()
+            .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
+            .build()
+
+        val analysis = ImageAnalysis
+            .Builder()
+            .setResolutionSelector(resolutionSelector)
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .build()
+            .apply {
+                setAnalyzer(Executors.newSingleThreadExecutor()) {
+                    viewModel.inferImage(it)
+                }
+            }
+
+        cameraProvider.unbindAll()
+        cameraProvider.bindToLifecycle(viewLifecycleOwner, cameraSelector, analysis)
+    }
 }
