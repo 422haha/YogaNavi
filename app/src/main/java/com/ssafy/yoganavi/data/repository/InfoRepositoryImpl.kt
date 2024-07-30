@@ -4,7 +4,6 @@ import com.ssafy.yoganavi.data.repository.response.DetailResponse
 import com.ssafy.yoganavi.data.repository.response.ListResponse
 import com.ssafy.yoganavi.data.repository.response.toDetailResponse
 import com.ssafy.yoganavi.data.repository.response.toListResponse
-import com.ssafy.yoganavi.data.source.info.InfoDataSource
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
@@ -12,6 +11,7 @@ import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
+import com.ssafy.yoganavi.data.source.info.InfoDataSource
 import com.ssafy.yoganavi.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -69,6 +69,11 @@ class InfoRepositoryImpl @Inject constructor(
     override suspend fun likeLecture(recordedId: Long): DetailResponse<Boolean> {
         val response = withContext(ioDispatcher) { infoDataSource.likeLecture(recordedId) }
         return response.toDetailResponse()
+    }
+
+    override suspend fun getLikeLectureList(): ListResponse<LectureData> {
+        val response = withContext(ioDispatcher) { infoDataSource.getLikeLectureList() }
+        return response.toListResponse()
     }
 
     // LIVE

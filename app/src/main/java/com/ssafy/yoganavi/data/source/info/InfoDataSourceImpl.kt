@@ -44,6 +44,9 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun likeLecture(recordedId: Long): Response<YogaDetailResponse<Boolean>> =
         infoAPI.likeLecture(recordedId)
 
+    override suspend fun getLikeLectureList(): Response<YogaResponse<LectureData>> =
+        infoAPI.getLikeLectureList()
+
     // LIVE
     override suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>> =
         infoAPI.getLiveList()
