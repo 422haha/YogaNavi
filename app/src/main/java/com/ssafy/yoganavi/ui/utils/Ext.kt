@@ -75,8 +75,6 @@ const val ITEM = 2
 
 // 화상강의 등록
 const val END_STR = "종료 날짜"
-const val LIMIT_STR = "무기한"
-const val LIMIT_DATE = 4102358400000 // 2099.12.31
 enum class Week(val hangle: String) {
     MON("월"),
     TUE("화"),
@@ -86,3 +84,8 @@ enum class Week(val hangle: String) {
     SAT("토"),
     SUN("일") }
 data class DayStatus(val day: Week, var isSelected: Boolean)
+
+// FCM
+const val CHANNEL_ID = "YogaNaviChannelId"
+const val CHANNEL_NAME = "YogaNavi"
+const val CHANNEL_DESCRIPTION = "YogaNavi Live Notification"

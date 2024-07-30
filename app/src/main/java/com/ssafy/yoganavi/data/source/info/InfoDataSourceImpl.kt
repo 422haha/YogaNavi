@@ -1,5 +1,6 @@
 package com.ssafy.yoganavi.data.source.info
 
+import com.ssafy.yoganavi.data.source.dto.home.HomeData
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
@@ -22,6 +23,9 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
 
     override suspend fun getTeacherList(filter: FilterData): Response<YogaResponse<TeacherData>> =
         infoAPI.getTeacherList(filter)
+
+    override suspend fun teacherLikeToggle(teacherId: Int): Response<YogaDetailResponse<Boolean>> =
+        infoAPI.teacherLikeToggle(teacherId)
 
     override suspend fun updateProfile(profile: Profile): Response<YogaDetailResponse<Profile>> =
         infoAPI.updateProfile(profile)
@@ -84,4 +88,8 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
 
     override suspend fun deleteNotice(articleId: Int): Response<YogaDetailResponse<Unit>> =
         infoAPI.deleteNotice(articleId)
+
+    // Home
+    override suspend fun getHomeList(): Response<YogaResponse<HomeData>> =
+        infoAPI.getHomeList()
 }

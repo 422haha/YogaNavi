@@ -7,13 +7,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
 import com.ssafy.yoganavi.databinding.ListItemLiveBinding
-import com.ssafy.yoganavi.ui.utils.LIMIT_DATE
-import com.ssafy.yoganavi.ui.utils.startTildeEnd
 import com.ssafy.yoganavi.ui.utils.UPDATE
-import com.ssafy.yoganavi.ui.utils.startVerticalEnd
 import com.ssafy.yoganavi.ui.utils.convertDaysToHangle
 import com.ssafy.yoganavi.ui.utils.formatDotDate
 import com.ssafy.yoganavi.ui.utils.formatTime
+import com.ssafy.yoganavi.ui.utils.startTildeEnd
+import com.ssafy.yoganavi.ui.utils.startVerticalEnd
 
 class ManagementLiveAdapter(
     private val navigateToLiveFragment: (Int) -> Unit,
@@ -38,10 +37,7 @@ class ManagementLiveAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: LiveLectureData) {
 
-            var date = "${formatDotDate(item.startDate)} ~ "
-
-            if(item.endDate != LIMIT_DATE && item.endDate != 0L)
-                date += formatDotDate(item.endDate)
+            val date = "${formatDotDate(item.startDate)} ~ ${formatDotDate(item.endDate)}"
 
             with(binding) {
                 tvDate.text = date

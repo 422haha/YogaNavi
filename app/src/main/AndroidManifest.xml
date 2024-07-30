@@ -46,7 +46,7 @@
         <!-- 푸시알림 아이콘 -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/splash" />
+            android:resource="@drawable/logo_noti" />
 
         <!-- 푸시알림 아이콘 색상 -->
         <meta-data

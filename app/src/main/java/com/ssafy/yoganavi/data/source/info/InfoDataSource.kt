@@ -1,5 +1,6 @@
 package com.ssafy.yoganavi.data.source.info
 
+import com.ssafy.yoganavi.data.source.dto.home.HomeData
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
@@ -20,6 +21,8 @@ interface InfoDataSource {
 
     //TEACHER
     suspend fun getTeacherList(filter : FilterData): Response<YogaResponse<TeacherData>>
+
+    suspend fun teacherLikeToggle(teacherId: Int):Response<YogaDetailResponse<Boolean>>
 
     // LECTURE
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>
@@ -63,4 +66,7 @@ interface InfoDataSource {
     ): Response<YogaDetailResponse<Unit>>
 
     suspend fun deleteNotice(articleId: Int): Response<YogaDetailResponse<Unit>>
+
+    // Home
+    suspend fun getHomeList(): Response<YogaResponse<HomeData>>
 }

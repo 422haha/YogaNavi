@@ -19,6 +19,7 @@ class DataStoreRepository @Inject constructor(@ApplicationContext val context: C
     private val Context.datastore: DataStore<Preferences> by preferencesDataStore(name = "user")
     private val accessKey = stringPreferencesKey("accessToken")
     private val refreshKey = stringPreferencesKey("refreshToken")
+    private val firebaseKey = stringPreferencesKey("firebaseToken")
 
     val accessToken: Flow<String> = context.datastore.data.catch { emit(emptyPreferences()) }
         .map { preference -> preference[accessKey] ?: "" }
@@ -26,12 +27,19 @@ class DataStoreRepository @Inject constructor(@ApplicationContext val context: C
     val refreshToken: Flow<String> = context.datastore.data.catch { emit(emptyPreferences()) }
         .map { preference -> preference[refreshKey] ?: "" }
 
+    val firebaseToken: Flow<String> = context.datastore.data.catch { emit(emptyPreferences()) }
+        .map { preference -> preference[firebaseKey] ?: "" }
+
     suspend fun setAccessToken(accessToken: String) = context.datastore.edit { preference ->
         preference[accessKey] = accessToken
     }
 
     suspend fun setRefreshToken(refreshToken: String) = context.datastore.edit { preference ->
         preference[refreshKey] = refreshToken
+    }
+
+    suspend fun setFirebaseToken(firebaseToken: String) = context.datastore.edit { preference ->
+        preference[firebaseKey] = firebaseToken
     }
 
     suspend fun clearToken() = context.datastore.edit { preference ->

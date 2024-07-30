@@ -3,7 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.schedule.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.InfoRepository
-import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
+import com.ssafy.yoganavi.data.source.dto.home.HomeData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,11 +15,11 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val infoRepository: InfoRepository
 ) : ViewModel() {
-    private val _homeList = MutableStateFlow<List<LiveLectureData>>(emptyList())
+    private val _homeList = MutableStateFlow<List<HomeData>>(emptyList())
     val homeList = _homeList.asStateFlow()
 
     fun getHomeList() = viewModelScope.launch(Dispatchers.IO) {
-        runCatching { infoRepository.getLiveList() }
+        runCatching { infoRepository.getHomeList() }
             .onSuccess { _homeList.emit(it.data.toMutableList()) }
             .onFailure { it.printStackTrace() }
     }
