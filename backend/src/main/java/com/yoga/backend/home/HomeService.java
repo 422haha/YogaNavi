@@ -32,64 +32,47 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class HomeService {
 
-    // JWT 유틸리티 클래스 인스턴스를 주입받습니다.
     @Autowired
     private JwtUtil jwtUtil;
 
-    // 사용자 리포지토리 인스턴스를 주입받습니다.
     @Autowired
     private UsersRepository usersRepository;
 
-    // 내 라이브 강의 리포지토리 인스턴스를 주입받습니다.
     @Autowired
     private MyLiveLectureRepository myLiveLectureRepository;
 
-    // 라이브 강의 리포지토리 인스턴스를 주입받습니다.
     @Autowired
     private LiveLectureRepository liveLectureRepository;
 
-    /**
-     * 주어진 사용자 ID에 해당하는 홈 데이터 리스트를 가져옵니다.
-     *
-     * @param userId 사용자 ID
-     * @return 홈 응답 DTO 리스트
-     */
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public List<HomeResponseDto> getHomeData(Integer userId) {
-        // 현재 시간을 가져옵니다.
-        long now = ZonedDateTime.now().toInstant().toEpochMilli();
+    public List<HomeResponseDto> getHomeData(int userId) {
+        long now = Instant.now().toEpochMilli();
 
-        // 사용자 ID로 내 라이브 강의 리스트를 조회합니다.
         List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findByUserId(userId);
-        // 홈 응답 DTO 리스트를 생성합니다.
         List<HomeResponseDto> responseList = new ArrayList<>();
 
-        // 내 라이브 강의 리스트를 순회합니다.
         for (MyLiveLecture myLiveLecture : myLiveLectures) {
-            // 라이브 강의 ID로 라이브 강의를 조회합니다.
             LiveLectures liveLecture = liveLectureRepository.findById(myLiveLecture.getLiveId()).orElse(null);
 
             if (liveLecture != null) {
-                // 라이브 강의의 시작일과 종료일, 가능한 요일로 강의 날짜 리스트를 가져옵니다.
-                List<String> lectureDates = getLectureDates(liveLecture.getStartDate(), liveLecture.getEndDate(), liveLecture.getAvailableDay());
+                List<String> lectureDates = getLectureDates(liveLecture.getStartDate().toEpochMilli(),
+                    liveLecture.getEndDate().toEpochMilli(),
+                    liveLecture.getAvailableDay());
                 for (String date : lectureDates) {
                     long lectureDateLong = convertToLong(date);
-                    // 현재 시간 이후의 강의만 추가합니다.
                     if (lectureDateLong >= now) {
-                        // 새로운 홈 응답 DTO를 생성하고 데이터를 설정합니다.
                         HomeResponseDto dto = new HomeResponseDto();
                         dto.setLiveId(liveLecture.getLiveId());
                         dto.setUserId(liveLecture.getUser().getId());
                         dto.setNickname(liveLecture.getUser().getNickname());
                         dto.setProfileImageUrl(liveLecture.getUser().getProfile_image_url());
-                        dto.setProfileImageUrlSmall(
-                            liveLecture.getUser().getProfile_image_url_small());
+                        dto.setProfileImageUrlSmall(liveLecture.getUser().getProfile_image_url_small());
                         dto.setLiveTitle(liveLecture.getLiveTitle());
                         dto.setLiveContent(liveLecture.getLiveContent());
-                        dto.setStartTime(liveLecture.getStartTime());
-                        dto.setEndTime(liveLecture.getEndTime());
-                        dto.setLectureDate(convertToLong(date));
-                        dto.setRegDate(liveLecture.getRegDate());
+                        dto.setStartTime(liveLecture.getStartTime().toEpochMilli());
+                        dto.setEndTime(liveLecture.getEndTime().toEpochMilli());
+                        dto.setLectureDate(lectureDateLong);
+                        dto.setRegDate(liveLecture.getRegDate().toEpochMilli());
                         dto.setMaxLiveNum(liveLecture.getMaxLiveNum());
                         dto.setLectureDay(LocalDate.parse(date).getDayOfWeek()
                             .getDisplayName(TextStyle.SHORT, Locale.ENGLISH).toUpperCase());
@@ -98,12 +81,10 @@ public class HomeService {
                 }
             }
         }
-        // 날짜와 시간 순서대로 정렬합니다.
         responseList.sort(Comparator.comparing(HomeResponseDto::getLectureDate).thenComparing(HomeResponseDto::getStartTime));
 
         return responseList;
     }
-
 
     /**
      * 시작일과 종료일, 가능한 요일로 강의 날짜 리스트를 생성합니다.

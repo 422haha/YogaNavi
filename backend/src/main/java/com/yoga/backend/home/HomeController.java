@@ -52,18 +52,13 @@ public class HomeController {
      */
     @GetMapping
     public ResponseEntity<Map<String, Object>> getHomeData(@RequestHeader("Authorization") String token) {
-        // JWT 토큰에서 사용자 ID를 추출합니다.
-        Integer userId = jwtUtil.getUserIdFromToken(token);
-        // 사용자 ID로 홈 데이터를 가져옵니다.
+        int userId = jwtUtil.getUserIdFromToken(token);
         List<HomeResponseDto> homeData = homeService.getHomeData(userId);
 
-        // 홈 데이터가 비어있는 경우
-        if (homeData.isEmpty()) {
-            // 성공 메시지와 빈 리스트를 포함한 응답을 반환합니다.
-            return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "내 화상 강의 할 일 조회 성공", "data", List.of()));
-        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "내 화상 강의 할 일 조회 성공");
+        response.put("data", homeData);
 
-        // 홈 데이터를 포함한 성공 응답을 반환합니다.
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "내 화상 강의 할 일 조회 성공", "data", homeData));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
