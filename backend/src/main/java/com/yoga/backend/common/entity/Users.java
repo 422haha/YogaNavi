@@ -74,6 +74,9 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<RecordedLectureLike> recordedLectureLikes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<TeacherLike> teacherLikes = new ArrayList<>();
+
     @Column
     private Instant deletedAt;
 
@@ -231,6 +234,14 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
 
     public void setRecordedLectureLikes(List<RecordedLectureLike> recordedLectureLikes) {
         this.recordedLectureLikes = recordedLectureLikes;
+    }
+
+    public List<TeacherLike> getTeacherLikes() {
+        return teacherLikes;
+    }
+
+    public void setTeacherLikes(List<TeacherLike> teacherLikes) {
+        this.teacherLikes = teacherLikes;
     }
 
     public Instant  getDeletedAt() {
