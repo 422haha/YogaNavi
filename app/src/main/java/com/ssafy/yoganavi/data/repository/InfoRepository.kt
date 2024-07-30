@@ -20,6 +20,7 @@ interface InfoRepository {
     //TEACHER
     suspend fun getTeacherList(filter : FilterData): ListResponse<TeacherData>
 
+    suspend fun teacherLikeToggle(teacherId : Int):DetailResponse<Boolean>
     // LECTURE
     suspend fun getLectureList(): ListResponse<LectureData>
 

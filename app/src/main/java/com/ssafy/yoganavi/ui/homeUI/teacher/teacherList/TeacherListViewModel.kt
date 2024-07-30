@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TeacherListViewModel @Inject constructor(
-    val infoRepository: InfoRepository
+    private val infoRepository: InfoRepository
 ) : ViewModel() {
     private val _teacherList = MutableStateFlow<List<TeacherData>>(emptyList())
     val teacherList = _teacherList.asStateFlow()
@@ -24,5 +24,9 @@ class TeacherListViewModel @Inject constructor(
         runCatching { infoRepository.getTeacherList(filter) }
             .onSuccess { _teacherList.emit(it.data.toMutableList()) }
             .onFailure { it.printStackTrace() }
+    }
+
+    fun teacherLikeToggle(teacherId:Int)=viewModelScope.launch(Dispatchers.IO) {
+        runCatching { infoRepository.teacherLikeToggle(teacherId) }
     }
 }
