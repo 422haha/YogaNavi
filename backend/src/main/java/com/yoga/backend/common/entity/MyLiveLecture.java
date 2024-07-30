@@ -27,7 +27,7 @@ public class MyLiveLecture {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer myListId; // 나의 강의 목록 ID (Primary Key)
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)//채티타입 레이지
     @JoinColumn(name = "live_id", nullable = false)
     private LiveLectures liveLecture; // 실시간 강의 ID (Foreign Key)
 
@@ -35,4 +35,7 @@ public class MyLiveLecture {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user; // 사용자 ID (Foreign Key)
 
+    public Integer getLiveId() {
+        return liveLecture.getLiveId();
+    }
 }
