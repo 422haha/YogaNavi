@@ -2,12 +2,15 @@ package com.yoga.backend.common.handler;
 
 import com.google.gson.Gson;
 import com.yoga.backend.common.constants.SecurityConstants;
+import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.util.JwtUtil;
+import com.yoga.backend.members.repository.UsersRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,23 +28,33 @@ import org.springframework.stereotype.Component;
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
+    private final UsersRepository usersRepository;
 
-    public CustomAuthenticationSuccessHandler(JwtUtil jwtUtil) {
+    public CustomAuthenticationSuccessHandler(JwtUtil jwtUtil , UsersRepository usersRepository) {
         this.jwtUtil = jwtUtil;
+        this.usersRepository = usersRepository;
     }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException {
 
+        String fcmToken = request.getHeader("FCM-TOKEN");
         String email = authentication.getName();
         String role = authentication.getAuthorities().stream()
             .findFirst()
             .map(a -> a.getAuthority().replace("ROLE_", ""))
             .orElse("");
 
-        // 추가
         jwtUtil.invalidateToken(email);
+
+        System.out.println("fcmToken ================= "+fcmToken);
+        Optional<Users> users=usersRepository.findByEmail(email);
+        if(users.isPresent()){
+            Users user=users.get();
+            user.setFcmToken(fcmToken);
+            usersRepository.save(user);
+        }
 
         String accessToken = jwtUtil.generateAccessToken(email, role);
         String refreshToken = jwtUtil.generateRefreshToken(email);

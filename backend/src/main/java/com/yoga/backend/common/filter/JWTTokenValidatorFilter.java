@@ -3,7 +3,6 @@ package com.yoga.backend.common.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yoga.backend.common.constants.SecurityConstants;
 import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.members.repository.UsersRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -15,23 +14,22 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-
+@Slf4j
 public class JWTTokenValidatorFilter extends OncePerRequestFilter {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     Map<String, Object> data = new HashMap<>();
 
     private final JwtUtil jwtUtil;
-    private final UsersRepository userRepository;
 
-    public JWTTokenValidatorFilter(UsersRepository userRepository, JwtUtil jwtUtil) {
-        this.userRepository = userRepository;
+    public JWTTokenValidatorFilter( JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
 
@@ -70,6 +68,7 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                     handleRefreshToken(request, response, filterChain, refreshToken);
                 }
             } catch (JwtException e) {
+                log.error("액세스 토큰 처리 불가 {}",e);
                 sendUnauthorizedResponse(response, "액세스 토큰 처리 불가");
             }
         } else {

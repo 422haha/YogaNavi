@@ -43,7 +43,7 @@ public class LectureDto {
         this.myLike = myLike != null && myLike;
     }
 
-    // findAllLectures
+    // findAllLectures, findMyLikedLectures
     public LectureDto(Long recordedId, String recordTitle, String recordThumbnailSmall,
         String recordThumbnail, Long likeCount, Boolean myLike) {
         this.recordedId = recordedId;

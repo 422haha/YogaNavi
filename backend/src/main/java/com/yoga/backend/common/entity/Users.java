@@ -74,11 +74,17 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<RecordedLectureLike> recordedLectureLikes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<TeacherLike> teacherLikes = new ArrayList<>();
+
     @Column
     private Instant deletedAt;
 
     @Column(nullable = false)
     private Boolean isDeleted = false;
+
+    @Column(length = 512)
+    private String fcmToken;
 
     public int getId() {
         return id;
@@ -233,6 +239,14 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
         this.recordedLectureLikes = recordedLectureLikes;
     }
 
+    public List<TeacherLike> getTeacherLikes() {
+        return teacherLikes;
+    }
+
+    public void setTeacherLikes(List<TeacherLike> teacherLikes) {
+        this.teacherLikes = teacherLikes;
+    }
+
     public Instant  getDeletedAt() {
         return deletedAt;
     }
@@ -249,4 +263,11 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
         this.isDeleted = isDeleted;
     }
 
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
 }
