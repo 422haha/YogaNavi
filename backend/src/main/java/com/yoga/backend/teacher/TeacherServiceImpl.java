@@ -3,7 +3,7 @@ package com.yoga.backend.teacher;
 import com.yoga.backend.common.awsS3.S3Service;
 import com.yoga.backend.common.entity.Hashtag;
 import com.yoga.backend.common.entity.Users;
-import com.yoga.backend.common.entity.LiveLectures;
+import com.yoga.backend.common.entity.TeacherLike;
 import com.yoga.backend.teacher.dto.DetailedTeacherDto;
 import com.yoga.backend.teacher.dto.TeacherDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -23,17 +25,20 @@ public class TeacherServiceImpl implements TeacherService {
     private static final long URL_EXPIRATION_SECONDS = 86400; // 24시간
 
     private final TeacherRepository teacherRepository;
+    private final TeacherLikeRepository teacherLikeRepository;
     private final S3Service s3Service;
 
     @Autowired
-    public TeacherServiceImpl(TeacherRepository teacherRepository, S3Service s3Service) {
+    public TeacherServiceImpl(TeacherRepository teacherRepository,
+        TeacherLikeRepository teacherLikeRepository, S3Service s3Service) {
         this.teacherRepository = teacherRepository;
+        this.teacherLikeRepository = teacherLikeRepository;
         this.s3Service = s3Service;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<TeacherDto> getAllTeachers(TeacherFilter filter) {
+    public List<TeacherDto> getAllTeachers(TeacherFilter filter, int userId) {
         List<Users> users = teacherRepository.findAllTeachers();
         LocalDate now = LocalDate.now();
 
@@ -70,17 +75,16 @@ public class TeacherServiceImpl implements TeacherService {
 
                 // maxLiveNum 필터링
                 boolean isValidMaxLiveNum = filter.getMaxLiveNum() == 1 ||
-                    user.getLiveLectures().stream().anyMatch(lecture -> lecture.getMaxLiveNum() == filter.getMaxLiveNum());
+                    user.getLiveLectures().stream()
+                        .anyMatch(lecture -> lecture.getMaxLiveNum() == filter.getMaxLiveNum());
 
                 return hasValidLecture && isValidMaxLiveNum;
             })
             .sorted((user1, user2) -> {
-                if (filter.getSorting() == 0) {
-                    return Integer.compare(user2.getId(), user1.getId()); // 최신순
-                } else {
-                    // Like count 필드가 없어서 임시로 이메일 길이로 비교
-                    return Integer.compare(user2.getEmail().length(), user1.getEmail().length()); // 인기순
-                }
+                // 좋아요 수 기준 정렬
+                int user1Likes = user1.getTeacherLikes().size();
+                int user2Likes = user2.getTeacherLikes().size();
+                return Integer.compare(user2Likes, user1Likes); // 내림차순 정렬
             })
             .map(user -> {
                 String profileImageUrl = null;
@@ -98,6 +102,9 @@ public class TeacherServiceImpl implements TeacherService {
                     System.err.println("Presigned URL 생성 오류: " + e.getMessage());
                 }
 
+                boolean likedByUser =
+                    teacherLikeRepository.findByTeacherAndUser(user, getUserById(userId)) != null;
+
                 return TeacherDto.builder()
                     .id(user.getId())
                     .email(user.getEmail())
@@ -107,6 +114,8 @@ public class TeacherServiceImpl implements TeacherService {
                     .content(user.getContent())
                     .hashtags(user.getHashtags().stream().map(Hashtag::getName)
                         .collect(Collectors.toSet()))
+                    .liked(likedByUser)
+                    .likeCount(user.getTeacherLikes().size())
                     .build();
             })
             .collect(Collectors.toList());
@@ -114,7 +123,7 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     @Transactional(readOnly = true)
-    public DetailedTeacherDto getTeacherById(int teacherId) {
+    public DetailedTeacherDto getTeacherById(int teacherId, int userId) {
         Users user = teacherRepository.findById(teacherId)
             .orElseThrow(() -> new RuntimeException("강사를 찾을 수 없습니다."));
 
@@ -135,6 +144,9 @@ public class TeacherServiceImpl implements TeacherService {
             System.err.println("Presigned URL 생성 오류: " + e.getMessage());
         }
 
+        boolean likedByUser =
+            teacherLikeRepository.findByTeacherAndUser(user, getUserById(userId)) != null;
+
         return DetailedTeacherDto.builder()
             .id(user.getId())
             .email(user.getEmail())
@@ -153,30 +165,60 @@ public class TeacherServiceImpl implements TeacherService {
                     .build()
             ).collect(Collectors.toList()))
             .notices(user.getArticles().stream().map(article -> {
-                String noticeImage = null;
-                String noticeImageSmall = null;
-                try {
-                    if (article.getImageUrl() != null) {
-                        noticeImage = s3Service.generatePresignedUrl(article.getImageUrl(),
-                            URL_EXPIRATION_SECONDS);
-                        System.out.println("생성된 noticeImage: " + noticeImage);
+                    String noticeImage = null;
+                    String noticeImageSmall = null;
+                    try {
+                        if (article.getImageUrl() != null && !article.getImageUrl().isEmpty()) {
+                            noticeImage = s3Service.generatePresignedUrl(article.getImageUrl(),
+                                URL_EXPIRATION_SECONDS);
+                            System.out.println("생성된 noticeImage: " + noticeImage);
+                        }
+                        if (article.getImageUrlSmall() != null && !article.getImageUrlSmall()
+                            .isEmpty()) {
+                            noticeImageSmall = s3Service.generatePresignedUrl(
+                                article.getImageUrlSmall(), URL_EXPIRATION_SECONDS);
+                            System.out.println("생성된 noticeImageSmall: " + noticeImageSmall);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("공지 Presigned URL 생성 오류: " + e.getMessage());
                     }
-                    if (article.getImageUrlSmall() != null) {
-                        noticeImageSmall = s3Service.generatePresignedUrl(
-                            article.getImageUrlSmall(), URL_EXPIRATION_SECONDS);
-                        System.out.println("생성된 noticeImageSmall: " + noticeImageSmall);
-                    }
-                } catch (Exception e) {
-                    System.err.println("공지 Presigned URL 생성 오류: " + e.getMessage());
-                }
 
-                return DetailedTeacherDto.NoticeDto.builder()
-                    .noticeId(article.getArticleId().toString())
-                    .noticeContent(article.getContent())
-                    .noticeImage(noticeImage)
-                    .noticeImageSmall(noticeImageSmall)
-                    .build();
-            }).collect(Collectors.toList()))
+                    return DetailedTeacherDto.NoticeDto.builder()
+                        .noticeId(article.getArticleId().toString())
+                        .noticeContent(article.getContent())
+                        .noticeImage(noticeImage)
+                        .noticeImageSmall(noticeImageSmall)
+                        .build();
+                }).sorted(Comparator.comparing(DetailedTeacherDto.NoticeDto::getNoticeId).reversed())
+                .collect(Collectors.toList()))
+            .likeCount(user.getTeacherLikes().size())
+            .liked(likedByUser)
             .build();
+    }
+
+    @Override
+    @Transactional
+    public boolean toggleLike(int teacherId, int userId) {
+        Users teacher = teacherRepository.findById(teacherId)
+            .orElseThrow(() -> new RuntimeException("강사를 찾을 수 없습니다."));
+        Users user = teacherRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        TeacherLike existingLike = teacherLikeRepository.findByTeacherAndUser(teacher, user);
+        if (existingLike != null) {
+            teacherLikeRepository.delete(existingLike);
+            return false; // 좋아요 취소
+        } else {
+            TeacherLike like = new TeacherLike();
+            like.setTeacher(teacher);
+            like.setUser(user);
+            teacherLikeRepository.save(like);
+            return true; // 좋아요 추가
+        }
+    }
+
+    private Users getUserById(int userId) {
+        return teacherRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
     }
 }
