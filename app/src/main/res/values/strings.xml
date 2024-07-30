@@ -75,6 +75,7 @@
     <string name="month">한 달</string>
     <string name="three_months">세 달</string>
     <string name="year">일 년</string>
+    <string name="total">전체</string>
     <string name="one_to_one">1:1</string>
     <string name="one_to_multiple">1:多</string>
     <string name="class_method">수업 방식</string>
