@@ -40,7 +40,7 @@ class TeacherListViewModel @Inject constructor(
 
     private fun getAllTeacherList() = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.getAllTeacherList(sorting, searchKeyword) }
-            .onSuccess { }
+            .onSuccess { _teacherList.emit(it.data.toMutableList())}
             .onFailure { it.printStackTrace() }
     }
 
