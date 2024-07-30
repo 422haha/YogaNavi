@@ -27,6 +27,8 @@ interface InfoRepository {
         searchKeyword: String
     ): ListResponse<TeacherData>
 
+    suspend fun getTeacherDetail(teacherId: Int): DetailResponse<TeacherData>
+
     suspend fun teacherLikeToggle(teacherId: Int): DetailResponse<Boolean>
 
     // LECTURE

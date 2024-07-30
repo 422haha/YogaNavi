@@ -60,6 +60,13 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toListResponse()
     }
 
+    override suspend fun getTeacherDetail(teacherId: Int): DetailResponse<TeacherData> {
+        val response = withContext(ioDispatcher) {
+            infoDataSource.getTeacherDetail(teacherId)
+        }
+        return response.toDetailResponse()
+    }
+
     override suspend fun teacherLikeToggle(teacherId: Int): DetailResponse<Boolean> {
         val response = withContext(ioDispatcher) { infoDataSource.teacherLikeToggle(teacherId) }
         return response.toDetailResponse()

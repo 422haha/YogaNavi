@@ -47,6 +47,9 @@ interface InfoAPI {
         @Query("searchKeyword") searchKeyword: String
     ): Response<YogaResponse<TeacherData>>
 
+    @GET("teacher/{teacher_id}")
+    suspend fun getTeacherDetail(@Path("teacher_id") teacherId: Int): Response<YogaDetailResponse<TeacherData>>
+
     @POST("teacher/like/{teacher_id}")
     suspend fun teacherLikeToggle(@Path("teacher_id") teacherId: Int): Response<YogaDetailResponse<Boolean>>
 

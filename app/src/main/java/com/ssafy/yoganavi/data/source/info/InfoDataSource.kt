@@ -31,6 +31,8 @@ interface InfoDataSource {
         searchKeyword: String
     ): Response<YogaResponse<TeacherData>>
 
+    suspend fun getTeacherDetail(teacherId: Int): Response<YogaDetailResponse<TeacherData>>
+
     suspend fun teacherLikeToggle(teacherId: Int): Response<YogaDetailResponse<Boolean>>
 
     // LECTURE
