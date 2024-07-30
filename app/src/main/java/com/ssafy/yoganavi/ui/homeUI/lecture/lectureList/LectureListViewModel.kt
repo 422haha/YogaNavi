@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,6 +38,7 @@ class LectureListViewModel @Inject constructor(
 
     fun setLectureLike(recordedId: Long) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.likeLecture(recordedId) }
+            .onSuccess { updateSortAndKeyword(likeChange = true) }
             .onFailure { it.printStackTrace() }
     }
 
@@ -47,9 +47,11 @@ class LectureListViewModel @Inject constructor(
         keyword: String? = _sortAndKeyword.value.keyword,
         searchInTitle: Boolean = _sortAndKeyword.value.searchInTitle,
         searchInContent: Boolean = _sortAndKeyword.value.searchInContent,
+        likeChange: Boolean? = null
     ) {
-        val newValue = SortAndKeyword(sort, keyword, searchInTitle, searchInContent)
-        Timber.d("NEW VALUE : ${newValue}")
+        val prevLike = _sortAndKeyword.value.likeChange
+        val newLike = if(likeChange != null) !prevLike else prevLike
+        val newValue = SortAndKeyword(sort, keyword, searchInTitle, searchInContent, newLike)
         _sortAndKeyword.value = newValue
     }
 }

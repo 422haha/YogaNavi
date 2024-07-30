@@ -63,3 +63,9 @@ fun addYear(currentMillis: Long): Long {
 
     return calendar.timeInMillis
 }
+
+fun Long.msToDuration(): String {
+    val minutes = (this / 1000) / 60
+    val seconds = (this / 1000) % 60
+    return String.format(Locale.KOREA, "%d:%02d", minutes, seconds)
+}

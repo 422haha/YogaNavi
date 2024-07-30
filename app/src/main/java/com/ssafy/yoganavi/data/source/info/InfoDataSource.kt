@@ -10,6 +10,7 @@ import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.response.YogaDetailResponse
 import com.ssafy.yoganavi.data.source.response.YogaResponse
+import com.ssafy.yoganavi.data.source.teacher.FilterData
 import retrofit2.Response
 
 interface InfoDataSource {
@@ -19,7 +20,9 @@ interface InfoDataSource {
     suspend fun updateProfile(profile: Profile): Response<YogaDetailResponse<Profile>>
 
     //TEACHER
-    suspend fun getTeacherList(): Response<YogaResponse<TeacherData>>
+    suspend fun getTeacherList(filter : FilterData): Response<YogaResponse<TeacherData>>
+
+    suspend fun teacherLikeToggle(teacherId: Int):Response<YogaDetailResponse<Boolean>>
 
     // LECTURE
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>
@@ -33,6 +36,8 @@ interface InfoDataSource {
     suspend fun deleteLectures(recordIdList: List<Long>): Response<YogaDetailResponse<Boolean>>
 
     suspend fun likeLecture(recordedId: Long): Response<YogaDetailResponse<Boolean>>
+
+    suspend fun getLikeLectureList(): Response<YogaResponse<LectureData>>
 
     // LIVE
     suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>>

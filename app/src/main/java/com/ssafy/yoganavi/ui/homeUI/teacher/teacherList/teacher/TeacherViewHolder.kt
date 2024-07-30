@@ -11,22 +11,39 @@ class TeacherViewHolder(
     private val binding: ListItemTeacherBinding,
     private val navigateToTeacherDetailFragment: (Int) -> Unit
 ) : ViewHolder(binding.root) {
-    fun bind(item: TeacherData) = with(binding) {
+    fun bind(item: TeacherData, teacherLikeToggle: (Int) -> Unit) = with(binding) {
         tvTeacherNickname.text = item.teacherName
         tvCount.text = item.likes.toK()
-        tvHashtag.text = item.hashtags.joinToString(" ", "#")
+        var count = item.likes
+        if (item.hashtags.isNotEmpty()) {
+            tvHashtag.text = item.hashtags.joinToString(" ", "#")
+        }
         Glide.with(binding.root)
             .load(item.teacherSmallProfile)
             .into(binding.ivProfile)
-        if (item.isLiked) {
-            binding.ivFavoriteColor.isVisible = true
-            binding.ivFavorite.isVisible = false
+        if (item.liked) {
+            ivFavoriteColor.isVisible = true
+            ivFavorite.isVisible = false
         } else {
-            binding.ivFavoriteColor.isVisible = false
-            binding.ivFavorite.isVisible = true
+            ivFavoriteColor.isVisible = false
+            ivFavorite.isVisible = true
         }
-        binding.root.setOnClickListener {
+        root.setOnClickListener {
             navigateToTeacherDetailFragment(item.teacherId)
+        }
+        ivFavorite.setOnClickListener {
+            ivFavoriteColor.isVisible = true
+            ivFavorite.isVisible = false
+            count += 1
+            tvCount.text = count.toString()
+            teacherLikeToggle(item.teacherId)
+        }
+        ivFavoriteColor.setOnClickListener {
+            ivFavoriteColor.isVisible = false
+            ivFavorite.isVisible = true
+            count -= 1
+            tvCount.text = count.toString()
+            teacherLikeToggle(item.teacherId)
         }
     }
 }

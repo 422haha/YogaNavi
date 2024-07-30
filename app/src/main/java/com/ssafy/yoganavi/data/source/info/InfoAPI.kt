@@ -10,6 +10,7 @@ import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.response.YogaDetailResponse
 import com.ssafy.yoganavi.data.source.response.YogaResponse
+import com.ssafy.yoganavi.data.source.teacher.FilterData
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -17,6 +18,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface InfoAPI {
 
@@ -28,29 +30,35 @@ interface InfoAPI {
 
     //TEACHER
     @GET("teacher")
-    suspend fun getTeacherList(): Response<YogaResponse<TeacherData>>
+    suspend fun getTeacherList(@Query("filter") filter: FilterData): Response<YogaResponse<TeacherData>>
+
+    @POST("teacher/like/{teacher_id}")
+    suspend fun teacherLikeToggle(@Path("teacher_id") teacherId: Int): Response<YogaDetailResponse<Boolean>>
 
     // LECTURE
-    @GET("mypage/recorded-lecture/list")
+    @GET("recorded-lecture/mypage/list")
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>
 
-    @POST("mypage/recorded-lecture/create")
+    @POST("recorded-lecture/mypage/create")
     suspend fun createLecture(@Body lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>>
 
-    @GET("mypage/recorded-lecture/detail/{recorded_id}")
+    @GET("recorded-lecture/mypage/detail/{recorded_id}")
     suspend fun getLecture(@Path("recorded_id") id: Long): Response<YogaDetailResponse<LectureDetailData>>
 
-    @PUT("mypage/recorded-lecture/update/{recorded_id}")
+    @PUT("recorded-lecture/mypage/update/{recorded_id}")
     suspend fun updateLecture(
         @Path("recorded_id") id: Long,
         @Body lecture: LectureDetailData
     ): Response<YogaDetailResponse<Boolean>>
 
-    @POST("mypage/recorded-lecture/delete")
+    @POST("recorded-lecture/mypage/delete")
     suspend fun deleteLectures(@Body body: HashMap<String, List<Long>>): Response<YogaDetailResponse<Boolean>>
 
     @POST("recorded-lecture/like/{recorded_id}")
     suspend fun likeLecture(@Path("recorded_id") id: Long): Response<YogaDetailResponse<Boolean>>
+
+    @GET("recorded-lecture/mypage/likelist")
+    suspend fun getLikeLectureList(): Response<YogaResponse<LectureData>>
 
     // Live
     @GET("mypage/live-lecture-manage")

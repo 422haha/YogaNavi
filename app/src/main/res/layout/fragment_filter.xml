@@ -293,19 +293,19 @@
                     android:text="@string/three_months"
                     android:textSize="@dimen/text_medium_large"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/rb_year"
+                    app:layout_constraintEnd_toStartOf="@id/rb_total"
                     app:layout_constraintStart_toEndOf="@id/rb_month"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <RadioButton
-                    android:id="@+id/rb_year"
+                    android:id="@+id/rb_total"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:background="@drawable/selector_radio_button"
                     android:button="@null"
                     android:gravity="center"
-                    android:text="@string/year"
+                    android:text="@string/total"
                     android:textSize="@dimen/text_medium_large"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
