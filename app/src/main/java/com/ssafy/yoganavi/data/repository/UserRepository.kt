@@ -6,7 +6,7 @@ import com.ssafy.yoganavi.data.source.user.UserRequest
 
 interface UserRepository {
 
-    suspend fun logIn(userRequest: UserRequest): DetailResponse<Boolean>
+    suspend fun logIn(userRequest: UserRequest, fcmToken: String): DetailResponse<Boolean>
 
     suspend fun signUp(userRequest: UserRequest): ListResponse<Unit>
 
@@ -25,4 +25,6 @@ interface UserRepository {
     suspend fun logout(): ListResponse<Unit>
 
     suspend fun quit(): ListResponse<Unit>
+
+    suspend fun updateFcmToken(fcmToken: String): ListResponse<Unit>
 }
