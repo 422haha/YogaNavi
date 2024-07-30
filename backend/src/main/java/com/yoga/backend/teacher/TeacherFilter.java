@@ -1,5 +1,8 @@
 package com.yoga.backend.teacher;
 
+/**
+ * 강사 필터 클래스
+ */
 public class TeacherFilter {
 
     private int sorting;
@@ -8,6 +11,7 @@ public class TeacherFilter {
     private String day;
     private int period;
     private int maxLiveNum;
+    private String searchKeyword;
 
     // Getters and setters
 
@@ -57,5 +61,13 @@ public class TeacherFilter {
 
     public void setMaxLiveNum(int maxLiveNum) {
         this.maxLiveNum = maxLiveNum;
+    }
+
+    public String getSearchKeyword() {
+        return searchKeyword;
+    }
+
+    public void setSearchKeyword(String searchKeyword) {
+        this.searchKeyword = searchKeyword;
     }
 }
