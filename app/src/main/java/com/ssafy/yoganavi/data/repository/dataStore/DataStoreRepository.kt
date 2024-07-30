@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.data.repository
+package com.ssafy.yoganavi.data.repository.dataStore
 
 import android.content.Context
 import androidx.datastore.core.DataStore
