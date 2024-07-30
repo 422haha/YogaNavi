@@ -1,9 +1,8 @@
 package com.yoga.backend.teacher;
 
+import com.yoga.backend.common.util.JwtUtil;
 import com.yoga.backend.teacher.dto.DetailedTeacherDto;
 import com.yoga.backend.teacher.dto.TeacherDto;
-import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.members.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,12 +32,13 @@ public class TeacherController {
      */
     @GetMapping
     public ResponseEntity<Map<String, Object>> getAllTeachers(
-        @RequestHeader(value = "sorting", defaultValue = "0") int sorting,
-        @RequestHeader(value = "startTime", defaultValue = "0") long startTime,
-        @RequestHeader(value = "endTime", defaultValue = "86400000") long endTime,
-        @RequestHeader(value = "day", defaultValue = "MON, TUE, WED, THU, FRI, SAT, SUN") String day,
-        @RequestHeader(value = "period", defaultValue = "3") int period,
-        @RequestHeader(value = "maxLiveNum", defaultValue = "1") int maxLiveNum,
+        @RequestParam(value = "sorting", defaultValue = "0") int sorting,
+        @RequestParam(value = "startTime", defaultValue = "0") long startTime,
+        @RequestParam(value = "endTime", defaultValue = "86340000") long endTime,
+        @RequestParam(value = "day", defaultValue = "MON,TUE,WED,THU,FRI,SAT,SUN,") String day,
+        @RequestParam(value = "period", defaultValue = "3") int period,
+        @RequestParam(value = "maxLiveNum", defaultValue = "1") int maxLiveNum,
+        @RequestParam(value = "searchKeyword", defaultValue = "") String searchKeyword,
         @RequestHeader("Authorization") String token) {
 
         // 사용자 ID를 토큰에서 추출
@@ -51,9 +51,46 @@ public class TeacherController {
         filter.setDay(day);
         filter.setPeriod(period);
         filter.setMaxLiveNum(maxLiveNum);
+        filter.setSearchKeyword(searchKeyword);
 
         try {
-            List<TeacherDto> teachers = teacherService.getAllTeachers(filter, userId);
+            List<TeacherDto> teachers;
+            if (searchKeyword.isEmpty()) {
+                teachers = teacherService.getAllTeachers(filter, userId);
+            } else {
+                teachers = teacherService.searchTeachers(filter, userId, searchKeyword);
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "success");
+            response.put("data", teachers);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "서버 내부 오류가 발생했습니다");
+            errorResponse.put("data", null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    /**
+     * 정렬된 강사 목록을 가져옵니다.
+     *
+     * @param sorting 정렬 방식 (0: 최신순, 1: 인기순)
+     * @param token   인증 토큰
+     * @return 정렬된 강사 목록
+     */
+    @GetMapping("/sort/{sorting}")
+    public ResponseEntity<Map<String, Object>> getSortedTeachers(
+        @PathVariable int sorting,
+        @RequestParam(value = "searchKeyword", defaultValue = "") String searchKeyword,
+        @RequestHeader("Authorization") String token) {
+
+        // 사용자 ID를 토큰에서 추출
+        int userId = jwtUtil.getUserIdFromToken(token);
+
+        try {
+            List<TeacherDto> teachers = teacherService.getSortedTeachers(sorting, userId);
             Map<String, Object> response = new HashMap<>();
             response.put("message", "success");
             response.put("data", teachers);
