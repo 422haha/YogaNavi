@@ -11,6 +11,7 @@ import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
+import com.ssafy.yoganavi.data.source.teacher.FilterData
 import com.ssafy.yoganavi.data.source.info.InfoDataSource
 import com.ssafy.yoganavi.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
@@ -34,8 +35,8 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toDetailResponse()
     }
 
-    override suspend fun getTeacherList(): ListResponse<TeacherData> {
-        val response = withContext(ioDispatcher) { infoDataSource.getTeacherList() }
+    override suspend fun getTeacherList(filter: FilterData): ListResponse<TeacherData> {
+        val response = withContext(ioDispatcher) { infoDataSource.getTeacherList(filter) }
         return response.toListResponse()
     }
 
