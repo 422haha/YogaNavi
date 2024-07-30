@@ -153,11 +153,7 @@
         tools:layout="@layout/fragment_lecture_detail">
         <action
             android:id="@+id/action_lectureDetailFragment_to_lectureVideoFragment"
-            app:destination="@id/lectureVideoFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
+            app:destination="@id/lectureVideoFragment"/>
         <argument
             android:name="recordedId"
             android:defaultValue="-1L"
