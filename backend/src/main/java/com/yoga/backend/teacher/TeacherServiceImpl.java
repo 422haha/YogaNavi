@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
-import java.time.ZoneId;
 import java.util.stream.Collectors;
 
 /**
@@ -36,54 +36,44 @@ public class TeacherServiceImpl implements TeacherService {
         this.s3Service = s3Service;
     }
 
+    /**
+     * 모든 강사 정보를 조회합니다.
+     *
+     * @param filter 필터 조건
+     * @param userId 사용자 ID
+     * @return 강사 정보 리스트
+     */
     @Override
     @Transactional(readOnly = true)
     public List<TeacherDto> getAllTeachers(TeacherFilter filter, int userId) {
-        List<Users> users = teacherRepository.findAllTeachers();
         LocalDate now = LocalDate.now();
+        long weekAfter = now.plusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toInstant()
+            .toEpochMilli();
+        long monthAfter = now.plusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant()
+            .toEpochMilli();
+        long threeMonthsAfter = now.plusMonths(3).atStartOfDay(ZoneId.systemDefault()).toInstant()
+            .toEpochMilli();
+
+        List<Users> users = teacherRepository.findTeachersByLectureFilter(
+            filter.getStartTime(),
+            filter.getEndTime(),
+            filter.getDay(),
+            filter.getPeriod(),
+            weekAfter,
+            monthAfter,
+            threeMonthsAfter,
+            filter.getMaxLiveNum()
+        );
 
         return users.stream()
             .filter(user -> {
-                boolean hasValidLecture = user.getLiveLectures().stream().anyMatch(lecture -> {
-                    // 시작 시간과 종료 시간 필터링
-                    boolean isValidTime = lecture.getStartTime().toEpochMilli() >= filter.getStartTime() &&
-                        lecture.getEndTime().toEpochMilli() <= filter.getEndTime();
-
-                    // 요일 필터링
-                    boolean isValidDay = true;
-                    if (!filter.getDay().equals("MON, TUE, WED, THU, FRI, SAT, SUN")) {
-                        for (String day : filter.getDay().split(", ")) {
-                            if (!lecture.getAvailableDay().contains(day.trim())) {
-                                isValidDay = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    // 기간 필터링
-                    boolean isValidPeriod = switch (filter.getPeriod()) {
-                        case 0 -> lecture.getEndDate().toEpochMilli() > now.plusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-                        case 1 -> lecture.getEndDate().toEpochMilli() > now.plusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-                        case 2 -> lecture.getEndDate().toEpochMilli() > now.plusMonths(3).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-                        case 3 -> true; // 무기한
-                        default -> false;
-                    };
-
-                    return isValidTime && isValidDay && isValidPeriod;
-                });
-
-                // maxLiveNum 필터링
-                boolean isValidMaxLiveNum = filter.getMaxLiveNum() == 1 ||
-                    user.getLiveLectures().stream()
-                        .anyMatch(lecture -> lecture.getMaxLiveNum() == filter.getMaxLiveNum());
-
-                return hasValidLecture && isValidMaxLiveNum;
-            })
-            .sorted((user1, user2) -> {
-                // 좋아요 수 기준 정렬
-                int user1Likes = user1.getTeacherLikes().size();
-                int user2Likes = user2.getTeacherLikes().size();
-                return Integer.compare(user2Likes, user1Likes); // 내림차순 정렬
+                if (filter.getSearchKeyword() == null || filter.getSearchKeyword().isEmpty()) {
+                    return true;
+                }
+                return user.getNickname().contains(filter.getSearchKeyword()) ||
+                    user.getEmail().contains(filter.getSearchKeyword()) ||
+                    user.getHashtags().stream()
+                        .anyMatch(hashtag -> hashtag.getName().contains(filter.getSearchKeyword()));
             })
             .map(user -> {
                 String profileImageUrl = null;
@@ -120,6 +110,13 @@ public class TeacherServiceImpl implements TeacherService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * 특정 강사 정보를 ID로 조회합니다.
+     *
+     * @param teacherId 강사 ID
+     * @param userId    사용자 ID
+     * @return 상세 강사 정보
+     */
     @Override
     @Transactional(readOnly = true)
     public DetailedTeacherDto getTeacherById(int teacherId, int userId) {
@@ -195,6 +192,13 @@ public class TeacherServiceImpl implements TeacherService {
             .build();
     }
 
+    /**
+     * 좋아요 상태를 토글합니다.
+     *
+     * @param teacherId 강사 ID
+     * @param userId    사용자 ID
+     * @return 좋아요 상태 (true: 좋아요 추가, false: 좋아요 취소)
+     */
     @Override
     @Transactional
     public boolean toggleLike(int teacherId, int userId) {
@@ -216,6 +220,168 @@ public class TeacherServiceImpl implements TeacherService {
         }
     }
 
+    /**
+     * 정렬된 강사 정보를 조회합니다.
+     *
+     * @param sorting 정렬 기준 (0: 최신순, 1: 인기순)
+     * @param userId  사용자 ID
+     * @return 정렬된 강사 정보 리스트
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<TeacherDto> getSortedTeachers(int sorting, int userId) {
+        List<Users> users = teacherRepository.findAllTeachers();
+
+        return users.stream()
+            .map(user -> {
+                String profileImageUrl = null;
+                String profileImageUrlSmall = null;
+                try {
+                    if (user.getProfile_image_url() != null) {
+                        profileImageUrl = s3Service.generatePresignedUrl(
+                            user.getProfile_image_url(), URL_EXPIRATION_SECONDS);
+                    }
+                    if (user.getProfile_image_url_small() != null) {
+                        profileImageUrlSmall = s3Service.generatePresignedUrl(
+                            user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Presigned URL 생성 오류: " + e.getMessage());
+                }
+
+                boolean likedByUser =
+                    teacherLikeRepository.findByTeacherAndUser(user, getUserById(userId)) != null;
+
+                return TeacherDto.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .nickname(user.getNickname())
+                    .profileImageUrl(profileImageUrl)
+                    .profileImageUrlSmall(profileImageUrlSmall)
+                    .content(user.getContent())
+                    .hashtags(user.getHashtags().stream().map(Hashtag::getName)
+                        .collect(Collectors.toSet()))
+                    .liked(likedByUser)
+                    .likeCount(user.getTeacherLikes().size())
+                    .build();
+            })
+            .sorted((user1, user2) -> {
+                if (sorting == 0) {
+                    return Integer.compare(user2.getId(), user1.getId());
+                } else {
+                    return Integer.compare(user2.getLikeCount(), user1.getLikeCount());
+                }
+            })
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * 검색 조건에 맞는 강사 정보를 조회합니다.
+     *
+     * @param filter  필터 조건
+     * @param userId  사용자 ID
+     * @param keyword 검색 키워드
+     * @return 강사 정보 리스트
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<TeacherDto> searchTeachers(TeacherFilter filter, int userId, String keyword) {
+        List<Users> users = teacherRepository.findAllTeachers();
+
+        return users.stream()
+            .filter(user -> user.getNickname().contains(keyword) ||
+                user.getEmail().contains(keyword) ||
+                user.getHashtags().stream()
+                    .anyMatch(hashtag -> hashtag.getName().contains(keyword)))
+            .map(user -> {
+                String profileImageUrl = null;
+                String profileImageUrlSmall = null;
+                try {
+                    if (user.getProfile_image_url() != null) {
+                        profileImageUrl = s3Service.generatePresignedUrl(
+                            user.getProfile_image_url(), URL_EXPIRATION_SECONDS);
+                    }
+                    if (user.getProfile_image_url_small() != null) {
+                        profileImageUrlSmall = s3Service.generatePresignedUrl(
+                            user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Presigned URL 생성 오류: " + e.getMessage());
+                }
+
+                boolean likedByUser =
+                    teacherLikeRepository.findByTeacherAndUser(user, getUserById(userId)) != null;
+
+                return TeacherDto.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .nickname(user.getNickname())
+                    .profileImageUrl(profileImageUrl)
+                    .profileImageUrlSmall(profileImageUrlSmall)
+                    .content(user.getContent())
+                    .hashtags(user.getHashtags().stream().map(Hashtag::getName)
+                        .collect(Collectors.toSet()))
+                    .liked(likedByUser)
+                    .likeCount(user.getTeacherLikes().size())
+                    .build();
+            })
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * 해시태그로 강사 정보를 조회합니다.
+     *
+     * @param hashtag 해시태그
+     * @param userId  사용자 ID
+     * @return 강사 정보 리스트
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<TeacherDto> searchTeachersByHashtag(String hashtag, int userId) {
+        List<Users> users = teacherRepository.findTeachersByHashtag(hashtag);
+
+        return users.stream()
+            .map(user -> {
+                String profileImageUrl = null;
+                String profileImageUrlSmall = null;
+                try {
+                    if (user.getProfile_image_url() != null) {
+                        profileImageUrl = s3Service.generatePresignedUrl(
+                            user.getProfile_image_url(), URL_EXPIRATION_SECONDS);
+                    }
+                    if (user.getProfile_image_url_small() != null) {
+                        profileImageUrlSmall = s3Service.generatePresignedUrl(
+                            user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Presigned URL 생성 오류: " + e.getMessage());
+                }
+
+                boolean likedByUser =
+                    teacherLikeRepository.findByTeacherAndUser(user, getUserById(userId)) != null;
+
+                return TeacherDto.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .nickname(user.getNickname())
+                    .profileImageUrl(profileImageUrl)
+                    .profileImageUrlSmall(profileImageUrlSmall)
+                    .content(user.getContent())
+                    .hashtags(user.getHashtags().stream().map(Hashtag::getName)
+                        .collect(Collectors.toSet()))
+                    .liked(likedByUser)
+                    .likeCount(user.getTeacherLikes().size())
+                    .build();
+            })
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * 사용자 ID로 사용자 정보를 조회합니다.
+     *
+     * @param userId 사용자 ID
+     * @return 사용자 정보
+     */
     private Users getUserById(int userId) {
         return teacherRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
