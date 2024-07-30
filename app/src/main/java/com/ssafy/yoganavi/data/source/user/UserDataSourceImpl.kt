@@ -9,8 +9,8 @@ import javax.inject.Singleton
 @Singleton
 class UserDataSourceImpl @Inject constructor(private val userAPI: UserAPI) : UserDataSource {
 
-    override suspend fun logIn(userRequest: UserRequest): Response<YogaDetailResponse<Boolean>> =
-        userAPI.login(userRequest.email, userRequest.password)
+    override suspend fun logIn(userRequest: UserRequest, fcmToken: String): Response<YogaDetailResponse<Boolean>> =
+        userAPI.login(userRequest.email, userRequest.password, fcmToken)
 
     override suspend fun signUp(userRequest: UserRequest): Response<YogaResponse<Unit>> =
         userAPI.signUp(userRequest)
@@ -39,4 +39,6 @@ class UserDataSourceImpl @Inject constructor(private val userAPI: UserAPI) : Use
     override suspend fun quit(): Response<YogaResponse<Unit>> =
         userAPI.quit()
 
+    override suspend fun updateFcmToken(fcmToken: String): Response<YogaResponse<Unit>> =
+        userAPI.updateFcmToken(fcmToken)
 }

@@ -18,8 +18,8 @@ class UserRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : UserRepository {
 
-    override suspend fun logIn(userRequest: UserRequest): DetailResponse<Boolean> {
-        val response = withContext(ioDispatcher) { userDataSource.logIn(userRequest) }
+    override suspend fun logIn(userRequest: UserRequest, fcmToken: String): DetailResponse<Boolean> {
+        val response = withContext(ioDispatcher) { userDataSource.logIn(userRequest, fcmToken) }
         return response.toDetailResponse()
     }
 
@@ -65,6 +65,11 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun quit(): ListResponse<Unit> {
         val response = withContext(ioDispatcher) { userDataSource.quit() }
+        return response.toListResponse()
+    }
+
+    override suspend fun updateFcmToken(fcmToken: String): ListResponse<Unit> {
+        val response = withContext(ioDispatcher) { userDataSource.updateFcmToken(fcmToken) }
         return response.toListResponse()
     }
 }

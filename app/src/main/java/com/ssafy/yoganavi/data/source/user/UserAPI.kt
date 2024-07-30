@@ -6,7 +6,9 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 
 interface UserAPI {
 
@@ -14,7 +16,8 @@ interface UserAPI {
     @POST("login")
     suspend fun login(
         @Field("username") username: String,
-        @Field("password") password: String
+        @Field("password") password: String,
+        @Header("FCM-TOKEN") token: String
     ): Response<YogaDetailResponse<Boolean>>
 
     @POST("members/register")
@@ -43,4 +46,9 @@ interface UserAPI {
 
     @POST("delete")
     suspend fun quit(): Response<YogaResponse<Unit>>
+
+    @PUT("fcm")
+    suspend fun updateFcmToken(
+        @Header("FCM-TOKEN") fcmToken: String
+    ): Response<YogaResponse<Unit>>
 }

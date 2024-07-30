@@ -8,11 +8,11 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.repository.DataStoreRepository
+import com.ssafy.yoganavi.data.repository.UserRepository
 import com.ssafy.yoganavi.ui.utils.CHANNEL_DESCRIPTION
 import com.ssafy.yoganavi.ui.utils.CHANNEL_ID
 import com.ssafy.yoganavi.ui.utils.CHANNEL_NAME
@@ -25,46 +25,33 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class LiveFcmService: FirebaseMessagingService() {
-    @Inject
-    lateinit var dataStoreRepository: DataStoreRepository
-
-//    @Throws(IOException::class)
-//    private fun getAccessToken(): String {
-//        val googleCredentials: GoogleCredentials =
-//            GoogleCredentials.fromStream(FileInputStream("service-account.json")).createScoped(Arrays.asList(SCOPES))
-//        googleCredentials.refreshAccessToken()
-//        return googleCredentials.getAccessToken().getTokenValue()
-//    }
+class LiveFcmService @Inject constructor(
+    private val userRepository: UserRepository,
+    private val dataStoreRepository: DataStoreRepository
+): FirebaseMessagingService() {
 
     // 토큰 만들기
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
         CoroutineScope(Dispatchers.IO).launch {
-            dataStoreRepository.setAccessToken(token)
-        }
-    }
-
-    // 토큰 가져오기
-    fun getFirebaseToken() {
-        //비동기 방식
-        FirebaseMessaging.getInstance().token.addOnSuccessListener {
-            Timber.d("token=${it}")
+            dataStoreRepository.setFcmToken(token)
+            userRepository.updateFcmToken(token)
         }
     }
 
     override fun onCreate() {
         super.onCreate()
+
         createNotificationChannel()
     }
     
-    // 백그라운드 data 처리
-    override fun onMessageReceived(message: RemoteMessage) {
-        super.onMessageReceived(message)
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        super.onMessageReceived(remoteMessage)
 
-        Timber.d("Message data: ${message.data}")
-        sendNotification(message)
+        Timber.d("From: ${remoteMessage.from}")
+
+        sendNotification(remoteMessage)
     }
 
     private fun createNotificationChannel() {
@@ -86,7 +73,6 @@ class LiveFcmService: FirebaseMessagingService() {
         val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val uniId: Int = (System.currentTimeMillis() / 7).toInt()
         val intent = Intent(this, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             remoteMessage.data.forEach { (key, value) ->
@@ -95,7 +81,7 @@ class LiveFcmService: FirebaseMessagingService() {
         }
 
         val pendingIntent = PendingIntent.getActivity(
-            this, uniId, intent,
+            this, 0, intent,
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -108,7 +94,7 @@ class LiveFcmService: FirebaseMessagingService() {
             .setContentIntent(pendingIntent) // 알림 실행 시 Intent
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 중요도 (HIGH: 상단바 표시 가능)
 
-        notificationManager.notify(uniId, notificationBuilder.build())
+        notificationManager.notify(0, notificationBuilder.build())
     }
 }
 

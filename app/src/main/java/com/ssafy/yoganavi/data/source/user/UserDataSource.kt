@@ -6,7 +6,7 @@ import retrofit2.Response
 
 interface UserDataSource {
 
-    suspend fun logIn(userRequest: UserRequest): Response<YogaDetailResponse<Boolean>>
+    suspend fun logIn(userRequest: UserRequest, fcmToken: String): Response<YogaDetailResponse<Boolean>>
 
     suspend fun signUp(userRequest: UserRequest): Response<YogaResponse<Unit>>
 
@@ -25,4 +25,6 @@ interface UserDataSource {
     suspend fun logout(): Response<YogaResponse<Unit>>
 
     suspend fun quit(): Response<YogaResponse<Unit>>
+
+    suspend fun updateFcmToken(fcmToken: String): Response<YogaResponse<Unit>>
 }

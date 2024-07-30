@@ -43,8 +43,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        LiveFcmService().getFirebaseToken()
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
             permissionHandler.branchPermission(Manifest.permission.POST_NOTIFICATIONS, "알림")
 

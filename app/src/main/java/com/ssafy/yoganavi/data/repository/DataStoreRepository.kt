@@ -7,10 +7,13 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,7 +22,7 @@ class DataStoreRepository @Inject constructor(@ApplicationContext val context: C
     private val Context.datastore: DataStore<Preferences> by preferencesDataStore(name = "user")
     private val accessKey = stringPreferencesKey("accessToken")
     private val refreshKey = stringPreferencesKey("refreshToken")
-    private val firebaseKey = stringPreferencesKey("firebaseToken")
+    private val fcmKey = stringPreferencesKey("fcmToken")
 
     val accessToken: Flow<String> = context.datastore.data.catch { emit(emptyPreferences()) }
         .map { preference -> preference[accessKey] ?: "" }
@@ -27,8 +30,8 @@ class DataStoreRepository @Inject constructor(@ApplicationContext val context: C
     val refreshToken: Flow<String> = context.datastore.data.catch { emit(emptyPreferences()) }
         .map { preference -> preference[refreshKey] ?: "" }
 
-    val firebaseToken: Flow<String> = context.datastore.data.catch { emit(emptyPreferences()) }
-        .map { preference -> preference[firebaseKey] ?: "" }
+    private val firebaseToken: Flow<String> = context.datastore.data.catch { emit(emptyPreferences()) }
+        .map { preference -> preference[fcmKey] ?: "" }
 
     suspend fun setAccessToken(accessToken: String) = context.datastore.edit { preference ->
         preference[accessKey] = accessToken
@@ -38,8 +41,20 @@ class DataStoreRepository @Inject constructor(@ApplicationContext val context: C
         preference[refreshKey] = refreshToken
     }
 
-    suspend fun setFirebaseToken(firebaseToken: String) = context.datastore.edit { preference ->
-        preference[firebaseKey] = firebaseToken
+    suspend fun setFcmToken(firebaseToken: String) = context.datastore.edit { preference ->
+        preference[fcmKey] = firebaseToken
+    }
+
+    suspend fun getFirebaseToken(): String {
+        var token = firebaseToken.firstOrNull() ?: ""
+
+        if(token.isBlank()) {
+            token = FirebaseMessaging.getInstance().token.await() ?: ""
+
+            setFcmToken(token)
+        }
+
+        return token
     }
 
     suspend fun clearToken() = context.datastore.edit { preference ->
