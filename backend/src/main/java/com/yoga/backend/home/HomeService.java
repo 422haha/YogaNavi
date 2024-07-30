@@ -2,6 +2,7 @@ package com.yoga.backend.home;
 
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
+import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.util.JwtUtil;
 import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.livelectures.LiveLectureRepository;
