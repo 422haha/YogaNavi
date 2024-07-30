@@ -8,6 +8,7 @@ data class TeacherData(
     val teacherName: String,
     @SerializedName("profileImageUrl")
     val teacherProfile: String,
+    @SerializedName("profileImageUrlSmall")
     val teacherSmallProfile: String,
     @SerializedName("id")
     val teacherId: Int,
