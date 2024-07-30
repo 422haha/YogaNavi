@@ -2,7 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.registerLive
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.yoganavi.data.repository.InfoRepository
+import com.ssafy.yoganavi.data.repository.info.InfoRepository
 import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
 import com.ssafy.yoganavi.ui.utils.Week
 import dagger.hilt.android.lifecycle.HiltViewModel

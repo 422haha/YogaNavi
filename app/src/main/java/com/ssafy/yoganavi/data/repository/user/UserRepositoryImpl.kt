@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.data.repository
+package com.ssafy.yoganavi.data.repository.user
 
 import com.ssafy.yoganavi.data.repository.response.DetailResponse
 import com.ssafy.yoganavi.data.repository.response.ListResponse

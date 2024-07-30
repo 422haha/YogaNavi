@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.data.repository
+package com.ssafy.yoganavi.data.repository.lecture
 
 import androidx.paging.PagingData
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
