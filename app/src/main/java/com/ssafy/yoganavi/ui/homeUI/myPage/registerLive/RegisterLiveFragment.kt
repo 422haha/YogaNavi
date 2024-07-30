@@ -32,7 +32,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
@@ -91,9 +90,6 @@ class RegisterLiveFragment :
                         tieEnd.isEnabled = false
                         viewModel.liveLectureData.endDate = addYear(viewModel.liveLectureData.startDate)
                         tieEnd.setText(formatDotDate(viewModel.liveLectureData.endDate))
-
-                        Timber.d("로오오그 ${viewModel.liveLectureData.startDate}")
-                        Timber.d("로오오그 ${viewModel.liveLectureData.endDate}")
                     } else {
                         tieEnd.isEnabled = true
                         viewModel.liveLectureData.endDate = 0L
