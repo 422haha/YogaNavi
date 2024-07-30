@@ -1,6 +1,6 @@
 package com.ssafy.yoganavi.data.auth
 
-import com.ssafy.yoganavi.data.repository.DataStoreRepository
+import com.ssafy.yoganavi.data.repository.dataStore.DataStoreRepository
 import com.ssafy.yoganavi.ui.utils.MEMBER
 import com.ssafy.yoganavi.ui.utils.NEED_REFRESH_TOKEN
 import com.ssafy.yoganavi.ui.utils.REFRESH_TOKEN

@@ -11,8 +11,8 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.ssafy.yoganavi.R
-import com.ssafy.yoganavi.data.repository.DataStoreRepository
-import com.ssafy.yoganavi.data.repository.UserRepository
+import com.ssafy.yoganavi.data.repository.dataStore.DataStoreRepository
+import com.ssafy.yoganavi.data.repository.user.UserRepository
 import com.ssafy.yoganavi.ui.utils.CHANNEL_DESCRIPTION
 import com.ssafy.yoganavi.ui.utils.CHANNEL_ID
 import com.ssafy.yoganavi.ui.utils.CHANNEL_NAME

@@ -2,8 +2,8 @@ package com.ssafy.yoganavi.ui.core
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.yoganavi.data.repository.DataStoreRepository
-import com.ssafy.yoganavi.data.repository.UserRepository
+import com.ssafy.yoganavi.data.repository.dataStore.DataStoreRepository
+import com.ssafy.yoganavi.data.repository.user.UserRepository
 import com.ssafy.yoganavi.data.repository.response.ListResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

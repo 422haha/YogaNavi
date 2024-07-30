@@ -15,6 +15,9 @@ import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.fragment.findNavController
@@ -24,6 +27,8 @@ import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.core.MainActivity
 import com.ssafy.yoganavi.ui.utils.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
 @AndroidEntryPoint
@@ -33,15 +38,15 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
     private val args by navArgs<LectureVideoFragmentArgs>()
     private val viewModel: LectureVideoViewModel by viewModels()
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         PermissionHelper(this, arrayOf(Manifest.permission.CAMERA), ::popBack)
             .launchPermission()
 
-        initCamera()
         setVideo()
         setFullscreen()
+        initCamera()
+        initCollect()
 
         requireActivity().onBackPressedDispatcher
             .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
@@ -49,6 +54,18 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
                     popBack()
                 }
             })
+    }
+
+    private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.keyPoints.collectLatest {
+                drawKeyPoints(it)
+            }
+        }
+    }
+
+    private fun drawKeyPoints(keyPoints: List<FloatArray>) {
+        binding.poseView.updateKeyPoints(keyPoints)
     }
 
     private fun setVideo() = with(binding) {
@@ -121,7 +138,7 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
             .build()
             .apply {
                 setAnalyzer(Executors.newSingleThreadExecutor()) {
-                    viewModel.inferImage(it)
+                    viewModel.inferImage(it, binding.poseView.width, binding.poseView.height)
                 }
             }
 
