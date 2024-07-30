@@ -2,7 +2,6 @@ package com.yoga.backend.teacher.dto;
 
 import java.util.List;
 import java.util.Set;
-
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,6 +21,8 @@ public class DetailedTeacherDto {
     private Set<String> hashtags;
     private List<LectureDto> recordedLectures;
     private List<NoticeDto> notices;
+    private int likeCount;
+    private boolean liked;
 
     /**
      * DetailedTeacherDto 생성자
@@ -35,10 +36,13 @@ public class DetailedTeacherDto {
      * @param hashtags             강사 해시태그
      * @param recordedLectures     녹화 강의 리스트
      * @param notices              공지 리스트
+     * @param likeCount            좋아요 수
+     * @param liked                좋아요 여부
      */
     public DetailedTeacherDto(int id, String email, String nickname, String profileImageUrl,
         String profileImageUrlSmall, String content, Set<String> hashtags,
-        List<LectureDto> recordedLectures, List<NoticeDto> notices) {
+        List<LectureDto> recordedLectures, List<NoticeDto> notices, int likeCount,
+        boolean liked) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
@@ -48,6 +52,8 @@ public class DetailedTeacherDto {
         this.hashtags = hashtags;
         this.recordedLectures = recordedLectures;
         this.notices = notices;
+        this.likeCount = likeCount;
+        this.liked = liked;
     }
 
     /**
