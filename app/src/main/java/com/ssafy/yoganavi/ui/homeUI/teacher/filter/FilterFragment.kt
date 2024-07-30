@@ -55,51 +55,56 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
         initListener()
     }
 
-    private fun initView(){
-        viewModel.filter = args.filter?: FilterData()
-        if(viewModel.filter.sorting==0){
+    private fun initView() {
+        viewModel.filter = args.filter ?: FilterData()
+        if (viewModel.filter.sorting == 0) {
             binding.rbRecent.isChecked = true
             binding.rbPopular.isChecked = false
-        }
-        else{
+        } else {
             binding.rbPopular.isChecked = true
             binding.rbRecent.isChecked = false
         }
 
-        binding.btnStartTime.text = (if (viewModel.filter.startTime > 0L) (viewModel.filter.startTime / 3600000).toInt().toString() else "00") + ":"+if (viewModel.filter.startTime > 0L && ((viewModel.filter.startTime % 3600000) > 0L)) ((viewModel.filter.startTime % 3600000) / 60000).toInt().toString() else "00"
-        binding.btnEndTime.text = (if (viewModel.filter.endTime > 0L) ((viewModel.filter.endTime / 3600000).toInt()).toString() else "12") + ":"+if (viewModel.filter.endTime > 0L && ((viewModel.filter.endTime % 3600000) > 0L)) ((viewModel.filter.endTime % 3600000) / 60000).toInt().toString() else "00"
+        binding.btnStartTime.text =
+            (if (viewModel.filter.startTime > 0L) (viewModel.filter.startTime / 3600000).toInt()
+                .toString() else "00") + ":" + if (viewModel.filter.startTime > 0L && ((viewModel.filter.startTime % 3600000) > 0L)) ((viewModel.filter.startTime % 3600000) / 60000).toInt()
+                .toString() else "00"
+        binding.btnEndTime.text =
+            (if (viewModel.filter.endTime > 0L) ((viewModel.filter.endTime / 3600000).toInt()).toString() else "12") + ":" + if (viewModel.filter.endTime > 0L && ((viewModel.filter.endTime % 3600000) > 0L)) ((viewModel.filter.endTime % 3600000) / 60000).toInt()
+                .toString() else "00"
 
         viewModel.filter.day.split(",").forEach {
             viewModel.dayStatusMap[Week.valueOf(it.trim())] = true
         }
         weekToggleButtonMap.forEach { (day, toggleBtn) ->
-            toggleBtn.isChecked = viewModel.dayStatusMap[day]?:false
+            toggleBtn.isChecked = viewModel.dayStatusMap[day] ?: false
         }
 
-        when(viewModel.filter.period){
+        when (viewModel.filter.period) {
             0 -> binding.rbWeek.isChecked = true
             1 -> binding.rbMonth.isChecked = true
             2 -> binding.rbThreeMonth.isChecked = true
             3 -> binding.rbTotal.isChecked = true
         }
-        if(viewModel.filter.maxLiveNum==0){
+        if (viewModel.filter.maxLiveNum == 0) {
             binding.rbOneToOne.isChecked = true
-        }
-        else{
+        } else {
             binding.rbOneToMulti.isChecked = true
         }
     }
+
     private fun showTimePicker(state: Int) {
         val title: String = if (state == START) "시작" else "종료"
 
-        val prevTime: Long = if(state == START) viewModel.filter.startTime
-        else if(state == END) viewModel.filter.endTime
+        val prevTime: Long = if (state == START) viewModel.filter.startTime
+        else if (state == END) viewModel.filter.endTime
         else 0
 
         val prevHour: Int = if (prevTime > 0L) (prevTime / 3600000).toInt()
         else 0
-        val prevMinute: Int = if (prevTime > 0L && ((prevTime % 3600000) > 0L)) ((prevTime % 3600000) / 60000).toInt()
-        else 0
+        val prevMinute: Int =
+            if (prevTime > 0L && ((prevTime % 3600000) > 0L)) ((prevTime % 3600000) / 60000).toInt()
+            else 0
         Timber.d("싸피 ${prevHour} : ${prevMinute} 원래는 ${prevTime}")
 
         val materialTimePicker = MaterialTimePicker.Builder()
@@ -118,10 +123,10 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
             val pickTime: Long =
                 ((materialTimePicker.hour * 3600) + (materialTimePicker.minute * 60)).toLong()
 
-            if(state == START) {
+            if (state == START) {
                 binding.btnStartTime.text = timeStr
                 viewModel.filter.startTime = pickTime
-            } else if(state == END) {
+            } else if (state == END) {
                 binding.btnEndTime.text = timeStr
                 viewModel.filter.endTime = pickTime
             }
@@ -134,8 +139,7 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
         binding.btnFilterSave.setOnClickListener {
             if (!weekToggleButtonMap.values.any { it.isChecked }) {
                 showSnackBar("요일을 선택하세요!")
-            }
-            else{
+            } else {
                 goBackStack()
             }
         }
@@ -148,10 +152,9 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
     }
 
     private fun goBackStack() {
-        if(binding.rbRecent.isChecked){
+        if (binding.rbRecent.isChecked) {
             viewModel.filter.sorting = 0
-        }
-        else{
+        } else {
             viewModel.filter.sorting = 1
         }
 
@@ -159,24 +162,21 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
             viewModel.dayStatusMap[day] = toggleBtn.isChecked
         }
 
-        viewModel.filter.day = viewModel.dayStatusMap.filter { it.value }.keys.joinToString(",") // “MON,WED,SUN” 처럼 저장됨
-        if(binding.rbWeek.isChecked){
+        viewModel.filter.day =
+            viewModel.dayStatusMap.filter { it.value }.keys.joinToString(",") // “MON,WED,SUN” 처럼 저장됨
+        if (binding.rbWeek.isChecked) {
             viewModel.filter.period = 0
-        }
-        else if(binding.rbMonth.isChecked){
+        } else if (binding.rbMonth.isChecked) {
             viewModel.filter.period = 1
-        }
-        else if(binding.rbThreeMonth.isChecked){
+        } else if (binding.rbThreeMonth.isChecked) {
             viewModel.filter.period = 2
-        }
-        else{
+        } else {
             viewModel.filter.period = 3
         }
 
-        if(binding.rbOneToOne.isChecked){
+        if (binding.rbOneToOne.isChecked) {
             viewModel.filter.maxLiveNum = 0
-        }
-        else{
+        } else {
             viewModel.filter.maxLiveNum = 1
         }
         val directions = FilterFragmentDirections
