@@ -1,4 +1,4 @@
-package com.yoga.backend.common.service;
+package com.yoga.backend.fcm;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -39,5 +39,14 @@ public class FCMService {
             System.out.println("메시지 전송 성공 " + response);
         }
 
+    }
+
+    public void setNewFcm(String fcmToken, int userId) {
+        Optional<Users> users = usersRepository.findById(userId);
+        if (users.isPresent()) {
+            Users user = users.get();
+            user.setFcmToken(fcmToken);
+            usersRepository.save(user);
+        }
     }
 }

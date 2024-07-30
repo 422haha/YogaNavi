@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 public class LiveLectureResponseDto {
 
-    private Integer liveId; // 화상 강의 ID
+    private Long liveId; // 화상 강의 ID
     private Long regDate; // 강의 등록 시간
 
     private int userId; // 강사 ID
