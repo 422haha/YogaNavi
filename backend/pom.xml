@@ -155,11 +155,19 @@
       <artifactId>spring-boot-starter-data-redis</artifactId>
     </dependency>
 
-
+    <!-- logging -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-logging</artifactId>
     </dependency>
+
+    <!-- https://mvnrepository.com/artifact/com.google.firebase/firebase-admin -->
+    <dependency>
+      <groupId>com.google.firebase</groupId>
+      <artifactId>firebase-admin</artifactId>
+      <version>9.3.0</version>
+    </dependency>
+
   </dependencies>
   <repositories>
     <repository>

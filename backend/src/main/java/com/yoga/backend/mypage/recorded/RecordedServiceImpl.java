@@ -31,9 +31,9 @@ import java.util.List;
 
 
 /**
- * @TODO 업데이트 하고 안쓰는 애들 삭제 시 잘 생성된것도 삭제됨.
- * <p>
- * 녹화 강의 관련 비즈니스 로직을 처리하는 서비스 구현 클래스. 강의 목록 조회, 강의 생성, 수정, 삭제 및 좋아요 기능을 제공.
+ *
+ *
+ * 녹화 강의 관련 비즈니스 로직을 처리하는 서비스 구현 클래스. 강의 목록 조회, 강의 생성, 수정, 삭제 및 좋아요 기능 제공.
  */
 @Slf4j
 @Service
@@ -43,7 +43,7 @@ public class RecordedServiceImpl implements RecordedService {
     private static final String S3_BASE_URL = "https://yoga-navi.s3.ap-northeast-2.amazonaws.com/";
 
     private final S3Service s3Service;
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
     private final RecordedLectureRepository recordedLectureRepository;
     private final RecordedLectureListRepository recordedLectureListRepository;
     private final MyLikeLectureListRepository myLikeLectureListRepository;
@@ -90,7 +90,7 @@ public class RecordedServiceImpl implements RecordedService {
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LectureDto> getLikeLectures(int userId) {
         List<LectureDto> lectures = myLikeLectureListRepository.findMyLikedLectures(userId);
-        return generatePresignedUrlsLike(lectures);
+        return applyPresignedUrls(lectures);
     }
 
     /**
@@ -484,14 +484,6 @@ public class RecordedServiceImpl implements RecordedService {
         dto.setRecordedLectureChapters(chapterDtos);
 
         return dto;
-    }
-
-    private List<LectureDto> generatePresignedUrlsLike(List<LectureDto> lectures) {
-        for (LectureDto lecture : lectures) {
-            lecture.setRecordThumbnail(s3Service.generatePresignedUrl(lecture.getRecordThumbnail(),
-                URL_EXPIRATION_SECONDS)); // 1 hour expiration
-        }
-        return lectures;
     }
 
     private List<LectureDto> applyPresignedUrls(List<LectureDto> lectures) {

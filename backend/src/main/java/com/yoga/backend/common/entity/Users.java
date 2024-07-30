@@ -83,6 +83,9 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     @Column(nullable = false)
     private Boolean isDeleted = false;
 
+    @Column(length = 512)
+    private String fcmToken;
+
     public int getId() {
         return id;
     }
@@ -260,4 +263,11 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
         this.isDeleted = isDeleted;
     }
 
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
 }

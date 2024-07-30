@@ -87,7 +87,7 @@ public class RecordedLectureListRepository {
             .fetch();
     }
 
-    // 검색 조건을 생성하는 메소드
+    // 검색 조건을 생성
     private BooleanExpression createSearchCondition(QRecordedLecture lecture, List<String> keywords,
         boolean searchTitle, boolean searchContent) {
         BooleanExpression titleCondition = null;

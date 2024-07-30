@@ -39,13 +39,17 @@ public class ProjectSecurityConfig {
 
     @Bean
     public CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler() {
-        return new CustomAuthenticationSuccessHandler(jwtUtil);
+        return new CustomAuthenticationSuccessHandler(jwtUtil, userRepository);
     }
 
     @Bean
     public JWTTokenValidatorFilter jwtTokenValidatorFilter() {
-        return new JWTTokenValidatorFilter(userRepository, jwtUtil);
+        return new JWTTokenValidatorFilter(jwtUtil);
     }
+
+//    @Bean FcmFilter fcmFilter() {
+//        return new FcmFilter(jwtUtil, userRepository);
+//    }
 
     /**
      * 기본 보안 필터 체인을 구성
