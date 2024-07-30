@@ -8,6 +8,7 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.media3.common.util.NotificationUtil.createNotificationChannel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.ssafy.yoganavi.R
@@ -17,20 +18,23 @@ import com.ssafy.yoganavi.ui.utils.CHANNEL_DESCRIPTION
 import com.ssafy.yoganavi.ui.utils.CHANNEL_ID
 import com.ssafy.yoganavi.ui.utils.CHANNEL_NAME
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.UUID
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class LiveFcmService @Inject constructor(
-    private val userRepository: UserRepository,
-    private val dataStoreRepository: DataStoreRepository
-): FirebaseMessagingService() {
+class LiveFcmService: FirebaseMessagingService() {
+    @Inject
+    lateinit var userRepository: UserRepository
+    @Inject
+    lateinit var dataStoreRepository: DataStoreRepository
 
-    // 토큰 만들기
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
@@ -39,39 +43,28 @@ class LiveFcmService @Inject constructor(
             userRepository.updateFcmToken(token)
         }
     }
-
-    override fun onCreate() {
-        super.onCreate()
-
-        createNotificationChannel()
-    }
     
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        Timber.d("From: ${remoteMessage.from}")
-
         sendNotification(remoteMessage)
-    }
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = CHANNEL_ID
-            val channelName = CHANNEL_NAME
-            val channelDescription = CHANNEL_DESCRIPTION
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(channelId, channelName, importance).apply {
-                description = channelDescription
-            }
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
     }
 
     private fun sendNotification(remoteMessage: RemoteMessage) {
         val channelId = CHANNEL_ID
         val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val uniId: Int = UUID.randomUUID().hashCode()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelName = CHANNEL_NAME
+            val channelDescription = CHANNEL_DESCRIPTION
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(channelId, channelName, importance).apply {
+                description = channelDescription
+            }
+            notificationManager.createNotificationChannel(channel)
+        }
 
         val intent = Intent(this, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -80,21 +73,22 @@ class LiveFcmService @Inject constructor(
             }
         }
 
-        val uniId: Int = (System.currentTimeMillis() / 7).toInt()
-
         val pendingIntent = PendingIntent.getActivity(
             this, uniId, intent,
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val title = remoteMessage.notification?.title ?: remoteMessage.data["title"]
+        val body = remoteMessage.notification?.body ?: remoteMessage.data["body"]
+
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.mipmap.ic_launcher) // 아이콘 설정
-            .setContentTitle(remoteMessage.data["title"].toString()) // 제목
-            .setContentText(remoteMessage.data["body"].toString()) // 메시지 내용
-            .setAutoCancel(true) // 알람클릭시 삭제여부
+            .setContentTitle(title) // 제목
+            .setContentText(body) // 메시지 내용
+            .setAutoCancel(true) // 알람 클릭시 삭제여부
             .setSound(soundUri) // 알림 소리
             .setContentIntent(pendingIntent) // 알림 실행 시 Intent
-            .setPriority(NotificationCompat.PRIORITY_HIGH) // 중요도 (HIGH: 상단바 표시 가능)
+            .setPriority(NotificationCompat.PRIORITY_MAX) // 중요도 (HIGH: 상단바 표시 가능)
 
         notificationManager.notify(uniId, notificationBuilder.build())
     }
