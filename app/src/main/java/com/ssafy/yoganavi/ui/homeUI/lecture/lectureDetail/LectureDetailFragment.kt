@@ -88,7 +88,7 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
             .toList()
             .toTypedArray()
 
-        val directions =LectureDetailFragmentDirections
+        val directions = LectureDetailFragmentDirections
             .actionLectureDetailFragmentToLectureVideoFragment(uriList = uriList)
 
         findNavController().navigate(directions)
