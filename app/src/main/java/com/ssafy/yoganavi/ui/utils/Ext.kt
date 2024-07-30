@@ -59,6 +59,7 @@ const val DELETE = "삭제"
 const val MAX_HASH_TAG = 5
 const val IS_MAX_HASH_TAG = "해시태그는 5개까지만 등록하실 수 있습니다."
 const val LECTURE_LIST = "강의 찾기"
+const val LECTURE = "강의"
 const val FAME = "fame"
 const val DATE = "date"
 const val ANY_CHECK_BOX = "찾을 파트를 선택해주세요!"
@@ -66,6 +67,10 @@ const val ANY_CHECK_BOX = "찾을 파트를 선택해주세요!"
 // 캘린더, 타임 Picker
 const val START = 1
 const val END = 2
+
+// 강의 Header, Item
+const val HEADER = 1
+const val ITEM = 2
 
 // 화상강의 등록
 const val END_STR = "종료 날짜"

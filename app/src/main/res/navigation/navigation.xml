@@ -162,7 +162,11 @@
         android:id="@+id/lectureVideoFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.lecture.lectureVideo.LectureVideoFragment"
         android:label="fragment_lecture_video"
-        tools:layout="@layout/fragment_lecture_video" />
+        tools:layout="@layout/fragment_lecture_video" >
+        <argument
+            android:name="uriList"
+            app:argType="string[]" />
+    </fragment>
     <fragment
         android:id="@+id/likeTeacherFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.likeTeacher.LikeTeacherFragment"
