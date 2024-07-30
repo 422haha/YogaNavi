@@ -9,6 +9,7 @@ import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.response.YogaDetailResponse
 import com.ssafy.yoganavi.data.source.response.YogaResponse
+import com.ssafy.yoganavi.data.source.teacher.FilterData
 import retrofit2.Response
 
 interface InfoDataSource {
@@ -18,7 +19,7 @@ interface InfoDataSource {
     suspend fun updateProfile(profile: Profile): Response<YogaDetailResponse<Profile>>
 
     //TEACHER
-    suspend fun getTeacherList(): Response<YogaResponse<TeacherData>>
+    suspend fun getTeacherList(filter : FilterData): Response<YogaResponse<TeacherData>>
 
     // LECTURE
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>

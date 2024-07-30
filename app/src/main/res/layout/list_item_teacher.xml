@@ -27,7 +27,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/tv_hashtag"
-        app:layout_constraintEnd_toStartOf="@id/iv_favorite"
+        app:layout_constraintEnd_toStartOf="@id/cv_favorite"
         app:layout_constraintStart_toEndOf="@+id/iv_profile"
         app:layout_constraintTop_toTopOf="@id/iv_profile"
         app:layout_constraintVertical_chainStyle="spread"
@@ -44,7 +44,7 @@
         app:layout_constraintTop_toBottomOf="@id/tv_teacher_nickname"
         tools:text="#힐링 요가 #요가 마스터 #유연성" />
 
-    <androidx.cardview.widget.CardView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cv_favorite"
         android:layout_width="30dp"
         android:layout_height="30dp"
@@ -65,7 +65,7 @@
             android:layout_height="match_parent"
             android:src="@drawable/favorite_color" />
 
-    </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/tv_count"

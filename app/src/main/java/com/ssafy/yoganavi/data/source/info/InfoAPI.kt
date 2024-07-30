@@ -27,6 +27,7 @@ interface InfoAPI {
 
     //TEACHER
     @GET("teacher")
+//    suspend fun getTeacherList(@Body filter:FilterData): Response<YogaResponse<TeacherData>>
     suspend fun getTeacherList(): Response<YogaResponse<TeacherData>>
 
     // LECTURE
