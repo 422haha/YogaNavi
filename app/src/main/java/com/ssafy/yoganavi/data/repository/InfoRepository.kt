@@ -33,6 +33,8 @@ interface InfoRepository {
 
     suspend fun likeLecture(recordedId: Long): DetailResponse<Boolean>
 
+    suspend fun getLikeLectureList() : ListResponse<LectureData>
+
     // LIVE
     suspend fun getLiveList(): ListResponse<LiveLectureData>
 

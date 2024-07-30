@@ -34,6 +34,8 @@ interface InfoDataSource {
 
     suspend fun likeLecture(recordedId: Long): Response<YogaDetailResponse<Boolean>>
 
+    suspend fun getLikeLectureList(): Response<YogaResponse<LectureData>>
+
     // LIVE
     suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>>
 

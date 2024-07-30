@@ -53,6 +53,9 @@ interface InfoAPI {
     @POST("recorded-lecture/like/{recorded_id}")
     suspend fun likeLecture(@Path("recorded_id") id: Long): Response<YogaDetailResponse<Boolean>>
 
+    @GET("mypage/recorded-lecture/likelist")
+    suspend fun getLikeLectureList(): Response<YogaResponse<LectureData>>
+
     // Live
     @GET("mypage/live-lecture-manage")
     suspend fun getLiveList(): Response<YogaResponse<LiveLectureData>>
