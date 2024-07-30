@@ -29,6 +29,7 @@ public class MyLikeLectureListRepository {
                 Expressions.as(lecture.id, "recordedId"),
                 Expressions.as(lecture.title, "recordTitle"),
                 Expressions.as(lecture.thumbnailSmall, "recordThumbnailSmall"),
+                Expressions.as(lecture.thumbnail, "recordThumbnail"),
                 Expressions.as(JPAExpressions.select(like.id.count())
                     .from(like)
                     .where(like.lecture.eq(lecture)), "likeCount"),

@@ -164,13 +164,6 @@ public class LiveLectureController {
      * @param token  인증 토큰
      * @return 조회 결과 응답
      */
-    /**
-     * 특정 강의를 조회하는 API 엔드포인트.
-     *
-     * @param liveId 조회할 강의 ID
-     * @param token  인증 토큰
-     * @return 조회 결과 응답
-     */
     @GetMapping("/{live_id}")
     public ResponseEntity<Map<String, Object>> getLiveLectureById(
         @PathVariable("live_id") Integer liveId,
