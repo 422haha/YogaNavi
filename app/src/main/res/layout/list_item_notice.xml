@@ -85,9 +85,9 @@
             android:layout_marginTop="@dimen/padding_medium"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
-            android:src="@drawable/sample"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_content" />
+            app:layout_constraintTop_toBottomOf="@id/tv_content"
+            tools:src="@drawable/sample" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
