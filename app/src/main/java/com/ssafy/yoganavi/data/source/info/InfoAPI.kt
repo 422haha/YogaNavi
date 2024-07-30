@@ -9,6 +9,7 @@ import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.response.YogaDetailResponse
 import com.ssafy.yoganavi.data.source.response.YogaResponse
+import com.ssafy.yoganavi.data.source.teacher.FilterData
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -16,6 +17,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface InfoAPI {
 
@@ -27,8 +29,7 @@ interface InfoAPI {
 
     //TEACHER
     @GET("teacher")
-//    suspend fun getTeacherList(@Body filter:FilterData): Response<YogaResponse<TeacherData>>
-    suspend fun getTeacherList(): Response<YogaResponse<TeacherData>>
+    suspend fun getTeacherList(@Query("filter") filter: FilterData): Response<YogaResponse<TeacherData>>
 
     // LECTURE
     @GET("mypage/recorded-lecture/list")

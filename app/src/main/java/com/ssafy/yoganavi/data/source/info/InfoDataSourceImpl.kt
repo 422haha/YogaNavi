@@ -21,8 +21,7 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
         infoAPI.getProfile()
 
     override suspend fun getTeacherList(filter: FilterData): Response<YogaResponse<TeacherData>> =
-//        infoAPI.getTeacherList(filter)
-        infoAPI.getTeacherList()
+        infoAPI.getTeacherList(filter)
 
     override suspend fun updateProfile(profile: Profile): Response<YogaDetailResponse<Profile>> =
         infoAPI.updateProfile(profile)
