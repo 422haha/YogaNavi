@@ -69,8 +69,6 @@ const val END = 2
 
 // 화상강의 등록
 const val END_STR = "종료 날짜"
-const val LIMIT_STR = "무기한"
-const val LIMIT_DATE = 4102358400000 // 2099.12.31
 enum class Week(val hangle: String) {
     MON("월"),
     TUE("화"),

@@ -1,6 +1,7 @@
 package com.ssafy.yoganavi.ui.utils
 
 import android.icu.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -54,3 +55,11 @@ fun startVerticalEnd(start: String, end: String): String = run { "$start | $end"
 fun startTildeEnd(start: String, end: String) = "$start~$end"
 
 fun startSpaceEnd(start: String, end: String) = "$start $end"
+
+fun addYear(currentMillis: Long): Long {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = currentMillis
+    calendar.add(Calendar.YEAR, 1)
+
+    return calendar.timeInMillis
+}

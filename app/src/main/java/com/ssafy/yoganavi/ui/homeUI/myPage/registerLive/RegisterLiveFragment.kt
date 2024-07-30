@@ -17,14 +17,13 @@ import com.ssafy.yoganavi.ui.utils.CREATE
 import com.ssafy.yoganavi.ui.utils.END
 import com.ssafy.yoganavi.ui.utils.END_STR
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
-import com.ssafy.yoganavi.ui.utils.LIMIT_DATE
-import com.ssafy.yoganavi.ui.utils.LIMIT_STR
 import com.ssafy.yoganavi.ui.utils.MODIFY_LIVE
 import com.ssafy.yoganavi.ui.utils.REGISTER
 import com.ssafy.yoganavi.ui.utils.REGISTER_LIVE
 import com.ssafy.yoganavi.ui.utils.START
 import com.ssafy.yoganavi.ui.utils.UPDATE
 import com.ssafy.yoganavi.ui.utils.Week
+import com.ssafy.yoganavi.ui.utils.addYear
 import com.ssafy.yoganavi.ui.utils.formatDotDate
 import com.ssafy.yoganavi.ui.utils.formatTime
 import com.ssafy.yoganavi.ui.utils.formatZeroDate
@@ -33,7 +32,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.Calendar
+import java.util.Locale
+import java.util.TimeZone
 
 @AndroidEntryPoint
 class RegisterLiveFragment :
@@ -84,14 +86,22 @@ class RegisterLiveFragment :
             )
 
             cbEndDateUnlimited.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    tieEnd.setText(LIMIT_STR)
-                    tieEnd.isEnabled = false
-                    viewModel.liveLectureData.endDate = LIMIT_DATE
+                if(viewModel.liveLectureData.startDate != 0L) {
+                    if (isChecked) {
+                        tieEnd.isEnabled = false
+                        viewModel.liveLectureData.endDate = addYear(viewModel.liveLectureData.startDate)
+                        tieEnd.setText(formatDotDate(viewModel.liveLectureData.endDate))
+
+                        Timber.d("로오오그 ${viewModel.liveLectureData.startDate}")
+                        Timber.d("로오오그 ${viewModel.liveLectureData.endDate}")
+                    } else {
+                        tieEnd.isEnabled = true
+                        viewModel.liveLectureData.endDate = 0L
+                        tieEnd.setText(END_STR)
+                    }
                 } else {
-                    tieEnd.setText(END_STR)
-                    tieEnd.isEnabled = true
-                    viewModel.liveLectureData.endDate = 0L
+                    cbEndDateUnlimited.isChecked = false
+                    showSnackBar("시작 날짜를 설정해주세요.")
                 }
             }
         }
@@ -155,17 +165,18 @@ class RegisterLiveFragment :
     }
 
     private fun showCalendar(state: Int) {
-        val calendar = Calendar.getInstance()
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"), Locale.KOREA)
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
+        calendar.set(Calendar.MILLISECOND, 0)
 
         if (state == START) {
             startDatePickerDialog = DatePickerDialog(
                 requireContext(),
                 R.style.MySpinnerDatePickerStyle,
                 { _, sYear, sMonth, sDay ->
-                    calendar.set(sYear, sMonth, sDay)
+                    calendar.set(sYear, sMonth, sDay, 0, 0, 0)
 
                     with(viewModel.liveLectureData) {
                         binding.tieStart.setText(intToDate(sYear, sMonth, sDay))
@@ -183,7 +194,7 @@ class RegisterLiveFragment :
                 requireContext(),
                 R.style.MySpinnerDatePickerStyle,
                 { _, sYear, sMonth, sDay ->
-                    calendar.set(sYear, sMonth, sDay)
+                    calendar.set(sYear, sMonth, sDay, 0 ,0, 0)
 
                     binding.tieEnd.setText(intToDate(sYear, sMonth, sDay))
                     viewModel.liveLectureData.endDate = calendar.timeInMillis
