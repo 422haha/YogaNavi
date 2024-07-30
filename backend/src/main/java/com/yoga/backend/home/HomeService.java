@@ -22,6 +22,8 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 홈 서비스 클래스.
@@ -52,6 +54,7 @@ public class HomeService {
      * @param userId 사용자 ID
      * @return 홈 응답 DTO 리스트
      */
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<HomeResponseDto> getHomeData(Integer userId) {
         // 현재 시간을 가져옵니다.
         long now = ZonedDateTime.now().toInstant().toEpochMilli();
@@ -98,50 +101,9 @@ public class HomeService {
         // 날짜와 시간 순서대로 정렬합니다.
         responseList.sort(Comparator.comparing(HomeResponseDto::getLectureDate).thenComparing(HomeResponseDto::getStartTime));
 
-
         return responseList;
     }
 
-    /**
-     * JWT 토큰을 사용하여 사용자의 라이브 강의 리스트를 가져옵니다.
-     *
-     * @param token JWT 토큰
-     * @return 홈 응답 DTO 리스트
-     */
-    public List<HomeResponseDto> getMyLiveLectures(String token) {
-        // 현재 시간을 가져옵니다.
-        long now = ZonedDateTime.now().toInstant().toEpochMilli();
-
-        // 토큰에서 사용자 ID를 추출합니다.
-        Integer userId = jwtUtil.getUserIdFromToken(token);
-        // 사용자 ID로 사용자를 조회합니다.
-        Users user = usersRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-
-        // 사용자 ID로 내 라이브 강의 리스트를 조회합니다.
-        List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findByUserId(userId);
-
-        return myLiveLectures.stream().map(myLiveLecture -> {
-            // 라이브 강의 ID로 라이브 강의를 조회합니다.
-            LiveLectures lecture = liveLectureRepository.findById(myLiveLecture.getLiveId()).orElseThrow(() -> new RuntimeException("Lecture not found"));
-
-            // 라이브 강의의 시작일과 종료일, 가능한 요일로 강의 날짜 리스트를 가져옵니다.
-            List<String> lectureDates = getLectureDates(lecture.getStartDate(), lecture.getEndDate(), lecture.getAvailableDay());
-
-            return lectureDates.stream().map(lectureDate -> {
-                // 새로운 홈 응답 DTO를 생성하고 데이터를 설정합니다.
-                HomeResponseDto dto = new HomeResponseDto();
-                dto.setNickname(user.getNickname());
-                dto.setProfileImageUrl(user.getProfile_image_url());
-                dto.setProfileImageUrlSmall(user.getProfile_image_url_small());
-                dto.setLiveTitle(lecture.getLiveTitle());
-                dto.setStartTime(lecture.getStartTime());
-                dto.setEndTime(lecture.getEndTime());
-                dto.setLectureDate(convertToLong(lectureDate));
-                dto.setLectureDay(LocalDate.parse(lectureDate).getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH).toUpperCase());
-                return dto;
-            }).collect(Collectors.toList());
-        }).flatMap(List::stream).collect(Collectors.toList());
-    }
 
     /**
      * 시작일과 종료일, 가능한 요일로 강의 날짜 리스트를 생성합니다.
@@ -199,17 +161,6 @@ public class HomeService {
                 }
             })
             .toList();
-    }
-
-    /**
-     * 날짜 문자열을 사용하여 요일 문자열을 반환합니다.
-     *
-     * @param date 날짜 문자열 (yyyy-MM-dd 형식)
-     * @return 요일 문자열
-     */
-    private String getDayOfWeek(String date) {
-        LocalDate localDate = LocalDate.parse(date);
-        return localDate.getDayOfWeek().toString();
     }
 
 
