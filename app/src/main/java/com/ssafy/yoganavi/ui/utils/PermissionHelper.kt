@@ -13,7 +13,8 @@ import androidx.fragment.app.Fragment
 
 class PermissionHelper(
     private val fragment: Fragment,
-    private val permissions: Array<String>
+    private val permissions: Array<String>,
+    private val popBack: () -> Unit
 ) {
     private val requestPermissionLauncher =
         fragment.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -43,7 +44,7 @@ class PermissionHelper(
     private fun finish(dialog: DialogInterface) {
         Toast.makeText(fragment.requireContext(), "권한을 허락하지 않으면 사용할 수 없습니다.", Toast.LENGTH_SHORT).show()
         dialog.cancel()
-        fragment.requireActivity().finish()
+        popBack()
     }
 
     private fun moveSettings(dialog: DialogInterface) {

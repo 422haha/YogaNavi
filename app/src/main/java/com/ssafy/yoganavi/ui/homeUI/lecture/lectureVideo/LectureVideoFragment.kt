@@ -36,7 +36,7 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        PermissionHelper(this, arrayOf(Manifest.permission.CAMERA))
+        PermissionHelper(this, arrayOf(Manifest.permission.CAMERA), ::popBack)
             .launchPermission()
 
         initCamera()
@@ -46,8 +46,7 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
         requireActivity().onBackPressedDispatcher
             .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    exitFullscreen()
-                    findNavController().popBackStack()
+                    popBack()
                 }
             })
     }
@@ -93,6 +92,11 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
                     or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
         }
         supportActionBar?.show()
+    }
+
+    private fun popBack() {
+        exitFullscreen()
+        findNavController().popBackStack()
     }
 
     private fun initCamera() {
