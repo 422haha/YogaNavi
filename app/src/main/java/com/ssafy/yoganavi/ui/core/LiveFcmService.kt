@@ -80,8 +80,10 @@ class LiveFcmService @Inject constructor(
             }
         }
 
+        val uniId: Int = (System.currentTimeMillis() / 7).toInt()
+
         val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
+            this, uniId, intent,
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -94,7 +96,7 @@ class LiveFcmService @Inject constructor(
             .setContentIntent(pendingIntent) // 알림 실행 시 Intent
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 중요도 (HIGH: 상단바 표시 가능)
 
-        notificationManager.notify(0, notificationBuilder.build())
+        notificationManager.notify(uniId, notificationBuilder.build())
     }
 }
 
