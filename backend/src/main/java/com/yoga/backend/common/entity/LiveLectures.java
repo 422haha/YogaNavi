@@ -57,7 +57,7 @@
         @JoinColumn(name = "user_id")
         private Users user; // 강사 ID (Foreign Key)
 
-        @Column(length = 20, nullable = false)
+        @Column(length = 100, nullable = false)
         private String availableDay; // 가능한 강의 요일
 
     }
