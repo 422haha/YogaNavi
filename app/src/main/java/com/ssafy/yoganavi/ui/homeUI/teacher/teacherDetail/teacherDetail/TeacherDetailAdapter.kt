@@ -13,7 +13,8 @@ import com.ssafy.yoganavi.ui.utils.ITEM_LECTURE
 import com.ssafy.yoganavi.ui.utils.ITEM_NOTICE
 
 class TeacherDetailAdapter(
-    val goReserve: (Int)->(Unit)
+    val goReserve: (Int)->(Unit),
+    private val navigateToLectureDetailFragment: (Long)->Unit
 ) : ListAdapter<TeacherDetailItem, ViewHolder>(TeacherDetailCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -55,7 +56,7 @@ class TeacherDetailAdapter(
         parent: ViewGroup
     ): TeacherDetailViewHolder {
         val binding = ListItemTeacherLectureRecycleBinding.inflate(inflater, parent, false)
-        return TeacherDetailViewHolder(binding)
+        return TeacherDetailViewHolder(binding,navigateToLectureDetailFragment)
     }
 
     private fun makeItemNoticeViewHolder(

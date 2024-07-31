@@ -156,12 +156,23 @@
             android:name="userId"
             android:defaultValue="-1"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_teacherDetailFragment_to_lectureDetailFragment"
+            app:destination="@id/lectureDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/teacherReservationFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.teacher.teacherReservation.TeacherReservationFragment"
         android:label="fragment_teacher_reservation"
-        tools:layout="@layout/fragment_teacher_reservation" />
+        tools:layout="@layout/fragment_teacher_reservation" >
+        <argument
+            android:name="teacherId"
+            app:argType="integer" />
+    </fragment>
     <fragment
         android:id="@+id/lectureDetailFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail.LectureDetailFragment"
