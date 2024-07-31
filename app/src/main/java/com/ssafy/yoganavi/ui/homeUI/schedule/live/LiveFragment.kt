@@ -11,8 +11,18 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setToolbar(false, "", false)
+
         binding.ibtnCancel.setOnClickListener {
             findNavController().popBackStack()
         }
+    }
+
+    private fun setFullscreen() {
+
+    }
+
+    private fun getFullscreen() {
+
     }
 }

@@ -128,4 +128,8 @@ dependencies {
     implementation (libs.firebase.messaging.ktx)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+
+    // Web RTC
+    implementation("io.getstream:stream-webrtc-android:1.1.3")
+    implementation ("io.getstream:stream-webrtc-android-ui:1.1.3")
 }
