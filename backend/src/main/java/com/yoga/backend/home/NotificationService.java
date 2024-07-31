@@ -6,6 +6,8 @@ import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.fcm.FCMService;
 import com.yoga.backend.mypage.livelectures.LiveLectureRepository;
 import com.yoga.backend.mypage.livelectures.MyLiveLectureRepository;
+import com.yoga.backend.mypage.livelectures.dto.LiveLectureDTO;
+import com.yoga.backend.members.repository.UsersRepository;
 
 import java.time.*;
 import java.util.*;
@@ -32,72 +34,81 @@ public class NotificationService {
     private MyLiveLectureRepository myLiveLectureRepository;
 
     @Autowired
+    private UsersRepository usersRepository;
+
+    @Autowired
     private FCMService fcmService;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
     public void handleLectureUpdate(LiveLectures updatedLecture) {
-        LocalDate startDate = updatedLecture.getStartDate().atZone(ZoneId.systemDefault())
-            .toLocalDate();
-        LocalDate endDate = updatedLecture.getEndDate().atZone(ZoneId.systemDefault())
-            .toLocalDate();
-        LocalTime lectureStartTime = updatedLecture.getStartTime().atZone(ZoneId.systemDefault())
-            .toLocalTime();
+        LiveLectureDTO lectureDTO = LiveLectureDTO.fromEntity(updatedLecture);
+        LocalDate startDate = lectureDTO.getStartDate().atZone(KOREA_ZONE).toLocalDate();
+        LocalDate endDate = lectureDTO.getEndDate().atZone(KOREA_ZONE).toLocalDate();
+        LocalTime lectureStartTime = extractTimeFromInstant(lectureDTO.getStartTime());
 
-        // 가능한 요일 문자열을 DayOfWeek 집합으로
-        Set<DayOfWeek> availableDays = parseAvailableDays(updatedLecture.getAvailableDay());
+        Set<DayOfWeek> availableDays = parseAvailableDays(lectureDTO.getAvailableDay());
 
         log.info("강의 업데이트 시작 - ID: {}, 제목: {}, 시작일: {}, 종료일: {}, 요일: {}",
-            updatedLecture.getLiveId(), updatedLecture.getLiveTitle(), startDate, endDate,
-            updatedLecture.getAvailableDay());
+            lectureDTO.getLiveId(), lectureDTO.getLiveTitle(), startDate, endDate,
+            lectureDTO.getAvailableDay());
 
-        // 시작일부터 종료일까지 각 날짜에 대해
+        LocalDate today = LocalDate.now(KOREA_ZONE);
+        boolean updatedToday = false;
+
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            // 해당 날짜가 강의 가능 요일인 경우에만
             if (availableDays.contains(date.getDayOfWeek())) {
                 String redisKey = REDIS_KEY_PREFIX + date.toString();
 
-                // redis에서 해당 날짜의 강의 목록 조회
-                List<LiveLectures> lectures = (List<LiveLectures>) redisTemplate.opsForValue()
-                    .get(redisKey);
+                List<LiveLectureDTO> lectures = getLecturesFromRedis(redisKey);
 
-                // 강의 목록이 없으면 새로운 리스트 생성
-                if (lectures == null) {
-                    lectures = new ArrayList<>();
-                    log.info("새 강의 목록 생성 - 날짜: {}", date);
-                }
-
-                // 기존 강의 업데이트 or 새 강의 추가
                 boolean found = false;
                 for (int i = 0; i < lectures.size(); i++) {
-                    if (lectures.get(i).getLiveId().equals(updatedLecture.getLiveId())) {
-                        lectures.set(i, updatedLecture);
+                    if (lectures.get(i).getLiveId().equals(lectureDTO.getLiveId())) {
+                        lectures.set(i, lectureDTO);
                         found = true;
-                        log.info("기존 강의 업데이트 - 날짜: {}, 강의 ID: {}", date,
-                            updatedLecture.getLiveId());
+                        log.info("기존 강의 업데이트 - 날짜: {}, 강의 ID: {}", date, lectureDTO.getLiveId());
                         break;
                     }
                 }
 
-                // 기존 강의가 없으면 새로 추가
                 if (!found) {
-                    lectures.add(updatedLecture);
-                    log.info("새 강의 추가 - 날짜: {}, 강의 ID: {}", date, updatedLecture.getLiveId());
+                    lectures.add(lectureDTO);
+                    log.info("새 강의 추가 - 날짜: {}, 강의 ID: {}", date, lectureDTO.getLiveId());
                 }
 
-                // 업데이트된 강의 목록 redis에 저장
                 redisTemplate.opsForValue().set(redisKey, lectures);
-
-                // redis 캐시의 만료 시간을 다음날 자정으로
                 redisTemplate.expireAt(redisKey,
-                    Date.from(date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                    Date.from(date.plusDays(1).atStartOfDay(KOREA_ZONE).toInstant()));
 
                 log.info("강의 ID {} Redis 캐시 업데이트 완료 (날짜: {}, 시작 시간: {})",
-                    updatedLecture.getLiveId(), date, lectureStartTime);
+                    lectureDTO.getLiveId(), date, lectureStartTime);
+
+                if (date.equals(today)) {
+                    updatedToday = true;
+                }
             }
         }
-        log.info("강의 업데이트 완료 - ID: {}", updatedLecture.getLiveId());
+
+        if (updatedToday) {
+            log.info("오늘 날짜의 강의가 업데이트되어 스케줄러를 즉시 실행합니다.");
+            checkUpcomingLecturesAndNotify();
+        }
+
+        log.info("강의 업데이트 완료 - ID: {}", lectureDTO.getLiveId());
+    }
+
+    private LocalTime extractTimeFromInstant(Instant instant) {
+        return LocalTime.ofInstant(instant, ZoneOffset.UTC);
+    }
+
+    private List<LiveLectureDTO> getLecturesFromRedis(String redisKey) {
+        List<Object> lecturesFromRedis = (List<Object>) redisTemplate.opsForValue().get(redisKey);
+        if (lecturesFromRedis == null) {
+            return new ArrayList<>();
+        }
+        return convertToLiveLectureDTOList(lecturesFromRedis);
     }
 
     public void handleLectureDelete(Long liveId) {
@@ -105,15 +116,18 @@ public class NotificationService {
         Set<String> keys = redisTemplate.keys(REDIS_KEY_PREFIX + "*");
         log.info("검색된 Redis 키 수: {}", keys.size());
         for (String key : keys) {
-            List<LiveLectures> lectures = (List<LiveLectures>) redisTemplate.opsForValue().get(key);
-            if (lectures != null) {
-                boolean removed = lectures.removeIf(lecture -> lecture.getLiveId().equals(liveId));
-                if (removed) {
+            List<Object> lecturesFromRedis = (List<Object>) redisTemplate.opsForValue().get(key);
+            if (lecturesFromRedis != null) {
+                List<LiveLectureDTO> lectures = convertToLiveLectureDTOList(lecturesFromRedis);
+                int initialSize = lectures.size();
+                lectures.removeIf(lecture -> lecture.getLiveId().equals(liveId));
+                if (lectures.size() < initialSize) {
                     redisTemplate.opsForValue().set(key, lectures);
                     log.info("강의 ID {} Redis 캐시에서 삭제 완료 (키: {})", liveId, key);
                 }
             }
         }
+        log.info("강의 삭제 완료 - ID: {}", liveId);
     }
 
     private Set<DayOfWeek> parseAvailableDays(String availableDays) {
@@ -144,67 +158,97 @@ public class NotificationService {
         }
     }
 
-    // 매일 자정에 오늘 강의 목록 캐시
+    private LiveLectureDTO convertMapToLiveLectureDTO(Map<String, Object> map) {
+        LiveLectureDTO dto = new LiveLectureDTO();
+        dto.setLiveId(((Number) map.get("liveId")).longValue());
+        dto.setLiveTitle((String) map.get("liveTitle"));
+        dto.setLiveContent((String) map.get("liveContent"));
+        dto.setStartDate(Instant.parse((String) map.get("startDate")));
+        dto.setEndDate(Instant.parse((String) map.get("endDate")));
+        dto.setStartTime(Instant.parse((String) map.get("startTime")));
+        dto.setEndTime(Instant.parse((String) map.get("endTime")));
+        dto.setMaxLiveNum((Integer) map.get("maxLiveNum"));
+        dto.setAvailableDay((String) map.get("availableDay"));
+        dto.setRegDate(Instant.parse((String) map.get("regDate")));
+        dto.setUserId((Integer) map.get("userId"));
+        return dto;
+    }
+
     @Scheduled(cron = "0 0 0 * * *")
     public void cacheTodayLectures() {
-        Instant nowUtc = Instant.now();
-        LocalDate todayKorea = LocalDate.ofInstant(nowUtc, KOREA_ZONE);
+        LocalDate todayKorea = LocalDate.now(KOREA_ZONE);
         String dayAbbreviation = todayKorea.getDayOfWeek().toString().substring(0, 3);
 
         Instant startOfDayKorea = todayKorea.atStartOfDay(KOREA_ZONE).toInstant();
         Instant endOfDayKorea = todayKorea.plusDays(1).atStartOfDay(KOREA_ZONE).toInstant();
 
-        List<LiveLectures> todayLectures = liveLectureRepository.findLecturesForToday(
-            startOfDayKorea, endOfDayKorea, dayAbbreviation);
+        List<LiveLectureDTO> todayLectures = liveLectureRepository.findLecturesForToday(
+                startOfDayKorea, endOfDayKorea, dayAbbreviation)
+            .stream()
+            .map(LiveLectureDTO::fromEntity)
+            .collect(Collectors.toList());
 
         String redisKey = REDIS_KEY_PREFIX + todayKorea.toString();
-        redisTemplate.opsForValue().set(redisKey, todayLectures); // 오늘 강의 목록 Redis에 저장
-        redisTemplate.expireAt(redisKey,
-            Date.from(endOfDayKorea)); // redis에 저장된 데이터 만료 시간을 다음날 자정으로
+        redisTemplate.opsForValue().set(redisKey, todayLectures);
+        redisTemplate.expireAt(redisKey, Date.from(endOfDayKorea));
 
         log.info("오늘 강의 목록 Redis 캐시 갱신 완료. 강의 개수: {}", todayLectures.size());
     }
 
-    // 매 10분마다 실행, 곧 시작할 강의의 알림을 처리
     @Scheduled(cron = "0 */10 * * * *")
     public void checkUpcomingLecturesAndNotify() {
         try {
             ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE);
             LocalDate todayKorea = nowKorea.toLocalDate();
-            LocalTime nowTimeKorea = nowKorea.toLocalTime();
 
             String redisKey = REDIS_KEY_PREFIX + todayKorea.toString();
-            List<LiveLectures> todayLectures = (List<LiveLectures>) redisTemplate.opsForValue()
-                .get(redisKey); // redis에서 오늘의 강의 목록 조회
+            List<LiveLectureDTO> todayLectures = getLecturesFromRedis(redisKey);
 
-            if (todayLectures == null) {
+            log.debug("오늘의 강의 수: {}", todayLectures.size());
+
+            if (todayLectures.isEmpty()) {
                 log.warn("Redis에서 오늘의 강의 목록 조회 불가. DB에서 조회.");
                 String dayAbbreviation = todayKorea.getDayOfWeek().toString().substring(0, 3);
                 Instant startOfDayKorea = todayKorea.atStartOfDay(KOREA_ZONE).toInstant();
                 Instant endOfDayKorea = todayKorea.plusDays(1).atStartOfDay(KOREA_ZONE).toInstant();
                 todayLectures = liveLectureRepository.findLecturesForToday(startOfDayKorea,
-                    endOfDayKorea, dayAbbreviation);// DB에서 오늘의 강의 목록 조회
-                redisTemplate.opsForValue().set(redisKey, todayLectures); // 조회한 데이터 redis에 다시 저장
-                redisTemplate.expireAt(redisKey,
-                    Date.from(endOfDayKorea)); // redis에 저장된 데이터 만료 시간 다음날 자정으로
+                        endOfDayKorea, dayAbbreviation)
+                    .stream()
+                    .map(LiveLectureDTO::fromEntity)
+                    .collect(Collectors.toList());
+                redisTemplate.opsForValue().set(redisKey, todayLectures);
+                redisTemplate.expireAt(redisKey, Date.from(endOfDayKorea));
             }
 
-            // 현재 시간 기준으로 10분 이내에 시작하는 강의 필터링
-            List<LiveLectures> upcomingLectures = todayLectures.stream()
+            log.info("오늘 강의 목록 Redis 캐시 확인 완료. 강의 개수: {}", todayLectures.size());
+
+            List<LiveLectureDTO> upcomingLectures = todayLectures.stream()
                 .filter(lecture -> {
-                    LocalDate lectureDate = LocalDate.ofInstant(lecture.getStartDate(), KOREA_ZONE);
-                    LocalTime lectureTime = LocalTime.ofInstant(lecture.getStartTime(), KOREA_ZONE);
-                    LocalDateTime lectureDateTime = LocalDateTime.of(lectureDate, lectureTime);
-                    LocalDateTime notificationTime = lectureDateTime.minusMinutes(10);
-                    return lectureDate.equals(todayKorea) &&
-                        lecture.getAvailableDay()
-                            .contains(todayKorea.getDayOfWeek().toString().substring(0, 3)) &&
-                        nowTimeKorea.isAfter(notificationTime.toLocalTime().minusMinutes(10)) &&
-                        nowTimeKorea.isBefore(notificationTime.toLocalTime());
+
+                    LocalTime lectureTime = extractTimeFromInstant(lecture.getStartTime());
+                    System.out.println("lectureTime : " + lectureTime);
+
+                    ZonedDateTime lectureDateTime = ZonedDateTime.of(todayKorea, lectureTime,
+                        KOREA_ZONE);
+                    System.out.println("lectureDateTime : " + lectureDateTime);
+
+                    ZonedDateTime notificationTime = lectureDateTime.minusMinutes(10);
+                    System.out.println("notificationTime : " + notificationTime);
+
+                    log.debug("강의 ID: {}, 강의 시작 시간: {}, 알림 시간: {}, 현재 시간: {}",
+                        lecture.getLiveId(), lectureDateTime, notificationTime, nowKorea);
+
+                    return lecture.getAvailableDay()
+                        .contains(todayKorea.getDayOfWeek().toString().substring(0, 3)) &&
+                        nowKorea.isAfter(notificationTime.minusMinutes(10)) &&
+                        nowKorea.isBefore(notificationTime);
                 })
                 .collect(Collectors.toList());
 
-            for (LiveLectures lecture : upcomingLectures) {
+            log.info("알림을 보낼 강의 수: {}", upcomingLectures.size());
+
+            for (LiveLectureDTO lecture : upcomingLectures) {
+                System.out.println("lecture : " + lecture.getLiveTitle());
                 sendNotificationToTeacher(lecture);
                 sendNotificationToStudents(lecture);
             }
@@ -213,9 +257,9 @@ public class NotificationService {
         }
     }
 
-    private void sendNotificationToTeacher(LiveLectures lecture) {
-        Users teacher = lecture.getUser();
-        if (teacher.getFcmToken() != null) {
+    private void sendNotificationToTeacher(LiveLectureDTO lecture) {
+        Users teacher = usersRepository.findById(lecture.getUserId()).orElse(null);
+        if (teacher != null && teacher.getFcmToken() != null) {
             try {
                 LocalTime lectureStartTime = LocalTime.ofInstant(lecture.getStartTime(),
                     KOREA_ZONE);
@@ -226,16 +270,15 @@ public class NotificationService {
                 fcmService.sendMessage("강의 시작 10분 전입니다.", message, teacher.getEmail());
                 log.info("강사 {}에게 강의 ID {} 알림 전송 성공", teacher.getEmail(), lecture.getLiveId());
             } catch (FirebaseMessagingException e) {
-                log.error("강사 {}에게 강의 ID {} 알림 전송 실패", teacher.getEmail(), lecture.getLiveId(),
-                    e);
+                log.error("강사 {}에게 강의 ID {} 알림 전송 실패", teacher.getEmail(), lecture.getLiveId(), e);
             }
         } else {
-            log.warn("강사 {}의 FCM 토큰이 없음. 강의 ID: {}", teacher.getEmail(), lecture.getLiveId());
+            log.warn("강사 정보 또는 FCM 토큰이 없음. 강의 ID: {}", lecture.getLiveId());
         }
     }
 
-    private void sendNotificationToStudents(LiveLectures lecture) {
-        List<MyLiveLecture> enrollments = myLiveLectureRepository.findByLiveLecture_LiveId(
+    private void sendNotificationToStudents(LiveLectureDTO lecture) {
+        List<MyLiveLecture> enrollments = myLiveLectureRepository.findByLiveLectureWithUser(
             lecture.getLiveId());
         for (MyLiveLecture enrollment : enrollments) {
             Users student = enrollment.getUser();
@@ -248,16 +291,28 @@ public class NotificationService {
                         lectureStartTime.toString());
 
                     fcmService.sendMessage("강의 시작 10분 전입니다.", message, student.getEmail());
-                    log.info("학생 {}에게 강의 ID {} 알림 전송 성공", student.getEmail(),
-                        lecture.getLiveId());
+                    log.info("학생 {}에게 강의 ID {} 알림 전송 성공", student.getEmail(), lecture.getLiveId());
                 } catch (FirebaseMessagingException e) {
-                    log.error("학생 {}에게 강의 ID {} 알림 전송 실패", student.getEmail(),
-                        lecture.getLiveId(), e);
+                    log.error("학생 {}에게 강의 ID {} 알림 전송 실패", student.getEmail(), lecture.getLiveId(),
+                        e);
                 }
             } else {
-                log.warn("학생 {}의 FCM 토큰이 없음. 강의 ID: {}", student.getEmail(),
-                    lecture.getLiveId());
+                log.warn("학생 {}의 FCM 토큰이 없음. 강의 ID: {}", student.getEmail(), lecture.getLiveId());
             }
         }
+    }
+
+    private List<LiveLectureDTO> convertToLiveLectureDTOList(List<Object> objects) {
+        return objects.stream()
+            .map(obj -> {
+                if (obj instanceof Map) {
+                    return convertMapToLiveLectureDTO((Map<String, Object>) obj);
+                } else if (obj instanceof LiveLectureDTO) {
+                    return (LiveLectureDTO) obj;
+                } else {
+                    throw new IllegalArgumentException("Unknown object type: " + obj.getClass());
+                }
+            })
+            .collect(Collectors.toList());
     }
 }
