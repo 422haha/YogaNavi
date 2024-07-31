@@ -74,6 +74,8 @@ const val END = 2
 // 강의 Header, Item
 const val HEADER = 1
 const val ITEM = 2
+const val ITEM_LECTURE = 2
+const val ITEM_NOTICE = 3
 
 // 화상강의 등록
 const val END_STR = "종료 날짜"

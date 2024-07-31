@@ -12,6 +12,7 @@ import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
+import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
 import com.ssafy.yoganavi.data.source.info.InfoDataSource
 import com.ssafy.yoganavi.data.source.teacher.FilterData
 import com.ssafy.yoganavi.di.IoDispatcher
@@ -58,6 +59,13 @@ class InfoRepositoryImpl @Inject constructor(
             )
         }
         return response.toListResponse()
+    }
+
+    override suspend fun getTeacherDetail(teacherId: Int): DetailResponse<TeacherDetailData> {
+        val response = withContext(ioDispatcher) {
+            infoDataSource.getTeacherDetail(teacherId)
+        }
+        return response.toDetailResponse()
     }
 
     override suspend fun teacherLikeToggle(teacherId: Int): DetailResponse<Boolean> {
