@@ -3,7 +3,7 @@ package com.yoga.backend.mypage.livelectures;
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
-import com.yoga.backend.home.NotificationService;
+import com.yoga.backend.fcm.NotificationService;
 import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateDto;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateResponseDto;
@@ -12,8 +12,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class LiveLectureServiceImpl implements LiveLectureService {
@@ -28,6 +29,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     private NotificationService notificationService;
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public LiveLectureCreateResponseDto createLiveLecture(
         LiveLectureCreateDto liveLectureCreateDto) {
         LiveLectures liveLecture = new LiveLectures();
@@ -74,6 +76,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * @return 모든 실시간 강의 리스트
      */
     @Override
+    @Transactional(readOnly = true)
     public List<LiveLectures> getAllLiveLectures() {
         return liveLecturesRepository.findAll();
     }
@@ -85,6 +88,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * @return 나의 실시간 강의 리스트
      */
     @Override
+    @Transactional(readOnly = true)
     public List<MyLiveLecture> getMyLiveLecturesByUserId(int userId) {
         return myLiveLectureRepository.findByUserId(userId);
     }
@@ -96,6 +100,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * @return 해당 사용자의 실시간 강의 리스트
      */
     @Override
+    @Transactional(readOnly = true)
     public List<LiveLectures> getLiveLecturesByUserId(int userId) {
         return liveLecturesRepository.findByUserId(userId);
     }
@@ -108,6 +113,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * @return 수정된 화상 강의 엔티티
      */
     @Override
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public LiveLectures updateLiveLecture(LiveLectureCreateDto liveLectureCreateDto) {
         LiveLectures liveLecture = liveLecturesRepository.findById(liveLectureCreateDto.getLiveId())
             .orElseThrow(() -> new IllegalArgumentException("Invalid lecture ID"));
@@ -149,6 +155,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * @return 해당 화상 강의 엔티티
      */
     @Override
+    @Transactional(readOnly = true)
     public LiveLectures getLiveLectureById(Long liveId) {
         return liveLecturesRepository.findById(liveId).orElse(null);
     }
@@ -161,6 +168,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * @return 소유자 여부
      */
     @Override
+    @Transactional(readOnly = true)
     public boolean isLectureOwner(Long liveId, int userId) {
         Optional<LiveLectures> lectureOpt = liveLecturesRepository.findById(liveId);
         return lectureOpt.isPresent() && Objects.equals(lectureOpt.get().getUser().getId(), userId);
@@ -173,6 +181,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * @param liveId 화상 강의 ID
      */
     @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void deleteLiveLectureById(Long liveId) {
         notificationService.handleLectureDelete(liveId);
 
