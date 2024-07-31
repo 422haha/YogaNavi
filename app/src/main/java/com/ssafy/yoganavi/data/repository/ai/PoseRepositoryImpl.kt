@@ -1,5 +1,6 @@
 package com.ssafy.yoganavi.data.repository.ai
 
+import android.graphics.Bitmap
 import androidx.camera.core.ImageProxy
 import com.ssafy.yoganavi.data.source.ai.PoseDataSource
 import com.ssafy.yoganavi.di.DefaultDispatcher
@@ -16,6 +17,11 @@ class PoseRepositoryImpl @Inject constructor(
 
     override suspend fun infer(image: ImageProxy, width: Int, height: Int): List<FloatArray> {
         val result = withContext(defaultDispatcher) { poseDataSource.infer(image, width, height) }
+        return removeBox(result)
+    }
+
+    override suspend fun infer(bitmap: Bitmap, width: Int, height: Int): List<FloatArray> {
+        val result = withContext(defaultDispatcher) { poseDataSource.infer(bitmap, width, height) }
         return removeBox(result)
     }
 
