@@ -15,6 +15,7 @@ import com.ssafy.yoganavi.ui.utils.CENTER_X
 import com.ssafy.yoganavi.ui.utils.CENTER_Y
 import com.ssafy.yoganavi.ui.utils.HEIGHT
 import com.ssafy.yoganavi.ui.utils.HEIGHT_RATIO
+import com.ssafy.yoganavi.ui.utils.KEYPOINT_NUM
 import com.ssafy.yoganavi.ui.utils.SCORE
 import com.ssafy.yoganavi.ui.utils.WIDTH
 import com.ssafy.yoganavi.ui.utils.WIDTH_RATIO
@@ -41,19 +42,19 @@ class PoseDataSourceImpl @Inject constructor(
     private val modelH = shape[2].toInt()
     private val imageStd = 255f
 
-    override suspend fun infer(imageProxy: ImageProxy, width: Int, height: Int): List<FloatArray> {
-        val bitmap = imageToBitmap(imageProxy)
+    override suspend fun infer(image: ImageProxy, width: Int, height: Int): List<List<KeyPoint>> {
+        val bitmap = imageToBitmap(image)
         val inputTensor = preProcess(bitmap, true)
         val rawOutput = process(inputTensor)
         val output = postProcess(rawOutput)
-        return rescaleToCamera(output, width, height)
+        return rescaleToCamera(output, width, height).map { it.toKeyPoints() }
     }
 
-    override suspend fun infer(bitmap: Bitmap, width: Int, height: Int): List<FloatArray> {
+    override suspend fun infer(bitmap: Bitmap, width: Int, height: Int): List<List<KeyPoint>> {
         val inputTensor = preProcess(bitmap, false)
         val rawOutput = process(inputTensor)
         val output = postProcess(rawOutput)
-        return rescaleToBitmap(output, width, height)
+        return rescaleToBitmap(output, width, height).map { it.toKeyPoints() }
     }
 
     override fun preProcess(bitmap: Bitmap, needFlip: Boolean): OnnxTensor {
@@ -213,4 +214,13 @@ class PoseDataSourceImpl @Inject constructor(
         .openRawResource(R.raw.yolov8n_pose)
         .readBytes()
 
+    private fun FloatArray.toKeyPoints() = List(KEYPOINT_NUM / 3) { index ->
+        val baseIndex = index * 3 + 5
+        KeyPoint(
+            index = index,
+            x = this[baseIndex],
+            y = this[baseIndex + 1],
+            confidence = this[baseIndex + 2]
+        )
+    }
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.exoplayer.ExoPlayer
 import com.ssafy.yoganavi.data.repository.ai.PoseRepository
+import com.ssafy.yoganavi.data.source.ai.KeyPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,21 +24,21 @@ class LectureVideoViewModel @Inject constructor(
     private val retriever = MediaMetadataRetriever()
     private var isVideoInfer: Boolean = false
 
-    private val _userKeyPoints: MutableStateFlow<List<FloatArray>> =
+    private val _userKeyPoints: MutableStateFlow<List<KeyPoint>> =
         MutableStateFlow(emptyList())
-    val userKeyPoints: StateFlow<List<FloatArray>> = _userKeyPoints.asStateFlow()
+    val userKeyPoints: StateFlow<List<KeyPoint>> = _userKeyPoints.asStateFlow()
 
-    private val _teacherKeyPoints: MutableStateFlow<List<FloatArray>> =
+    private val _teacherKeyPoints: MutableStateFlow<List<KeyPoint>> =
         MutableStateFlow(emptyList())
-    val teacherKeyPoints: StateFlow<List<FloatArray>> = _teacherKeyPoints.asStateFlow()
+    val teacherKeyPoints: StateFlow<List<KeyPoint>> = _teacherKeyPoints.asStateFlow()
 
     fun inferImage(
         image: ImageProxy,
         width: Int,
         height: Int
     ) = viewModelScope.launch(Dispatchers.Default) {
-        val result: List<FloatArray> = poseRepository.infer(image, width, height)
-        _userKeyPoints.emit(result)
+        val result: List<List<KeyPoint>> = poseRepository.infer(image, width, height)
+        _userKeyPoints.emit(result.firstOrNull().orEmpty())
         image.close()
     }
 
@@ -67,18 +68,18 @@ class LectureVideoViewModel @Inject constructor(
         )
 
         bitmap?.let {
-            val result = poseRepository.infer(bitmap, bitmap.width, bitmap.height)
+            val results = poseRepository.infer(bitmap, bitmap.width, bitmap.height)
             val ratio = height / bitmap.height.toFloat()
             val diffX = (width - bitmap.width * ratio) / 2f
-            result.forEach { points ->
-                for (idx in points.indices step 3) {
-                    if (points[idx] == 0f || points[idx + 1] == 0f) continue
-                    points[idx] = points[idx] * ratio + diffX
-                    points[idx + 1] = points[idx + 1] * ratio
-                }
+            val result = results.firstOrNull().orEmpty()
+            val keyPoints = mutableListOf<KeyPoint>()
+            result.forEachIndexed { idx, keyPoint ->
+                val x = if (keyPoint.x == 0f) 0f else keyPoint.x * ratio + diffX
+                val y = if (keyPoint.y == 0f) 0f else keyPoint.y * ratio
+                keyPoints.add(KeyPoint(idx, x, y, keyPoint.confidence))
             }
             bitmap.recycle()
-            _teacherKeyPoints.emit(result)
+            _teacherKeyPoints.emit(keyPoints)
         }
 
         isVideoInfer = false
