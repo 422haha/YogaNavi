@@ -33,12 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class HomeService {
 
     @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private UsersRepository usersRepository;
-
-    @Autowired
     private MyLiveLectureRepository myLiveLectureRepository;
 
     @Autowired
