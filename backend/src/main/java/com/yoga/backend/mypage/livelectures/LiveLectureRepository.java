@@ -7,8 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import java.util.List;
 
 public interface LiveLectureRepository extends JpaRepository<LiveLectures, Long> {
+    
+    @Query("SELECT ll FROM LiveLectures ll JOIN FETCH ll.user WHERE ll.user.id = :id")
     List<LiveLectures> findByUserId(int id);
 
     List<LiveLectures> findByStartTimeBetween(Instant start, Instant end);
