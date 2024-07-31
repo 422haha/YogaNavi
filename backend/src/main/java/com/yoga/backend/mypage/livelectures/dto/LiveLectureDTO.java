@@ -1,9 +1,10 @@
 package com.yoga.backend.mypage.livelectures.dto;
 
 import com.yoga.backend.common.entity.LiveLectures;
+import java.io.Serializable;
 import java.time.Instant;
 
-public class LiveLectureDTO {
+public class LiveLectureDTO implements Serializable {
     private Long liveId;
     private String liveTitle;
     private String liveContent;
