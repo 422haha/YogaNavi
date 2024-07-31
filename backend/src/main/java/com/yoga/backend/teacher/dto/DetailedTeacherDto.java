@@ -64,27 +64,30 @@ public class DetailedTeacherDto {
     public static class LectureDto {
 
         private String lectureId;
-        private String lectureTitle;
-        private String lectureDescription;
-        private int likes;
-        private boolean likedByUser;
+        private String recordTitle;
+        private String recordThumbnail;
+        private String recordThumbnailSmall;
+        private int likeCount;
+        private boolean myLike;
 
         /**
          * LectureDto 생성자
          *
-         * @param lectureId          강의 ID
-         * @param lectureTitle       강의 제목
-         * @param lectureDescription 강의 설명
-         * @param likes              좋아요 수
-         * @param likedByUser        사용자에 의한 좋아요 여부
+         * @param lectureId            강의 ID
+         * @param recordTitle          강의 제목
+         * @param recordThumbnail      강의 썸네일 URL
+         * @param recordThumbnailSmall 강의 작은 썸네일 URL
+         * @param likeCount            좋아요 수
+         * @param myLike               사용자에 의한 좋아요 여부
          */
-        public LectureDto(String lectureId, String lectureTitle, String lectureDescription,
-            int likes, boolean likedByUser) {
+        public LectureDto(String lectureId, String recordTitle, String recordThumbnail,
+            String recordThumbnailSmall, int likeCount, boolean myLike) {
             this.lectureId = lectureId;
-            this.lectureTitle = lectureTitle;
-            this.lectureDescription = lectureDescription;
-            this.likes = likes;
-            this.likedByUser = likedByUser;
+            this.recordTitle = recordTitle;
+            this.recordThumbnail = recordThumbnail;
+            this.recordThumbnailSmall = recordThumbnailSmall;
+            this.likeCount = likeCount;
+            this.myLike = myLike;
         }
     }
 
@@ -95,25 +98,41 @@ public class DetailedTeacherDto {
     @Builder
     public static class NoticeDto {
 
-        private String noticeId;
-        private String noticeContent;
-        private String noticeImage;
-        private String noticeImageSmall;
+        private String articleId;
+        private String content;
+        private String imageUrl;
+        private String imageUrlSmall;
+        private long createdAt;
+        private long updatedAt;
+        private String userName;
+        private String profileImageUrl;
+        private String profileImageSmallUrl;
 
         /**
          * NoticeDto 생성자
          *
-         * @param noticeId         공지 ID
-         * @param noticeContent    공지 내용
-         * @param noticeImage      공지 이미지 URL
-         * @param noticeImageSmall 공지 작은 이미지 URL
+         * @param articleId            공지 ID
+         * @param content              공지 내용
+         * @param imageUrl             공지 이미지 URL
+         * @param imageUrlSmall        공지 작은 이미지 URL
+         * @param createdAt            생성 시간
+         * @param updatedAt            수정 시간
+         * @param userName             사용자 이름
+         * @param profileImageUrl      프로필 이미지 URL
+         * @param profileImageSmallUrl 프로필 작은 이미지 URL
          */
-        public NoticeDto(String noticeId, String noticeContent, String noticeImage,
-            String noticeImageSmall) {
-            this.noticeId = noticeId;
-            this.noticeContent = noticeContent;
-            this.noticeImage = noticeImage;
-            this.noticeImageSmall = noticeImageSmall;
+        public NoticeDto(String articleId, String content, String imageUrl, String imageUrlSmall,
+            long createdAt, long updatedAt, String userName, String profileImageUrl,
+            String profileImageSmallUrl) {
+            this.articleId = articleId;
+            this.content = content;
+            this.imageUrl = imageUrl;
+            this.imageUrlSmall = imageUrlSmall;
+            this.createdAt = createdAt;
+            this.updatedAt = updatedAt;
+            this.userName = userName;
+            this.profileImageUrl = profileImageUrl;
+            this.profileImageSmallUrl = profileImageSmallUrl;
         }
     }
 }
