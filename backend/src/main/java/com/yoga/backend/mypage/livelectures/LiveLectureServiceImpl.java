@@ -3,6 +3,7 @@ package com.yoga.backend.mypage.livelectures;
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
+import com.yoga.backend.home.NotificationService;
 import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateDto;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateResponseDto;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,9 +24,12 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     private UsersRepository usersRepository;
     @Autowired
     private MyLiveLectureRepository myLiveLectureRepository;
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
-    public LiveLectureCreateResponseDto createLiveLecture(LiveLectureCreateDto liveLectureCreateDto) {
+    public LiveLectureCreateResponseDto createLiveLecture(
+        LiveLectureCreateDto liveLectureCreateDto) {
         LiveLectures liveLecture = new LiveLectures();
         liveLecture.setLiveTitle(liveLectureCreateDto.getLiveTitle());
         liveLecture.setLiveContent(liveLectureCreateDto.getLiveContent());
@@ -37,12 +42,14 @@ public class LiveLectureServiceImpl implements LiveLectureService {
         liveLecture.setAvailableDay(liveLectureCreateDto.getAvailableDay());
 
         if (liveLectureCreateDto.getUserId() != 0) {
-            Optional<Users> userOptional = usersRepository.findById(liveLectureCreateDto.getUserId());
+            Optional<Users> userOptional = usersRepository.findById(
+                liveLectureCreateDto.getUserId());
             if (userOptional.isPresent()) {
                 Users user = userOptional.get();
                 liveLecture.setUser(user);
 
                 LiveLectures savedLiveLecture = liveLecturesRepository.save(liveLecture);
+                notificationService.handleLectureUpdate(savedLiveLecture);
 
                 MyLiveLecture myLiveLecture = new MyLiveLecture();
                 myLiveLecture.setLiveLecture(savedLiveLecture);
@@ -60,8 +67,10 @@ public class LiveLectureServiceImpl implements LiveLectureService {
             throw new IllegalArgumentException("사용자 ID는 0일 수 없습니다");
         }
     }
+
     /**
      * 모든 실시간 강의를 조회
+     *
      * @return 모든 실시간 강의 리스트
      */
     @Override
@@ -71,6 +80,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
 
     /**
      * 특정 사용자 ID에 대한 나의 실시간 강의 목록을 조회
+     *
      * @param userId 사용자 ID
      * @return 나의 실시간 강의 리스트
      */
@@ -127,7 +137,9 @@ public class LiveLectureServiceImpl implements LiveLectureService {
             liveLecture.setAvailableDay(liveLectureCreateDto.getAvailableDay());
         }
 
-        return liveLecturesRepository.save(liveLecture);
+        LiveLectures updatedLecture = liveLecturesRepository.save(liveLecture);
+        notificationService.handleLectureUpdate(updatedLecture);
+        return updatedLecture;
     }
 
     /**
@@ -162,7 +174,10 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      */
     @Override
     public void deleteLiveLectureById(Long liveId) {
-        List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findByLiveLecture_LiveId(liveId);
+        notificationService.handleLectureDelete(liveId);
+
+        List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findByLiveLecture_LiveId(
+            liveId);
         myLiveLectureRepository.deleteAll(myLiveLectures);
         liveLecturesRepository.deleteById(liveId);
     }
