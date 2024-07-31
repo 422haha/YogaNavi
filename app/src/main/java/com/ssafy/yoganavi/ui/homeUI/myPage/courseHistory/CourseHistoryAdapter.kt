@@ -15,7 +15,7 @@ import com.ssafy.yoganavi.ui.utils.formatTime
 import com.ssafy.yoganavi.ui.utils.startSpaceEnd
 import com.ssafy.yoganavi.ui.utils.startTildeEnd
 
-class CourseHistoryAdapter: ListAdapter<HomeData, CourseHistoryAdapter.ViewHolder>(DiffUtilCallback()) {
+class CourseHistoryAdapter: ListAdapter<HomeData, CourseHistoryAdapter.ViewHolder>(CourseHistoryDiffUtilCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent)
     }
@@ -61,7 +61,7 @@ class CourseHistoryAdapter: ListAdapter<HomeData, CourseHistoryAdapter.ViewHolde
     }
 }
 
-class DiffUtilCallback : DiffUtil.ItemCallback<HomeData>() {
+class CourseHistoryDiffUtilCallback : DiffUtil.ItemCallback<HomeData>() {
     override fun areItemsTheSame(oldItem: HomeData, newItem: HomeData): Boolean {
         return oldItem.liveId == newItem.liveId
     }
