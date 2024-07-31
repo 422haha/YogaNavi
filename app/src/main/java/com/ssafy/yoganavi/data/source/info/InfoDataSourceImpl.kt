@@ -110,4 +110,8 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     // Home
     override suspend fun getHomeList(): Response<YogaResponse<HomeData>> =
         infoAPI.getHomeList()
+
+    // CourseHistory
+    override suspend fun getCourseHistoryList(): Response<YogaResponse<HomeData>> =
+        infoAPI.getCourseHistoryList()
 }

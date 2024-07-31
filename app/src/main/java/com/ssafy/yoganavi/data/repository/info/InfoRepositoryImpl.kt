@@ -168,4 +168,9 @@ class InfoRepositoryImpl @Inject constructor(
         val response = withContext(ioDispatcher) { infoDataSource.getHomeList() }
         return response.toListResponse()
     }
+
+    override suspend fun getCourseHistoryList(): ListResponse<HomeData> {
+        val response = withContext(ioDispatcher) { infoDataSource.getCourseHistoryList() }
+        return response.toListResponse()
+    }
 }

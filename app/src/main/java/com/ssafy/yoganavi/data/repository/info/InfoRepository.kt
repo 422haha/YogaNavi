@@ -71,4 +71,7 @@ interface InfoRepository {
 
     // Home
     suspend fun getHomeList(): ListResponse<HomeData>
+
+    // CourseHistory
+    suspend fun getCourseHistoryList(): ListResponse<HomeData>
 }

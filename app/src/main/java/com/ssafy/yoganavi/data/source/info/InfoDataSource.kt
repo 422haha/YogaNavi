@@ -78,4 +78,7 @@ interface InfoDataSource {
 
     // Home
     suspend fun getHomeList(): Response<YogaResponse<HomeData>>
+
+    // CourseHistory
+    suspend fun getCourseHistoryList(): Response<YogaResponse<HomeData>>
 }

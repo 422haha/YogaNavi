@@ -10,7 +10,6 @@ import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.response.YogaDetailResponse
 import com.ssafy.yoganavi.data.source.response.YogaResponse
-import com.ssafy.yoganavi.data.source.teacher.FilterData
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -115,4 +114,8 @@ interface InfoAPI {
     // Home
     @GET("home")
     suspend fun getHomeList(): Response<YogaResponse<HomeData>>
+
+    // CourseHistory
+    @GET("mypage/course-history")
+    suspend fun getCourseHistoryList(): Response<YogaResponse<HomeData>>
 }
