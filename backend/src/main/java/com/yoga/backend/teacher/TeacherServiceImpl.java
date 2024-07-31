@@ -4,6 +4,7 @@ import com.yoga.backend.common.awsS3.S3Service;
 import com.yoga.backend.common.entity.Hashtag;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.entity.TeacherLike;
+import com.yoga.backend.common.entity.RecordedLectures.RecordedLecture;
 import com.yoga.backend.teacher.dto.DetailedTeacherDto;
 import com.yoga.backend.teacher.dto.TeacherDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,11 +81,11 @@ public class TeacherServiceImpl implements TeacherService {
                 String profileImageUrl = null;
                 String profileImageUrlSmall = null;
                 try {
-                    if (user.getProfile_image_url() != null) {
+                    if (user.getProfile_image_url() != null && !user.getProfile_image_url().isEmpty()) {
                         profileImageUrl = s3Service.generatePresignedUrl(
                             user.getProfile_image_url(), URL_EXPIRATION_SECONDS);
                     }
-                    if (user.getProfile_image_url_small() != null) {
+                    if (user.getProfile_image_url_small() != null && !user.getProfile_image_url_small().isEmpty()) {
                         profileImageUrlSmall = s3Service.generatePresignedUrl(
                             user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
                     }
@@ -127,12 +128,12 @@ public class TeacherServiceImpl implements TeacherService {
         String profileImageUrl = null;
         String profileImageUrlSmall = null;
         try {
-            if (user.getProfile_image_url() != null) {
+            if (user.getProfile_image_url() != null && !user.getProfile_image_url().isEmpty()) {
                 profileImageUrl = s3Service.generatePresignedUrl(user.getProfile_image_url(),
                     URL_EXPIRATION_SECONDS);
                 System.out.println("생성된 profileImageUrl: " + profileImageUrl);
             }
-            if (user.getProfile_image_url_small() != null) {
+            if (user.getProfile_image_url_small() != null && !user.getProfile_image_url_small().isEmpty()) {
                 profileImageUrlSmall = s3Service.generatePresignedUrl(
                     user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
                 System.out.println("생성된 profileImageUrlSmall: " + profileImageUrlSmall);
@@ -144,6 +145,8 @@ public class TeacherServiceImpl implements TeacherService {
         boolean likedByUser =
             teacherLikeRepository.findByTeacherAndUser(user, getUserById(userId)) != null;
 
+        final String finalProfileImageUrl = profileImageUrl;
+        final String finalProfileImageUrlSmall = profileImageUrlSmall;
         return DetailedTeacherDto.builder()
             .id(user.getId())
             .email(user.getEmail())
@@ -152,41 +155,54 @@ public class TeacherServiceImpl implements TeacherService {
             .profileImageUrlSmall(profileImageUrlSmall)
             .content(user.getContent())
             .hashtags(user.getHashtags().stream().map(Hashtag::getName).collect(Collectors.toSet()))
-            .recordedLectures(user.getRecordedLectures().stream().map(lecture ->
-                DetailedTeacherDto.LectureDto.builder()
+            .recordedLectures(user.getRecordedLectures().stream().map(lecture -> {
+                String recordThumbnail = null;
+                String recordThumbnailSmall = null;
+                try {
+                    if (lecture.getThumbnail() != null && !lecture.getThumbnail().isEmpty()) {
+                        recordThumbnail = s3Service.generatePresignedUrl(lecture.getThumbnail(), URL_EXPIRATION_SECONDS);
+                    }
+                    if (lecture.getThumbnailSmall() != null && !lecture.getThumbnailSmall().isEmpty()) {
+                        recordThumbnailSmall = s3Service.generatePresignedUrl(lecture.getThumbnailSmall(), URL_EXPIRATION_SECONDS);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Recorded Lecture Presigned URL 생성 오류: " + e.getMessage());
+                }
+                return DetailedTeacherDto.LectureDto.builder()
                     .lectureId(lecture.getId().toString())
-                    .lectureTitle(lecture.getTitle())
-                    .lectureDescription(lecture.getContent())
-                    .likes((int) lecture.getLikeCount())
-                    .likedByUser(false)
-                    .build()
-            ).collect(Collectors.toList()))
+                    .recordTitle(lecture.getTitle())
+                    .recordThumbnail(recordThumbnail)
+                    .recordThumbnailSmall(recordThumbnailSmall)
+                    .likeCount((int) lecture.getLikeCount())
+                    .myLike(false) // 사용자가 좋아요를 눌렀는지 확인 필요
+                    .build();
+            }).collect(Collectors.toList()))
             .notices(user.getArticles().stream().map(article -> {
-                    String noticeImage = null;
-                    String noticeImageSmall = null;
+                    String imageUrl = article.getImageUrl();
+                    String imageUrlSmall = article.getImageUrlSmall();
                     try {
-                        if (article.getImageUrl() != null && !article.getImageUrl().isEmpty()) {
-                            noticeImage = s3Service.generatePresignedUrl(article.getImageUrl(),
-                                URL_EXPIRATION_SECONDS);
-                            System.out.println("생성된 noticeImage: " + noticeImage);
+                        if (imageUrl != null && !imageUrl.isEmpty() && !imageUrl.contains("X-Amz-Algorithm")) {
+                            imageUrl = s3Service.generatePresignedUrl(article.getImageUrl(), URL_EXPIRATION_SECONDS);
                         }
-                        if (article.getImageUrlSmall() != null && !article.getImageUrlSmall()
-                            .isEmpty()) {
-                            noticeImageSmall = s3Service.generatePresignedUrl(
-                                article.getImageUrlSmall(), URL_EXPIRATION_SECONDS);
-                            System.out.println("생성된 noticeImageSmall: " + noticeImageSmall);
+                        if (imageUrlSmall != null && !imageUrlSmall.isEmpty() && !imageUrlSmall.contains("X-Amz-Algorithm")) {
+                            imageUrlSmall = s3Service.generatePresignedUrl(article.getImageUrlSmall(), URL_EXPIRATION_SECONDS);
                         }
                     } catch (Exception e) {
                         System.err.println("공지 Presigned URL 생성 오류: " + e.getMessage());
                     }
 
                     return DetailedTeacherDto.NoticeDto.builder()
-                        .noticeId(article.getArticleId().toString())
-                        .noticeContent(article.getContent())
-                        .noticeImage(noticeImage)
-                        .noticeImageSmall(noticeImageSmall)
+                        .articleId(article.getArticleId().toString()) // noticeId -> articleId
+                        .content(article.getContent()) // noticeContent -> content
+                        .imageUrl(imageUrl) // noticeImage -> imageUrl
+                        .imageUrlSmall(imageUrlSmall) // noticeImageSmall -> imageUrlSmall
+                        .createdAt(article.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()) // createdAt 추가
+                        .updatedAt(article.getUpdatedAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()) // updatedAt 추가
+                        .userName(user.getNickname()) // userName 추가
+                        .profileImageUrl(finalProfileImageUrl) // profileImageUrl 추가
+                        .profileImageSmallUrl(finalProfileImageUrlSmall) // profileImageUrlSmall 추가
                         .build();
-                }).sorted(Comparator.comparing(DetailedTeacherDto.NoticeDto::getNoticeId).reversed())
+                }).sorted(Comparator.comparing(DetailedTeacherDto.NoticeDto::getArticleId).reversed())
                 .collect(Collectors.toList()))
             .likeCount(user.getTeacherLikes().size())
             .liked(likedByUser)
