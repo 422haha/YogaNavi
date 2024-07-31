@@ -8,9 +8,9 @@ import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
+import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
 import com.ssafy.yoganavi.data.source.response.YogaDetailResponse
 import com.ssafy.yoganavi.data.source.response.YogaResponse
-import com.ssafy.yoganavi.data.source.teacher.FilterData
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -48,7 +48,7 @@ interface InfoAPI {
     ): Response<YogaResponse<TeacherData>>
 
     @GET("teacher/{teacher_id}")
-    suspend fun getTeacherDetail(@Path("teacher_id") teacherId: Int): Response<YogaDetailResponse<TeacherData>>
+    suspend fun getTeacherDetail(@Path("teacher_id") teacherId: Int): Response<YogaDetailResponse<TeacherDetailData>>
 
     @POST("teacher/like/{teacher_id}")
     suspend fun teacherLikeToggle(@Path("teacher_id") teacherId: Int): Response<YogaDetailResponse<Boolean>>

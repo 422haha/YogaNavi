@@ -8,6 +8,7 @@ import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
+import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
 import com.ssafy.yoganavi.data.source.response.YogaDetailResponse
 import com.ssafy.yoganavi.data.source.response.YogaResponse
 import com.ssafy.yoganavi.data.source.teacher.FilterData
@@ -31,7 +32,7 @@ interface InfoDataSource {
         searchKeyword: String
     ): Response<YogaResponse<TeacherData>>
 
-    suspend fun getTeacherDetail(teacherId: Int): Response<YogaDetailResponse<TeacherData>>
+    suspend fun getTeacherDetail(teacherId: Int): Response<YogaDetailResponse<TeacherDetailData>>
 
     suspend fun teacherLikeToggle(teacherId: Int): Response<YogaDetailResponse<Boolean>>
 
