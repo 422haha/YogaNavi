@@ -42,17 +42,26 @@ class PoseDataSourceImpl @Inject constructor(
     private val imageStd = 255f
 
     override suspend fun infer(imageProxy: ImageProxy, width: Int, height: Int): List<FloatArray> {
-        val inputTensor = preProcess(imageProxy)
+        val bitmap = imageToBitmap(imageProxy)
+        val inputTensor = preProcess(bitmap, true)
         val rawOutput = process(inputTensor)
         val output = postProcess(rawOutput)
-        return rescale(output, width, height)
+        return rescaleToCamera(output, width, height)
     }
 
-    override fun preProcess(imageProxy: ImageProxy): OnnxTensor {
-        val matrix = Matrix().apply { setScale(-1f, 1f) }
-        val bitmap = imageProxy.toBitmap()
+    override suspend fun infer(bitmap: Bitmap, width: Int, height: Int): List<FloatArray> {
+        val inputTensor = preProcess(bitmap, false)
+        val rawOutput = process(inputTensor)
+        val output = postProcess(rawOutput)
+        return rescaleToBitmap(output, width, height)
+    }
+
+    override fun preProcess(bitmap: Bitmap, needFlip: Boolean): OnnxTensor {
+        val sx = if (needFlip) -1f else 1f
+        val sy = 1f
+        val matrix = Matrix().apply { setScale(sx, sy) }
         val rescaledBitmap = Bitmap.createScaledBitmap(bitmap, modelW, modelH, true)
-        val rotatedBitmap = Bitmap.createBitmap(rescaledBitmap, 0, 0, modelW, modelH, matrix, true)
+        val flippedBitmap = Bitmap.createBitmap(rescaledBitmap, 0, 0, modelW, modelH, matrix, true)
 
         val cap = shape.reduce { acc, l -> acc * l }.toInt()
         val order = ByteOrder.nativeOrder()
@@ -62,7 +71,7 @@ class PoseDataSourceImpl @Inject constructor(
         for (x in 0 until modelW) {
             for (y in 0 until modelH) {
                 val idx = modelW * y + x
-                val pixelValue = rotatedBitmap.getPixel(x, y)
+                val pixelValue = flippedBitmap.getPixel(x, y)
 
                 buffer.put(idx, Color.red(pixelValue) / imageStd)
                 buffer.put(idx + area, Color.green(pixelValue) / imageStd)
@@ -71,6 +80,8 @@ class PoseDataSourceImpl @Inject constructor(
         }
         return OnnxTensor.createTensor(ortEnv, buffer, shape)
     }
+
+    private fun imageToBitmap(imageProxy: ImageProxy): Bitmap = imageProxy.toBitmap()
 
     override fun process(inputTensor: OnnxTensor): OrtSession.Result = inputTensor.use {
         val inputName = ortSession.inputNames.first()
@@ -83,7 +94,11 @@ class PoseDataSourceImpl @Inject constructor(
         return filterByIOU(filteredOutputs)
     }
 
-    override fun rescale(result: List<FloatArray>, width: Int, height: Int): List<FloatArray> {
+    override fun rescaleToCamera(
+        result: List<FloatArray>,
+        width: Int,
+        height: Int
+    ): List<FloatArray> {
         val scaleX = width / modelW.toFloat()
         val scaleY = scaleX * HEIGHT_RATIO / WIDTH_RATIO
         val realY = width * HEIGHT_RATIO / WIDTH_RATIO
@@ -93,6 +108,24 @@ class PoseDataSourceImpl @Inject constructor(
             for (idx in 5 until keyPoints.size step 3) {
                 keyPoints[idx] = keyPoints[idx] * scaleX
                 keyPoints[idx + 1] = keyPoints[idx + 1] * scaleY - (diffY / 2f)
+            }
+        }
+
+        return result
+    }
+
+    override fun rescaleToBitmap(
+        result: List<FloatArray>,
+        width: Int,
+        height: Int
+    ): List<FloatArray> {
+        val scaleX = width / modelW.toFloat()
+        val scaleY = height / modelH.toFloat()
+
+        result.forEach { keyPoints ->
+            for (idx in 5 until keyPoints.size step 3) {
+                keyPoints[idx] *= scaleX
+                keyPoints[idx + 1] *= scaleY
             }
         }
 

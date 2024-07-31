@@ -27,6 +27,7 @@ import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.core.MainActivity
 import com.ssafy.yoganavi.ui.utils.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
@@ -37,6 +38,9 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
 ) {
     private val args by navArgs<LectureVideoFragmentArgs>()
     private val viewModel: LectureVideoViewModel by viewModels()
+    private lateinit var player: ExoPlayer
+    private val width by lazy { binding.poseView.width }
+    private val height by lazy { binding.poseView.height }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -58,18 +62,25 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.keyPoints.collectLatest {
-                drawKeyPoints(it)
-            }
+            collectUserKeyPoints()
+            collectTeacherKeyPoints()
         }
     }
 
-    private fun drawKeyPoints(keyPoints: List<FloatArray>) {
-        binding.poseView.updateKeyPoints(keyPoints)
+    private fun CoroutineScope.collectUserKeyPoints() = launch {
+        viewModel.userKeyPoints.collectLatest { keyPoints ->
+            binding.poseView.updateUserKeyPoints(keyPoints)
+        }
+    }
+
+    private fun CoroutineScope.collectTeacherKeyPoints() = launch {
+        viewModel.teacherKeyPoints.collectLatest { keyPoints ->
+            binding.poseView.updateTeacherKeyPoints(keyPoints)
+        }
     }
 
     private fun setVideo() = with(binding) {
-        val player = ExoPlayer.Builder(requireContext()).build()
+        player = ExoPlayer.Builder(requireContext()).build()
         val mediaItems = args.uriList.map { url ->
             MediaItem.fromUri(url)
         }
@@ -137,8 +148,9 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
             .apply {
-                setAnalyzer(Executors.newSingleThreadExecutor()) {
-                    viewModel.inferImage(it, binding.poseView.width, binding.poseView.height)
+                setAnalyzer(Executors.newSingleThreadExecutor()) { imageProxy ->
+                    viewModel.inferImage(imageProxy, width, height)
+                    viewModel.inferVideo(player, width, height)
                 }
             }
 

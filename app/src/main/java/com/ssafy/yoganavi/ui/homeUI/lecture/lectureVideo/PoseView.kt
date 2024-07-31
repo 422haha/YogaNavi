@@ -8,12 +8,15 @@ import android.util.AttributeSet
 import android.view.View
 
 class PoseView(context: Context, attrs: AttributeSet) : View(context, attrs) {
-    private val kPointsThreshold = 0.35f
-    private var keyPoints: List<FloatArray> = emptyList()
-    private val pointPaint = Paint().apply {
+    private val kPointsThreshold = 0.45f
+    private val radius = 15f
+    private var userKeyPoints: List<FloatArray> = emptyList()
+    private var teacherKeyPoints: List<FloatArray> = emptyList()
+
+    private val userPaint = Paint().apply {
         color = Color.GREEN
-        style = Paint.Style.STROKE
-        strokeWidth = 30f
+        style = Paint.Style.FILL
+        strokeWidth = 15f
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -22,7 +25,7 @@ class PoseView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     }
 
     private fun drawPointsAndLines(canvas: Canvas) {
-        keyPoints.forEach { points ->
+        userKeyPoints.forEach { points ->
             drawPoint(canvas, points)
         }
     }
@@ -33,13 +36,18 @@ class PoseView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             val yPos = points[i + 1]
             val confidence = points[i + 2]
             if (xPos > 0 && yPos > 0 && confidence > kPointsThreshold) {
-                canvas.drawPoint(xPos, yPos, pointPaint)
+                canvas.drawCircle(xPos, yPos, radius, userPaint)
             }
         }
     }
 
-    fun updateKeyPoints(newKeyPoints: List<FloatArray>) {
-        keyPoints = newKeyPoints
+    fun updateUserKeyPoints(newKeyPoints: List<FloatArray>) {
+        userKeyPoints = newKeyPoints
         invalidate()
+    }
+
+    fun updateTeacherKeyPoints(newKeyPoints: List<FloatArray>) {
+        teacherKeyPoints = newKeyPoints
+        // TODO 비교 연산 해야함!
     }
 }
