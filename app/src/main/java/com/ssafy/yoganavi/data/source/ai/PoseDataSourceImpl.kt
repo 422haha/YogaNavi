@@ -217,6 +217,7 @@ class PoseDataSourceImpl @Inject constructor(
     private fun FloatArray.toKeyPoints() = List(KEYPOINT_NUM / 3) { index ->
         val baseIndex = index * 3 + 5
         KeyPoint(
+            index = index,
             x = this[baseIndex],
             y = this[baseIndex + 1],
             confidence = this[baseIndex + 2]

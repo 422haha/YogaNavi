@@ -24,13 +24,13 @@ class LectureVideoViewModel @Inject constructor(
     private val retriever = MediaMetadataRetriever()
     private var isVideoInfer: Boolean = false
 
-    private val _userKeyPoints: MutableStateFlow<List<List<KeyPoint>>> =
+    private val _userKeyPoints: MutableStateFlow<List<KeyPoint>> =
         MutableStateFlow(emptyList())
-    val userKeyPoints: StateFlow<List<List<KeyPoint>>> = _userKeyPoints.asStateFlow()
+    val userKeyPoints: StateFlow<List<KeyPoint>> = _userKeyPoints.asStateFlow()
 
-    private val _teacherKeyPoints: MutableStateFlow<List<List<KeyPoint>>> =
+    private val _teacherKeyPoints: MutableStateFlow<List<KeyPoint>> =
         MutableStateFlow(emptyList())
-    val teacherKeyPoints: StateFlow<List<List<KeyPoint>>> = _teacherKeyPoints.asStateFlow()
+    val teacherKeyPoints: StateFlow<List<KeyPoint>> = _teacherKeyPoints.asStateFlow()
 
     fun inferImage(
         image: ImageProxy,
@@ -38,7 +38,7 @@ class LectureVideoViewModel @Inject constructor(
         height: Int
     ) = viewModelScope.launch(Dispatchers.Default) {
         val result: List<List<KeyPoint>> = poseRepository.infer(image, width, height)
-        _userKeyPoints.emit(result)
+        _userKeyPoints.emit(result.firstOrNull().orEmpty())
         image.close()
     }
 
@@ -68,22 +68,18 @@ class LectureVideoViewModel @Inject constructor(
         )
 
         bitmap?.let {
-            val result = poseRepository.infer(bitmap, bitmap.width, bitmap.height)
+            val results = poseRepository.infer(bitmap, bitmap.width, bitmap.height)
             val ratio = height / bitmap.height.toFloat()
             val diffX = (width - bitmap.width * ratio) / 2f
-            val list = mutableListOf<List<KeyPoint>>()
-
-            result.forEach { points ->
-                val keyPointList = mutableListOf<KeyPoint>()
-                points.forEach { keyPoint ->
-                    val x = if (keyPoint.x == 0f) 0f else keyPoint.x * ratio + diffX
-                    val y = if (keyPoint.y == 0f) 0f else keyPoint.y * ratio
-                    keyPointList.add(KeyPoint(x, y, keyPoint.confidence))
-                }
-                list.add(keyPointList)
+            val result = results.firstOrNull().orEmpty()
+            val keyPoints = mutableListOf<KeyPoint>()
+            result.forEachIndexed { idx, keyPoint ->
+                val x = if (keyPoint.x == 0f) 0f else keyPoint.x * ratio + diffX
+                val y = if (keyPoint.y == 0f) 0f else keyPoint.y * ratio
+                keyPoints.add(KeyPoint(idx, x, y, keyPoint.confidence))
             }
             bitmap.recycle()
-            _teacherKeyPoints.emit(result)
+            _teacherKeyPoints.emit(keyPoints)
         }
 
         isVideoInfer = false
