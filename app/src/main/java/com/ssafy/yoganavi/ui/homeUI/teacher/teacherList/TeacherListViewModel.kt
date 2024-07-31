@@ -2,7 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.teacher.teacherList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.yoganavi.data.repository.InfoRepository
+import com.ssafy.yoganavi.data.repository.info.InfoRepository
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.teacher.FilterData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +40,7 @@ class TeacherListViewModel @Inject constructor(
 
     private fun getAllTeacherList() = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.getAllTeacherList(sorting, searchKeyword) }
-            .onSuccess { }
+            .onSuccess { _teacherList.emit(it.data.toMutableList())}
             .onFailure { it.printStackTrace() }
     }
 

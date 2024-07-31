@@ -2,7 +2,8 @@ package com.ssafy.yoganavi.ui.loginUI.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.yoganavi.data.repository.UserRepository
+import com.ssafy.yoganavi.data.repository.dataStore.DataStoreRepository
+import com.ssafy.yoganavi.data.repository.user.UserRepository
 import com.ssafy.yoganavi.data.repository.response.DetailResponse
 import com.ssafy.yoganavi.data.source.user.UserRequest
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
@@ -19,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val dataStoreRepository: DataStoreRepository
 ) : ViewModel() {
 
     private val _loginEvent: MutableSharedFlow<LogInEvent> = MutableSharedFlow()
@@ -32,7 +34,7 @@ class LoginViewModel @Inject constructor(
         }
 
         val request = UserRequest(email = email, password = password)
-        runCatching { userRepository.logIn(request) }
+        runCatching { userRepository.logIn(request, dataStoreRepository.getFirebaseToken()) }
             .onSuccess { emitResponse(it) }
             .onFailure { emitError(it.message ?: NO_RESPONSE) }
     }

@@ -13,6 +13,7 @@ fun Int.toK() = if (this < 1000) {
 const val TIME_OUT = 5000L
 const val MEMBER = "members"
 const val TOKEN = "Authorization"
+const val FCM_TOKEN = "FCM_Token"
 const val REFRESH_TOKEN = "Refresh-Token"
 const val NEED_REFRESH_TOKEN = "refresh_token_required"
 const val TOKEN_REQUIRED = "token_required"

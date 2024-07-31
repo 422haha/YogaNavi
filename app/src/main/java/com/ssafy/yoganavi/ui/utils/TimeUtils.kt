@@ -6,9 +6,9 @@ import java.util.Date
 import java.util.Locale
 
 fun formatTime(milliseconds: Long): String {
-    val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
-    val date = Date(milliseconds  * 1000)
-    return formatter.format(date)
+    val hours = (milliseconds / (3600 * 1000)).toInt() // 시간 계산
+    val minutes = ((milliseconds % (3600 * 1000)) / (60 * 1000)).toInt() // 분 계산
+    return String.format(Locale.getDefault(), "%02d:%02d", hours, minutes)
 }
 
 fun formatDotDate(milliseconds: Long): String {

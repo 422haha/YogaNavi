@@ -56,6 +56,10 @@ android {
 }
 
 dependencies {
+
+    // ONNX
+    implementation(libs.onnxruntime.android)
+
     // cameraX
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)
