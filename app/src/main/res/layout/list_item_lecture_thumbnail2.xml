@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent">
+
+    <!-- 4, 5-2, 5-11 -->
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cv_content"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/padding_extra_small"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="3:4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/iv_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            tools:src="@color/gray_10" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- TODO 상황에 따라 흰색, 검은색 설정하기 -->
+    <ImageView
+        android:id="@+id/iv_favorite"
+        android:layout_width="@dimen/icon_extra_small"
+        android:layout_height="@dimen/icon_extra_small"
+        android:layout_marginTop="@dimen/padding_small"
+        android:layout_marginEnd="@dimen/padding_small"
+        android:src="@drawable/selector_toggle"
+        app:layout_constraintEnd_toEndOf="@id/cv_content"
+        app:layout_constraintTop_toTopOf="@id/cv_content" />
+
+    <!-- TODO 만약 999보다 크면 999+ 이런식으로 해야할듯 -->
+    <TextView
+        android:id="@+id/tv_count"
+        style="@style/commonText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLength="4"
+        android:text="0"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@id/iv_favorite"
+        app:layout_constraintStart_toStartOf="@id/iv_favorite"
+        app:layout_constraintTop_toBottomOf="@id/iv_favorite" />
+
+    <RadioButton
+        android:id="@+id/rb_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_extra_small"
+        android:clickable="false"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        style="@style/commonText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/padding_small"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:singleLine="true"
+        app:layout_constraintBottom_toBottomOf="@id/cv_content"
+        app:layout_constraintEnd_toEndOf="@id/cv_content"
+        app:layout_constraintStart_toStartOf="@id/cv_content"
+        tools:text="SO EZ 요가" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
