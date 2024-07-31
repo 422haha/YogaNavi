@@ -8,6 +8,7 @@ import com.yoga.backend.teacher.dto.DetailedTeacherDto;
 import com.yoga.backend.teacher.dto.TeacherDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -44,7 +45,7 @@ public class TeacherServiceImpl implements TeacherService {
      * @return 강사 정보 리스트
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<TeacherDto> getAllTeachers(TeacherFilter filter, int userId) {
         LocalDate now = LocalDate.now();
         long weekAfter = now.plusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toInstant()
@@ -118,7 +119,7 @@ public class TeacherServiceImpl implements TeacherService {
      * @return 상세 강사 정보
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public DetailedTeacherDto getTeacherById(int teacherId, int userId) {
         Users user = teacherRepository.findById(teacherId)
             .orElseThrow(() -> new RuntimeException("강사를 찾을 수 없습니다."));
@@ -200,7 +201,7 @@ public class TeacherServiceImpl implements TeacherService {
      * @return 좋아요 상태 (true: 좋아요 추가, false: 좋아요 취소)
      */
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public boolean toggleLike(int teacherId, int userId) {
         Users teacher = teacherRepository.findById(teacherId)
             .orElseThrow(() -> new RuntimeException("강사를 찾을 수 없습니다."));
@@ -228,7 +229,7 @@ public class TeacherServiceImpl implements TeacherService {
      * @return 정렬된 강사 정보 리스트
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<TeacherDto> getSortedTeachers(int sorting, int userId) {
         List<Users> users = teacherRepository.findAllTeachers();
 
@@ -284,7 +285,7 @@ public class TeacherServiceImpl implements TeacherService {
      * @return 강사 정보 리스트
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<TeacherDto> searchTeachers(TeacherFilter filter, int userId, String keyword) {
         List<Users> users = teacherRepository.findAllTeachers();
 
@@ -336,7 +337,7 @@ public class TeacherServiceImpl implements TeacherService {
      * @return 강사 정보 리스트
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<TeacherDto> searchTeachersByHashtag(String hashtag, int userId) {
         List<Users> users = teacherRepository.findTeachersByHashtag(hashtag);
 
