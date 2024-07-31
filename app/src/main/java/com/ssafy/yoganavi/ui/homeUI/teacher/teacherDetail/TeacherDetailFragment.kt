@@ -22,7 +22,7 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
     private val viewModel: TeacherDetailViewModel by viewModels()
     private val args by navArgs<TeacherDetailFragmentArgs>()
     private val teacherDetailAdapter by lazy {
-        TeacherDetailAdapter(goReserve = ::goReserve)
+        TeacherDetailAdapter(goReserve = ::goReserve, navigateToLectureDetailFragment = ::navigateToLectureDetailFragment)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,7 +69,11 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
     }
 
     private fun goReserve(teacherId: Int) {
-        // TODO: teacherID 연결해야함. 
-        findNavController().navigate(R.id.action_teacherDetailFragment_to_teacherReservationFragment)
+        val directions = TeacherDetailFragmentDirections.actionTeacherDetailFragmentToTeacherReservationFragment(teacherId)
+        findNavController().navigate(directions)
+    }
+    private fun navigateToLectureDetailFragment(recordedId: Long=-1) {
+        val directions = TeacherDetailFragmentDirections.actionTeacherDetailFragmentToLectureDetailFragment(recordedId)
+        findNavController().navigate(directions)
     }
 }

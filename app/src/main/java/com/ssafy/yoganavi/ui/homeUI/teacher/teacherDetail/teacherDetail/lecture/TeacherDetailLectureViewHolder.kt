@@ -9,7 +9,8 @@ import com.ssafy.yoganavi.databinding.ListItemLectureThumbnail2Binding
 import com.ssafy.yoganavi.ui.utils.toK
 
 class TeacherDetailLectureViewHolder(
-    private val binding: ListItemLectureThumbnail2Binding
+    private val binding: ListItemLectureThumbnail2Binding,
+    private val navigateToLectureDetailFragment: (Long)->Unit
 ) : ViewHolder(binding.root) {
     fun bind(data: LectureData) = with(binding) {
         tvTitle.text = data.recordTitle
@@ -28,5 +29,8 @@ class TeacherDetailLectureViewHolder(
             .placeholder(circularProgressDrawable)
             .into(ivThumbnail)
 
+        binding.root.setOnClickListener {
+            navigateToLectureDetailFragment(data.recordedId)
+        }
     }
 }
