@@ -43,6 +43,7 @@ const val RESERVE = "예약하기"
 const val MODIFY = "정보 수정"
 const val HOME = "요가 할 일"
 const val LIKE_LECTURE = "좋아요한 강의"
+const val COURSE_HISTORY = "수강 내역"
 
 // 이름 
 const val CREATE = "생성"
