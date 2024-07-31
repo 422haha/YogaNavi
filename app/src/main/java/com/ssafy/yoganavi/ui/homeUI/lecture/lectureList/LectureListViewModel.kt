@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.ssafy.yoganavi.data.repository.InfoRepository
-import com.ssafy.yoganavi.data.repository.LectureRepository
+import com.ssafy.yoganavi.data.repository.info.InfoRepository
+import com.ssafy.yoganavi.data.repository.lecture.LectureRepository
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.ui.homeUI.lecture.lectureList.lecture.SortAndKeyword
 import dagger.hilt.android.lifecycle.HiltViewModel

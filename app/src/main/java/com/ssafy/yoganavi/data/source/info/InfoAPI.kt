@@ -118,4 +118,8 @@ interface InfoAPI {
     // Home
     @GET("home")
     suspend fun getHomeList(): Response<YogaResponse<HomeData>>
+
+    // CourseHistory
+    @GET("mypage/course-history")
+    suspend fun getCourseHistoryList(): Response<YogaResponse<HomeData>>
 }

@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.Strictness
 import com.ssafy.yoganavi.data.auth.AuthInterceptor
-import com.ssafy.yoganavi.data.repository.DataStoreRepository
+import com.ssafy.yoganavi.data.repository.dataStore.DataStoreRepository
 import com.ssafy.yoganavi.data.source.info.InfoAPI
 import com.ssafy.yoganavi.data.source.lecture.LectureAPI
 import com.ssafy.yoganavi.data.source.user.UserAPI

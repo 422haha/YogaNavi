@@ -204,9 +204,9 @@
     </fragment>
     <fragment
         android:id="@+id/myListFragment"
-        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.myList.MyListFragment"
+        android:name="com.ssafy.yoganavi.ui.homeUI.myPage.courseHistory.CourseHistoryFragment"
         android:label="fragment_my_list"
-        tools:layout="@layout/fragment_my_list" />
+        tools:layout="@layout/fragment_course_history" />
     <fragment
         android:id="@+id/modifyFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.modify.ModifyFragment"
