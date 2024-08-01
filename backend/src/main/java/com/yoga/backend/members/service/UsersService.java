@@ -11,7 +11,6 @@ public interface UsersService {
 
     Users registerUser(RegisterDto registerDto);
 
-    @Transactional
     void recoverAccount(Users user);
 
     boolean checkNickname(String nickname);
@@ -20,9 +19,16 @@ public interface UsersService {
 
     void sendSimpleMessage(String registerDto, String message, String s);
 
+    String sendEmailVerificationToken(String email);
+
     String sendPasswordResetToken(String email);
 
-    boolean validateResetToken(String email, String token);
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    boolean validatePasswordAuthToken(String email, String token);
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    boolean validateEmailAuthToken(String email, String token);
+
 
     String resetPassword(String email, String newPassword);
 
@@ -30,14 +36,11 @@ public interface UsersService {
 
     Users updateUser(UpdateDto updateDto, int userId);
 
-    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     Set<String> getUserHashtags(int userId);
 
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
     void updateUserHashtags(int userId, Set<String> newHashtags);
 
     void requestDeleteUser(int userId);
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
     void processDeletedUsers();
 }

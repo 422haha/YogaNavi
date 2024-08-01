@@ -45,7 +45,10 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
     private String role;
 
     @Column
-    private String resetToken;
+    private String authToken;
+
+    @Column
+    private Instant authTokenExpirationTime;
 
     @Column(length = 100)
     private String content; // 강사 소개 내용
@@ -142,14 +145,21 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
         this.role = role;
     }
 
-    public String getResetToken() {
-        return resetToken;
+    public String getAuthToken() {
+        return authToken;
     }
 
-    public void setResetToken(String resetToken) {
-        this.resetToken = resetToken;
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 
+    public Instant getAuthTokenExpirationTime() {
+        return authTokenExpirationTime;
+    }
+
+    public void setAuthTokenExpirationTime(Instant authTokenExpirationTime) {
+        this.authTokenExpirationTime = authTokenExpirationTime;
+    }
 
     public String getContent() {
         return content;
@@ -247,7 +257,7 @@ public class Users {// 여러 사용자나 프로세스가 동시에 같은 회�
         this.teacherLikes = teacherLikes;
     }
 
-    public Instant  getDeletedAt() {
+    public Instant getDeletedAt() {
         return deletedAt;
     }
 

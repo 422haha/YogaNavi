@@ -26,7 +26,12 @@ public class FCMService {
         this.usersRepository = usersRepository;
     }
 
-    public void sendBatchMessagesWithData(String title, Map<String, Map<String, String>> tokenToDataMap) throws FirebaseMessagingException {
+    /**
+     * @param title 메시지 제목
+     * @param tokenToDataMap 메시지 내용 및
+     */
+    public void sendBatchMessagesWithData(String title,
+        Map<String, Map<String, String>> tokenToDataMap) throws FirebaseMessagingException {
         List<Message> messages = tokenToDataMap.entrySet().stream()
             .map(entry -> Message.builder()
                 .setNotification(Notification.builder()

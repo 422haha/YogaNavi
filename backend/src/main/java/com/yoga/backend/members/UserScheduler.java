@@ -5,11 +5,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserDeletionScheduler {
+public class UserScheduler {
 
     private final UsersService usersService;
 
-    public UserDeletionScheduler(UsersService usersService) {
+    public UserScheduler(UsersService usersService) {
         this.usersService = usersService;
     }
 

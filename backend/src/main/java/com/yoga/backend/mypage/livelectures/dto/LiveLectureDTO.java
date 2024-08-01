@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.time.Instant;
 
 public class LiveLectureDTO implements Serializable {
+
     private Long liveId;
     private String liveTitle;
     private String liveContent;

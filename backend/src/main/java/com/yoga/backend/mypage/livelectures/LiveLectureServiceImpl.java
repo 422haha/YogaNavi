@@ -28,10 +28,17 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     @Autowired
     private NotificationService notificationService;
 
+    /**
+     * 라이브 강의 생성
+     *
+     * @param liveLectureCreateDto 생성할 강의 정보
+     * @return 강의 생성 결과
+     */
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public LiveLectureCreateResponseDto createLiveLecture(
         LiveLectureCreateDto liveLectureCreateDto) {
+
         LiveLectures liveLecture = new LiveLectures();
         liveLecture.setLiveTitle(liveLectureCreateDto.getLiveTitle());
         liveLecture.setLiveContent(liveLectureCreateDto.getLiveContent());
@@ -62,6 +69,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
                 responseDto.setMessage("화상강의 생성 성공");
                 responseDto.setData(null);
                 return responseDto;
+
             } else {
                 throw new IllegalArgumentException("사용자를 찾을 수 없습니다");
             }
@@ -71,7 +79,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     }
 
     /**
-     * 모든 실시간 강의를 조회
+     * 모든 실시간 강의 조회
      *
      * @return 모든 실시간 강의 리스트
      */
@@ -94,7 +102,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     }
 
     /**
-     * 사용자 ID로 화상 강의를 조회합니다.
+     * 사용자 ID로 화상 강의를 조회
      *
      * @param userId 사용자 ID
      * @return 해당 사용자의 실시간 강의 리스트
@@ -107,7 +115,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
 
 
     /**
-     * 화상 강의를 수정합니다.
+     * 화상 강의를 수정
      *
      * @param liveLectureCreateDto 수정할 화상 강의 DTO
      * @return 수정된 화상 강의 엔티티
@@ -115,6 +123,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public LiveLectures updateLiveLecture(LiveLectureCreateDto liveLectureCreateDto) {
+
         LiveLectures liveLecture = liveLecturesRepository.findById(liveLectureCreateDto.getLiveId())
             .orElseThrow(() -> new IllegalArgumentException("Invalid lecture ID"));
 
@@ -149,7 +158,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     }
 
     /**
-     * 단일 화상 강의를 조회합니다.
+     * 단일 화상 강의 조회
      *
      * @param liveId 화상 강의 ID
      * @return 해당 화상 강의 엔티티
@@ -161,7 +170,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     }
 
     /**
-     * 화상 강의의 소유자인지 확인합니다.
+     * 화상 강의의 소유자인지 확인
      *
      * @param liveId 화상 강의 ID
      * @param userId 사용자 ID
@@ -176,7 +185,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
 
 
     /**
-     * 화상 강의를 삭제합니다.
+     * 화상 강의 삭제
      *
      * @param liveId 화상 강의 ID
      */
@@ -187,6 +196,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
 
         List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findByLiveLecture_LiveId(
             liveId);
+
         myLiveLectureRepository.deleteAll(myLiveLectures);
         liveLecturesRepository.deleteById(liveId);
     }

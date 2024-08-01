@@ -101,31 +101,6 @@ public class NotificationService {
     }
 
     /**
-     * Instant에서 LocalTime 추출
-     *
-     * @param instant 시간 정보를 포함한 Instant
-     * @return 추출된 LocalTime
-     */
-    private LocalTime extractTimeFromInstant(Instant instant) {
-        return LocalTime.ofInstant(instant, ZoneOffset.UTC);
-    }
-
-    /**
-     * Redis에서 강의 목록 불러옴
-     *
-     * @param redisKey Redis 키
-     * @return 강의 DTO 목록
-     */
-    private List<LiveLectureDTO> getLecturesFromRedis(String redisKey) {
-        List<Object> lecturesFromRedis = (List<Object>) redisTemplate.opsForValue().get(redisKey);
-
-        if (lecturesFromRedis == null) {
-            return new ArrayList<>();
-        }
-        return convertToLiveLectureDTOList(lecturesFromRedis);
-    }
-
-    /**
      * 강의가 삭제된 경우
      *
      * @param liveId 삭제할 강의 ID
@@ -152,68 +127,6 @@ public class NotificationService {
             }
         }
         log.info("강의 삭제 완료 - ID: {}", liveId);
-    }
-
-    /**
-     * 요일 문자열을 DayOfWeek 집합으로
-     *
-     * @param availableDays 가능한 요일 문자열
-     * @return DayOfWeek 집합
-     */
-    private Set<DayOfWeek> parseAvailableDays(String availableDays) {
-        return Arrays.stream(availableDays.split(","))
-            .map(String::trim)
-            .map(this::mapToDayOfWeek)
-            .collect(Collectors.toSet());
-    }
-
-    /**
-     * 요일 문자열을 DayOfWeek 열거형으로
-     *
-     * @param day 요일 문자열
-     * @return 해당하는 DayOfWeek 열거형
-     */
-    private DayOfWeek mapToDayOfWeek(String day) {
-        switch (day.toUpperCase()) {
-            case "MON":
-                return DayOfWeek.MONDAY;
-            case "TUE":
-                return DayOfWeek.TUESDAY;
-            case "WED":
-                return DayOfWeek.WEDNESDAY;
-            case "THU":
-                return DayOfWeek.THURSDAY;
-            case "FRI":
-                return DayOfWeek.FRIDAY;
-            case "SAT":
-                return DayOfWeek.SATURDAY;
-            case "SUN":
-                return DayOfWeek.SUNDAY;
-            default:
-                throw new IllegalArgumentException("Invalid day: " + day);
-        }
-    }
-
-    /**
-     * Map을 LiveLectureDTO로
-     *
-     * @param map 변환할 Map 객체
-     * @return 변환된 LiveLectureDTO 객체
-     */
-    private LiveLectureDTO convertMapToLiveLectureDTO(Map<String, Object> map) {
-        LiveLectureDTO dto = new LiveLectureDTO();
-        dto.setLiveId(((Number) map.get("liveId")).longValue());
-        dto.setLiveTitle((String) map.get("liveTitle"));
-        dto.setLiveContent((String) map.get("liveContent"));
-        dto.setStartDate(Instant.parse((String) map.get("startDate")));
-        dto.setEndDate(Instant.parse((String) map.get("endDate")));
-        dto.setStartTime(Instant.parse((String) map.get("startTime")));
-        dto.setEndTime(Instant.parse((String) map.get("endTime")));
-        dto.setMaxLiveNum((Integer) map.get("maxLiveNum"));
-        dto.setAvailableDay((String) map.get("availableDay"));
-        dto.setRegDate(Instant.parse((String) map.get("regDate")));
-        dto.setUserId((Integer) map.get("userId"));
-        return dto;
     }
 
     /**
@@ -299,7 +212,7 @@ public class NotificationService {
     }
 
     /**
-     * 알림을 전송
+     * 알림 전송
      *
      * @param lectures 알림 보낼 강의 목록
      */
@@ -353,5 +266,93 @@ public class NotificationService {
                 }
             })
             .collect(Collectors.toList());
+    }
+
+
+    /**
+     * Map을 LiveLectureDTO로
+     *
+     * @param map 변환할 Map 객체
+     * @return 변환된 LiveLectureDTO 객체
+     */
+    private LiveLectureDTO convertMapToLiveLectureDTO(Map<String, Object> map) {
+        LiveLectureDTO dto = new LiveLectureDTO();
+        dto.setLiveId(((Number) map.get("liveId")).longValue());
+        dto.setLiveTitle((String) map.get("liveTitle"));
+        dto.setLiveContent((String) map.get("liveContent"));
+        dto.setStartDate(Instant.parse((String) map.get("startDate")));
+        dto.setEndDate(Instant.parse((String) map.get("endDate")));
+        dto.setStartTime(Instant.parse((String) map.get("startTime")));
+        dto.setEndTime(Instant.parse((String) map.get("endTime")));
+        dto.setMaxLiveNum((Integer) map.get("maxLiveNum"));
+        dto.setAvailableDay((String) map.get("availableDay"));
+        dto.setRegDate(Instant.parse((String) map.get("regDate")));
+        dto.setUserId((Integer) map.get("userId"));
+        return dto;
+    }
+
+    /**
+     * Instant에서 LocalTime 추출
+     *
+     * @param instant 시간 정보를 포함한 Instant
+     * @return 추출된 LocalTime
+     */
+    private LocalTime extractTimeFromInstant(Instant instant) {
+        return LocalTime.ofInstant(instant, ZoneOffset.UTC);
+    }
+
+    /**
+     * Redis에서 강의 목록 불러옴
+     *
+     * @param redisKey Redis 키
+     * @return 강의 DTO 목록
+     */
+    private List<LiveLectureDTO> getLecturesFromRedis(String redisKey) {
+        List<Object> lecturesFromRedis = (List<Object>) redisTemplate.opsForValue().get(redisKey);
+
+        if (lecturesFromRedis == null) {
+            return new ArrayList<>();
+        }
+        return convertToLiveLectureDTOList(lecturesFromRedis);
+    }
+
+    /**
+     * 요일 문자열을 DayOfWeek 집합으로
+     *
+     * @param availableDays 가능한 요일 문자열
+     * @return DayOfWeek 집합
+     */
+    private Set<DayOfWeek> parseAvailableDays(String availableDays) {
+        return Arrays.stream(availableDays.split(","))
+            .map(String::trim)
+            .map(this::mapToDayOfWeek)
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * 요일 문자열을 DayOfWeek 열거형으로
+     *
+     * @param day 요일 문자열
+     * @return 해당하는 DayOfWeek 열거형
+     */
+    private DayOfWeek mapToDayOfWeek(String day) {
+        switch (day.toUpperCase()) {
+            case "MON":
+                return DayOfWeek.MONDAY;
+            case "TUE":
+                return DayOfWeek.TUESDAY;
+            case "WED":
+                return DayOfWeek.WEDNESDAY;
+            case "THU":
+                return DayOfWeek.THURSDAY;
+            case "FRI":
+                return DayOfWeek.FRIDAY;
+            case "SAT":
+                return DayOfWeek.SATURDAY;
+            case "SUN":
+                return DayOfWeek.SUNDAY;
+            default:
+                throw new IllegalArgumentException("Invalid day: " + day);
+        }
     }
 }
