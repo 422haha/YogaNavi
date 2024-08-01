@@ -21,4 +21,9 @@ class TeacherDetailViewModel @Inject constructor(
             .onSuccess { it.data?.let { data -> bindData(data) } }
             .onFailure { it.printStackTrace() }
     }
+
+    fun likeLecture(lectureId: Long) = viewModelScope.launch(Dispatchers.IO) {
+        runCatching { infoRepository.likeLecture(lectureId) }
+            .onFailure { it.printStackTrace() }
+    }
 }

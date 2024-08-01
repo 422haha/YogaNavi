@@ -7,9 +7,12 @@ import com.ssafy.yoganavi.ui.homeUI.teacher.teacherDetail.teacherDetail.lecture.
 
 class TeacherDetailViewHolder(
     private val binding: ListItemTeacherLectureRecycleBinding,
-    private val navigateToLectureDetailFragment: (Long)->Unit
+    private val navigateToLectureDetailFragment: (Long) -> Unit,
+    private val sendLikeLecture: (Long) -> Unit
 ) : ViewHolder(binding.root) {
-    private val teacherDetailLectureAdapter = TeacherDetailLectureAdapter(navigateToLectureDetailFragment)
+    private val teacherDetailLectureAdapter =
+        TeacherDetailLectureAdapter(navigateToLectureDetailFragment, sendLikeLecture)
+
     fun bind(lectureDataList: List<LectureData>) {
         binding.rvLecture.adapter = teacherDetailLectureAdapter
         teacherDetailLectureAdapter.submitList(lectureDataList)
