@@ -86,25 +86,12 @@ public class UserController {
      * @return 인증번호 전송 결과
      */
     @PostMapping("/members/register/email")
-    public ResponseEntity<Map<String, Object>> registerUserEmail(
-        @RequestBody RegisterDto registerDto) {
+    public ResponseEntity<Map<String, Object>> registerUserEmail(@RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
-        System.out.println("in email : " + registerDto.getEmail());
-        boolean check = usersService.checkUser(registerDto.getEmail());
-        if (check) {
-            int randNum = (int) (Math.random() * 899999) + 100000;
-            rNum = randNum;
-            usersService.sendSimpleMessage(registerDto.getEmail(), "Yoga Navi 회원가입 인증번호",
-                "회원가입 인증번호 : " + rNum);
-
-            response.put("message", "인증 번호 전송");
-            response.put("data", new Object[]{});
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } else {
-            response.put("message", "이미 존재하는 회원");
-            response.put("data", new Object[]{});
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-        }
+        String result = usersService.sendEmailVerificationToken(registerDto.getEmail());
+        response.put("message", result);
+        response.put("data", new Object[]{});
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -114,15 +101,15 @@ public class UserController {
      * @return 인증번호 확인 결과
      */
     @PostMapping("/members/register/authnumber")
-    public ResponseEntity<Map<String, Object>> checkAuthNumber(
-        @RequestBody RegisterDto registerDto) {
+    public ResponseEntity<Map<String, Object>> checkAuthNumber(@RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
-        if (registerDto.getAuthnumber() == rNum) {
+        boolean isValid = usersService.validateEmailAuthToken(registerDto.getEmail(), String.valueOf(registerDto.getAuthnumber()));
+        if (isValid) {
             response.put("message", "인증 완료");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } else {
-            response.put("message", "틀린 번호");
+            response.put("message", "인증 실패 (잘못된 인증번호 또는 만료)");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
@@ -154,7 +141,7 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> passwordCheckAuthNumber(
         @RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
-        boolean isValid = usersService.validateResetToken(registerDto.getEmail(),
+        boolean isValid = usersService.validatePasswordAuthToken(registerDto.getEmail(),
             String.valueOf(registerDto.getAuthnumber()));
         if (isValid) {
             response.put("message", "인증 완료");

@@ -2,10 +2,12 @@ package com.yoga.backend.members.service;
 
 import com.yoga.backend.common.awsS3.S3Service;
 import com.yoga.backend.common.entity.Hashtag;
+import com.yoga.backend.common.entity.TempAuthInfo;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.dto.RegisterDto;
 import com.yoga.backend.members.dto.UpdateDto;
 import com.yoga.backend.members.repository.HashtagRepository;
+import com.yoga.backend.members.repository.TempAuthInfoRepository;
 import com.yoga.backend.members.repository.UsersRepository;
 import java.time.Duration;
 import java.time.Instant;
@@ -29,9 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UsersServiceImpl implements UsersService {
 
+    private static final Duration TOKEN_VALIDITY_DURATION = Duration.ofMinutes(5);
     private static final ZoneId KOREA_ZONE_ID = ZoneId.of("Asia/Seoul");
     private static final Duration DELETE_DELAY = Duration.ofDays(7);
-//    private static final Duration DELETE_DELAY = Duration.ofMinutes(2); // 시험용
+    //    private static final Duration DELETE_DELAY = Duration.ofMinutes(2); // 시험용
     public static final long URL_EXPIRATION_SECONDS = 86400; // 1 hour
 
     private final S3Service s3Service;
@@ -40,19 +43,22 @@ public class UsersServiceImpl implements UsersService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
     private final HashtagRepository hashtagRepository;
+    private final TempAuthInfoRepository tempAuthInfoRepository;
 
     public UsersServiceImpl(S3Service s3Service,
         UserDeletionService userDeletionService,
         JavaMailSender emailSender,
         UsersRepository usersRepository,
         PasswordEncoder passwordEncoder,
-        HashtagRepository hashtagRepository) {
+        HashtagRepository hashtagRepository,
+        TempAuthInfoRepository tempAuthInfoRepository) {
         this.s3Service = s3Service;
         this.userDeletionService = userDeletionService;
         this.emailSender = emailSender;
         this.usersRepository = usersRepository;
         this.passwordEncoder = passwordEncoder;
         this.hashtagRepository = hashtagRepository;
+        this.tempAuthInfoRepository = tempAuthInfoRepository;
     }
 
     /**
@@ -64,24 +70,16 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public Users registerUser(RegisterDto registerDto) {
-        // 비밀번호 해시화
         String hashPwd = passwordEncoder.encode(registerDto.getPassword());
-        registerDto.setPassword(hashPwd);
 
-        // 사용자 정보 생성
-        Users users = new Users();
-        users.setPwd(registerDto.getPassword());
-        users.setEmail(registerDto.getEmail());
-        users.setNickname(registerDto.getNickname());
-        users.setIsDeleted(false);
+        Users user = new Users();
+        user.setEmail(registerDto.getEmail());
+        user.setPwd(hashPwd);
+        user.setNickname(registerDto.getNickname());
+        user.setIsDeleted(false);
+        user.setRole(registerDto.isTeacher() ? "TEACHER" : "STUDENT");
 
-        if (registerDto.isTeacher()) {
-            users.setRole("TEACHER");
-        } else {
-            users.setRole("STUDENT");
-        }
-
-        return usersRepository.save(users);
+        return usersRepository.save(user);
     }
 
     /**
@@ -135,11 +133,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public boolean checkUser(String email) {
-        Optional<Users> users = usersRepository.findByEmail(email);
-        if (users.isEmpty()) {
-            return true;
-        }
-        return false;
+        return !usersRepository.findByEmail(email).isPresent();
     }
 
     /**
@@ -159,6 +153,32 @@ public class UsersServiceImpl implements UsersService {
     }
 
     /**
+     * 이메일 인증용 토큰을 생성하고 이메일로 전송
+     *
+     * @param email 사용자 이메일
+     * @return 토큰 전송 결과 메시지
+     */
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public String sendEmailVerificationToken(String email) {
+        if (checkUser(email)) {
+            String token = generateToken();
+            TempAuthInfo tempAuthInfo = new TempAuthInfo();
+            tempAuthInfo.setEmail(email);
+            tempAuthInfo.setAuthToken(token);
+            tempAuthInfo.setExpirationTime(Instant.now().plus(TOKEN_VALIDITY_DURATION));
+            tempAuthInfoRepository.save(tempAuthInfo);
+
+            sendSimpleMessage(email, "Yoga Navi 회원가입 인증번호",
+                "회원가입 인증번호 : " + token + "\n이 인증번호는 5분 동안 유효합니다.");
+
+            return "인증 번호 전송";
+        } else {
+            return "이미 존재하는 회원입니다.";
+        }
+    }
+
+    /**
      * 비밀번호 재설정 토큰을 생성하고 이메일로 전송
      *
      * @param email 사용자 이메일
@@ -170,17 +190,22 @@ public class UsersServiceImpl implements UsersService {
         Optional<Users> userOpt = usersRepository.findByEmailWithLock(email);
         if (userOpt.isPresent()) {
             Users user = userOpt.get();
-            int randNum = (int) (Math.random() * 899999) + 100000;
-            user.setResetToken(String.valueOf(randNum));
+            String token = generateToken();
+            user.setAuthToken(token);
+            user.setAuthTokenExpirationTime(Instant.now().plus(TOKEN_VALIDITY_DURATION));
             usersRepository.save(user);
 
             sendSimpleMessage(email, "Yoga Navi 비밀번호 재설정 인증번호",
-                "비밀번호 재설정 인증번호 : " + randNum);
+                "비밀번호 재설정 인증번호 : " + token + "\n이 인증번호는 10분 동안 유효합니다.");
 
             return "인증 번호 전송";
         } else {
             return "존재하지 않는 회원입니다.";
         }
+    }
+
+    private String generateToken() {
+        return Integer.toString((int) (Math.random() * 899999) + 100000);
     }
 
     /**
@@ -192,15 +217,38 @@ public class UsersServiceImpl implements UsersService {
      */
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public boolean validateResetToken(String email, String token) {
+    public boolean validatePasswordAuthToken(String email, String token) {
         Optional<Users> userOpt = usersRepository.findByEmailWithLock(email);
         if (userOpt.isPresent()) {
             Users user = userOpt.get();
-            return token.equals(user.getResetToken());
+            return token.equals(user.getAuthToken()) &&
+                Instant.now().isBefore(user.getAuthTokenExpirationTime());
         }
         return false;
     }
 
+    /**
+     * 이메일 재설정 토큰의 유효성 검증
+     *
+     * @param email 사용자 이메일
+     * @param token 검증할 토큰
+     * @return 토큰 유효성 여부
+     */
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public boolean validateEmailAuthToken(String email, String token) {
+        Optional<TempAuthInfo> tempAuthInfoOpt = tempAuthInfoRepository.findByEmail(email);
+        if (tempAuthInfoOpt.isPresent()) {
+            TempAuthInfo tempAuthInfo = tempAuthInfoOpt.get();
+            boolean isValid = token.equals(tempAuthInfo.getAuthToken()) &&
+                Instant.now().isBefore(tempAuthInfo.getExpirationTime());
+            if (isValid) {
+                tempAuthInfoRepository.deleteByEmail(email);
+            }
+            return isValid;
+        }
+        return false;
+    }
 
     /**
      * 사용자의 비밀번호 재설정
@@ -215,9 +263,13 @@ public class UsersServiceImpl implements UsersService {
         Optional<Users> userOpt = usersRepository.findByEmailWithLock(email);
         if (userOpt.isPresent()) {
             Users user = userOpt.get();
+            if (Instant.now().isAfter(user.getAuthTokenExpirationTime())) {
+                return "인증 시간이 만료되었습니다. 다시 인증해주세요.";
+            }
             String hashPwd = passwordEncoder.encode(newPassword);
             user.setPwd(hashPwd);
-            user.setResetToken(null);
+            user.setAuthToken(null);
+            user.setAuthTokenExpirationTime(null);
             usersRepository.save(user);
             return "비밀번호 재설정 성공";
         }
@@ -275,12 +327,12 @@ public class UsersServiceImpl implements UsersService {
         if (users.isPresent()) {
             Users user = users.get();
 
-            if (updateDto.getNickname() != null) {
+            if (updateDto.getNickname() != null && !updateDto.getNickname().isEmpty()) {
                 log.debug("사용자 {}의 닉네임 변경: {}", userId, updateDto.getNickname());
                 user.setNickname(updateDto.getNickname());
             }
 
-            if (updateDto.getImageUrl() != null) {
+            if (updateDto.getImageUrl() != null && !updateDto.getImageUrl().isEmpty()) {
                 String oldImageUrl = user.getProfile_image_url();
                 if (oldImageUrl != null && !oldImageUrl.equals(updateDto.getImageUrl())) {
                     log.debug("사용자 {}의 프로필 이미지 삭제: {}", userId, oldImageUrl);
@@ -298,7 +350,7 @@ public class UsersServiceImpl implements UsersService {
                 user.setProfile_image_url(updateDto.getImageUrl());
             }
 
-            if (updateDto.getImageUrlSmall() != null) {
+            if (updateDto.getImageUrlSmall() != null && !updateDto.getImageUrlSmall().isEmpty()) {
                 String oldImageUrlSmall = user.getProfile_image_url_small();
                 if (oldImageUrlSmall != null && !oldImageUrlSmall.equals(
                     updateDto.getImageUrlSmall())) {
@@ -317,7 +369,7 @@ public class UsersServiceImpl implements UsersService {
                 user.setProfile_image_url_small(updateDto.getImageUrlSmall());
             }
 
-            if (updateDto.getPassword() != null) {
+            if (updateDto.getPassword() != null && !updateDto.getPassword().isEmpty()) {
                 log.debug("사용자 {}의 비밀번호 수정", userId);
                 user.setPwd(passwordEncoder.encode(updateDto.getPassword()));
             }
@@ -416,7 +468,8 @@ public class UsersServiceImpl implements UsersService {
         ZonedDateTime nowSeoul = ZonedDateTime.now(KOREA_ZONE_ID);
         Instant expirationTime = nowSeoul.toInstant();
 
-        List<Users> usersToDelete = usersRepository.findByDeletedAtBeforeAndIsDeletedFalse(expirationTime);
+        List<Users> usersToDelete = usersRepository.findByDeletedAtBeforeAndIsDeletedFalse(
+            expirationTime);
         for (Users user : usersToDelete) {
             try {
                 userDeletionService.processDeletedUser(user);
