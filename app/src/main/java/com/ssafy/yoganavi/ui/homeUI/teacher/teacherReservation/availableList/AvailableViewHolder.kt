@@ -9,11 +9,14 @@ import com.ssafy.yoganavi.ui.utils.startTildeEnd
 class AvailableViewHolder(
     private val binding: ListItemAvailableClassBinding
 ) : ViewHolder(binding.root) {
-    fun bind(item: LiveLectureData) {
+    fun bind(item: LiveLectureData,visibleCalendar:(Long,Long)->(Unit)) {
         val classString = item.availableDay + " | " + item.liveTitle + " | " + startTildeEnd(
             formatTime(item.startTime),
             formatTime(item.endTime)
         )
         binding.rvAvailableClass.text = classString
+        binding.root.setOnClickListener {
+            visibleCalendar(item.startDate,item.endDate)
+        }
     }
 }

@@ -6,7 +6,9 @@ import androidx.recyclerview.widget.ListAdapter
 import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
 import com.ssafy.yoganavi.databinding.ListItemAvailableClassBinding
 
-class AvailableAdapter() :
+class AvailableAdapter(
+    val visibleCalendar : (Long,Long)->(Unit)
+) :
     ListAdapter<LiveLectureData, AvailableViewHolder>(AvailableViewHolderItemCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AvailableViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -15,6 +17,6 @@ class AvailableAdapter() :
     }
 
     override fun onBindViewHolder(holder: AvailableViewHolder, position: Int) {
-        holder.bind(currentList[position])
+        holder.bind(currentList[position],visibleCalendar)
     }
 }
