@@ -15,10 +15,10 @@ class TeacherDetailLectureViewHolder(
 ) : ViewHolder(binding.root) {
     fun bind(data: LectureData) = with(binding) {
         var cnt = data.likeCount
-        var isS = data.myLike
+        var isSelected = data.myLike
         tvTitle.text = data.recordTitle
         tvCount.text = cnt.toK()
-        ivFavorite.isSelected = isS
+        ivFavorite.isSelected = isSelected
 
 
         val circularProgressDrawable = CircularProgressDrawable(binding.root.context).apply {
@@ -36,11 +36,11 @@ class TeacherDetailLectureViewHolder(
             navigateToLectureDetailFragment(data.recordedId)
         }
         binding.ivFavorite.setOnClickListener {
-            if (isS) cnt -= 1
+            if (isSelected) cnt -= 1
             else cnt += 1
             tvCount.text = cnt.toK()
-            isS = !isS
-            ivFavorite.isSelected = isS
+            isSelected = !isSelected
+            ivFavorite.isSelected = isSelected
             sendLikeLecture(data.recordedId)
         }
     }
