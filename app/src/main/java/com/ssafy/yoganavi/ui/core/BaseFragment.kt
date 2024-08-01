@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -15,6 +16,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.ssafy.yoganavi.ui.loginUI.find.FindFragment
 import com.ssafy.yoganavi.ui.loginUI.join.JoinFragment
 import com.ssafy.yoganavi.ui.loginUI.login.LoginFragment
+import com.ssafy.yoganavi.ui.utils.SESSION_END
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 typealias Inflate<T> = (LayoutInflater, ViewGroup?, Boolean) -> T
 
@@ -78,5 +82,13 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
                 InputMethodManager.HIDE_NOT_ALWAYS
             )
         }
+    }
+
+    suspend fun endSession() = withContext(Dispatchers.Main) {
+        val fragment = this@BaseFragment
+        if (fragment is LoginFragment || fragment is FindFragment || fragment is JoinFragment) return@withContext
+
+        Toast.makeText(requireContext(), SESSION_END, Toast.LENGTH_SHORT).show()
+        logout()
     }
 }

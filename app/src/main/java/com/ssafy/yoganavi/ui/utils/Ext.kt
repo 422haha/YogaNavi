@@ -22,10 +22,12 @@ const val END_TIME = "00:00"
 
 // 수신부
 const val FORBIDDEN = 403
+const val UNAUTHORIZED = 401
 const val NO_AUTH = "권한이 없습니다."
 const val NO_RESPONSE = "에러가 발생했습니다."
 const val IS_BLANK = "빈칸을 확인해주세요!"
 const val PASSWORD_DIFF = "비밀번호가 일치하지 않습니다."
+const val SESSION_END = "세션이 만료되었습니다."
 
 // 타이틀
 const val MY_PAGE = "마이 페이지"
