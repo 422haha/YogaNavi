@@ -22,7 +22,6 @@ import org.hibernate.annotations.GenericGenerator;
 @Setter
 @Getter
 @Entity
-@Table(name = "LiveLectures")
 public class LiveLectures {
 
     @Id
