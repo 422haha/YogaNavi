@@ -65,6 +65,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
         AlertDialog.Builder(requireContext())
             .setMessage(message)
             .setPositiveButton(getString(R.string.check)) { _, _ -> logout() }
+            .setCancelable(false)
             .show()
     }
 }
