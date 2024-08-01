@@ -185,7 +185,7 @@ public class TeacherServiceImpl implements TeacherService {
                     .myLike(myLike)
                     .build();
             })
-            .sorted(Comparator.comparingInt(DetailedTeacherDto.LectureDto::getLikeCount).reversed())
+            .sorted(Comparator.comparing(DetailedTeacherDto.LectureDto::getRecordedId).reversed())
             .collect(Collectors.toList());
 
         return DetailedTeacherDto.builder()
@@ -215,17 +215,17 @@ public class TeacherServiceImpl implements TeacherService {
                         System.err.println("공지 Presigned URL 생성 오류: " + e.getMessage());
                     }
                     return DetailedTeacherDto.NoticeDto.builder()
-                        .articleId(article.getArticleId().toString()) // noticeId -> articleId
-                        .content(article.getContent()) // noticeContent -> content
-                        .imageUrl(imageUrl) // noticeImage -> imageUrl
-                        .imageUrlSmall(imageUrlSmall) // noticeImageSmall -> imageUrlSmall
+                        .articleId(article.getArticleId().toString())
+                        .content(article.getContent())
+                        .imageUrl(imageUrl)
+                        .imageUrlSmall(imageUrlSmall)
                         .createdAt(article.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant()
-                            .toEpochMilli()) // createdAt 추가
+                            .toEpochMilli())
                         .updatedAt(article.getUpdatedAt().atZone(ZoneId.systemDefault()).toInstant()
-                            .toEpochMilli()) // updatedAt 추가
-                        .userName(user.getNickname()) // userName 추가
-                        .profileImageUrl(finalProfileImageUrl) // profileImageUrl 추가
-                        .profileImageSmallUrl(finalProfileImageUrlSmall) // profileImageUrlSmall 추가
+                            .toEpochMilli())
+                        .userName(user.getNickname())
+                        .profileImageUrl(finalProfileImageUrl)
+                        .profileImageSmallUrl(finalProfileImageUrlSmall)
                         .build();
                 }).sorted(Comparator.comparing(DetailedTeacherDto.NoticeDto::getArticleId).reversed())
                 .collect(Collectors.toList()))
