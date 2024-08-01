@@ -46,13 +46,7 @@ class TeacherReservationFragment :
         lifecycleScope.launch {
             delay(300)
             tvSelectClassMethod.isVisible = true
-            tvSelectClassMethod.startAnimation(
-                AnimationUtils.loadAnimation(
-                    context,
-                    R.anim.slide_up
-                )
-            )
-            rgClass.visibility = View.INVISIBLE
+            tvSelectClassMethod.startAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_up))
             delay(500)
             rgClass.isVisible = true
             rbOneToMulti.startAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_up))
@@ -71,18 +65,18 @@ class TeacherReservationFragment :
         rbOneToMulti.setOnClickListener {
             visibleAvailableClass()
         }
-
     }
 
     private fun visibleAvailableClass() = with(binding) {
         lifecycleScope.launch {
             tvSelectTerm.isVisible = false
             calendar.isVisible = false
+            tvAvailableClass.isVisible = false
+            lyRvAvailableClass.isVisible = false
             tvAvailableClass.apply {
                 isVisible = true
                 startAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_up))
             }
-            lyRvAvailableClass.visibility = View.INVISIBLE
             delay(500)
             // TODO: 이거 rv 처리
             lyRvAvailableClass.apply {
