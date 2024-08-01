@@ -17,6 +17,9 @@ class TeacherViewHolder(
         var count = item.likes
         if (item.hashtags.isNotEmpty()) {
             tvHashtag.text = item.hashtags.joinToString(" #", "#")
+            tvHashtag.isVisible = true
+        } else {
+            tvHashtag.isVisible = false
         }
         Glide.with(binding.root)
             .load(item.teacherSmallProfile)
