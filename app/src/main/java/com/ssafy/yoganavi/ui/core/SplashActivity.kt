@@ -30,7 +30,9 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivitySplashBinding.inflate(layoutInflater)
+        window.navigationBarColor = resources.getColor(R.color.bottomnav, null)
         setContentView(binding.root)
+
         viewModel.autoLogin()
         loadSplash()
 
