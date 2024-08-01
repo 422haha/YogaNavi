@@ -57,18 +57,13 @@ public class TeacherServiceImpl implements TeacherService {
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<TeacherDto> getAllTeachers(TeacherFilter filter, int sorting, int userId) {
         LocalDate now = LocalDate.now();
-        long weekAfter = now.plusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        long monthAfter = now.plusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        long threeMonthsAfter = now.plusMonths(3).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long weekAfter = now.plusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toInstant()
+            .toEpochMilli();
+        long monthAfter = now.plusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant()
+            .toEpochMilli();
+        long threeMonthsAfter = now.plusMonths(3).atStartOfDay(ZoneId.systemDefault()).toInstant()
+            .toEpochMilli();
 
-        System.out.println("Filter Start Time: " + filter.getStartTime());
-        System.out.println("Filter End Time: " + filter.getEndTime());
-        System.out.println("Filter Days: " + filter.getDay());
-        System.out.println("Filter Period: " + filter.getPeriod());
-        System.out.println("Week After: " + weekAfter);
-        System.out.println("Month After: " + monthAfter);
-        System.out.println("Three Months After: " + threeMonthsAfter);
-        System.out.println("Filter Max Live Num: " + filter.getMaxLiveNum());
         List<Users> users = teacherRepository.findTeachersByLectureFilter(
             filter.getStartTime(),
             filter.getEndTime(),
@@ -79,7 +74,7 @@ public class TeacherServiceImpl implements TeacherService {
             threeMonthsAfter,
             filter.getMaxLiveNum()
         );
-        System.out.println("Filtered users: " + users.size());
+
         return users.stream()
             .filter(user -> {
                 if (filter.getSearchKeyword() == null || filter.getSearchKeyword().isEmpty()) {
@@ -153,13 +148,11 @@ public class TeacherServiceImpl implements TeacherService {
             if (user.getProfile_image_url() != null && !user.getProfile_image_url().isEmpty()) {
                 profileImageUrl = s3Service.generatePresignedUrl(user.getProfile_image_url(),
                     URL_EXPIRATION_SECONDS);
-                System.out.println("생성된 profileImageUrl: " + profileImageUrl);
             }
             if (user.getProfile_image_url_small() != null && !user.getProfile_image_url_small()
                 .isEmpty()) {
                 profileImageUrlSmall = s3Service.generatePresignedUrl(
                     user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
-                System.out.println("생성된 profileImageUrlSmall: " + profileImageUrlSmall);
             }
         } catch (Exception e) {
             System.err.println("Presigned URL 생성 오류: " + e.getMessage());
@@ -289,9 +282,6 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<TeacherDto> getSortedTeachers(int sorting, int userId, String keyword) {
-        System.out.println(
-            "Entering getSortedTeachers with sorting: " + sorting + ", userId: " + userId
-                + ", keyword: " + keyword);
 
         List<Users> users = teacherRepository.findAllTeachers();
 
@@ -305,10 +295,6 @@ public class TeacherServiceImpl implements TeacherService {
                 user.getHashtags().stream()
                     .anyMatch(hashtag -> hashtag.getName().contains(keyword)))
             .collect(Collectors.toList());
-
-        if (filteredUsers.isEmpty()) {
-            System.out.println("No users found with the given keyword: " + keyword);
-        }
 
         List<TeacherDto> result = filteredUsers.stream()
             .map(user -> {
@@ -351,8 +337,6 @@ public class TeacherServiceImpl implements TeacherService {
                 }
             })
             .collect(Collectors.toList());
-
-        System.out.println("Exiting getSortedTeachers with result size: " + result.size());
 
         return result;
     }

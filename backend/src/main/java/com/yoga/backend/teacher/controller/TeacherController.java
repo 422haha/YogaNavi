@@ -59,7 +59,7 @@ public class TeacherController {
 
         try {
             List<TeacherDto> teachers = teacherService.getAllTeachers(filter, sorting, userId);
-            System.out.println("Retrieved teachers: " + teachers.size());
+
             // 응답 생성
             Map<String, Object> response = new HashMap<>();
             response.put("message", "success");
