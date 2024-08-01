@@ -4,18 +4,18 @@ import android.Manifest
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.databinding.FragmentLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
-import com.ssafy.yoganavi.ui.homeUI.schedule.live.webRtc.WebRTCSessionState
 import com.ssafy.yoganavi.ui.utils.PermissionHandler
 import com.ssafy.yoganavi.ui.utils.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class LiveFragment: BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::inflate) {
@@ -27,7 +27,7 @@ class LiveFragment: BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infla
             ActivityResultContracts.RequestPermission()
         ) { _: Boolean -> }
 
-    private val permissionHandler: PermissionHandler by lazy { PermissionHandler(requireContext(), requestPermissionLauncher) }
+    private val permissionHandler: PermissionHandler by lazy { PermissionHandler(requireActivity(), requestPermissionLauncher) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -38,16 +38,7 @@ class LiveFragment: BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infla
 
         initListener()
 
-        setUI()
-
         observeSessionState()
-    }
-
-    private fun checkPermission() {
-        PermissionHelper(this, arrayOf(Manifest.permission.CAMERA), ::popBack)
-            .launchPermission()
-
-        permissionHandler.branchPermission(Manifest.permission.RECORD_AUDIO, "오디오")
     }
 
     private fun initListener() {
@@ -72,26 +63,21 @@ class LiveFragment: BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infla
     }
 
     private fun observeSessionState() {
-        CoroutineScope(Dispatchers.Main).launch {
-            viewModel.sessionManager.signalingClient.sessionStateFlow.collect { state ->
-                updateUI(state)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+                viewModel.sessionManager.signalingClient.sessionStateFlow.collect { state ->
+                    Timber.d("상태 로그!! $state")
+                    binding.tvState.text = state.toString()
+                }
             }
         }
     }
 
-    private fun setUI() {
-        binding.stageScreen.isVisible = true
-        binding.videoCallScreen.isVisible = false
-    }
+    private fun checkPermission() {
+        PermissionHelper(this, arrayOf(Manifest.permission.CAMERA), ::popBack)
+            .launchPermission()
 
-    private fun updateUI(state: WebRTCSessionState) {
-        if (state == WebRTCSessionState.Active || state == WebRTCSessionState.Ready) {
-            binding.stageScreen.isVisible = false
-            binding.videoCallScreen.isVisible = true
-        } else {
-            binding.stageScreen.isVisible = true
-            binding.videoCallScreen.isVisible = false
-        }
+        permissionHandler.branchPermission(Manifest.permission.RECORD_AUDIO, "오디오")
     }
 
     private fun popBack() {
