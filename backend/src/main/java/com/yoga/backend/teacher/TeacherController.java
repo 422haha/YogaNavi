@@ -57,14 +57,7 @@ public class TeacherController {
         filter.setSearchKeyword(searchKeyword);
 
         try {
-            List<TeacherDto> teachers;
-            // 검색 키워드에 따른 강사 목록 조회
-            if (searchKeyword.isEmpty()) {
-                teachers = teacherService.getAllTeachers(filter, userId);
-            } else {
-                teachers = teacherService.searchTeachers(filter, userId, searchKeyword);
-            }
-
+            List<TeacherDto> teachers = teacherService.getAllTeachers(filter, userId);
             // 응답 생성
             Map<String, Object> response = new HashMap<>();
             response.put("message", "success");
@@ -96,7 +89,7 @@ public class TeacherController {
         int userId = jwtUtil.getUserIdFromToken(token);
 
         try {
-            List<TeacherDto> teachers = teacherService.getSortedTeachers(sorting, userId);
+            List<TeacherDto> teachers = teacherService.getSortedTeachers(sorting, userId, searchKeyword);
             // 응답 생성
             Map<String, Object> response = new HashMap<>();
             response.put("message", "success");
