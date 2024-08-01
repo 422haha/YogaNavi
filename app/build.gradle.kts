@@ -1,3 +1,4 @@
+
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -27,6 +28,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "ACCESS_KEY", properties.getProperty("accessKey"))
         buildConfigField("String", "SECRET_KEY", properties.getProperty("secretKey"))
+        buildConfigField("String", "SIGNALING_SERVER_IP_ADDRESS", properties.getProperty("signalingServerIp"))
     }
 
     buildTypes {
