@@ -32,34 +32,50 @@ public interface TeacherRepository extends JpaRepository<Users, Integer> {
     /**
      * 필터 조건에 맞는 강사 정보를 조회합니다.
      *
-     * @param startTime 강의 시작 시간
-     * @param endTime 강의 종료 시간
-     * @param day 강의 요일
-     * @param period 필터 기간
-     * @param weekAfter 일주일 후
-     * @param monthAfter 한 달 후
-     * @param threeMonthsAfter 세 달 후
-     * @param maxLiveNum 최대 수강자 수
+     * @param startTime        강의 시작 시간 (밀리초 단위 타임스탬프)
+     * @param endTime          강의 종료 시간 (밀리초 단위 타임스탬프)
+     * @param days             강의 요일 (쉼표로 구분된 문자열)
+     * @param period           필터 기간 (0: 일주일 후, 1: 한 달 후, 2: 세 달 후, 3: 전체 기간)
+     * @param weekAfter        일주일 후 (밀리초 단위 타임스탬프)
+     * @param monthAfter       한 달 후 (밀리초 단위 타임스탬프)
+     * @param threeMonthsAfter 세 달 후 (밀리초 단위 타임스탬프)
+     * @param maxLiveNum       최대 수강자 수 (1: 1대1, 1보다 큰 값: 1대다)
      * @return 필터 조건에 맞는 강사 리스트
      */
     @Query(value =
         "SELECT DISTINCT u.* FROM users u " +
             "JOIN live_lectures l ON u.user_id = l.user_id " +
-            "WHERE l.start_time >= :startTime AND l.end_time <= :endTime " +
-            "AND (:day = 'MON,TUE,WED,THU,FRI,SAT,SUN' OR REGEXP_LIKE(l.available_day, REPLACE(:day, ',', '|'))) " +
-            "AND ((:period = 0 AND l.end_date > :weekAfter) OR " +
-            "     (:period = 1 AND l.end_date > :monthAfter) OR " +
-            "     (:period = 2 AND l.end_date > :threeMonthsAfter) OR " +
-            "     (:period = 3)) " +
-            "AND (CASE WHEN :maxLiveNum = 1 THEN l.max_live_num > 0 ELSE l.max_live_num = 1 END)",
+            "WHERE l.start_time >= FROM_UNIXTIME(:startTime / 1000) " +
+            "AND l.end_time <= FROM_UNIXTIME(:endTime / 1000) " +
+            "AND (" +
+            "  (:days = 'MON,TUE,WED,THU,FRI,SAT,SUN,' " +
+            "   OR (INSTR(:days, 'MON,') > 0 AND l.available_day LIKE '%MON%') OR " +
+            "      (INSTR(:days, 'TUE,') > 0 AND l.available_day LIKE '%TUE%') OR " +
+            "      (INSTR(:days, 'WED,') > 0 AND l.available_day LIKE '%WED%') OR " +
+            "      (INSTR(:days, 'THU,') > 0 AND l.available_day LIKE '%THU%') OR " +
+            "      (INSTR(:days, 'FRI,') > 0 AND l.available_day LIKE '%FRI%') OR " +
+            "      (INSTR(:days, 'SAT,') > 0 AND l.available_day LIKE '%SAT%') OR " +
+            "      (INSTR(:days, 'SUN,') > 0 AND l.available_day LIKE '%SUN%')) " +
+            ") " +
+            "AND (" +
+            "  (:period = 0 AND l.end_date > FROM_UNIXTIME(:weekAfter / 1000)) OR " +
+            "  (:period = 1 AND l.end_date > FROM_UNIXTIME(:monthAfter / 1000)) OR " +
+            "  (:period = 2 AND l.end_date > FROM_UNIXTIME(:threeMonthsAfter / 1000)) OR " +
+            "  (:period = 3) " +
+            ") " +
+            "AND (" +
+            "  (:maxLiveNum = 1 AND l.max_live_num > 0) OR " +
+            "  (:maxLiveNum != 1 AND l.max_live_num = 1) " +
+            ")",
         nativeQuery = true)
     List<Users> findTeachersByLectureFilter(
         @Param("startTime") long startTime,
         @Param("endTime") long endTime,
-        @Param("day") String day,
+        @Param("days") String days,
         @Param("period") int period,
         @Param("weekAfter") long weekAfter,
         @Param("monthAfter") long monthAfter,
         @Param("threeMonthsAfter") long threeMonthsAfter,
-        @Param("maxLiveNum") int maxLiveNum);
+        @Param("maxLiveNum") int maxLiveNum
+    );
 }
