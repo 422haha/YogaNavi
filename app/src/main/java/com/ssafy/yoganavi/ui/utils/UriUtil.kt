@@ -10,7 +10,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.math.sqrt
 
+const val MB = 1_048_576
 fun getVideoPath(context: Context, uri: Uri): String {
     val fileName = context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
         val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
@@ -60,11 +62,19 @@ suspend fun getImagePath(
     val bmp = BitmapFactory.decodeFile(originalPath) ?: return@withContext Pair("", "")
     val rotatedBitmap = getCorrectlyOrientedBitmap(originalPath, bmp)
 
-    // 미니 이미지 생성 및 저장
+    val fileSizeInBytes = tempFile.length()
+    val scaleFactor = if (fileSizeInBytes > MB) {
+        sqrt(MB.toDouble() / fileSizeInBytes.toDouble())
+    } else {
+        1.0
+    }
+
+    val newWidth = (rotatedBitmap.width * scaleFactor).toInt()
+    val newHeight = (rotatedBitmap.height * scaleFactor).toInt()
     val miniBitmap = Bitmap.createScaledBitmap(
         rotatedBitmap,
-        rotatedBitmap.width / 6,
-        rotatedBitmap.height / 6,
+        newWidth,
+        newHeight,
         true
     )
 
