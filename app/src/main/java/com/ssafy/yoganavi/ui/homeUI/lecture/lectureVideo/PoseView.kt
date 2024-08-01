@@ -20,12 +20,11 @@ import com.ssafy.yoganavi.ui.utils.RIGHT_HIP
 import com.ssafy.yoganavi.ui.utils.RIGHT_KNEE
 import com.ssafy.yoganavi.ui.utils.RIGHT_SHOULDER
 import com.ssafy.yoganavi.ui.utils.RIGHT_WRIST
-import kotlin.math.pow
-import kotlin.math.sqrt
+import kotlin.math.abs
 
 class PoseView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private val size = KEYPOINT_NUM / 3
-    private val distanceThreshold = 200f
+    private val angleThreshold = 20f
     private val keyPointsThreshold = 0.45f
     private val radius = 15f
     private var userKeyPoints: List<KeyPoint> = List(size) { KeyPoint(0, 0f, 0f, 0f) }
@@ -71,18 +70,76 @@ class PoseView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     }
 
     private fun compareWithTeacher() {
-        userKeyPoints.forEachIndexed { idx, _ ->
-            val userX = userKeyPoints[idx].x
-            val userY = userKeyPoints[idx].y
-            val teacherX = teacherKeyPoints[idx].x
-            val teacherY = teacherKeyPoints[idx].y
+        if (teacherKeyPoints.isEmpty() or userKeyPoints.isEmpty()) return
 
-            val distanceX = (userX - teacherX).toDouble().pow(2.0)
-            val distanceY = (userY - teacherY).toDouble().pow(2.0)
-            val distance = sqrt(distanceX + distanceY)
+        val compareLeftArm = compareKeyPoint(LEFT_SHOULDER, LEFT_ELBOW)
+        val compareRightArm = compareKeyPoint(RIGHT_SHOULDER, RIGHT_ELBOW)
+        val compareLeftCuff = compareKeyPoint(LEFT_ELBOW, LEFT_WRIST)
+        val compareRightCuff = compareKeyPoint(RIGHT_ELBOW, RIGHT_WRIST)
+        val compareLeftThigh = compareKeyPoint(LEFT_HIP, LEFT_KNEE)
+        val compareRightThigh = compareKeyPoint(RIGHT_HIP, RIGHT_KNEE)
+        val compareLeftCalf = compareKeyPoint(LEFT_KNEE, LEFT_ANKLE)
+        val compareShoulder = compareKeyPoint(LEFT_SHOULDER, RIGHT_SHOULDER)
+        val compareLeftBody = compareKeyPoint(LEFT_SHOULDER, LEFT_HIP)
+        val compareRightBody = compareKeyPoint(RIGHT_SHOULDER, RIGHT_HIP)
+        val comparePelvis = compareKeyPoint(LEFT_HIP, RIGHT_HIP)
 
-            colorList[idx] = if (distance > distanceThreshold) Color.RED else Color.GREEN
-        }
+        if (compareLeftArm) makeGreen(LEFT_SHOULDER, LEFT_ELBOW)
+        else makeRed(LEFT_SHOULDER, LEFT_ELBOW)
+
+        if (compareRightArm) makeGreen(RIGHT_SHOULDER, RIGHT_ELBOW)
+        else makeRed(RIGHT_SHOULDER, RIGHT_ELBOW)
+
+        if (compareLeftCuff) makeGreen(LEFT_ELBOW, LEFT_WRIST)
+        else makeRed(LEFT_ELBOW, LEFT_WRIST)
+
+        if (compareRightCuff) makeGreen(RIGHT_ELBOW, RIGHT_WRIST)
+        else makeRed(RIGHT_ELBOW, RIGHT_WRIST)
+
+        if (compareLeftThigh) makeGreen(LEFT_HIP, LEFT_KNEE)
+        else makeRed(LEFT_HIP, LEFT_KNEE)
+
+        if (compareRightThigh) makeGreen(RIGHT_HIP, RIGHT_KNEE)
+        else makeRed(RIGHT_HIP, RIGHT_KNEE)
+
+        if (compareLeftCalf) makeGreen(LEFT_KNEE, LEFT_ANKLE)
+        else makeRed(LEFT_KNEE, LEFT_ANKLE)
+
+        if (compareShoulder) makeGreen(LEFT_SHOULDER, RIGHT_SHOULDER)
+        else makeRed(LEFT_SHOULDER, RIGHT_SHOULDER)
+
+        if (compareLeftBody) makeGreen(LEFT_SHOULDER, LEFT_HIP)
+        else makeRed(LEFT_SHOULDER, LEFT_HIP)
+
+        if (compareRightBody) makeGreen(RIGHT_SHOULDER, RIGHT_HIP)
+        else makeRed(RIGHT_SHOULDER, RIGHT_HIP)
+
+        if (comparePelvis) makeGreen(LEFT_HIP, RIGHT_HIP)
+        else makeRed(LEFT_HIP, RIGHT_HIP)
+    }
+
+    private fun makeGreen(startKeyPoint: Int, endKeyPoint: Int) {
+        colorList[startKeyPoint] = Color.GREEN
+        colorList[endKeyPoint] = Color.GREEN
+    }
+
+    private fun makeRed(startKeyPoint: Int, endKeyPoint: Int) {
+        colorList[startKeyPoint] = Color.RED
+        colorList[endKeyPoint] = Color.RED
+    }
+
+    private fun compareKeyPoint(start: Int, end: Int): Boolean {
+        val teacherDiffX: Float = teacherKeyPoints[end].x - teacherKeyPoints[start].x
+        val teacherDiffY: Float = teacherKeyPoints[end].y - teacherKeyPoints[start].y
+        val userDiffX: Float = userKeyPoints[end].x - userKeyPoints[start].x
+        val userDiffY: Float = userKeyPoints[end].y - userKeyPoints[start].y
+
+        val teacherGradient: Float =
+            if (teacherDiffX != 0f) teacherDiffY / teacherDiffX else Float.POSITIVE_INFINITY
+        val userGradient: Float =
+            if (userDiffX != 0f) userDiffY / userDiffX else Float.POSITIVE_INFINITY
+
+        return abs(teacherGradient - userGradient) < angleThreshold
     }
 
     private fun drawArmLines(canvas: Canvas) {
@@ -131,9 +188,9 @@ class PoseView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         if (start.x <= 0 || start.y <= 0 || end.x <= 0 || end.y <= 0) return
         if (start.confidence < keyPointsThreshold || end.confidence < keyPointsThreshold) return
 
-        if(colorList[start.index] == Color.GREEN && colorList[end.index] == Color.GREEN){
+        if (colorList[start.index] == Color.GREEN && colorList[end.index] == Color.GREEN) {
             canvas.drawLine(start.x, start.y, end.x, end.y, goodPaint)
-        }else{
+        } else {
             canvas.drawLine(start.x, start.y, end.x, end.y, badPaint)
         }
     }
