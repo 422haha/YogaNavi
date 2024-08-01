@@ -60,11 +60,9 @@ class TeacherListFragment :
         initListener()
         initCollect()
         if (args.sorting == 0) {
-            viewModel.setSorting(0, filter)
-            binding.rbRecent.isChecked = true
+            lifecycleScope.launch { viewModel.setSorting(0, filter) }
         } else {
-            viewModel.setSorting(1, filter)
-            binding.rbPopular.isChecked = true
+            lifecycleScope.launch { viewModel.setSorting(1, filter) }
         }
     }
 
@@ -72,9 +70,9 @@ class TeacherListFragment :
         binding.lyFilter.setOnClickListener {
             val directions = TeacherListFragmentDirections
                 .actionTeacherListFragmentToFilterFragment(
-                    args.filter,
+                    filter,
                     viewModel.getIsInit(),
-                    viewModel.getSorting()
+                    viewModel.sorting.value
                 )
             findNavController().navigate(directions)
         }
@@ -90,17 +88,30 @@ class TeacherListFragment :
             }
         })
         binding.rbRecent.setOnClickListener {
-            viewModel.setSorting(0, filter)
+            lifecycleScope.launch { viewModel.setSorting(0, filter) }
         }
         binding.rbPopular.setOnClickListener {
-            viewModel.setSorting(1, filter)
+            lifecycleScope.launch { viewModel.setSorting(1, filter) }
         }
     }
 
     fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.teacherList.collectLatest {
-                noticeAdapter.submitList(it)
+            launch {
+                viewModel.sorting.collectLatest { sorting ->
+                    if (sorting == 0) {
+                        binding.rbRecent.isChecked = true
+                        binding.rbPopular.isChecked = false
+                    } else {
+                        binding.rbPopular.isChecked = true
+                        binding.rbRecent.isChecked = false
+                    }
+                }
+            }
+            launch {
+                viewModel.teacherList.collectLatest { teacherList ->
+                    noticeAdapter.submitList(teacherList)
+                }
             }
         }
     }
