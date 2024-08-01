@@ -6,6 +6,7 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.ObjectMetadata
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
+import com.ssafy.yoganavi.data.repository.response.AuthException
 import com.ssafy.yoganavi.data.repository.response.DetailResponse
 import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
@@ -32,7 +33,10 @@ class ModifyViewModel @Inject constructor(
     val hashtagList: StateFlow<List<String>> = _hashtagList.asStateFlow()
     var profile = Profile()
 
-    fun getProfile(bindData: suspend (Profile) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+    fun getProfile(
+        bindData: suspend (Profile) -> Unit,
+        endSession: suspend () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching {
             infoRepository.getProfile()
         }.onSuccess {
@@ -47,7 +51,7 @@ class ModifyViewModel @Inject constructor(
                 bindData(data)
             }
         }.onFailure {
-            it.printStackTrace()
+            (it as? AuthException)?.let { endSession() } ?: it.printStackTrace()
         }
     }
 
@@ -66,7 +70,8 @@ class ModifyViewModel @Inject constructor(
     fun modifyProfile(
         nickname: String,
         password: String,
-        isModified: (DetailResponse<Profile>) -> Unit
+        isModified: (DetailResponse<Profile>) -> Unit,
+        endSession: suspend () -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
         profile = profile.copy(
             nickname = nickname,
@@ -105,7 +110,7 @@ class ModifyViewModel @Inject constructor(
 
         runCatching { infoRepository.updateProfile(profile) }
             .onSuccess { isModified(it) }
-            .onFailure { it.printStackTrace() }
+            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
     }
 
     fun setThumbnail(path: String, miniPath: String) = viewModelScope.launch(Dispatchers.IO) {

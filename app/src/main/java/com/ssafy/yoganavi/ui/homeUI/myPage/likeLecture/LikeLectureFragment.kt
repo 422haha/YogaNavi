@@ -37,7 +37,7 @@ class LikeLectureFragment : BaseFragment<FragmentLikeLectureBinding>(
 
         binding.rvLecture.adapter = lectureAdapter
         initCollect()
-        viewModel.getLectureList()
+        viewModel.getLectureList(::endSession)
     }
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
@@ -55,5 +55,5 @@ class LikeLectureFragment : BaseFragment<FragmentLikeLectureBinding>(
         findNavController().navigate(directions)
     }
 
-    private fun sendLikeLecture(recordedId: Long) = viewModel.setLectureLike(recordedId)
+    private fun sendLikeLecture(recordedId: Long) = viewModel.setLectureLike(recordedId, ::endSession)
 }

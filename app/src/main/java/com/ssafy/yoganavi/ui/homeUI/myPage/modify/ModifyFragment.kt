@@ -81,7 +81,7 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
         }
     }
 
-    private fun getProfile() = viewModel.getProfile(::bindData)
+    private fun getProfile() = viewModel.getProfile(::bindData, ::endSession)
 
     private suspend fun bindData(data: Profile) = withContext(Dispatchers.Main) {
         with(binding) {
@@ -116,13 +116,7 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
         check.setOnClickListener {
             val nickname = tieNn.text?.toString() ?: ""
             val password = tiePw.text?.toString() ?: ""
-            viewModel.modifyProfile(nickname, password) { event ->
-                when (event) {
-                    is DetailResponse.AuthError -> showSnackBar(NO_AUTH)
-                    is DetailResponse.Error -> showSnackBar(event.message)
-                    is DetailResponse.Success -> moveToBackStack()
-                }
-            }
+            viewModel.modifyProfile(nickname, password, ::isModified, ::endSession)
         }
 
         tiePw.addTextChangedListener { editText ->
@@ -167,5 +161,13 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
             action = Intent.ACTION_GET_CONTENT
         }
         imageUriLauncher.launch(intent)
+    }
+
+    private fun isModified(event: DetailResponse<Profile>) {
+        when (event) {
+            is DetailResponse.AuthError -> showSnackBar(NO_AUTH)
+            is DetailResponse.Error -> showSnackBar(event.message)
+            is DetailResponse.Success -> moveToBackStack()
+        }
     }
 }

@@ -6,6 +6,7 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.ObjectMetadata
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
+import com.ssafy.yoganavi.data.repository.response.AuthException
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
@@ -30,12 +31,15 @@ class RegisterNoticeViewModel @Inject constructor(
     private val _notice = MutableStateFlow(NoticeData())
     val notice: StateFlow<NoticeData> = _notice.asStateFlow()
 
-    fun getNotice(articleId: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun getNotice(
+        articleId: Int,
+        endSession: suspend () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.getNotice(articleId) }
             .onSuccess {
                 it.data?.let { notice -> _notice.emit(notice) }
             }
-            .onFailure { it.printStackTrace() }
+            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
     }
 
     fun removeImage() = viewModelScope.launch(Dispatchers.IO) {
@@ -66,37 +70,43 @@ class RegisterNoticeViewModel @Inject constructor(
         _notice.emit(notice.value.copy(content = content))
     }
 
-    fun insertNotice(content: String, goBackStack: suspend () -> Unit) =
-        viewModelScope.launch(Dispatchers.IO) {
-            val uuid = UUID.randomUUID()
-            val imageUrlKey = "$NOTICE/$uuid"
-            val imageUrlSmallKey = "$NOTICE/$MINI/$uuid"
-            val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
-            val imageUrlSmall = s3Client.getUrl(BUCKET_NAME, imageUrlSmallKey)
-            if (notice.value.imageUrlPath.isNotBlank()) {
+    fun insertNotice(
+        content: String,
+        goBackStack: suspend () -> Unit,
+        endSession: suspend () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        val uuid = UUID.randomUUID()
+        val imageUrlKey = "$NOTICE/$uuid"
+        val imageUrlSmallKey = "$NOTICE/$MINI/$uuid"
+        val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
+        val imageUrlSmall = s3Client.getUrl(BUCKET_NAME, imageUrlSmallKey)
+        if (notice.value.imageUrlPath.isNotBlank()) {
 
-                val noticeFile = File(notice.value.imageUrlPath)
-                val miniFile = File(notice.value.imageUrlSmallPath)
+            val noticeFile = File(notice.value.imageUrlPath)
+            val miniFile = File(notice.value.imageUrlSmallPath)
 
-                val metadata = ObjectMetadata().apply { contentType = "image/webp" }
-                transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile, metadata)
-                transferUtility.upload(BUCKET_NAME, imageUrlSmallKey, miniFile, metadata)
-            }
-            var request = RegisterNoticeRequest(
-                content = content,
-                imageUrl = imageUrl.toString(),
-                imageUrlSmall = imageUrlSmall.toString()
-            )
-            if(notice.value.imageUrlPath.isBlank()) {
-                request = RegisterNoticeRequest(content=content, imageUrl = "")
-            }
-            runCatching { infoRepository.insertNotice(request) }
-                .onSuccess { goBackStack() }
-                .onFailure { it.printStackTrace() }
+            val metadata = ObjectMetadata().apply { contentType = "image/webp" }
+            transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile, metadata)
+            transferUtility.upload(BUCKET_NAME, imageUrlSmallKey, miniFile, metadata)
         }
+        var request = RegisterNoticeRequest(
+            content = content,
+            imageUrl = imageUrl.toString(),
+            imageUrlSmall = imageUrlSmall.toString()
+        )
+        if (notice.value.imageUrlPath.isBlank()) {
+            request = RegisterNoticeRequest(content = content, imageUrl = "")
+        }
+        runCatching { infoRepository.insertNotice(request) }
+            .onSuccess { goBackStack() }
+            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
+    }
 
-    fun updateNotice(content: String, goBackStack: suspend () -> Unit) =
-        viewModelScope.launch(Dispatchers.IO) {
+    fun updateNotice(
+        content: String,
+        goBackStack: suspend () -> Unit,
+        endSession: suspend () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
             val uuid = UUID.randomUUID()
             val imageUrlKey = "$NOTICE/$uuid"
             val imageUrlSmallKey = "$NOTICE/$MINI/$uuid"
@@ -131,6 +141,6 @@ class RegisterNoticeViewModel @Inject constructor(
 
             runCatching { infoRepository.updateNotice(request, notice.value.articleId) }
                 .onSuccess { goBackStack() }
-                .onFailure { it.printStackTrace() }
+                .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
         }
 }

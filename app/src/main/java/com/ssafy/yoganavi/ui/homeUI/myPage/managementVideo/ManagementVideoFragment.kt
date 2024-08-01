@@ -46,7 +46,7 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
         binding.rvLecture.adapter = lectureAdapter
         initListener()
         initCollect()
-        viewModel.getLectureList()
+        viewModel.getLectureList(::endSession)
     }
 
     private fun initListener() {
@@ -93,7 +93,7 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
             deleteBtn.isChecked = false
             deleteBtn.visibility = View.GONE
         }
-        if (indexList.isNotEmpty()) viewModel.deleteLecture(indexList)
+        if (indexList.isNotEmpty()) viewModel.deleteLecture(indexList, ::endSession)
     }
 
     private fun setSelectListener() = with(binding.rvLecture) {
@@ -122,7 +122,7 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
         menuListener = ::setMode
     )
 
-    private fun sendLikeLecture(recordedId: Long) = viewModel.setLectureLike(recordedId)
+    private fun sendLikeLecture(recordedId: Long) = viewModel.setLectureLike(recordedId, ::endSession)
 
     private fun navigateToRegisterVideoFragment(recordedId: Long = -1L) {
         val directions = ManagementVideoFragmentDirections

@@ -4,6 +4,7 @@ import android.media.MediaMetadataRetriever
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
+import com.ssafy.yoganavi.data.repository.response.AuthException
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -18,11 +19,12 @@ class LectureDetailViewModel @Inject constructor(
 
     fun getLecture(
         recordId: Long,
-        bindData: suspend (LectureDetailData) -> Unit
+        bindData: suspend (LectureDetailData) -> Unit,
+        endSession: suspend () -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.getLecture(recordId) }
             .onSuccess { it.data?.let { data -> bindData(data) } }
-            .onFailure { it.printStackTrace() }
+            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
     }
 
     fun getVideoInfo(uri: String) = viewModelScope.async(Dispatchers.IO) {

@@ -3,6 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.teacher.teacherDetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
+import com.ssafy.yoganavi.data.repository.response.AuthException
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -13,17 +14,22 @@ import javax.inject.Inject
 class TeacherDetailViewModel @Inject constructor(
     private val infoRepository: InfoRepository
 ) : ViewModel() {
+
     fun getTeacherDetail(
         teacherId: Int,
-        bindData: suspend (TeacherDetailData) -> Unit
+        bindData: suspend (TeacherDetailData) -> Unit,
+        endSession: suspend () -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.getTeacherDetail(teacherId) }
             .onSuccess { it.data?.let { data -> bindData(data) } }
-            .onFailure { it.printStackTrace() }
+            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
     }
 
-    fun likeLecture(lectureId: Long) = viewModelScope.launch(Dispatchers.IO) {
+    fun likeLecture(
+        lectureId: Long,
+        endSession: suspend () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.likeLecture(lectureId) }
-            .onFailure { it.printStackTrace() }
+            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
     }
 }

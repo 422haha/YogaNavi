@@ -3,6 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.teacher.teacherList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
+import com.ssafy.yoganavi.data.repository.response.AuthException
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.teacher.FilterData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class TeacherListViewModel @Inject constructor(
     private val infoRepository: InfoRepository
 ) : ViewModel() {
+
     private val _teacherList = MutableStateFlow<List<TeacherData>>(emptyList())
     val teacherList = _teacherList.asStateFlow()
     private var searchKeyword: String = ""
@@ -23,45 +25,53 @@ class TeacherListViewModel @Inject constructor(
     val sorting = _sorting.asStateFlow()
     private var isInit: Boolean = true
 
-    fun initCheckGetTeacherList(filter: FilterData) {
+    private fun initCheckGetTeacherList(filter: FilterData, endSession: suspend () -> Unit) {
         if (isInit) {
-            getAllTeacherList()
+            getAllTeacherList(endSession)
         } else {
-            getTeacherList(filter)
+            getTeacherList(filter, endSession)
         }
     }
 
-    private fun getTeacherList(filter: FilterData) = viewModelScope.launch(Dispatchers.IO) {
+    private fun getTeacherList(
+        filter: FilterData,
+        endSession: suspend () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.getTeacherList(sorting.value, filter, searchKeyword) }
             .onSuccess { _teacherList.emit(it.data.toMutableList()) }
-            .onFailure { it.printStackTrace() }
+            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
     }
 
-    private fun getAllTeacherList() = viewModelScope.launch(Dispatchers.IO) {
+    private fun getAllTeacherList(
+        endSession: suspend () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.getAllTeacherList(sorting.value, searchKeyword) }
             .onSuccess { _teacherList.emit(it.data.toMutableList()) }
-            .onFailure { it.printStackTrace() }
+            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
     }
 
-    fun teacherLikeToggle(filter: FilterData, teacherId: Int) =
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching { infoRepository.teacherLikeToggle(teacherId) }
-                .onSuccess { initCheckGetTeacherList(filter) }
-                .onFailure { it.printStackTrace() }
-        }
+    fun teacherLikeToggle(
+        filter: FilterData,
+        teacherId: Int,
+        endSession: suspend () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        runCatching { infoRepository.teacherLikeToggle(teacherId) }
+            .onSuccess { initCheckGetTeacherList(filter, endSession) }
+            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
+    }
 
-    fun setSearchKeyword(filter: FilterData, newString: String?) {
+    fun setSearchKeyword(filter: FilterData, newString: String?, endSession: suspend () -> Unit) {
         searchKeyword = newString ?: ""
-        initCheckGetTeacherList(filter)
+        initCheckGetTeacherList(filter, endSession)
     }
 
     fun getSearchKeyword(): String {
         return searchKeyword
     }
 
-    suspend fun setSorting(newSorting: Int, filter: FilterData) {
+    suspend fun setSorting(newSorting: Int, filter: FilterData, endSession: suspend () -> Unit) {
         _sorting.emit(newSorting)
-        initCheckGetTeacherList(filter)
+        initCheckGetTeacherList(filter, endSession)
     }
 
     fun setIsInit() {

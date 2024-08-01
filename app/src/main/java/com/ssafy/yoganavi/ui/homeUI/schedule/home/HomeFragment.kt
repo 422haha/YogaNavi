@@ -32,7 +32,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
         initCollect()
 
-        viewModel.getHomeList()
+        viewModel.getHomeList(::endSession)
     }
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {

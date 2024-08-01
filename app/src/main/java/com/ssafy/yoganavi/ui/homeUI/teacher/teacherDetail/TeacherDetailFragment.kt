@@ -35,7 +35,7 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
         getTeacherDetail()
     }
 
-    private fun getTeacherDetail() = viewModel.getTeacherDetail(args.userId, ::bindData)
+    private fun getTeacherDetail() = viewModel.getTeacherDetail(args.userId, ::bindData, ::endSession)
     private suspend fun bindData(data: TeacherDetailData) = withContext(Dispatchers.Main) {
         val itemList: MutableList<TeacherDetailItem> = mutableListOf()
         val header = TeacherData(
@@ -88,6 +88,6 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
     }
 
     private fun sendLikeLecture(lectureId: Long) {
-        viewModel.likeLecture(lectureId)
+        viewModel.likeLecture(lectureId, ::endSession)
     }
 }

@@ -77,9 +77,7 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
         initCollect()
         initListener()
 
-        if (args.recordedId != -1L) viewModel.getLecture(args.recordedId) { data ->
-            setView(data)
-        }
+        if (args.recordedId != -1L) viewModel.getLecture(args.recordedId, ::setView, ::endSession)
     }
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
@@ -152,7 +150,8 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
             titleList = chapterTitleList,
             contentList = chapterContentList,
             onSuccess = ::successToUpload,
-            onFailure = ::failToUpload
+            onFailure = ::failToUpload,
+            endSession = ::endSession
         )
     }
 

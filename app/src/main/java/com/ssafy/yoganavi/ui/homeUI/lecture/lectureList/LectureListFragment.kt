@@ -110,5 +110,6 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
         findNavController().navigate(directions)
     }
 
-    private fun sendLikeLecture(recordedId: Long) = viewModel.setLectureLike(recordedId)
+    private fun sendLikeLecture(recordedId: Long) =
+        viewModel.setLectureLike(recordedId, ::endSession)
 }

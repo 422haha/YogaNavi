@@ -3,6 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.registerLive
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
+import com.ssafy.yoganavi.data.repository.response.AuthException
 import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
 import com.ssafy.yoganavi.ui.utils.Week
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,11 @@ class RegisterLiveViewModel @Inject constructor(
     var liveLectureData = LiveLectureData(teacherProfile = "", teacherSmallProfile = "")
     var dayStatusMap = Week.entries.associateWith { false }.toMutableMap()
 
-    fun getLive(liveId: Int, onReadLive: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+    fun getLive(
+        liveId: Int,
+        onReadLive: () -> Unit,
+        endSession: suspend () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.getLive(liveId) }
             .onSuccess {
                 it.data?.let { data ->
@@ -32,20 +37,24 @@ class RegisterLiveViewModel @Inject constructor(
                     onReadLive()
                 }
             }
-            .onFailure { it.printStackTrace() }
+            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
     }
 
-    fun createLive(popBack: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        runCatching {
-            infoRepository.createLive(liveLectureData) }
+    fun createLive(
+        popBack: suspend () -> Unit,
+        endSession: suspend () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        runCatching { infoRepository.createLive(liveLectureData) }
             .onSuccess { popBack() }
-            .onFailure { it.printStackTrace() }
+            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
     }
 
-    fun updateLive(popBack: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        runCatching {
-            infoRepository.updateLive(liveLectureData, liveLectureData.liveId) }
+    fun updateLive(
+        popBack: suspend () -> Unit,
+        endSession: suspend () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        runCatching { infoRepository.updateLive(liveLectureData, liveLectureData.liveId) }
             .onSuccess { popBack() }
-            .onFailure { it.printStackTrace() }
+            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
     }
 }

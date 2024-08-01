@@ -30,7 +30,7 @@ class CourseHistoryFragment : BaseFragment<FragmentCourseHistoryBinding>(Fragmen
 
         initCollect()
 
-        viewModel.getCourseHistoryList()
+        viewModel.getCourseHistoryList(::endSession)
     }
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {

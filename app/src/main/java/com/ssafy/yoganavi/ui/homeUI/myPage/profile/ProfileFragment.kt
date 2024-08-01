@@ -27,7 +27,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
         getProfileData()
     }
 
-    private fun getProfileData() = viewModel.getProfileData(::bindData)
+    private fun getProfileData() = viewModel.getProfileData(::bindData, ::endSession)
 
     private suspend fun bindData(profile: Profile) = withContext(Dispatchers.Main) {
         with(binding) {

@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
 import com.ssafy.yoganavi.data.repository.lecture.LectureRepository
+import com.ssafy.yoganavi.data.repository.response.AuthException
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.ui.homeUI.lecture.lectureList.lecture.SortAndKeyword
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,10 +37,13 @@ class LectureListViewModel @Inject constructor(
             )
         }.cachedIn(viewModelScope)
 
-    fun setLectureLike(recordedId: Long) = viewModelScope.launch(Dispatchers.IO) {
+    fun setLectureLike(
+        recordedId: Long,
+        endSession: suspend () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.likeLecture(recordedId) }
             .onSuccess { updateSortAndKeyword(likeChange = true) }
-            .onFailure { it.printStackTrace() }
+            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
     }
 
     fun updateSortAndKeyword(
@@ -50,7 +54,7 @@ class LectureListViewModel @Inject constructor(
         likeChange: Boolean? = null
     ) {
         val prevLike = _sortAndKeyword.value.likeChange
-        val newLike = if(likeChange != null) !prevLike else prevLike
+        val newLike = if (likeChange != null) !prevLike else prevLike
         val newValue = SortAndKeyword(sort, keyword, searchInTitle, searchInContent, newLike)
         _sortAndKeyword.value = newValue
     }

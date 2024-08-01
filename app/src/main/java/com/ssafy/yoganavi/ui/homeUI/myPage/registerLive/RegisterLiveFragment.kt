@@ -85,10 +85,11 @@ class RegisterLiveFragment :
             )
 
             cbEndDateUnlimited.setOnCheckedChangeListener { _, isChecked ->
-                if(viewModel.liveLectureData.startDate != 0L) {
+                if (viewModel.liveLectureData.startDate != 0L) {
                     if (isChecked) {
                         tieEnd.isEnabled = false
-                        viewModel.liveLectureData.endDate = addYear(viewModel.liveLectureData.startDate)
+                        viewModel.liveLectureData.endDate =
+                            addYear(viewModel.liveLectureData.startDate)
                         tieEnd.setText(formatDotDate(viewModel.liveLectureData.endDate))
                     } else {
                         tieEnd.isEnabled = true
@@ -104,39 +105,19 @@ class RegisterLiveFragment :
     }
 
     private fun setModifyInfo() {
-        viewModel.getLive(args.liveId) {
-            lifecycleScope.launch {
-                withContext(Dispatchers.Main) {
-                    binding.etTitle.setText(viewModel.liveLectureData.liveTitle)
-                    binding.etContent.setText(viewModel.liveLectureData.liveContent)
-
-                    viewModel.dayStatusMap.forEach { (day, isSelected) ->
-                        weekToggleButtonMap[day]?.isChecked = isSelected
-                    }
-
-                    binding.tieStart.setText(formatDotDate(viewModel.liveLectureData.startDate))
-                    binding.tieEnd.setText(formatDotDate(viewModel.liveLectureData.endDate))
-
-                    binding.btnStart.text = formatTime(viewModel.liveLectureData.startTime)
-                    binding.btnEnd.text = formatTime(viewModel.liveLectureData.endTime)
-
-                    val size = resources.getStringArray(R.array.maxnum_array).size
-                    if (viewModel.liveLectureData.maxLiveNum in 1..size)
-                        binding.spMaxNum.setSelection(viewModel.liveLectureData.maxLiveNum - 1)
-                }
-            }
-        }
+        viewModel.getLive(args.liveId, ::onReadLive, ::endSession)
     }
 
     private fun setRegister() {
         hideKeyboard()
 
-        if(!binding.etTitle.text.isNullOrBlank() &&
+        if (!binding.etTitle.text.isNullOrBlank() &&
             !binding.etContent.text.isNullOrBlank() &&
             !weekToggleButtonMap.values.all { !it.isChecked } &&
             viewModel.liveLectureData.startDate != 0L &&
             viewModel.liveLectureData.endDate != 0L &&
-            viewModel.liveLectureData.endTime != 0L) {
+            viewModel.liveLectureData.endTime != 0L
+        ) {
 
             viewModel.liveLectureData.apply {
                 with(binding) {
@@ -154,10 +135,12 @@ class RegisterLiveFragment :
             }
 
             if (args.state == CREATE)
-                viewModel.createLive(::popBackStack)
+                viewModel.createLive(::popBackStack, ::endSession)
             else
-                viewModel.updateLive(::popBackStack)
-        } else { showSnackBar(IS_BLANK) }
+                viewModel.updateLive(::popBackStack, ::endSession)
+        } else {
+            showSnackBar(IS_BLANK)
+        }
     }
 
     private fun showCalendar(state: Int) {
@@ -190,7 +173,7 @@ class RegisterLiveFragment :
                 requireContext(),
                 R.style.MySpinnerDatePickerStyle,
                 { _, sYear, sMonth, sDay ->
-                    calendar.set(sYear, sMonth, sDay, 0 ,0, 0)
+                    calendar.set(sYear, sMonth, sDay, 0, 0, 0)
 
                     binding.tieEnd.setText(intToDate(sYear, sMonth, sDay))
                     viewModel.liveLectureData.endDate = calendar.timeInMillis
@@ -205,15 +188,16 @@ class RegisterLiveFragment :
     private fun showTimePicker(state: Int) {
         val title: String = if (state == START) "시작" else "종료"
 
-        val prevTime: Long = if(state == START) viewModel.liveLectureData.startTime
-        else if(state == END) viewModel.liveLectureData.endTime
+        val prevTime: Long = if (state == START) viewModel.liveLectureData.startTime
+        else if (state == END) viewModel.liveLectureData.endTime
         else 0
 
         val prevHour: Int = if (prevTime > 0L) (prevTime / (3600 * 1000)).toInt()
         else 0
 
-        val prevMinute: Int = if (prevTime > 0L && ((prevTime % (3600 * 1000)) > 0L)) ((prevTime % (3600 * 1000)) / (60 * 1000)).toInt()
-        else 0
+        val prevMinute: Int =
+            if (prevTime > 0L && ((prevTime % (3600 * 1000)) > 0L)) ((prevTime % (3600 * 1000)) / (60 * 1000)).toInt()
+            else 0
 
         val materialTimePicker = MaterialTimePicker.Builder()
             .setTimeFormat(TimeFormat.CLOCK_12H)
@@ -231,10 +215,10 @@ class RegisterLiveFragment :
             val pickTime: Long =
                 ((materialTimePicker.hour * 3600 * 1000) + (materialTimePicker.minute * 60 * 1000)).toLong()
 
-            if(state == START) {
+            if (state == START) {
                 binding.btnStart.text = timeStr
                 viewModel.liveLectureData.startTime = pickTime
-            } else if(state == END) {
+            } else if (state == END) {
                 binding.btnEnd.text = timeStr
                 viewModel.liveLectureData.endTime = pickTime
             }
@@ -243,7 +227,28 @@ class RegisterLiveFragment :
         materialTimePicker.show(childFragmentManager, "fragment_tag")
     }
 
-    private suspend fun popBackStack() = withContext(Dispatchers.Main){
+    private fun onReadLive() = lifecycleScope.launch {
+        withContext(Dispatchers.Main) {
+            binding.etTitle.setText(viewModel.liveLectureData.liveTitle)
+            binding.etContent.setText(viewModel.liveLectureData.liveContent)
+
+            viewModel.dayStatusMap.forEach { (day, isSelected) ->
+                weekToggleButtonMap[day]?.isChecked = isSelected
+            }
+
+            binding.tieStart.setText(formatDotDate(viewModel.liveLectureData.startDate))
+            binding.tieEnd.setText(formatDotDate(viewModel.liveLectureData.endDate))
+
+            binding.btnStart.text = formatTime(viewModel.liveLectureData.startTime)
+            binding.btnEnd.text = formatTime(viewModel.liveLectureData.endTime)
+
+            val size = resources.getStringArray(R.array.maxnum_array).size
+            if (viewModel.liveLectureData.maxLiveNum in 1..size)
+                binding.spMaxNum.setSelection(viewModel.liveLectureData.maxLiveNum - 1)
+        }
+    }
+
+    private suspend fun popBackStack() = withContext(Dispatchers.Main) {
         findNavController().popBackStack()
     }
 }
