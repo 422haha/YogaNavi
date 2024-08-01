@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 @Builder
 public class ReservationRequestDto {
+
     private String period; // 기간
     private int method; // 수업 방식 (0: 1대1, 1: 1대다)
     private Long lectureId; // 수강 가능한 수업 ID
