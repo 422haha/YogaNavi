@@ -8,7 +8,7 @@ import com.ssafy.yoganavi.ui.utils.loadImageSequentially
 
 class TeacherDetailHeaderViewHolder(
     private val binding: ListItemTeacherHeaderBinding,
-    private val goReserve: (Int) -> (Unit)
+    private val goReserve: (Int, String, String, String) -> (Unit)
 ) : ViewHolder(binding.root) {
     fun bind(teacherDetailHeader: TeacherData) = with(binding) {
         if (teacherDetailHeader.teacherProfile.isNotBlank() && teacherDetailHeader.teacherSmallProfile.isNotBlank()) {
@@ -36,8 +36,16 @@ class TeacherDetailHeaderViewHolder(
             tvHashtag.isVisible = false
         }
         btnReserve.setOnClickListener {
-            goReserve(teacherDetailHeader.teacherId)
+            var hashtagString = ""
+            if (teacherDetailHeader.hashtags.isNotEmpty())
+                hashtagString =
+                    teacherDetailHeader.hashtags.joinToString(separator = " #", prefix = "#")
+            goReserve(
+                teacherDetailHeader.teacherId,
+                teacherDetailHeader.teacherName,
+                hashtagString,
+                teacherDetailHeader.teacherSmallProfile
+            )
         }
-
     }
 }

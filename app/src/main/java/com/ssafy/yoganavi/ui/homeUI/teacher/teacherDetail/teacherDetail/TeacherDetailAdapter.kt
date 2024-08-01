@@ -13,7 +13,7 @@ import com.ssafy.yoganavi.ui.utils.ITEM_LECTURE
 import com.ssafy.yoganavi.ui.utils.ITEM_NOTICE
 
 class TeacherDetailAdapter(
-    val goReserve: (Int) -> (Unit),
+    val goReserve: (Int, String, String, String) -> (Unit),
     private val navigateToLectureDetailFragment: (Long) -> Unit,
     private val sendLikeLecture: (Long) -> Unit
 ) : ListAdapter<TeacherDetailItem, ViewHolder>(TeacherDetailCallback()) {
