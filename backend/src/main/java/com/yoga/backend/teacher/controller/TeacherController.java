@@ -50,7 +50,6 @@ public class TeacherController {
 
         // 필터 설정
         TeacherFilter filter = new TeacherFilter();
-        filter.setSorting(sorting);
         filter.setStartTime(Instant.ofEpochMilli(startTime).toEpochMilli());
         filter.setEndTime(Instant.ofEpochMilli(endTime).toEpochMilli());
         filter.setDay(day);
@@ -59,7 +58,8 @@ public class TeacherController {
         filter.setSearchKeyword(searchKeyword);
 
         try {
-            List<TeacherDto> teachers = teacherService.getAllTeachers(filter, userId);
+            List<TeacherDto> teachers = teacherService.getAllTeachers(filter, sorting, userId);
+
             // 응답 생성
             Map<String, Object> response = new HashMap<>();
             response.put("message", "success");
@@ -91,7 +91,8 @@ public class TeacherController {
         int userId = jwtUtil.getUserIdFromToken(token);
 
         try {
-            List<TeacherDto> teachers = teacherService.getSortedTeachers(sorting, userId, searchKeyword);
+            List<TeacherDto> teachers = teacherService.getSortedTeachers(sorting, userId,
+                searchKeyword);
             // 응답 생성
             Map<String, Object> response = new HashMap<>();
             response.put("message", "success");

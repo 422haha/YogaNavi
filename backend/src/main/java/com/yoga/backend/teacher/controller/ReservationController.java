@@ -34,8 +34,8 @@ public class ReservationController {
      * 예약을 생성합니다.
      *
      * @param reservationRequest 예약 요청 DTO
-     * @param token 인증 토큰
-     * @param csrfToken CSRF 토큰
+     * @param token              인증 토큰
+     * @param csrfToken          CSRF 토큰
      * @return 생성된 예약 응답
      */
     @PostMapping
@@ -45,9 +45,10 @@ public class ReservationController {
         @RequestHeader("CSRF-Token") String csrfToken) {
         int userId = jwtUtil.getUserIdFromToken(token);
         try {
-            Reservation reservation = reservationService.createReservation(userId, reservationRequest);
+            Reservation reservation = reservationService.createReservation(userId,
+                reservationRequest);
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "success");
+            response.put("message", "성공");
             response.put("data", reservation);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
@@ -61,7 +62,7 @@ public class ReservationController {
     /**
      * 실시간 강의 목록을 조회합니다.
      *
-     * @param token 인증 토큰
+     * @param token  인증 토큰
      * @param method 수업 방식 (0: 1대1, 1: 1대다)
      * @return 실시간 강의 목록 응답
      */
@@ -72,7 +73,7 @@ public class ReservationController {
         try {
             List<LiveLectureDto> liveLectures = reservationService.getAllLiveLectures(method);
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "success");
+            response.put("message", "성공");
             response.put("data", liveLectures);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -90,12 +91,13 @@ public class ReservationController {
      * @return 사용자 예약 목록 응답
      */
     @GetMapping("/user")
-    public ResponseEntity<Map<String, Object>> getUserReservations(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<Map<String, Object>> getUserReservations(
+        @RequestHeader("Authorization") String token) {
         int userId = jwtUtil.getUserIdFromToken(token);
         try {
             List<Reservation> reservations = reservationService.getUserReservations(userId);
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "success");
+            response.put("message", "성공");
             response.put("data", reservations);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -117,7 +119,7 @@ public class ReservationController {
         try {
             List<Reservation> reservations = reservationService.getTeacherReservations(teacherId);
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "success");
+            response.put("message", "성공");
             response.put("data", reservations);
             return ResponseEntity.ok(response);
         } catch (Exception e) {

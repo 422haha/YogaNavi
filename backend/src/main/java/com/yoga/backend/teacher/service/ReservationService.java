@@ -9,10 +9,11 @@ import java.util.List;
  * 예약 서비스를 위한 인터페이스
  */
 public interface ReservationService {
+
     /**
      * 예약을 생성합니다.
      *
-     * @param userId 사용자 ID
+     * @param userId             사용자 ID
      * @param reservationRequest 예약 요청 DTO
      * @return 생성된 예약
      */

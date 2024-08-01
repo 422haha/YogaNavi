@@ -5,8 +5,8 @@ import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.teacher.dto.ReservationRequestDto;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureDto;
 import com.yoga.backend.mypage.livelectures.LiveLectureRepository;
-import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.teacher.repository.ReservationRepository;
+import com.yoga.backend.members.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +37,7 @@ public class ReservationServiceImpl implements ReservationService {
     /**
      * 예약을 생성합니다.
      *
-     * @param userId 사용자 ID
+     * @param userId             사용자 ID
      * @param reservationRequest 예약 요청 DTO
      * @return 생성된 예약
      */
@@ -86,8 +86,16 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional(readOnly = true)
     public List<LiveLectureDto> getAllLiveLectures(int method) {
-        return liveLectureRepository.findAllByMethod(method).stream().map(lecture -> {
-            return LiveLectureDto.fromEntity(lecture);
-        }).collect(Collectors.toList());
+        if (method == 0) {
+            // 1대1 강의 조회
+            return liveLectureRepository.findAllByMaxLiveNum(1).stream()
+                .map(LiveLectureDto::fromEntity)
+                .collect(Collectors.toList());
+        } else {
+            // 1대다 강의 조회
+            return liveLectureRepository.findAllByMaxLiveNumGreaterThan(1).stream()
+                .map(LiveLectureDto::fromEntity)
+                .collect(Collectors.toList());
+        }
     }
 }
