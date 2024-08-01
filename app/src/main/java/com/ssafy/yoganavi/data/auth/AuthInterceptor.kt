@@ -1,11 +1,14 @@
 package com.ssafy.yoganavi.data.auth
 
 import com.ssafy.yoganavi.data.repository.dataStore.DataStoreRepository
+import com.ssafy.yoganavi.ui.utils.AuthManager
+import com.ssafy.yoganavi.ui.utils.FORBIDDEN
 import com.ssafy.yoganavi.ui.utils.MEMBER
 import com.ssafy.yoganavi.ui.utils.NEED_REFRESH_TOKEN
 import com.ssafy.yoganavi.ui.utils.REFRESH_TOKEN
 import com.ssafy.yoganavi.ui.utils.TOKEN
 import com.ssafy.yoganavi.ui.utils.TOKEN_REQUIRED
+import com.ssafy.yoganavi.ui.utils.UNAUTHORIZED
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -13,7 +16,8 @@ import okhttp3.Response
 import javax.inject.Inject
 
 class AuthInterceptor @Inject constructor(
-    private val dataStoreRepository: DataStoreRepository
+    private val dataStoreRepository: DataStoreRepository,
+    private val authManager: AuthManager
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -23,6 +27,8 @@ class AuthInterceptor @Inject constructor(
         }
 
         response.saveToken()
+        val code = response.code
+        if (code == UNAUTHORIZED || code == FORBIDDEN) authManager.authError(NEED_REFRESH_TOKEN)
         return response
     }
 
