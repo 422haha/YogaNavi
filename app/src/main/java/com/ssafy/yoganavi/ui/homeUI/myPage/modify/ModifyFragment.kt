@@ -81,7 +81,7 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
         }
     }
 
-    private fun getProfile() = viewModel.getProfile(::bindData, ::endSession)
+    private fun getProfile() = viewModel.getProfile(::bindData)
 
     private suspend fun bindData(data: Profile) = withContext(Dispatchers.Main) {
         with(binding) {
@@ -116,7 +116,7 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
         check.setOnClickListener {
             val nickname = tieNn.text?.toString() ?: ""
             val password = tiePw.text?.toString() ?: ""
-            viewModel.modifyProfile(nickname, password, ::isModified, ::endSession)
+            viewModel.modifyProfile(nickname, password, ::isModified)
         }
 
         tiePw.addTextChangedListener { editText ->

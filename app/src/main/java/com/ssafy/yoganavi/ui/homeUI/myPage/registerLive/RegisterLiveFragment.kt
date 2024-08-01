@@ -105,7 +105,7 @@ class RegisterLiveFragment :
     }
 
     private fun setModifyInfo() {
-        viewModel.getLive(args.liveId, ::onReadLive, ::endSession)
+        viewModel.getLive(args.liveId, ::onReadLive)
     }
 
     private fun setRegister() {
@@ -135,9 +135,9 @@ class RegisterLiveFragment :
             }
 
             if (args.state == CREATE)
-                viewModel.createLive(::popBackStack, ::endSession)
+                viewModel.createLive(::popBackStack)
             else
-                viewModel.updateLive(::popBackStack, ::endSession)
+                viewModel.updateLive(::popBackStack)
         } else {
             showSnackBar(IS_BLANK)
         }

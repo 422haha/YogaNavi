@@ -61,11 +61,11 @@ class TeacherListFragment :
         initCollect()
         if (args.sorting == 0) {
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(0, filter, ::endSession)
+                viewModel.setSorting(0, filter)
             }
         } else {
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(1, filter, ::endSession)
+                viewModel.setSorting(1, filter)
             }
         }
     }
@@ -82,7 +82,7 @@ class TeacherListFragment :
         }
         binding.svSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                viewModel.setSearchKeyword(filter, query, ::endSession)
+                viewModel.setSearchKeyword(filter, query)
                 return false
             }
 
@@ -93,13 +93,13 @@ class TeacherListFragment :
         })
         binding.rbRecent.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(0, filter, ::endSession)
+                viewModel.setSorting(0, filter)
             }
         }
 
         binding.rbPopular.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(1, filter, ::endSession)
+                viewModel.setSorting(1, filter)
             }
         }
     }
@@ -132,6 +132,6 @@ class TeacherListFragment :
     }
 
     private fun teacherLikeToggle(teacherId: Int = -1) {
-        viewModel.teacherLikeToggle(filter, teacherId, ::endSession)
+        viewModel.teacherLikeToggle(filter, teacherId)
     }
 }

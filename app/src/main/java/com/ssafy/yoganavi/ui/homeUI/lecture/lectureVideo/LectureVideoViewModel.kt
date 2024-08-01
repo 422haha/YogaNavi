@@ -47,43 +47,48 @@ class LectureVideoViewModel @Inject constructor(
         width: Int,
         height: Int
     ) = viewModelScope.launch(Dispatchers.Default) {
-        if (isVideoInfer) return@launch
+        runCatching {
+            if (isVideoInfer) return@launch
 
-        isVideoInfer = true
-        val (position, uri) = withContext(Dispatchers.Main) {
-            val position = player.currentPosition
-            val uri = player.currentMediaItem?.localConfiguration?.uri?.toString()
-            return@withContext Pair(position, uri)
-        }
-
-        if (position == 0L || uri.isNullOrBlank()) {
-            isVideoInfer = false
-            return@launch
-        }
-
-        retriever.setDataSource(uri)
-        val bitmap = retriever.getFrameAtTime(
-            position * 1000,
-            MediaMetadataRetriever.OPTION_CLOSEST_SYNC
-        )
-
-        bitmap?.let {
-            val results = poseRepository.infer(bitmap, bitmap.width, bitmap.height)
-            val ratio = height / bitmap.height.toFloat()
-            val diffX = (width - bitmap.width * ratio) / 2f
-            val result = results.firstOrNull().orEmpty()
-            val keyPoints = mutableListOf<KeyPoint>()
-            result.forEachIndexed { idx, keyPoint ->
-                val x = if (keyPoint.x == 0f) 0f else keyPoint.x * ratio + diffX
-                val y = if (keyPoint.y == 0f) 0f else keyPoint.y * ratio
-                keyPoints.add(KeyPoint(idx, x, y, keyPoint.confidence))
+            isVideoInfer = true
+            val (position, uri) = withContext(Dispatchers.Main) {
+                val position = player.currentPosition
+                val uri = player.currentMediaItem?.localConfiguration?.uri?.toString()
+                return@withContext Pair(position, uri)
             }
-            bitmap.recycle()
-            _teacherKeyPoints.emit(keyPoints)
-        }
 
-        isVideoInfer = false
+            if (position == 0L || uri.isNullOrBlank()) {
+                isVideoInfer = false
+                return@launch
+            }
+
+            retriever.setDataSource(uri)
+            val bitmap = retriever.getFrameAtTime(
+                position * 1000,
+                MediaMetadataRetriever.OPTION_CLOSEST_SYNC
+            )
+
+            bitmap?.let {
+                val results = poseRepository.infer(bitmap, bitmap.width, bitmap.height)
+                val ratio = height / bitmap.height.toFloat()
+                val diffX = (width - bitmap.width * ratio) / 2f
+                val result = results.firstOrNull().orEmpty()
+                val keyPoints = mutableListOf<KeyPoint>()
+                result.forEachIndexed { idx, keyPoint ->
+                    val x = if (keyPoint.x == 0f) 0f else keyPoint.x * ratio + diffX
+                    val y = if (keyPoint.y == 0f) 0f else keyPoint.y * ratio
+                    keyPoints.add(KeyPoint(idx, x, y, keyPoint.confidence))
+                }
+                bitmap.recycle()
+                _teacherKeyPoints.emit(keyPoints)
+            }
+
+            isVideoInfer = false
+        }.onFailure {
+            isVideoInfer = false
+        }
     }
+
 
     override fun onCleared() {
         super.onCleared()

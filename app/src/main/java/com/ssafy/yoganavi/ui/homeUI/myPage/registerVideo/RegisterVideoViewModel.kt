@@ -6,7 +6,6 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.ObjectMetadata
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
-import com.ssafy.yoganavi.data.repository.response.AuthException
 import com.ssafy.yoganavi.data.repository.response.DetailResponse
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
 import com.ssafy.yoganavi.data.source.dto.lecture.VideoChapterData
@@ -42,19 +41,18 @@ class RegisterVideoViewModel @Inject constructor(
 
     fun getLecture(
         recordId: Long,
-        setView: suspend (LectureDetailData) -> Unit,
-        endSession: suspend () -> Unit
+        setView: suspend (LectureDetailData) -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
-            runCatching { infoRepository.getLecture(recordId) }
-                .onSuccess {
-                    it.data?.let { lecture ->
-                        setView(lecture)
-                        lectureDetailData = lecture
-                        _chapterList.emit(lecture.recordedLectureChapters)
-                    }
+        runCatching { infoRepository.getLecture(recordId) }
+            .onSuccess {
+                it.data?.let { lecture ->
+                    setView(lecture)
+                    lectureDetailData = lecture
+                    _chapterList.emit(lecture.recordedLectureChapters)
                 }
-                .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
-        }
+            }
+            .onFailure { it.printStackTrace() }
+    }
 
     fun deleteChapter(data: VideoChapterData) = viewModelScope.launch(Dispatchers.IO) {
         val list = chapterList.value.toMutableList()
@@ -106,8 +104,7 @@ class RegisterVideoViewModel @Inject constructor(
         titleList: List<String>,
         contentList: List<String>,
         onSuccess: suspend () -> Unit,
-        onFailure: suspend (String) -> Unit,
-        endSession: suspend () -> Unit
+        onFailure: suspend (String) -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching {
 
@@ -198,7 +195,7 @@ class RegisterVideoViewModel @Inject constructor(
             }
         }
             .onSuccess { onSuccess() }
-            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
+            .onFailure { it.printStackTrace() }
     }
 
     fun setChapterList(list: MutableList<VideoChapterData>) {

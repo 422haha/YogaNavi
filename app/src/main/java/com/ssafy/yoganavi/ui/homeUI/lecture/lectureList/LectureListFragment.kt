@@ -111,5 +111,5 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
     }
 
     private fun sendLikeLecture(recordedId: Long) =
-        viewModel.setLectureLike(recordedId, ::endSession)
+        viewModel.setLectureLike(recordedId)
 }

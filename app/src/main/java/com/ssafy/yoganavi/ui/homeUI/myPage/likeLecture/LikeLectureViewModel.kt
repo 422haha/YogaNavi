@@ -3,7 +3,6 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.likeLecture
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
-import com.ssafy.yoganavi.data.repository.response.AuthException
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -21,19 +20,16 @@ class LikeLectureViewModel @Inject constructor(
     private val _lectureList: MutableStateFlow<List<LectureData>> = MutableStateFlow(emptyList())
     val lectureList: StateFlow<List<LectureData>> = _lectureList.asStateFlow()
 
-    fun getLectureList(endSession: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+    fun getLectureList() = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.getLikeLectureList() }
             .onSuccess { _lectureList.emit(it.data.toMutableList()) }
-            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
+            .onFailure { it.printStackTrace() }
     }
 
-    fun setLectureLike(
-        recordedId: Long,
-        endSession: suspend () -> Unit
-    ) = viewModelScope.launch(Dispatchers.IO) {
+    fun setLectureLike(recordedId: Long) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.likeLecture(recordedId) }
-            .onSuccess { getLectureList(endSession) }
-            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
+            .onSuccess { getLectureList() }
+            .onFailure { it.printStackTrace() }
     }
 
 }

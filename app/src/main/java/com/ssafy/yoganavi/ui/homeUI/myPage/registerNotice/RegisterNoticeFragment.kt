@@ -50,19 +50,19 @@ class RegisterNoticeFragment :
         binding.btnAddPhoto.visibility = View.VISIBLE
 
         if (args.articleId != -1) {
-            viewModel.getNotice(args.articleId, ::endSession)
+            viewModel.getNotice(args.articleId)
             setToolbar(false, MANAGEMENT_UPDATE, true, REGISTER) {
                 val notice = binding.etNotice.text.toString()
 
                 if (notice.isBlank()) showSnackBar(R.string.notice_info)
-                else viewModel.updateNotice(notice, ::goBackStack, ::endSession)
+                else viewModel.updateNotice(notice, ::goBackStack)
             }
         } else {
             setToolbar(false, MANAGEMENT_INSERT, true, REGISTER) {
                 val notice = binding.etNotice.text.toString()
 
                 if (notice.isBlank()) showSnackBar(R.string.notice_info)
-                else viewModel.insertNotice(notice, ::goBackStack, ::endSession)
+                else viewModel.insertNotice(notice, ::goBackStack)
             }
         }
         initCollect()

@@ -46,7 +46,7 @@ class ManagementLiveFragment :
 
         initCollect()
 
-        viewModel.getLiveList(::endSession)
+        viewModel.getLiveList()
     }
 
     private fun initListener() {
@@ -90,14 +90,14 @@ class ManagementLiveFragment :
             .setTitle("화상강의 삭제")
             .setMessage("정말로 삭제하시겠습니까?")
             .setPositiveButton("확인") { _, _ ->
-                viewModel.deleteLive(liveId, ::removeLive, ::endSession)
+                viewModel.deleteLive(liveId, ::removeLive)
             }
             .setNegativeButton("취소", null)
             .show()
     }
 
     private fun removeLive() {
-        viewModel.getLiveList(::endSession)
+        viewModel.getLiveList()
         showSnackBar(getString(R.string.live_delete_msg))
     }
 }

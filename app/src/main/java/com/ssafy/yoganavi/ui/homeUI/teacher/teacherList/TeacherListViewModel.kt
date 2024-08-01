@@ -3,7 +3,6 @@ package com.ssafy.yoganavi.ui.homeUI.teacher.teacherList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
-import com.ssafy.yoganavi.data.repository.response.AuthException
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.teacher.FilterData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,53 +24,47 @@ class TeacherListViewModel @Inject constructor(
     val sorting = _sorting.asStateFlow()
     private var isInit: Boolean = true
 
-    private fun initCheckGetTeacherList(filter: FilterData, endSession: suspend () -> Unit) {
+    private fun initCheckGetTeacherList(filter: FilterData) {
         if (isInit) {
-            getAllTeacherList(endSession)
+            getAllTeacherList()
         } else {
-            getTeacherList(filter, endSession)
+            getTeacherList(filter)
         }
     }
 
-    private fun getTeacherList(
-        filter: FilterData,
-        endSession: suspend () -> Unit
-    ) = viewModelScope.launch(Dispatchers.IO) {
+    private fun getTeacherList(filter: FilterData) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.getTeacherList(sorting.value, filter, searchKeyword) }
             .onSuccess { _teacherList.emit(it.data.toMutableList()) }
-            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
+            .onFailure { it.printStackTrace() }
     }
 
-    private fun getAllTeacherList(
-        endSession: suspend () -> Unit
-    ) = viewModelScope.launch(Dispatchers.IO) {
+    private fun getAllTeacherList() = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.getAllTeacherList(sorting.value, searchKeyword) }
             .onSuccess { _teacherList.emit(it.data.toMutableList()) }
-            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
+            .onFailure { it.printStackTrace() }
     }
 
     fun teacherLikeToggle(
         filter: FilterData,
-        teacherId: Int,
-        endSession: suspend () -> Unit
+        teacherId: Int
     ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.teacherLikeToggle(teacherId) }
-            .onSuccess { initCheckGetTeacherList(filter, endSession) }
-            .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
+            .onSuccess { initCheckGetTeacherList(filter) }
+            .onFailure { it.printStackTrace() }
     }
 
-    fun setSearchKeyword(filter: FilterData, newString: String?, endSession: suspend () -> Unit) {
+    fun setSearchKeyword(filter: FilterData, newString: String?) {
         searchKeyword = newString ?: ""
-        initCheckGetTeacherList(filter, endSession)
+        initCheckGetTeacherList(filter)
     }
 
     fun getSearchKeyword(): String {
         return searchKeyword
     }
 
-    suspend fun setSorting(newSorting: Int, filter: FilterData, endSession: suspend () -> Unit) {
+    suspend fun setSorting(newSorting: Int, filter: FilterData) {
         _sorting.emit(newSorting)
-        initCheckGetTeacherList(filter, endSession)
+        initCheckGetTeacherList(filter)
     }
 
     fun setIsInit() {

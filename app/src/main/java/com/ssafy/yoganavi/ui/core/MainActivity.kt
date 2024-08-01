@@ -1,10 +1,12 @@
 package com.ssafy.yoganavi.ui.core
 
 import android.Manifest
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -18,13 +20,19 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.snackbar.Snackbar
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.ActivityMainBinding
+import com.ssafy.yoganavi.ui.utils.AuthManager
 import com.ssafy.yoganavi.ui.utils.PermissionHandler
+import com.ssafy.yoganavi.ui.utils.SESSION_END
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    @Inject
+    lateinit var authManager: AuthManager
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
 
@@ -32,11 +40,20 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
-            if(!isGranted)
-                Snackbar.make(binding.root, "실시간 강의 알림은 권한이 필요합니다.\n설정 화면에서 알림 권한을 허용해주세요.", Snackbar.LENGTH_SHORT).show()
+            if (!isGranted)
+                Snackbar.make(
+                    binding.root,
+                    "실시간 강의 알림은 권한이 필요합니다.\n설정 화면에서 알림 권한을 허용해주세요.",
+                    Snackbar.LENGTH_SHORT
+                ).show()
         }
 
-    private val permissionHandler: PermissionHandler by lazy { PermissionHandler(this, requestPermissionLauncher) }
+    private val permissionHandler: PermissionHandler by lazy {
+        PermissionHandler(
+            this,
+            requestPermissionLauncher
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,12 +85,24 @@ class MainActivity : AppCompatActivity() {
 
     private fun initCollect() = lifecycleScope.launch {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.mainEvent.collectLatest { event ->
-                setBottomNavigationVisible(event.isBottomNavigationVisible)
-                setTitle(event.title)
-                setMenuItem(event.menuItem, event.menuListener)
-                checkGoBack(event.canGoBack)
-            }
+            collectMainEvent()
+            collectAuthEvent()
+        }
+    }
+
+    private fun CoroutineScope.collectMainEvent() = launch {
+        viewModel.mainEvent.collectLatest { event ->
+            setBottomNavigationVisible(event.isBottomNavigationVisible)
+            setTitle(event.title)
+            setMenuItem(event.menuItem, event.menuListener)
+            checkGoBack(event.canGoBack)
+        }
+    }
+
+    private fun CoroutineScope.collectAuthEvent() = launch {
+        authManager.authEvent.collect {
+            Toast.makeText(this@MainActivity, SESSION_END, Toast.LENGTH_SHORT).show()
+            moveToLogin()
         }
     }
 
@@ -104,5 +133,11 @@ class MainActivity : AppCompatActivity() {
         } else {
             binding.ivGoBack.visibility = View.GONE
         }
+    }
+
+    private fun moveToLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

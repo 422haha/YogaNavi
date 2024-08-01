@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.dataStore.DataStoreRepository
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
-import com.ssafy.yoganavi.data.repository.response.AuthException
 import com.ssafy.yoganavi.data.repository.user.UserRepository
 import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,11 +18,11 @@ class ProfileViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) : ViewModel() {
 
-    fun getProfileData(bindData: suspend (Profile) -> Unit, endSession: suspend () -> Unit) =
+    fun getProfileData(bindData: suspend (Profile) -> Unit) =
         viewModelScope.launch(Dispatchers.IO) {
             runCatching { infoRepository.getProfile() }
                 .onSuccess { it.data?.let { data -> bindData(data) } }
-                .onFailure { (it as? AuthException)?.let { endSession() } ?: it.printStackTrace() }
+                .onFailure { it.printStackTrace() }
         }
 
     fun clearUserData(moveLogin: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {

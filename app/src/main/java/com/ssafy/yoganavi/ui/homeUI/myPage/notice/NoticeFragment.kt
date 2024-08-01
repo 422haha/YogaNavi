@@ -30,7 +30,7 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding
         binding.rvMyList.adapter = noticeAdapter
         initCollect()
         initListener()
-        viewModel.getNoticeAll(::endSession)
+        viewModel.getNoticeAll()
     }
 
     private fun initListener() {
@@ -56,7 +56,7 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding
     }
 
     private fun noticeDelete(noticeData: NoticeData) {
-        viewModel.deleteNotice(noticeData.articleId, ::endSession)
+        viewModel.deleteNotice(noticeData.articleId)
     }
 
 }

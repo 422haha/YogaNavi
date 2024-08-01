@@ -45,7 +45,7 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
         getLectureDetail()
     }
 
-    private fun getLectureDetail() = viewModel.getLecture(args.recordedId, ::bindData, ::endSession)
+    private fun getLectureDetail() = viewModel.getLecture(args.recordedId, ::bindData)
 
     private suspend fun bindData(data: LectureDetailData) = withContext(Dispatchers.Main) {
         val itemList: MutableList<LectureDetailItem> = mutableListOf()
