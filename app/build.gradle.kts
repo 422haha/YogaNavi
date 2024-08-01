@@ -1,3 +1,4 @@
+
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -27,6 +28,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "ACCESS_KEY", properties.getProperty("accessKey"))
         buildConfigField("String", "SECRET_KEY", properties.getProperty("secretKey"))
+        buildConfigField("String", "SIGNALING_SERVER_IP_ADDRESS", properties.getProperty("signalingServerIp"))
     }
 
     buildTypes {
@@ -128,4 +130,8 @@ dependencies {
     implementation (libs.firebase.messaging.ktx)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+
+    // Web RTC
+    implementation("io.getstream:stream-webrtc-android:1.1.3")
+    implementation ("io.getstream:stream-webrtc-android-ui:1.1.3")
 }

@@ -71,10 +71,18 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
         teacherDetailAdapter.submitList(itemList)
     }
 
-    private fun goReserve(teacherId: Int) {
+    private fun goReserve(
+        teacherId: Int,
+        teacherName: String,
+        hashtags: String,
+        teacherSmallProfile: String
+    ) {
         val directions =
             TeacherDetailFragmentDirections.actionTeacherDetailFragmentToTeacherReservationFragment(
-                teacherId
+                teacherId,
+                teacherName,
+                hashtags,
+                teacherSmallProfile
             )
         findNavController().navigate(directions)
     }

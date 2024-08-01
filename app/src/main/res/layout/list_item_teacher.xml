@@ -26,11 +26,12 @@
         android:layout_marginHorizontal="@dimen/padding_large"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/tv_hashtag"
+        app:layout_constraintBottom_toTopOf="@+id/tv_hashtag"
         app:layout_constraintEnd_toStartOf="@id/cv_favorite"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/iv_profile"
-        app:layout_constraintTop_toTopOf="@id/iv_profile"
-        app:layout_constraintVertical_chainStyle="spread"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:text="요구르드" />
 
     <TextView
@@ -38,10 +39,11 @@
         style="@style/SingleLineText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@id/iv_profile"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/tv_teacher_nickname"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@id/tv_teacher_nickname"
-        app:layout_constraintTop_toBottomOf="@id/tv_teacher_nickname"
+        app:layout_constraintTop_toBottomOf="@+id/tv_teacher_nickname"
         tools:text="#힐링 요가 #요가 마스터 #유연성" />
 
     <androidx.constraintlayout.widget.ConstraintLayout

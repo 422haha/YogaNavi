@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.hilt.android) apply false
     id("com.google.gms.google-services") version "4.4.2" apply false
+
 }
 
 buildscript {
