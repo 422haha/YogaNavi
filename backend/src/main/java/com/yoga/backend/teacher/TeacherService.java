@@ -22,11 +22,12 @@ public interface TeacherService {
     /**
      * 정렬된 강사 정보를 조회합니다.
      *
-     * @param sorting 정렬 방식 (0: 최신순, 1: 인기순)
+     * @param sorting 정렬 기준 (0: 최신순, 1: 인기순)
      * @param userId  사용자 ID
-     * @return 강사 정보 리스트
+     * @param keyword 검색 키워드
+     * @return 정렬된 강사 정보 리스트
      */
-    List<TeacherDto> getSortedTeachers(int sorting, int userId);
+    List<TeacherDto> getSortedTeachers(int sorting, int userId, String keyword);
 
     /**
      * ID로 특정 강사 정보를 조회합니다.

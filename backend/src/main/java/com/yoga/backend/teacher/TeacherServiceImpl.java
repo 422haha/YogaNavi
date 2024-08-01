@@ -268,32 +268,46 @@ public class TeacherServiceImpl implements TeacherService {
      *
      * @param sorting 정렬 기준 (0: 최신순, 1: 인기순)
      * @param userId  사용자 ID
+     * @param keyword 검색 키워드
      * @return 정렬된 강사 정보 리스트
      */
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public List<TeacherDto> getSortedTeachers(int sorting, int userId) {
+    public List<TeacherDto> getSortedTeachers(int sorting, int userId, String keyword) {
+        System.out.println("Entering getSortedTeachers with sorting: " + sorting + ", userId: " + userId + ", keyword: " + keyword);
+
         List<Users> users = teacherRepository.findAllTeachers();
 
-        return users.stream()
+        // Check if the keyword filter is working properly
+        List<Users> filteredUsers = users.stream()
+            .filter(user -> keyword == null || keyword.isEmpty() ||
+                user.getNickname().contains(keyword) ||
+                user.getEmail().contains(keyword) ||
+                (user.getContent() != null && user.getContent().contains(keyword)) || // Added null check for content
+                user.getHashtags().stream()
+                    .anyMatch(hashtag -> hashtag.getName().contains(keyword)))
+            .collect(Collectors.toList());
+
+        if (filteredUsers.isEmpty()) {
+            System.out.println("No users found with the given keyword: " + keyword);
+        }
+
+        List<TeacherDto> result = filteredUsers.stream()
             .map(user -> {
                 String profileImageUrl = null;
                 String profileImageUrlSmall = null;
                 try {
                     if (user.getProfile_image_url() != null) {
-                        profileImageUrl = s3Service.generatePresignedUrl(
-                            user.getProfile_image_url(), URL_EXPIRATION_SECONDS);
+                        profileImageUrl = s3Service.generatePresignedUrl(user.getProfile_image_url(), URL_EXPIRATION_SECONDS);
                     }
                     if (user.getProfile_image_url_small() != null) {
-                        profileImageUrlSmall = s3Service.generatePresignedUrl(
-                            user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
+                        profileImageUrlSmall = s3Service.generatePresignedUrl(user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
                     }
                 } catch (Exception e) {
                     System.err.println("Presigned URL 생성 오류: " + e.getMessage());
                 }
 
-                boolean likedByUser =
-                    teacherLikeRepository.findByTeacherAndUser(user, getUserById(userId)) != null;
+                boolean likedByUser = teacherLikeRepository.findByTeacherAndUser(user, getUserById(userId)) != null;
 
                 return TeacherDto.builder()
                     .id(user.getId())
@@ -302,8 +316,7 @@ public class TeacherServiceImpl implements TeacherService {
                     .profileImageUrl(profileImageUrl)
                     .profileImageUrlSmall(profileImageUrlSmall)
                     .content(user.getContent())
-                    .hashtags(user.getHashtags().stream().map(Hashtag::getName)
-                        .collect(Collectors.toSet()))
+                    .hashtags(user.getHashtags().stream().map(Hashtag::getName).collect(Collectors.toSet()))
                     .liked(likedByUser)
                     .likeCount(user.getTeacherLikes().size())
                     .build();
@@ -316,6 +329,10 @@ public class TeacherServiceImpl implements TeacherService {
                 }
             })
             .collect(Collectors.toList());
+
+        System.out.println("Exiting getSortedTeachers with result size: " + result.size());
+
+        return result;
     }
 
     /**
