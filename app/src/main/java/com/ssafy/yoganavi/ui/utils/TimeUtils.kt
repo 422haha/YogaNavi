@@ -1,6 +1,7 @@
 package com.ssafy.yoganavi.ui.utils
 
 import android.icu.text.SimpleDateFormat
+import com.prolificinteractive.materialcalendarview.CalendarDay
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -27,7 +28,7 @@ fun formatDashWeekDate(milliseconds: Long): String {
     val formatter = SimpleDateFormat("yyyy-MM-dd EEEE", Locale.getDefault())
     val date = Date(milliseconds)
     val tempStr = formatter.format(date)
-    return tempStr.substring(0,tempStr.length-2)
+    return tempStr.substring(0, tempStr.length - 2)
 }
 
 fun formatZeroDate(hour: Int, minute: Int): String {
@@ -36,6 +37,18 @@ fun formatZeroDate(hour: Int, minute: Int): String {
     val minuteStr: String = if(minute < 10) "0$minute" else "$minute"
 
     return "$hourStr:$minuteStr"
+}
+
+fun convertLongToCalendarDay(epochMillis: Long): CalendarDay {
+    val date = Date(epochMillis)
+    val calendar = Calendar.getInstance()
+    calendar.time = date
+
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH) + 1 // 월은 0부터 시작하므로 1을 더해줍니다.
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+    return CalendarDay.from(year, month, day)
 }
 
 fun convertDaysToHangle(days: String): String {

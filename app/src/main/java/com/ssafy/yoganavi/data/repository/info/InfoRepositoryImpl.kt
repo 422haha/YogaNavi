@@ -73,6 +73,15 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toDetailResponse()
     }
 
+    override suspend fun getAvailableClass(
+        teacherId: Int,
+        method: Int
+    ): ListResponse<LiveLectureData> {
+        val response =
+            withContext(ioDispatcher) { infoDataSource.getAvailableClass(teacherId, method) }
+        return response.toListResponse()
+    }
+
     // LECTURE
     override suspend fun getLectureList(): ListResponse<LectureData> {
         val response = withContext(ioDispatcher) { infoDataSource.getLectureList() }

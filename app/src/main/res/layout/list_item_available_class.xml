@@ -9,9 +9,11 @@
     android:layout_marginVertical="3dp"
     app:cardCornerRadius="12dp"
     app:strokeColor="@color/gray_10"
+    android:backgroundTint="@color/white"
     app:strokeWidth="1dp">
 
     <RadioButton
+        android:id="@+id/rv_available_class"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"

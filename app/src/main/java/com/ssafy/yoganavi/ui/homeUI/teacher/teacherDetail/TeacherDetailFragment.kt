@@ -10,6 +10,7 @@ import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
 import com.ssafy.yoganavi.databinding.FragmentTeacherDetailBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.teacher.teacherDetail.teacherDetail.TeacherDetailAdapter
+import com.ssafy.yoganavi.ui.utils.TEACHER_DETAIL
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,7 +31,7 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(false, "강사", true)
+        setToolbar(false, TEACHER_DETAIL, true)
         binding.rvTeacherDetail.adapter = teacherDetailAdapter
         getTeacherDetail()
     }
