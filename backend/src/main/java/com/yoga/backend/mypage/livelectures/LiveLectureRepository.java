@@ -13,9 +13,6 @@ import java.util.List;
  */
 public interface LiveLectureRepository extends JpaRepository<LiveLectures, Long> {
 
-    @Query("SELECT ll FROM LiveLectures ll WHERE ll.method = :method")
-    List<LiveLectures> findAllByMethod(@Param("method") int method);
-
     @Query("SELECT ll FROM LiveLectures ll JOIN FETCH ll.user WHERE ll.user.id = :id")
     List<LiveLectures> findByUserId(int id);
 
@@ -23,4 +20,20 @@ public interface LiveLectureRepository extends JpaRepository<LiveLectures, Long>
 
     @Query("SELECT l FROM LiveLectures l WHERE DATE(l.startDate) = DATE(:startOfDay) AND FUNCTION('TIME', l.startTime) >= FUNCTION('TIME', :startOfDay) AND FUNCTION('TIME', l.startTime) < FUNCTION('TIME', :endOfDay) AND l.availableDay LIKE %:dayAbbreviation%")
     List<LiveLectures> findLecturesForToday(@Param("startOfDay") Instant startOfDay, @Param("endOfDay") Instant endOfDay, @Param("dayAbbreviation") String dayAbbreviation);
+
+    /**
+     * 최대 수강자 수가 1인 실시간 강의를 조회합니다. (1대1 수업)
+     *
+     * @param maxLiveNum 최대 수강자 수
+     * @return 실시간 강의 목록
+     */
+    List<LiveLectures> findAllByMaxLiveNum(int maxLiveNum);
+
+    /**
+     * 최대 수강자 수가 1보다 큰 실시간 강의를 조회합니다. (1대다 수업)
+     *
+     * @param maxLiveNum 기준 최대 수강자 수
+     * @return 실시간 강의 목록
+     */
+    List<LiveLectures> findAllByMaxLiveNumGreaterThan(int maxLiveNum);
 }
