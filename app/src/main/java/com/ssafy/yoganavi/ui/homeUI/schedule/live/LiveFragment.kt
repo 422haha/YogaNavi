@@ -14,8 +14,10 @@ import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.PermissionHandler
 import com.ssafy.yoganavi.ui.utils.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
+import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import org.webrtc.RendererCommon
+import org.webrtc.VideoTrack
 
 @AndroidEntryPoint
 class LiveFragment: BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::inflate) {
@@ -50,12 +52,12 @@ class LiveFragment: BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infla
 
             // 비디오 일시 중지
             ibtnVideo.setOnClickListener {
-
+                videoCallScreen.pauseVideo()
             }
 
             // 전후면 카메라 전환
             ibtnCamSwitch.setOnClickListener {
-
+                videoCallScreen.setMirror(true)
             }
 
             ibtnCancel.setOnClickListener { findNavController().popBackStack() }
@@ -66,7 +68,6 @@ class LiveFragment: BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infla
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
                 viewModel.sessionManager.signalingClient.sessionStateFlow.collect { state ->
-                    Timber.d("상태 로그!! $state")
                     binding.tvState.text = state.toString()
                 }
             }
@@ -82,5 +83,53 @@ class LiveFragment: BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infla
 
     private fun popBack() {
         findNavController().popBackStack()
+    }
+
+    fun VideoRenderer(videoTrack: VideoTrack) {
+        val sessionManager = viewModel.sessionManager
+
+        VideoTextureViewRenderer(requireActivity()).apply {
+            init(
+                sessionManager.peerConnectionFactory.eglBaseContext,
+                object : RendererCommon.RendererEvents {
+                    override fun onFirstFrameRendered() = Unit
+
+                    override fun onFrameResolutionChanged(p0: Int, p1: Int, p2: Int) = Unit
+                }
+            )
+            setupVideo(trackState, videoTrack, this)
+            view = this
+        }
+
+        AndroidView(
+            factory = { context ->
+
+            },
+            update = { v -> setupVideo(trackState, videoTrack, v) },
+            modifier = modifier
+        )
+    }
+
+    private fun cleanTrack(
+        view: VideoTextureViewRenderer?,
+        trackState: MutableState<VideoTrack?>
+    ) {
+        view?.let { trackState.value?.removeSink(it) }
+        trackState.value = null
+    }
+
+    private fun setupVideo(
+        trackState: MutableState<VideoTrack?>,
+        track: VideoTrack,
+        renderer: VideoTextureViewRenderer
+    ) {
+        if (trackState.value == track) {
+            return
+        }
+
+        cleanTrack(renderer, trackState)
+
+        trackState.value = track
+        track.addSink(renderer)
     }
 }
