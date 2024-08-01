@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="SingleLineText">
         <item name="android:singleLine">true</item>
         <item name="android:ellipsize">end</item>
@@ -17,6 +18,11 @@
 
     <style name="BoldMediumText">
         <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="BoldSemiMediumText">
+        <item name="android:textSize">21sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
