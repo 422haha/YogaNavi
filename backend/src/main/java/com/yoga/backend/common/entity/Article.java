@@ -3,11 +3,14 @@ package com.yoga.backend.common.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 게시글(공지사항) 엔티티 클래스
  */
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "Article")
 public class Article {
