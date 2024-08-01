@@ -4,7 +4,7 @@ import com.yoga.backend.common.entity.LiveLectures;
 import java.io.Serializable;
 import java.time.Instant;
 
-public class LiveLectureDTO implements Serializable {
+public class LiveLectureDto implements Serializable {
 
     private Long liveId;
     private String liveTitle;
@@ -106,8 +106,8 @@ public class LiveLectureDTO implements Serializable {
         this.userId = userId;
     }
 
-    public static LiveLectureDTO fromEntity(LiveLectures lecture) {
-        LiveLectureDTO dto = new LiveLectureDTO();
+    public static LiveLectureDto fromEntity(LiveLectures lecture) {
+        LiveLectureDto dto = new LiveLectureDto();
         dto.setLiveId(lecture.getLiveId());
         dto.setLiveTitle(lecture.getLiveTitle());
         dto.setLiveContent(lecture.getLiveContent());

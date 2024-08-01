@@ -1,13 +1,15 @@
-package com.yoga.backend.teacher;
+package com.yoga.backend.teacher.service;
 
 import com.yoga.backend.common.awsS3.S3Service;
 import com.yoga.backend.common.entity.Hashtag;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.entity.TeacherLike;
-import com.yoga.backend.common.entity.RecordedLectures.RecordedLecture;
 import com.yoga.backend.mypage.recorded.repository.RecordedLectureLikeRepository;
+import com.yoga.backend.teacher.TeacherFilter;
 import com.yoga.backend.teacher.dto.DetailedTeacherDto;
 import com.yoga.backend.teacher.dto.TeacherDto;
+import com.yoga.backend.teacher.repository.TeacherLikeRepository;
+import com.yoga.backend.teacher.repository.TeacherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;

@@ -1,8 +1,10 @@
-package com.yoga.backend.teacher;
+package com.yoga.backend.teacher.controller;
 
 import com.yoga.backend.common.util.JwtUtil;
+import com.yoga.backend.teacher.TeacherFilter;
 import com.yoga.backend.teacher.dto.DetailedTeacherDto;
 import com.yoga.backend.teacher.dto.TeacherDto;
+import com.yoga.backend.teacher.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

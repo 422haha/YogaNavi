@@ -1,5 +1,6 @@
-package com.yoga.backend.teacher;
+package com.yoga.backend.teacher.service;
 
+import com.yoga.backend.teacher.TeacherFilter;
 import com.yoga.backend.teacher.dto.DetailedTeacherDto;
 import com.yoga.backend.teacher.dto.TeacherDto;
 

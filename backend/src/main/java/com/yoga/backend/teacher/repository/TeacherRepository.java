@@ -1,4 +1,4 @@
-package com.yoga.backend.teacher;
+package com.yoga.backend.teacher.repository;
 
 import com.yoga.backend.common.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
