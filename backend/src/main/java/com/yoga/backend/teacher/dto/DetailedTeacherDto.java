@@ -63,7 +63,7 @@ public class DetailedTeacherDto {
     @Builder
     public static class LectureDto {
 
-        private String lectureId;
+        private String recordedId;
         private String recordTitle;
         private String recordThumbnail;
         private String recordThumbnailSmall;
@@ -73,16 +73,16 @@ public class DetailedTeacherDto {
         /**
          * LectureDto 생성자
          *
-         * @param lectureId            강의 ID
+         * @param recordedId           녹화 강의 ID
          * @param recordTitle          강의 제목
          * @param recordThumbnail      강의 썸네일 URL
          * @param recordThumbnailSmall 강의 작은 썸네일 URL
          * @param likeCount            좋아요 수
          * @param myLike               사용자에 의한 좋아요 여부
          */
-        public LectureDto(String lectureId, String recordTitle, String recordThumbnail,
+        public LectureDto(String recordedId, String recordTitle, String recordThumbnail,
             String recordThumbnailSmall, int likeCount, boolean myLike) {
-            this.lectureId = lectureId;
+            this.recordedId = recordedId;
             this.recordTitle = recordTitle;
             this.recordThumbnail = recordThumbnail;
             this.recordThumbnailSmall = recordThumbnailSmall;
