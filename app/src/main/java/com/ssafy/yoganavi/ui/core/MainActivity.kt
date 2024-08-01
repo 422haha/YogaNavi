@@ -102,6 +102,7 @@ class MainActivity : AppCompatActivity() {
     private fun CoroutineScope.collectAuthEvent() = launch {
         authManager.authEvent.collect {
             Toast.makeText(this@MainActivity, SESSION_END, Toast.LENGTH_SHORT).show()
+            viewModel.clearToken()
             moveToLogin()
         }
     }

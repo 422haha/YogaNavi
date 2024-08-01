@@ -15,8 +15,8 @@ const val MEMBER = "members"
 const val TOKEN = "Authorization"
 const val FCM_TOKEN = "FCM_Token"
 const val REFRESH_TOKEN = "Refresh-Token"
-const val NEED_REFRESH_TOKEN = "refresh_token_required"
-const val TOKEN_REQUIRED = "token_required"
+const val NEED_REFRESH_TOKEN = "세션이 만료되었습니다."
+const val TOKEN_REQUIRED = "Refresh-Token-Request"
 const val PAGE_SIZE = 30
 const val END_TIME = "00:00"
 

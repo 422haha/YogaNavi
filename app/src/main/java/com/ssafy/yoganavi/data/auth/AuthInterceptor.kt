@@ -22,11 +22,15 @@ class AuthInterceptor @Inject constructor(
 
     override fun intercept(chain: Interceptor.Chain): Response {
         var response = chain.addToken()
-        if (response.code == 401 && response.header(NEED_REFRESH_TOKEN) == TOKEN_REQUIRED) {
-            response = chain.getNewToken()
+
+        if (response.code == UNAUTHORIZED && response.header(TOKEN_REQUIRED) != null) {
+            val newTokenResponse = chain.getNewToken()
+            newTokenResponse.saveToken()
+            response = chain.addToken()
+        } else {
+            response.saveToken()
         }
 
-        response.saveToken()
         val code = response.code
         if (code == UNAUTHORIZED || code == FORBIDDEN) authManager.authError(NEED_REFRESH_TOKEN)
         return response
@@ -43,9 +47,11 @@ class AuthInterceptor @Inject constructor(
     }
 
     private fun Interceptor.Chain.getNewToken(): Response {
+        val token = runBlocking { dataStoreRepository.accessToken.firstOrNull() } ?: ""
         val refreshToken = runBlocking { dataStoreRepository.refreshToken.firstOrNull() } ?: ""
         val request = request()
             .newBuilder()
+            .addHeader(TOKEN, "Bearer $token")
             .addHeader(REFRESH_TOKEN, refreshToken)
             .build()
 
