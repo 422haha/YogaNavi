@@ -40,6 +40,7 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         PermissionHelper(this, arrayOf(Manifest.permission.CAMERA), ::popBack)
             .launchPermission()
 
