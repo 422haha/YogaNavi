@@ -5,7 +5,6 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
 import com.ssafy.yoganavi.databinding.FragmentTeacherDetailBinding
@@ -22,7 +21,11 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
     private val viewModel: TeacherDetailViewModel by viewModels()
     private val args by navArgs<TeacherDetailFragmentArgs>()
     private val teacherDetailAdapter by lazy {
-        TeacherDetailAdapter(goReserve = ::goReserve, navigateToLectureDetailFragment = ::navigateToLectureDetailFragment)
+        TeacherDetailAdapter(
+            goReserve = ::goReserve,
+            navigateToLectureDetailFragment = ::navigateToLectureDetailFragment,
+            sendLikeLecture = ::sendLikeLecture
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,11 +72,22 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
     }
 
     private fun goReserve(teacherId: Int) {
-        val directions = TeacherDetailFragmentDirections.actionTeacherDetailFragmentToTeacherReservationFragment(teacherId)
+        val directions =
+            TeacherDetailFragmentDirections.actionTeacherDetailFragmentToTeacherReservationFragment(
+                teacherId
+            )
         findNavController().navigate(directions)
     }
-    private fun navigateToLectureDetailFragment(recordedId: Long=-1) {
-        val directions = TeacherDetailFragmentDirections.actionTeacherDetailFragmentToLectureDetailFragment(recordedId)
+
+    private fun navigateToLectureDetailFragment(recordedId: Long = -1) {
+        val directions =
+            TeacherDetailFragmentDirections.actionTeacherDetailFragmentToLectureDetailFragment(
+                recordedId
+            )
         findNavController().navigate(directions)
+    }
+
+    private fun sendLikeLecture(lectureId: Long) {
+        viewModel.likeLecture(lectureId)
     }
 }
