@@ -33,7 +33,7 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
             binding.btnStartTime.text = "00:00"
             viewModel.filter.startTime = 0L
             binding.btnEndTime.text = "23:59"
-            viewModel.filter.startTime = 86340000L
+            viewModel.filter.endTime = 86340000L
             binding.ibtnMon.isChecked = true
             binding.ibtnTue.isChecked = true
             binding.ibtnWed.isChecked = true
