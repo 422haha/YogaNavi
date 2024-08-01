@@ -32,6 +32,8 @@ interface InfoRepository {
 
     suspend fun teacherLikeToggle(teacherId: Int): DetailResponse<Boolean>
 
+    suspend fun getAvailableClass(teacherId: Int, method: Int): ListResponse<LiveLectureData>
+
     // LECTURE
     suspend fun getLectureList(): ListResponse<LectureData>
 
