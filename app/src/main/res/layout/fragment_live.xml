@@ -7,13 +7,23 @@
     tools:context=".ui.homeUI.schedule.live.LiveFragment">
 
     <io.getstream.webrtc.android.ui.VideoTextureViewRenderer
-        android:id="@+id/participantVideoRenderer"
+        android:id="@+id/videoCallScreen"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="OFFLINE"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <ImageButton
         android:id="@+id/ibtn_mic"
