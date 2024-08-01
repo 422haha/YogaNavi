@@ -14,11 +14,12 @@ public interface TeacherService {
     /**
      * 모든 강사 정보를 조회합니다.
      *
-     * @param filter 필터 조건
-     * @param userId 사용자 ID
+     * @param filter  필터 조건
+     * @param sorting 정렬 기준 (0: 최신순, 1: 인기순)
+     * @param userId  사용자 ID
      * @return 강사 정보 리스트
      */
-    List<TeacherDto> getAllTeachers(TeacherFilter filter, int userId);
+    List<TeacherDto> getAllTeachers(TeacherFilter filter, int sorting, int userId);
 
     /**
      * 정렬된 강사 정보를 조회합니다.
