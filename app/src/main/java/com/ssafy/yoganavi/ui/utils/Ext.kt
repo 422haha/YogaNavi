@@ -18,7 +18,7 @@ const val REFRESH_TOKEN = "Refresh-Token"
 const val NEED_REFRESH_TOKEN = "refresh_token_required"
 const val TOKEN_REQUIRED = "token_required"
 const val PAGE_SIZE = 30
-
+const val END_TIME = "00:00"
 
 // 수신부
 const val FORBIDDEN = 403
