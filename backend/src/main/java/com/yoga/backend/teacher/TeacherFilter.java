@@ -5,13 +5,13 @@ package com.yoga.backend.teacher;
  */
 public class TeacherFilter {
 
-    private int sorting;
-    private long startTime;
-    private long endTime;
-    private String day;
-    private int period;
-    private int maxLiveNum;
-    private String searchKeyword;
+    private int sorting; // 정렬 기준
+    private long startTime; // 강의 시작 시간
+    private long endTime; // 강의 종료 시간
+    private String day; // 강의 요일
+    private int period; // 필터 기간
+    private int maxLiveNum; // 최대 수강자 수
+    private String searchKeyword; // 검색 키워드
 
     // Getters and setters
 
