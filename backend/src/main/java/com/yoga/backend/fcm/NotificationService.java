@@ -5,7 +5,7 @@ import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.mypage.livelectures.LiveLectureRepository;
 import com.yoga.backend.mypage.livelectures.MyLiveLectureRepository;
-import com.yoga.backend.mypage.livelectures.dto.LiveLectureDTO;
+import com.yoga.backend.mypage.livelectures.dto.LiveLectureDto;
 import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,7 +44,7 @@ public class NotificationService {
      */
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void handleLectureUpdate(LiveLectures updatedLecture) {
-        LiveLectureDTO lectureDTO = LiveLectureDTO.fromEntity(updatedLecture);
+        LiveLectureDto lectureDTO = LiveLectureDto.fromEntity(updatedLecture);
         LocalDate startDate = lectureDTO.getStartDate().atZone(KOREA_ZONE).toLocalDate();
         LocalDate endDate = lectureDTO.getEndDate().atZone(KOREA_ZONE).toLocalDate();
         LocalTime lectureStartTime = extractTimeFromInstant(lectureDTO.getStartTime());
@@ -61,7 +61,7 @@ public class NotificationService {
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
             if (availableDays.contains(date.getDayOfWeek())) {
                 String redisKey = REDIS_KEY_PREFIX + date.toString();
-                List<LiveLectureDTO> lectures = getLecturesFromRedis(redisKey);
+                List<LiveLectureDto> lectures = getLecturesFromRedis(redisKey);
                 boolean found = false;
 
                 // 기존 강의 업데이트 or 새 강의 추가
@@ -116,7 +116,7 @@ public class NotificationService {
             List<Object> lecturesFromRedis = (List<Object>) redisTemplate.opsForValue().get(key);
             if (lecturesFromRedis != null) {
 
-                List<LiveLectureDTO> lectures = convertToLiveLectureDTOList(lecturesFromRedis);
+                List<LiveLectureDto> lectures = convertToLiveLectureDtoList(lecturesFromRedis);
                 int initialSize = lectures.size();
                 lectures.removeIf(lecture -> lecture.getLiveId().equals(liveId));
 
@@ -140,10 +140,10 @@ public class NotificationService {
         Instant endOfDayKorea = todayKorea.plusDays(1).atStartOfDay(KOREA_ZONE).toInstant();
 
         // 오늘 강의 목록
-        List<LiveLectureDTO> todayLectures = liveLectureRepository.findLecturesForToday(
+        List<LiveLectureDto> todayLectures = liveLectureRepository.findLecturesForToday(
                 startOfDayKorea, endOfDayKorea, dayAbbreviation)
             .stream()
-            .map(LiveLectureDTO::fromEntity)
+            .map(LiveLectureDto::fromEntity)
             .collect(Collectors.toList());
 
         // redis에 오늘의 강의 목록 저장
@@ -162,7 +162,7 @@ public class NotificationService {
             ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE);
             LocalDate todayKorea = nowKorea.toLocalDate();
             String redisKey = REDIS_KEY_PREFIX + todayKorea.toString();
-            List<LiveLectureDTO> todayLectures = getLecturesFromRedis(redisKey);
+            List<LiveLectureDto> todayLectures = getLecturesFromRedis(redisKey);
             log.debug("오늘의 강의 수: {}", todayLectures.size());
 
             // 캐시가 비어있으면
@@ -175,7 +175,7 @@ public class NotificationService {
                 todayLectures = liveLectureRepository.findLecturesForToday(startOfDayKorea,
                         endOfDayKorea, dayAbbreviation)
                     .stream()
-                    .map(LiveLectureDTO::fromEntity)
+                    .map(LiveLectureDto::fromEntity)
                     .collect(Collectors.toList());
 
                 redisTemplate.opsForValue().set(redisKey, todayLectures);
@@ -184,7 +184,7 @@ public class NotificationService {
             log.info("오늘 강의 목록 Redis 캐시 확인 완료. 강의 개수: {}", todayLectures.size());
 
             // 10분 후에 시작하는 강의 찾기
-            List<LiveLectureDTO> upcomingLectures = todayLectures.stream()
+            List<LiveLectureDto> upcomingLectures = todayLectures.stream()
                 .filter(lecture -> {
                     LocalTime lectureTime = extractTimeFromInstant(lecture.getStartTime());
                     ZonedDateTime lectureDateTime = ZonedDateTime.of(todayKorea, lectureTime,
@@ -216,10 +216,10 @@ public class NotificationService {
      *
      * @param lectures 알림 보낼 강의 목록
      */
-    private void sendNotificationsWithoutDuplication(List<LiveLectureDTO> lectures) {
+    private void sendNotificationsWithoutDuplication(List<LiveLectureDto> lectures) {
         Map<String, Map<String, String>> notifications = new HashMap<>();
 
-        for (LiveLectureDTO lecture : lectures) {
+        for (LiveLectureDto lecture : lectures) {
             String message = String.format("%s 강의가 10분 후에 시작됩니다.", lecture.getLiveTitle());
 
             Map<String, String> notificationData = new HashMap<>();
@@ -249,18 +249,18 @@ public class NotificationService {
     }
 
     /**
-     * 객체 리스트를 LiveLectureDTO 리스트로
+     * 객체 리스트를 LiveLectureDto 리스트로
      *
      * @param objects 변환할 객체 리스트
-     * @return 변환된 LiveLectureDTO 리스트
+     * @return 변환된 LiveLectureDto 리스트
      */
-    private List<LiveLectureDTO> convertToLiveLectureDTOList(List<Object> objects) {
+    private List<LiveLectureDto> convertToLiveLectureDtoList(List<Object> objects) {
         return objects.stream()
             .map(obj -> {
                 if (obj instanceof Map) {
-                    return convertMapToLiveLectureDTO((Map<String, Object>) obj);
-                } else if (obj instanceof LiveLectureDTO) {
-                    return (LiveLectureDTO) obj;
+                    return convertMapToLiveLectureDto((Map<String, Object>) obj);
+                } else if (obj instanceof LiveLectureDto) {
+                    return (LiveLectureDto) obj;
                 } else {
                     throw new IllegalArgumentException("Unknown object type: " + obj.getClass());
                 }
@@ -270,13 +270,13 @@ public class NotificationService {
 
 
     /**
-     * Map을 LiveLectureDTO로
+     * Map을 LiveLectureDto로
      *
      * @param map 변환할 Map 객체
-     * @return 변환된 LiveLectureDTO 객체
+     * @return 변환된 LiveLectureDto 객체
      */
-    private LiveLectureDTO convertMapToLiveLectureDTO(Map<String, Object> map) {
-        LiveLectureDTO dto = new LiveLectureDTO();
+    private LiveLectureDto convertMapToLiveLectureDto(Map<String, Object> map) {
+        LiveLectureDto dto = new LiveLectureDto();
         dto.setLiveId(((Number) map.get("liveId")).longValue());
         dto.setLiveTitle((String) map.get("liveTitle"));
         dto.setLiveContent((String) map.get("liveContent"));
@@ -307,13 +307,13 @@ public class NotificationService {
      * @param redisKey Redis 키
      * @return 강의 DTO 목록
      */
-    private List<LiveLectureDTO> getLecturesFromRedis(String redisKey) {
+    private List<LiveLectureDto> getLecturesFromRedis(String redisKey) {
         List<Object> lecturesFromRedis = (List<Object>) redisTemplate.opsForValue().get(redisKey);
 
         if (lecturesFromRedis == null) {
             return new ArrayList<>();
         }
-        return convertToLiveLectureDTOList(lecturesFromRedis);
+        return convertToLiveLectureDtoList(lecturesFromRedis);
     }
 
     /**

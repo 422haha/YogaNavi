@@ -5,7 +5,6 @@ package com.yoga.backend.teacher;
  */
 public class TeacherFilter {
 
-    private int sorting; // 정렬 기준
     private long startTime; // 강의 시작 시간
     private long endTime; // 강의 종료 시간
     private String day; // 강의 요일
@@ -13,15 +12,7 @@ public class TeacherFilter {
     private int maxLiveNum; // 최대 수강자 수
     private String searchKeyword; // 검색 키워드
 
-    // Getters and setters
-
-    public int getSorting() {
-        return sorting;
-    }
-
-    public void setSorting(int sorting) {
-        this.sorting = sorting;
-    }
+    // Getters and setters...
 
     public long getStartTime() {
         return startTime;

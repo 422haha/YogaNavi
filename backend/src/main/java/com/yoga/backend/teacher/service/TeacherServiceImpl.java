@@ -1,13 +1,15 @@
-package com.yoga.backend.teacher;
+package com.yoga.backend.teacher.service;
 
 import com.yoga.backend.common.awsS3.S3Service;
 import com.yoga.backend.common.entity.Hashtag;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.entity.TeacherLike;
-import com.yoga.backend.common.entity.RecordedLectures.RecordedLecture;
 import com.yoga.backend.mypage.recorded.repository.RecordedLectureLikeRepository;
+import com.yoga.backend.teacher.TeacherFilter;
 import com.yoga.backend.teacher.dto.DetailedTeacherDto;
 import com.yoga.backend.teacher.dto.TeacherDto;
+import com.yoga.backend.teacher.repository.TeacherLikeRepository;
+import com.yoga.backend.teacher.repository.TeacherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -46,13 +48,14 @@ public class TeacherServiceImpl implements TeacherService {
     /**
      * 모든 강사 정보를 조회합니다.
      *
-     * @param filter 필터 조건
-     * @param userId 사용자 ID
+     * @param filter  필터 조건
+     * @param sorting 정렬 기준 (0: 최신순, 1: 인기순)
+     * @param userId  사용자 ID
      * @return 강사 정보 리스트
      */
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public List<TeacherDto> getAllTeachers(TeacherFilter filter, int userId) {
+    public List<TeacherDto> getAllTeachers(TeacherFilter filter, int sorting, int userId) {
         LocalDate now = LocalDate.now();
         long weekAfter = now.plusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toInstant()
             .toEpochMilli();
@@ -116,6 +119,13 @@ public class TeacherServiceImpl implements TeacherService {
                     .likeCount(user.getTeacherLikes().size())
                     .build();
             })
+            .sorted((user1, user2) -> {
+                if (sorting == 0) {
+                    return Integer.compare(user2.getId(), user1.getId());
+                } else {
+                    return Integer.compare(user2.getLikeCount(), user1.getLikeCount());
+                }
+            })
             .collect(Collectors.toList());
     }
 
@@ -138,13 +148,11 @@ public class TeacherServiceImpl implements TeacherService {
             if (user.getProfile_image_url() != null && !user.getProfile_image_url().isEmpty()) {
                 profileImageUrl = s3Service.generatePresignedUrl(user.getProfile_image_url(),
                     URL_EXPIRATION_SECONDS);
-                System.out.println("생성된 profileImageUrl: " + profileImageUrl);
             }
             if (user.getProfile_image_url_small() != null && !user.getProfile_image_url_small()
                 .isEmpty()) {
                 profileImageUrlSmall = s3Service.generatePresignedUrl(
                     user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
-                System.out.println("생성된 profileImageUrlSmall: " + profileImageUrlSmall);
             }
         } catch (Exception e) {
             System.err.println("Presigned URL 생성 오류: " + e.getMessage());
@@ -274,7 +282,6 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<TeacherDto> getSortedTeachers(int sorting, int userId, String keyword) {
-        System.out.println("Entering getSortedTeachers with sorting: " + sorting + ", userId: " + userId + ", keyword: " + keyword);
 
         List<Users> users = teacherRepository.findAllTeachers();
 
@@ -283,14 +290,11 @@ public class TeacherServiceImpl implements TeacherService {
             .filter(user -> keyword == null || keyword.isEmpty() ||
                 user.getNickname().contains(keyword) ||
                 user.getEmail().contains(keyword) ||
-                (user.getContent() != null && user.getContent().contains(keyword)) || // Added null check for content
+                (user.getContent() != null && user.getContent().contains(keyword)) ||
+                // Added null check for content
                 user.getHashtags().stream()
                     .anyMatch(hashtag -> hashtag.getName().contains(keyword)))
             .collect(Collectors.toList());
-
-        if (filteredUsers.isEmpty()) {
-            System.out.println("No users found with the given keyword: " + keyword);
-        }
 
         List<TeacherDto> result = filteredUsers.stream()
             .map(user -> {
@@ -298,16 +302,19 @@ public class TeacherServiceImpl implements TeacherService {
                 String profileImageUrlSmall = null;
                 try {
                     if (user.getProfile_image_url() != null) {
-                        profileImageUrl = s3Service.generatePresignedUrl(user.getProfile_image_url(), URL_EXPIRATION_SECONDS);
+                        profileImageUrl = s3Service.generatePresignedUrl(
+                            user.getProfile_image_url(), URL_EXPIRATION_SECONDS);
                     }
                     if (user.getProfile_image_url_small() != null) {
-                        profileImageUrlSmall = s3Service.generatePresignedUrl(user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
+                        profileImageUrlSmall = s3Service.generatePresignedUrl(
+                            user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
                     }
                 } catch (Exception e) {
                     System.err.println("Presigned URL 생성 오류: " + e.getMessage());
                 }
 
-                boolean likedByUser = teacherLikeRepository.findByTeacherAndUser(user, getUserById(userId)) != null;
+                boolean likedByUser =
+                    teacherLikeRepository.findByTeacherAndUser(user, getUserById(userId)) != null;
 
                 return TeacherDto.builder()
                     .id(user.getId())
@@ -316,7 +323,8 @@ public class TeacherServiceImpl implements TeacherService {
                     .profileImageUrl(profileImageUrl)
                     .profileImageUrlSmall(profileImageUrlSmall)
                     .content(user.getContent())
-                    .hashtags(user.getHashtags().stream().map(Hashtag::getName).collect(Collectors.toSet()))
+                    .hashtags(user.getHashtags().stream().map(Hashtag::getName)
+                        .collect(Collectors.toSet()))
                     .liked(likedByUser)
                     .likeCount(user.getTeacherLikes().size())
                     .build();
@@ -329,8 +337,6 @@ public class TeacherServiceImpl implements TeacherService {
                 }
             })
             .collect(Collectors.toList());
-
-        System.out.println("Exiting getSortedTeachers with result size: " + result.size());
 
         return result;
     }
