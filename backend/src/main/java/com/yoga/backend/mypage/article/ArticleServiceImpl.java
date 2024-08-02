@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Isolation;
 
 import java.time.LocalDateTime;
 import java.net.URL;
@@ -63,7 +64,7 @@ public class ArticleServiceImpl implements ArticleService {
      * @return 게시글 리스트
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<Article> getArticlesByUserId(int userId) {
         List<Article> articles = articleRepository.findByUserIdWithUser(userId);
         return applyPresignedUrlsAsync(articles);
@@ -76,7 +77,7 @@ public class ArticleServiceImpl implements ArticleService {
      * @return 게시글 Optional 객체
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public Optional<Article> getArticleById(Long id) {
         Optional<Article> articleOpt = articleRepository.findByIdWithUser(id);
         return articleOpt.map(this::applyPresignedUrl);
@@ -102,7 +103,8 @@ public class ArticleServiceImpl implements ArticleService {
 
             // 이미지 URL 업데이트
             updateImageUrl(article, newImage, article::getImage, article::setImage);
-            updateImageUrl(article, newImageSmall, article::getImageUrlSmall, article::setImageUrlSmall);
+            updateImageUrl(article, newImageSmall, article::getImageUrlSmall,
+                article::setImageUrlSmall);
 
             article.setUpdatedAt(LocalDateTime.now());
             article = articleRepository.save(article);
@@ -116,7 +118,8 @@ public class ArticleServiceImpl implements ArticleService {
         }
     }
 
-    private void updateImageUrl(Article article, String newImage, java.util.function.Supplier<String> getter, java.util.function.Consumer<String> setter) {
+    private void updateImageUrl(Article article, String newImage,
+        java.util.function.Supplier<String> getter, java.util.function.Consumer<String> setter) {
         if (newImage != null) {
             if (newImage.isBlank()) {
                 setter.accept("");
@@ -124,7 +127,8 @@ public class ArticleServiceImpl implements ArticleService {
                 String oldImage = getter.get();
                 setter.accept(newImage);
 
-                if (oldImage != null && !oldImage.isBlank() && !extractKeyFromUrl(oldImage).equals(extractKeyFromUrl(newImage))) {
+                if (oldImage != null && !oldImage.isBlank() && !extractKeyFromUrl(oldImage).equals(
+                    extractKeyFromUrl(newImage))) {
                     String oldKey = extractKeyFromUrl(oldImage);
                     if (oldKey != null) {
                         s3Service.deleteFile(oldKey);
@@ -173,7 +177,7 @@ public class ArticleServiceImpl implements ArticleService {
      * @return 게시글 리스트
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<Article> findByContent(String content) {
         List<Article> articles = articleRepository.findByContent(content);
         return applyPresignedUrlsAsync(articles);
@@ -211,7 +215,8 @@ public class ArticleServiceImpl implements ArticleService {
                     newArticle.setUser(article.getUser());
                     newArticle.setContent(article.getContent());
                     newArticle.setImage(getPresignedUrl(article.getImage(), presignedUrls));
-                    newArticle.setImageUrlSmall(getPresignedUrl(article.getImageUrlSmall(), presignedUrls));
+                    newArticle.setImageUrlSmall(
+                        getPresignedUrl(article.getImageUrlSmall(), presignedUrls));
                     newArticle.setCreatedAt(article.getCreatedAt());
                     newArticle.setUpdatedAt(article.getUpdatedAt());
 
@@ -221,8 +226,10 @@ public class ArticleServiceImpl implements ArticleService {
                     newUser.setId(originalUser.getId());
                     newUser.setEmail(originalUser.getEmail());
                     newUser.setNickname(originalUser.getNickname());
-                    newUser.setProfile_image_url(getPresignedUrl(originalUser.getProfile_image_url(), presignedUrls));
-                    newUser.setProfile_image_url_small(getPresignedUrl(originalUser.getProfile_image_url_small(), presignedUrls));
+                    newUser.setProfile_image_url(
+                        getPresignedUrl(originalUser.getProfile_image_url(), presignedUrls));
+                    newUser.setProfile_image_url_small(
+                        getPresignedUrl(originalUser.getProfile_image_url_small(), presignedUrls));
 
                     newArticle.setUser(newUser);
 
@@ -267,6 +274,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
         return imageUrl;
     }
+
     /**
      * URL에서 S3 키를 추출합니다.
      *
