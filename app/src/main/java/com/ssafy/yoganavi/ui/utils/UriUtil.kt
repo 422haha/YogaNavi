@@ -118,20 +118,22 @@ suspend fun uploadFile(
     transferUtility: TransferUtility,
     key: String,
     file: File,
-    meta: ObjectMetadata
+    meta: ObjectMetadata? = null
 ): Boolean = suspendCancellableCoroutine { continuation ->
-    transferUtility.upload(BUCKET_NAME, key, file, meta).apply {
-        setTransferListener(object : TransferListener {
-            override fun onStateChanged(id: Int, state: TransferState?) {
-                if (state == TransferState.COMPLETED) continuation.resume(true)
-            }
+    val observer = meta?.let {
+        transferUtility.upload(BUCKET_NAME, key, file, meta)
+    } ?: transferUtility.upload(BUCKET_NAME, key, file)
 
-            override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
-            }
+    observer.setTransferListener(object : TransferListener {
+        override fun onStateChanged(id: Int, state: TransferState?) {
+            if (state == TransferState.COMPLETED) continuation.resume(true)
+        }
 
-            override fun onError(id: Int, ex: java.lang.Exception?) {
-                continuation.resume(false)
-            }
-        })
-    }
+        override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
+        }
+
+        override fun onError(id: Int, ex: java.lang.Exception?) {
+            continuation.resume(false)
+        }
+    })
 }
