@@ -1,88 +1,96 @@
 package com.yoga.backend.teacher.service;
 
-import com.yoga.backend.common.entity.Reservation;
-import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.entity.LiveLectures;
-import com.yoga.backend.common.entity.ReservationDate;
-import com.yoga.backend.teacher.dto.ReservationRequestDto;
-import com.yoga.backend.mypage.livelectures.dto.LiveLectureDto;
+import com.yoga.backend.common.entity.MyLiveLecture;
+import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.mypage.livelectures.LiveLectureRepository;
-import com.yoga.backend.teacher.repository.ReservationRepository;
+import com.yoga.backend.mypage.livelectures.dto.LiveLectureDto;
 import com.yoga.backend.members.repository.UsersRepository;
-import com.yoga.backend.teacher.repository.ReservationDateRepository;
+import com.yoga.backend.teacher.dto.ReservationRequestDto;
+import com.yoga.backend.mypage.livelectures.MyLiveLectureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Isolation;
 
-import java.time.DayOfWeek;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 예약 서비스 구현 클래스 예약 생성 및 조회 등의 비즈니스 로직을 구현
+ */
 @Service
 public class ReservationServiceImpl implements ReservationService {
 
-    private final ReservationRepository reservationRepository;
+    private final MyLiveLectureRepository myLiveLectureRepository;
     private final UsersRepository usersRepository;
     private final LiveLectureRepository liveLectureRepository;
-    private final ReservationDateRepository reservationDateRepository;
 
     @Autowired
-    public ReservationServiceImpl(ReservationRepository reservationRepository,
+    public ReservationServiceImpl(MyLiveLectureRepository myLiveLectureRepository,
         UsersRepository usersRepository,
-        LiveLectureRepository liveLectureRepository,
-        ReservationDateRepository reservationDateRepository) {
-        this.reservationRepository = reservationRepository;
+        LiveLectureRepository liveLectureRepository) {
+        this.myLiveLectureRepository = myLiveLectureRepository;
         this.usersRepository = usersRepository;
         this.liveLectureRepository = liveLectureRepository;
-        this.reservationDateRepository = reservationDateRepository;
     }
 
+    /**
+     * 예약 생성
+     *
+     * @param userId             사용자 ID
+     * @param reservationRequest 예약 요청 DTO
+     */
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Reservation createReservation(int userId, ReservationRequestDto reservationRequest) {
+    @Transactional
+    public void createReservation(int userId, ReservationRequestDto reservationRequest) {
         Users user = usersRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        LiveLectures liveLecture = liveLectureRepository.findById((long) reservationRequest.getLiveLectureId())
+        LiveLectures liveLecture = liveLectureRepository.findById(
+                (long) reservationRequest.getLiveLectureId())
             .orElseThrow(() -> new RuntimeException("실시간 강의를 찾을 수 없습니다."));
 
-        List<Instant> reservationDates = getReservationDatesWithinRange((long) reservationRequest.getLiveLectureId(),
-            Instant.ofEpochMilli(reservationRequest.getStartDate()),
-            Instant.ofEpochMilli(reservationRequest.getEndDate()));
+        MyLiveLecture myLiveLecture = new MyLiveLecture();
+        myLiveLecture.setUser(user);
+        myLiveLecture.setLiveLecture(liveLecture);
+        myLiveLecture.setStartDate(Instant.ofEpochMilli(reservationRequest.getStartDate()));
+        myLiveLecture.setEndDate(Instant.ofEpochMilli(reservationRequest.getEndDate()));
 
-        for (Instant reservationDate : reservationDates) {
-            ReservationDate date = new ReservationDate();
-            date.setDate(reservationDate);
-            reservationDateRepository.save(date); // ReservationDate를 먼저 저장
-
-            Reservation reservation = new Reservation();
-            reservation.setUser(user);
-            reservation.setLiveLecture(liveLecture);
-            reservation.setReservationDate(date);
-
-            reservationRepository.save(reservation);
-        }
-        return null;
+        myLiveLectureRepository.save(myLiveLecture);
     }
 
+    /**
+     * 사용자 예약 조회
+     *
+     * @param userId 사용자 ID
+     * @return 사용자의 예약 목록
+     */
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public List<Reservation> getUserReservations(int userId) {
-        return reservationRepository.findByUserId(userId);
+    public List<MyLiveLecture> getUserReservations(int userId) {
+        return myLiveLectureRepository.findByUserId(userId);
     }
 
+    /**
+     * 실시간 강의 예약 조회
+     *
+     * @param liveLectureId 실시간 강의 ID
+     * @return 실시간 강의의 예약 목록
+     */
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public List<Reservation> getLiveLectureReservations(int liveLectureId) {
-        return reservationRepository.findByLiveLecture_LiveId(liveLectureId);
+    public List<MyLiveLecture> getLiveLectureReservations(int liveLectureId) {
+        return myLiveLectureRepository.findByLiveLecture_LiveId((long) liveLectureId);
     }
 
+    /**
+     * 모든 실시간 강의 조회
+     *
+     * @param method 조회 방법 (0: 최대 수강자 수가 1인 강의, 1: 그 외)
+     * @return 실시간 강의 목록
+     */
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LiveLectureDto> getAllLiveLectures(int method) {
@@ -97,6 +105,13 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
 
+    /**
+     * 강사별 실시간 강의 조회
+     *
+     * @param teacherId 강사 ID
+     * @param method    조회 방법 (0: 최대 수강자 수가 1인 강의, 1: 그 외)
+     * @return 강사의 실시간 강의 목록
+     */
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LiveLectureDto> getLiveLecturesByTeacherAndMethod(int teacherId, int method) {
@@ -111,64 +126,15 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
 
+    /**
+     * 강사 예약 조회
+     *
+     * @param teacherId 강사 ID
+     * @return 강사의 예약 목록
+     */
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public List<Reservation> getReservationsByTeacher(int teacherId) {
-        return reservationRepository.findByLiveLecture_UserId(teacherId);
-    }
-
-    @Override
-    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public List<Instant> getReservationDatesWithinRange(Long liveId, Instant startDate, Instant endDate) {
-        LiveLectures liveLecture = liveLectureRepository.findById(liveId)
-            .orElseThrow(() -> new RuntimeException("실시간 강의를 찾을 수 없습니다."));
-
-        List<Instant> reservationDates = new ArrayList<>();
-        Instant current = startDate;
-        ZoneId zoneId = ZoneId.systemDefault();
-        DayOfWeek[] availableDays = parseAvailableDays(liveLecture.getAvailableDay());
-
-        while (!current.isAfter(endDate)) {
-            LocalDateTime localDateTime = LocalDateTime.ofInstant(current, zoneId);
-            DayOfWeek currentDayOfWeek = localDateTime.getDayOfWeek();
-
-            for (DayOfWeek day : availableDays) {
-                if (currentDayOfWeek.equals(day)) {
-                    reservationDates.add(current);
-                }
-            }
-            current = current.plus(1, ChronoUnit.DAYS);
-        }
-        return reservationDates;
-    }
-
-    private DayOfWeek[] parseAvailableDays(String availableDay) {
-        String[] days = availableDay.split(",");
-        DayOfWeek[] dayOfWeeks = new DayOfWeek[days.length];
-        for (int i = 0; i < days.length; i++) {
-            dayOfWeeks[i] = convertToDayOfWeek(days[i].trim().toUpperCase());
-        }
-        return dayOfWeeks;
-    }
-
-    private DayOfWeek convertToDayOfWeek(String day) {
-        switch (day) {
-            case "MON":
-                return DayOfWeek.MONDAY;
-            case "TUE":
-                return DayOfWeek.TUESDAY;
-            case "WED":
-                return DayOfWeek.WEDNESDAY;
-            case "THU":
-                return DayOfWeek.THURSDAY;
-            case "FRI":
-                return DayOfWeek.FRIDAY;
-            case "SAT":
-                return DayOfWeek.SATURDAY;
-            case "SUN":
-                return DayOfWeek.SUNDAY;
-            default:
-                throw new IllegalArgumentException("Invalid day of week: " + day);
-        }
+    public List<MyLiveLecture> getReservationsByTeacher(int teacherId) {
+        return myLiveLectureRepository.findByLiveLectureWithUser((long) teacherId);
     }
 }

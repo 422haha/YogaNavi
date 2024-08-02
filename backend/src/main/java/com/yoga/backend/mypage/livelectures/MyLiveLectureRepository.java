@@ -1,6 +1,6 @@
 package com.yoga.backend.mypage.livelectures;
+
 import com.yoga.backend.common.entity.MyLiveLecture;
-import com.yoga.backend.common.entity.Users;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +22,8 @@ public interface MyLiveLectureRepository extends JpaRepository<MyLiveLecture, Lo
 
     @Query("SELECT mll FROM MyLiveLecture mll JOIN FETCH mll.user WHERE mll.liveLecture.liveId = :liveId")
     List<MyLiveLecture> findByLiveLectureIdWithUser(@Param("liveId") Long liveId);
+
+    @Query("SELECT mll FROM MyLiveLecture mll WHERE mll.liveLecture.liveId = :liveId AND mll.user.id = :userId")
+    MyLiveLecture findByLiveLectureIdAndUserId(@Param("liveId") Long liveId,
+        @Param("userId") int userId);
 }
