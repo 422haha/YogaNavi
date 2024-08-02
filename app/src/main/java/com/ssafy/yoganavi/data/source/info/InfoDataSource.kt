@@ -80,7 +80,7 @@ interface InfoDataSource {
         articleId: Int
     ): Response<YogaDetailResponse<Unit>>
 
-    suspend fun deleteNotice(articleId: Int): Response<YogaDetailResponse<Unit>>
+    suspend fun deleteNotice(articleId: Int): Response<YogaResponse<Unit>>
 
     // Home
     suspend fun getHomeList(): Response<YogaResponse<HomeData>>

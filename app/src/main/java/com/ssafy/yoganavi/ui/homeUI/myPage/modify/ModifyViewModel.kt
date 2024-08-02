@@ -43,7 +43,7 @@ class ModifyViewModel @Inject constructor(
                     imageUrlSmall = data.imageUrlSmall,
                     teacher = data.teacher
                 )
-                _hashtagList.emit(data.hashTags.toSet())
+                _hashtagList.emit(data.hashTags?.toSet() ?: emptySet())
                 bindData(data)
             }
         }.onFailure {

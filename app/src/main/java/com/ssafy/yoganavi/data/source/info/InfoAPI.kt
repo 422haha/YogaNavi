@@ -119,7 +119,7 @@ interface InfoAPI {
     ): Response<YogaDetailResponse<Unit>>
 
     @DELETE("mypage/notification/delete/{article_id}")
-    suspend fun deleteNotice(@Path("article_id") id: Int): Response<YogaDetailResponse<Unit>>
+    suspend fun deleteNotice(@Path("article_id") id: Int): Response<YogaResponse<Unit>>
 
     // Home
     @GET("home")

@@ -72,7 +72,7 @@ interface InfoRepository {
         articleId: Int
     ): DetailResponse<Unit>
 
-    suspend fun deleteNotice(articleId: Int): DetailResponse<Unit>
+    suspend fun deleteNotice(articleId: Int): ListResponse<Unit>
 
     // Home
     suspend fun getHomeList(): ListResponse<HomeData>

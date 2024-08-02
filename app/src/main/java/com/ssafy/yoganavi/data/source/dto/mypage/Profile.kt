@@ -5,7 +5,7 @@ data class Profile(
     val password: String = "",
     val imageUrl: String? = "",
     val imageUrlSmall: String? = "",
-    val hashTags: List<String> = emptyList(),
+    val hashTags: List<String>? = emptyList(),
     val teacher: Boolean = false,
 
     @Transient

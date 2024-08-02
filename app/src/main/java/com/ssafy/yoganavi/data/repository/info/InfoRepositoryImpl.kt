@@ -176,9 +176,9 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toDetailResponse()
     }
 
-    override suspend fun deleteNotice(articleId: Int): DetailResponse<Unit> {
+    override suspend fun deleteNotice(articleId: Int): ListResponse<Unit> {
         val response = withContext(ioDispatcher) { infoDataSource.deleteNotice(articleId) }
-        return response.toDetailResponse()
+        return response.toListResponse()
     }
 
     override suspend fun getHomeList(): ListResponse<HomeData> {
