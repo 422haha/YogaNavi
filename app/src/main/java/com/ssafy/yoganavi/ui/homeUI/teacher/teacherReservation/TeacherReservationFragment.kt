@@ -55,8 +55,8 @@ class TeacherReservationFragment :
             } else {
                 viewModel.registerLive(
                     liveId,
-                    saveStartDate!!.toLong(),
-                    saveEndDate!!.toLong(),
+                    saveEndDate?.toLong(),
+                    saveEndDate?.toLong(),
                     method
                 )
                 findNavController().navigate(R.id.action_teacherReservationFragment_to_homeFragment)
@@ -127,16 +127,14 @@ class TeacherReservationFragment :
 
     fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            launch {
-                viewModel.availableList.collectLatest {
-                    availableAdapter.submitList(it)
-                    if (it.isNotEmpty()) {
-                        binding.rvAvailableClass.isVisible = true
-                        binding.tvNothing.isVisible = false
-                    } else {
-                        binding.rvAvailableClass.isVisible = false
-                        binding.tvNothing.isVisible = true
-                    }
+            viewModel.availableList.collectLatest {
+                availableAdapter.submitList(it)
+                if (it.isNotEmpty()) {
+                    binding.rvAvailableClass.isVisible = true
+                    binding.tvNothing.isVisible = false
+                } else {
+                    binding.rvAvailableClass.isVisible = false
+                    binding.tvNothing.isVisible = true
                 }
             }
         }
@@ -172,7 +170,7 @@ class TeacherReservationFragment :
     }
 
     private fun visibleCalendar(startDate: Long, endDate: Long, lectureId: Int) = with(binding) {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             liveId = lectureId
             calendar.clearSelection()
             calendar.state().edit().setMinimumDate(startDate.toCalendarDay())
