@@ -13,6 +13,7 @@ import com.yoga.backend.teacher.repository.ReservationDateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Isolation;
 
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -43,7 +44,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Reservation createReservation(int userId, ReservationRequestDto reservationRequest) {
         Users user = usersRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
@@ -71,19 +72,19 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<Reservation> getUserReservations(int userId) {
         return reservationRepository.findByUserId(userId);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<Reservation> getLiveLectureReservations(int liveLectureId) {
         return reservationRepository.findByLiveLecture_LiveId(liveLectureId);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LiveLectureDto> getAllLiveLectures(int method) {
         if (method == 0) {
             return liveLectureRepository.findAllByMaxLiveNum(1).stream()
@@ -97,7 +98,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LiveLectureDto> getLiveLecturesByTeacherAndMethod(int teacherId, int method) {
         if (method == 0) {
             return liveLectureRepository.findByUserIdAndMaxLiveNum(teacherId, 1).stream()
@@ -111,12 +112,13 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<Reservation> getReservationsByTeacher(int teacherId) {
         return reservationRepository.findByLiveLecture_UserId(teacherId);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<Instant> getReservationDatesWithinRange(Long liveId, Instant startDate, Instant endDate) {
         LiveLectures liveLecture = liveLectureRepository.findById(liveId)
             .orElseThrow(() -> new RuntimeException("실시간 강의를 찾을 수 없습니다."));
