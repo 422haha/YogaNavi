@@ -31,6 +31,11 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setEmptyView(false)
+    }
+
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
@@ -79,4 +84,13 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
             )
         }
     }
+
+    fun checkEmptyList(list: List<Any>) {
+        if (activity == null || requireActivity() !is MainActivity) return
+
+        if (list.isEmpty()) setEmptyView(true)
+        else setEmptyView(false)
+    }
+
+    fun setEmptyView(isEmpty: Boolean) = activityViewModel.setEmptyView(isEmpty)
 }

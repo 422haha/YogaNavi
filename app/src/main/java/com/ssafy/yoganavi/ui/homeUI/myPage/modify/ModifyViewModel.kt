@@ -11,8 +11,11 @@ import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
 import com.ssafy.yoganavi.ui.utils.LOGO
 import com.ssafy.yoganavi.ui.utils.MINI
+import com.ssafy.yoganavi.ui.utils.uploadFile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,8 +31,8 @@ class ModifyViewModel @Inject constructor(
     private val s3Client: AmazonS3Client
 ) : ViewModel() {
 
-    private val _hashtagList: MutableStateFlow<List<String>> = MutableStateFlow(emptyList())
-    val hashtagList: StateFlow<List<String>> = _hashtagList.asStateFlow()
+    private val _hashtagList: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet())
+    val hashtagList: StateFlow<Set<String>> = _hashtagList.asStateFlow()
     var profile = Profile()
 
     fun getProfile(bindData: suspend (Profile) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
@@ -43,7 +46,7 @@ class ModifyViewModel @Inject constructor(
                     imageUrlSmall = data.imageUrlSmall,
                     teacher = data.teacher
                 )
-                _hashtagList.emit(data.hashTags)
+                _hashtagList.emit(data.hashTags?.toSet() ?: emptySet())
                 bindData(data)
             }
         }.onFailure {
@@ -52,7 +55,7 @@ class ModifyViewModel @Inject constructor(
     }
 
     fun addHashTag(hashTag: String) = viewModelScope.launch(Dispatchers.IO) {
-        val newList = hashtagList.value.toMutableList()
+        val newList = hashtagList.value.toMutableSet()
         newList.add(hashTag)
         _hashtagList.emit(newList)
     }
@@ -60,18 +63,22 @@ class ModifyViewModel @Inject constructor(
     fun deleteHashTag(index: Int) = viewModelScope.launch(Dispatchers.IO) {
         val newList = hashtagList.value.toMutableList()
         newList.removeAt(index)
-        _hashtagList.emit(newList)
+        _hashtagList.emit(newList.toSet())
     }
 
     fun modifyProfile(
         nickname: String,
         password: String,
-        isModified: (DetailResponse<Profile>) -> Unit
+        isModified: (DetailResponse<Profile>) -> Unit,
+        showLoadingView: suspend () -> Unit,
+        uploadFail: suspend () -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
+        showLoadingView()
+
         profile = profile.copy(
             nickname = nickname,
             password = password,
-            hashTags = hashtagList.value
+            hashTags = hashtagList.value.toList()
         )
 
         if (profile.logoPath.isNotBlank()) {
@@ -79,19 +86,15 @@ class ModifyViewModel @Inject constructor(
             val miniFile = File(profile.logoSmallPath)
             val metadata = ObjectMetadata().apply { contentType = "image/webp" }
 
-            transferUtility.upload(
-                BUCKET_NAME,
-                profile.logoKey,
-                thumbnailFile,
-                metadata
+            val uploadResults = awaitAll(
+                async { uploadFile(transferUtility, profile.logoKey, thumbnailFile, metadata) },
+                async { uploadFile(transferUtility, profile.logoSmallKey, miniFile, metadata) }
             )
 
-            transferUtility.upload(
-                BUCKET_NAME,
-                profile.logoSmallKey,
-                miniFile,
-                metadata
-            )
+            if (uploadResults.any { false }) {
+                uploadFail()
+                return@launch
+            }
 
         } else {
             val url = profile.imageUrl?.substringBefore("?")

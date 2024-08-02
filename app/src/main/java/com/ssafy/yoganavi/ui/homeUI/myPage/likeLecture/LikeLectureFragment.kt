@@ -43,6 +43,7 @@ class LikeLectureFragment : BaseFragment<FragmentLikeLectureBinding>(
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.lectureList.collectLatest { lectureList ->
+                checkEmptyList(lectureList)
                 lectureAdapter.submitList(lectureList)
             }
         }

@@ -11,8 +11,11 @@ import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
 import com.ssafy.yoganavi.ui.utils.MINI
 import com.ssafy.yoganavi.ui.utils.NOTICE
+import com.ssafy.yoganavi.ui.utils.uploadFile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -68,22 +71,35 @@ class RegisterNoticeViewModel @Inject constructor(
 
     fun insertNotice(
         content: String,
-        goBackStack: suspend () -> Unit
+        showLoadingView: suspend () -> Unit,
+        goBackStack: suspend () -> Unit,
+        uploadFail: suspend () -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
+        showLoadingView()
+
         val uuid = UUID.randomUUID()
         val imageUrlKey = "$NOTICE/$uuid"
         val imageUrlSmallKey = "$NOTICE/$MINI/$uuid"
         val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
         val imageUrlSmall = s3Client.getUrl(BUCKET_NAME, imageUrlSmallKey)
+
         if (notice.value.imageUrlPath.isNotBlank()) {
 
             val noticeFile = File(notice.value.imageUrlPath)
             val miniFile = File(notice.value.imageUrlSmallPath)
 
             val metadata = ObjectMetadata().apply { contentType = "image/webp" }
-            transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile, metadata)
-            transferUtility.upload(BUCKET_NAME, imageUrlSmallKey, miniFile, metadata)
+            val uploadResults = awaitAll(
+                async { uploadFile(transferUtility, imageUrlKey, noticeFile, metadata) },
+                async { uploadFile(transferUtility, imageUrlSmallKey, miniFile, metadata) }
+            )
+
+            if (uploadResults.any { false }) {
+                uploadFail()
+                return@launch
+            }
         }
+
         var request = RegisterNoticeRequest(
             content = content,
             imageUrl = imageUrl.toString(),
@@ -92,6 +108,7 @@ class RegisterNoticeViewModel @Inject constructor(
         if (notice.value.imageUrlPath.isBlank()) {
             request = RegisterNoticeRequest(content = content, imageUrl = "")
         }
+
         runCatching { infoRepository.insertNotice(request) }
             .onSuccess { goBackStack() }
             .onFailure { it.printStackTrace() }
@@ -99,8 +116,12 @@ class RegisterNoticeViewModel @Inject constructor(
 
     fun updateNotice(
         content: String,
-        goBackStack: suspend () -> Unit
+        showLoadingView: suspend () -> Unit,
+        goBackStack: suspend () -> Unit,
+        uploadFail: suspend () -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
+        showLoadingView()
+
         val uuid = UUID.randomUUID()
         val imageUrlKey = "$NOTICE/$uuid"
         val imageUrlSmallKey = "$NOTICE/$MINI/$uuid"
@@ -112,14 +133,22 @@ class RegisterNoticeViewModel @Inject constructor(
             val miniFile = File(notice.value.imageUrlSmallPath)
             val metadata = ObjectMetadata().apply { contentType = "image/webp" }
 
-            transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile, metadata)
-            transferUtility.upload(BUCKET_NAME, imageUrlSmallKey, miniFile, metadata)
+            val uploadResults = awaitAll(
+                async { uploadFile(transferUtility, imageUrlKey, noticeFile, metadata) },
+                async { uploadFile(transferUtility, imageUrlSmallKey, miniFile, metadata) }
+            )
+
+            if (uploadResults.any { false }) {
+                uploadFail()
+                return@launch
+            }
 
             val newNotice = notice.value.copy(
                 imageUrl = imageUrl.toString(),
                 imageUrlSmall = imageUrlSmall.toString(),
             )
             _notice.emit(newNotice)
+
         } else {
             val prevUrl = notice.value.imageUrl?.substringBefore("?")
             val prevUrlSmall = notice.value.imageUrlSmall?.substringBefore("?")
@@ -137,4 +166,5 @@ class RegisterNoticeViewModel @Inject constructor(
             .onSuccess { goBackStack() }
             .onFailure { it.printStackTrace() }
     }
+
 }

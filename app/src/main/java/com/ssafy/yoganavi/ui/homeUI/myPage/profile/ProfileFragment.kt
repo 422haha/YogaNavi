@@ -18,6 +18,7 @@ import kotlinx.coroutines.withContext
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBinding::inflate) {
     private val viewModel: ProfileViewModel by viewModels()
+    private var isTeacher: Boolean = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -40,6 +41,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
             }
 
             if (profile.teacher) {
+                isTeacher = true
                 tvManagementVideo.visibility = View.VISIBLE
                 tvManagementLive.visibility = View.VISIBLE
                 tvRegisterNotice.visibility = View.VISIBLE
@@ -52,12 +54,15 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
             tvLikeTeacher.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_likeTeacherFragment) }
             tvLikeLecture.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_likeLectureFragment) }
             tvMyList.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_myListFragment) }
-            tvModify.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_modifyFragment) }
             tvManagementLive.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_managementLiveFragment) }
             tvManagementVideo.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_managementVideoFragment) }
             tvRegisterNotice.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_noticeFragment) }
             tvLogout.setOnClickListener { viewModel.clearUserData(::logout) }
             tvQuit.setOnClickListener { viewModel.quitUser(::quitDialog) }
+            tvModify.setOnClickListener {
+                val action = ProfileFragmentDirections.actionProfileFragmentToModifyFragment(isTeacher)
+                findNavController().navigate(action)
+            }
         }
     }
 

@@ -118,7 +118,7 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
         articleId: Int
     ): Response<YogaDetailResponse<Unit>> = infoAPI.updateNotice(registerNoticeRequest, articleId)
 
-    override suspend fun deleteNotice(articleId: Int): Response<YogaDetailResponse<Unit>> =
+    override suspend fun deleteNotice(articleId: Int): Response<YogaResponse<Unit>> =
         infoAPI.deleteNotice(articleId)
 
     // Home
