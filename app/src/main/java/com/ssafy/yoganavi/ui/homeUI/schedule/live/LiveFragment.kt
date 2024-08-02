@@ -17,6 +17,7 @@ import com.ssafy.yoganavi.ui.utils.PermissionHandler
 import com.ssafy.yoganavi.ui.utils.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
 import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.webrtc.RendererCommon
@@ -26,6 +27,7 @@ import org.webrtc.VideoTrack
 class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::inflate) {
 
     private val viewModel: LiveViewModel by viewModels()
+    private var callMediaStateJob: Job? = null
 
     private lateinit var localRenderer: VideoTextureViewRenderer
     private lateinit var remoteRenderer: VideoTextureViewRenderer
@@ -76,12 +78,26 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     }
 
     private fun observeSessionState() {
-        viewLifecycleOwner.lifecycleScope.launch {
+        callMediaStateJob = viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.sessionState.collect { state ->
                     handleSessionState(state)
-                    binding.tvState.text = state.toString()
                 }
+            }
+        }
+    }
+
+    private fun handleSessionState(state: WebRTCSessionState) {
+        binding.tvState.text = state.toString()
+
+        when (state) {
+            WebRTCSessionState.Active -> { observeCallMediaState() }
+            WebRTCSessionState.Ready -> { }
+            WebRTCSessionState.Creating -> { }
+            WebRTCSessionState.Impossible,
+            WebRTCSessionState.Offline -> {
+                callMediaStateJob?.cancel()
+                callMediaStateJob = null
             }
         }
     }
@@ -113,43 +129,19 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         binding.ibtnVideo.setImageResource(if (isEnabled) R.drawable.baseline_videocam_24 else R.drawable.baseline_videocam_off_24)
     }
 
-    private fun handleSessionState(state: WebRTCSessionState) {
-        binding.tvState.text = state.toString()
-        when (state) {
-            WebRTCSessionState.Ready -> {
-                // Ready 상태에 대한 처리
-                // observeCallMediaState()는 여기서 호출하지 않아도 됩니다.
-                // 이미 onViewCreated에서 호출되었기 때문입니다.
-            }
-            WebRTCSessionState.Active -> {
-                // Active 상태에 대한 처리
-            }
-            WebRTCSessionState.Creating -> {
-                // Creating 상태에 대한 처리
-            }
-            WebRTCSessionState.Impossible -> {
-                // Impossible 상태에 대한 처리
-            }
-            WebRTCSessionState.Offline -> {
-                // Offline 상태에 대한 처리
-                // 예: 연결 재시도 또는 사용자에게 알림
-            }
-        }
-    }
-
     private fun renderInit() {
         localRenderer = binding.localVideoCallScreen
         remoteRenderer = binding.remoteVideoCallScreen
 
         localRenderer.init(viewModel.sessionManager.peerConnectionFactory.eglBaseContext,
-            object : RendererCommon.RendererEvents {
+            object: RendererCommon.RendererEvents {
                 override fun onFirstFrameRendered() = Unit
 
                 override fun onFrameResolutionChanged(width: Int, height: Int, rotation: Int) = Unit
             })
 
         remoteRenderer.init(viewModel.sessionManager.peerConnectionFactory.eglBaseContext,
-            object : RendererCommon.RendererEvents {
+            object: RendererCommon.RendererEvents {
                 override fun onFirstFrameRendered() = Unit
 
                 override fun onFrameResolutionChanged(width: Int, height: Int, rotation: Int) = Unit
