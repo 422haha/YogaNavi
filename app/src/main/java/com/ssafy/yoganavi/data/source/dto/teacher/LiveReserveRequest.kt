@@ -2,7 +2,7 @@ package com.ssafy.yoganavi.data.source.dto.teacher
 
 class LiveReserveRequest(
     val liveId: Int,
-    val startDate: Long,
-    val endDate: Long,
+    val startDate: Long?,
+    val endDate: Long?,
     val method: Int
 )
