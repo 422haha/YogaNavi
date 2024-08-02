@@ -9,6 +9,7 @@ import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
+import com.ssafy.yoganavi.data.source.dto.teacher.LiveReserveRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
 import com.ssafy.yoganavi.data.source.teacher.FilterData
@@ -33,6 +34,9 @@ interface InfoRepository {
     suspend fun teacherLikeToggle(teacherId: Int): DetailResponse<Boolean>
 
     suspend fun getAvailableClass(teacherId: Int, method: Int): ListResponse<LiveLectureData>
+
+    suspend fun registerLive(liveReserveRequest: LiveReserveRequest): DetailResponse<Unit>
+
 
     // LECTURE
     suspend fun getLectureList(): ListResponse<LectureData>

@@ -12,13 +12,18 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
+import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentTeacherReservationBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.teacher.teacherReservation.availableList.AvailableAdapter
+import com.ssafy.yoganavi.ui.utils.NOTHING
+import com.ssafy.yoganavi.ui.utils.PICK_DATE
 import com.ssafy.yoganavi.ui.utils.RESERVATION
 import com.ssafy.yoganavi.ui.utils.RESERVE
-import com.ssafy.yoganavi.ui.utils.convertLongToCalendarDay
+import com.ssafy.yoganavi.ui.utils.SELECT_CLASS
+import com.ssafy.yoganavi.ui.utils.toCalendarDay
+import com.ssafy.yoganavi.ui.utils.toLong
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -33,12 +38,29 @@ class TeacherReservationFragment :
     private val availableAdapter by lazy {
         AvailableAdapter(::visibleCalendar)
     }
+    private var saveStartDate: CalendarDay? = null
+    private var saveEndDate: CalendarDay? = null
+    private var liveId = 0
+    private var method = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setToolbar(false, RESERVE, true, RESERVATION) {
-            // TODO: 조건 체크, 널 값 없이 예약되도록
-            findNavController().navigate(R.id.action_teacherReservationFragment_to_homeFragment)
+            if (!(binding.rbOneToOne.isChecked || binding.rbOneToMulti.isChecked)) {
+                showSnackBar(SELECT_CLASS)
+            } else if (binding.tvNothing.isVisible) {
+                showSnackBar(NOTHING)
+            } else if (saveStartDate == null || saveEndDate == null) {
+                showSnackBar(PICK_DATE)
+            } else {
+                viewModel.registerLive(
+                    liveId,
+                    saveStartDate!!.toLong(),
+                    saveEndDate!!.toLong(),
+                    method
+                )
+                findNavController().navigate(R.id.action_teacherReservationFragment_to_homeFragment)
+            }
         }
         initView()
         binding.rvAvailableClass.adapter = availableAdapter
@@ -62,7 +84,12 @@ class TeacherReservationFragment :
             tvHashtag.text = args.hashtags
             tvHashtag.isVisible = true
         } else tvHashtag.isVisible = false
+
         preAnimation()
+        showRbMethod()
+    }
+
+    private fun showRbMethod() = with(binding) {
         lifecycleScope.launch {
             delay(300)
             tvSelectClassMethod.isVisible = true
@@ -77,17 +104,25 @@ class TeacherReservationFragment :
             rbOneToMulti.startAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_up))
             rbOneToOne.startAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_up))
         }
+
     }
 
     private fun initListener() = with(binding) {
         rbOneToOne.setOnClickListener {
-            viewModel.getAvailableClass(args.teacherId, 0)
-            visibleAvailableClass()
+            clickMethod()
         }
         rbOneToMulti.setOnClickListener {
-            viewModel.getAvailableClass(args.teacherId, 1)
-            visibleAvailableClass()
+            clickMethod()
         }
+    }
+
+    private fun clickMethod() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.getAvailableClass(args.teacherId, 1)
+            method = 1
+            availableAdapter.selectedPosition = -1
+        }
+        visibleAvailableClass()
     }
 
     fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
@@ -95,6 +130,13 @@ class TeacherReservationFragment :
             launch {
                 viewModel.availableList.collectLatest {
                     availableAdapter.submitList(it)
+                    if (it.isNotEmpty()) {
+                        binding.rvAvailableClass.isVisible = true
+                        binding.tvNothing.isVisible = false
+                    } else {
+                        binding.rvAvailableClass.isVisible = false
+                        binding.tvNothing.isVisible = true
+                    }
                 }
             }
         }
@@ -111,6 +153,8 @@ class TeacherReservationFragment :
 
     private fun visibleAvailableClass() = with(binding) {
         lifecycleScope.launch {
+            saveStartDate = null
+            saveEndDate = null
             tvSelectTerm.isVisible = false
             calendar.isVisible = false
             tvAvailableClass.isVisible = false
@@ -127,8 +171,13 @@ class TeacherReservationFragment :
         }
     }
 
-    private fun visibleCalendar(startDate: Long, endDate: Long) = with(binding) {
+    private fun visibleCalendar(startDate: Long, endDate: Long, lectureId: Int) = with(binding) {
         lifecycleScope.launch {
+            liveId = lectureId
+            calendar.clearSelection()
+            calendar.state().edit().setMinimumDate(startDate.toCalendarDay())
+                .setMaximumDate(endDate.toCalendarDay())
+                .commit()
             tvSelectTerm.apply {
                 isVisible = true
                 startAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_up))
@@ -139,8 +188,31 @@ class TeacherReservationFragment :
                 isVisible = true
                 startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_in))
             }
-            calendar.state().edit().setMinimumDate(convertLongToCalendarDay(startDate))
-            calendar.state().edit().setMinimumDate(convertLongToCalendarDay(endDate))
+        }
+        calendar.setOnRangeSelectedListener { _, dates ->
+            handleRangeSelection(dates)
+        }
+
+        calendar.setOnDateChangedListener { _, date, _ ->
+            handleDateSelection(date)
+        }
+    }
+
+    private fun handleRangeSelection(dates: List<CalendarDay>) {
+        if (dates.isNotEmpty()) {
+            val startDate = dates.first()
+            val endDate = dates.last()
+            saveStartDate = startDate
+            saveEndDate = endDate
+        }
+    }
+
+    private fun handleDateSelection(date: CalendarDay) {
+        if (saveStartDate == null) {
+            saveStartDate = date
+        } else {
+            saveStartDate = null
+            saveEndDate = null
         }
     }
 }
