@@ -1,24 +1,23 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter
 
 import android.view.View
-import androidx.media3.common.MediaItem
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ssafy.yoganavi.data.source.dto.lecture.VideoChapterData
 import com.ssafy.yoganavi.databinding.CustomChapterViewBinding
 
-class ChapterViewHolder(
+class VideoViewHolder(
     private val binding: CustomChapterViewBinding,
-    private val addVideoListener: (VideoChapterData) -> Unit,
-    private val deleteListener: (VideoChapterData) -> Unit
+    private val addVideoListener: (Int) -> Unit,
+    private val deleteListener: (Int) -> Unit,
+    private val getVideo: (String, CustomChapterViewBinding) -> Unit
 ) : ViewHolder(binding.root) {
 
     fun bind(data: VideoChapterData) = with(binding) {
         etTitle.setText(data.chapterTitle)
         etContent.setText(data.chapterDescription)
-        tvRegisterBtn.setOnClickListener { addVideoListener(data) }
+        tvRegisterBtn.setOnClickListener { addVideoListener(layoutPosition) }
         tvDeleteBtn.setOnClickListener {
-            deleteListener(data)
+            deleteListener(layoutPosition)
             clearVideo()
         }
 
@@ -28,21 +27,21 @@ class ChapterViewHolder(
             else -> ""
         }
 
-        if (uri.isNotBlank()) addVideo(uri)
+        if (uri.isNotBlank()) getVideo(uri, binding)
         else clearVideo()
     }
 
-    private fun addVideo(uri: String) = with(binding) {
-        val mediaItem = MediaItem.fromUri(uri)
-        pvVideo.player = ExoPlayer.Builder(root.context).build().apply {
-            setMediaItem(mediaItem)
-        }
-        pvVideo.player?.prepare()
-
-        tvAddVideo.visibility = View.GONE
-        grayView.visibility = View.GONE
-        pvVideo.visibility = View.VISIBLE
-    }
+//    private fun addVideo(uri: String) = with(binding) {
+//        val mediaItem = MediaItem.fromUri(uri)
+//        pvVideo.player = ExoPlayer.Builder(root.context).build().apply {
+//            setMediaItem(mediaItem)
+//        }
+//        pvVideo.player?.prepare()
+//
+//        tvAddVideo.visibility = View.GONE
+//        grayView.visibility = View.GONE
+//        pvVideo.visibility = View.VISIBLE
+//    }
 
     private fun clearVideo() = with(binding) {
         pvVideo.player?.let { player ->
