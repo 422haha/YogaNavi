@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.data.source.dto.home.HomeData
 import com.ssafy.yoganavi.databinding.ListItemHomeBinding
@@ -33,16 +32,10 @@ class HomeAdapter(
     ): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: HomeData) {
             with(binding) {
-                val circularProgressDrawable = CircularProgressDrawable(binding.root.context).apply {
-                    strokeWidth = 5f
-                    centerRadius = 30f
-                }
-                circularProgressDrawable.start()
-
                 if(!item.teacherSmallProfile.isNullOrBlank()) {
                     Glide.with(binding.root)
                         .load(item.teacherSmallProfile)
-                        .placeholder(circularProgressDrawable)
+                        .circleCrop()
                         .into(ivProfile)
                 }
 
