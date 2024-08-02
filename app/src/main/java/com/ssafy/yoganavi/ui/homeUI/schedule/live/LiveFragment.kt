@@ -47,20 +47,11 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
         setToolbar(false, "", false)
 
-        checkPermission()
-
         initListener()
 
         observeSessionState()
 
         renderInit()
-    }
-
-    private fun checkPermission() {
-        PermissionHelper(this, arrayOf(Manifest.permission.CAMERA), ::popBack)
-            .launchPermission()
-
-        permissionHandler.branchPermission(Manifest.permission.RECORD_AUDIO, "오디오")
     }
 
     private fun initListener() {
@@ -87,13 +78,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     private fun observeSessionState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.sessionManager.signalingClient.sessionStateFlow.collect { state ->
-                    if (state == WebRTCSessionState.Ready) {
-                        viewModel.sessionManager.onSessionScreenReady().apply {
-                            observeCallMediaState()
-                        }
-                    }
-                    // TODO 연결 상태에 따라 실행 예시로 disconnect
+                viewModel.sessionState.collect { state ->
+                    handleSessionState(state)
                     binding.tvState.text = state.toString()
                 }
             }
@@ -112,19 +98,43 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     }
 
     private fun handleMicrophoneState(isEnabled: Boolean) {
+        if(isEnabled) permissionHandler.branchPermission(Manifest.permission.RECORD_AUDIO, "오디오")
+
         viewModel.sessionManager.enableMicrophone(isEnabled)
 
         binding.ibtnMic.setImageResource(if (isEnabled) R.drawable.baseline_mic_24 else R.drawable.baseline_mic_off_24)
     }
 
     private fun handleCameraState(isEnabled: Boolean) {
+        if(isEnabled) PermissionHelper(this, arrayOf(Manifest.permission.CAMERA), ::popBack).launchPermission()
+
         viewModel.sessionManager.enableCamera(isEnabled)
 
         binding.ibtnVideo.setImageResource(if (isEnabled) R.drawable.baseline_videocam_24 else R.drawable.baseline_videocam_off_24)
     }
 
-    private fun popBack() {
-        findNavController().popBackStack()
+    private fun handleSessionState(state: WebRTCSessionState) {
+        binding.tvState.text = state.toString()
+        when (state) {
+            WebRTCSessionState.Ready -> {
+                // Ready 상태에 대한 처리
+                // observeCallMediaState()는 여기서 호출하지 않아도 됩니다.
+                // 이미 onViewCreated에서 호출되었기 때문입니다.
+            }
+            WebRTCSessionState.Active -> {
+                // Active 상태에 대한 처리
+            }
+            WebRTCSessionState.Creating -> {
+                // Creating 상태에 대한 처리
+            }
+            WebRTCSessionState.Impossible -> {
+                // Impossible 상태에 대한 처리
+            }
+            WebRTCSessionState.Offline -> {
+                // Offline 상태에 대한 처리
+                // 예: 연결 재시도 또는 사용자에게 알림
+            }
+        }
     }
 
     private fun renderInit() {
@@ -149,12 +159,14 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.sessionManager.localVideoTrackFlow.collectLatest {
+                        cleanLocalTrack(it)
                         setupLocalVideo(it)
                     }
                 }
 
                 launch {
                     viewModel.sessionManager.remoteVideoTrackFlow.collectLatest {
+                        cleanRemoteTrack(it)
                         setupRemoteVideo(it)
                     }
                 }
@@ -170,7 +182,15 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         videoTrack?.addSink(remoteRenderer)
     }
 
-    private fun cleanTrack() {
-//        viewModel.sessionManager.remoteVideoTrackFlow.removeSink(localRenderer)
+    private fun cleanLocalTrack(videoTrack: VideoTrack?) {
+        videoTrack?.removeSink(localRenderer)
+    }
+
+    private fun cleanRemoteTrack(videoTrack: VideoTrack?) {
+        videoTrack?.removeSink(remoteRenderer)
+    }
+
+    private fun popBack() {
+        findNavController().popBackStack()
     }
 }
