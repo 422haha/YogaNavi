@@ -1,10 +1,13 @@
 package com.yoga.backend.teacher.dto;
 
+/**
+ * 예약 요청 DTO 클래스 실시간 강의 예약 요청에 사용됩니다.
+ */
 public class ReservationRequestDto {
-    private int liveLectureId;
-    private Long reservationDateId;
-    private Long startDate;  // 추가
-    private Long endDate;    // 추가
+
+    private int liveLectureId; // 실시간 강의 ID
+    private Long startDate;    // 시작 날짜 (밀리초 단위)
+    private Long endDate;      // 종료 날짜 (밀리초 단위)
 
     // getters and setters
     public int getLiveLectureId() {
@@ -13,14 +16,6 @@ public class ReservationRequestDto {
 
     public void setLiveLectureId(int liveLectureId) {
         this.liveLectureId = liveLectureId;
-    }
-
-    public Long getReservationDateId() {
-        return reservationDateId;
-    }
-
-    public void setReservationDateId(Long reservationDateId) {
-        this.reservationDateId = reservationDateId;
     }
 
     public Long getStartDate() {
