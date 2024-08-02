@@ -69,6 +69,9 @@ const val LECTURE = "강의"
 const val FAME = "fame"
 const val DATE = "date"
 const val ANY_CHECK_BOX = "찾을 파트를 선택해주세요!"
+const val SELECT_CLASS = "수업방식을 선택하세요."
+const val NOTHING = "수강가능한 수업이 없습니다."
+const val PICK_DATE = "날짜를 선택하세요."
 
 // 캘린더, 타임 Picker
 const val START = 1
@@ -82,6 +85,7 @@ const val ITEM_NOTICE = 3
 
 // 화상강의 등록
 const val END_STR = "종료 날짜"
+
 enum class Week(val hangle: String) {
     MON("월"),
     TUE("화"),
@@ -89,7 +93,9 @@ enum class Week(val hangle: String) {
     THU("목"),
     FRI("금"),
     SAT("토"),
-    SUN("일") }
+    SUN("일")
+}
+
 data class DayStatus(val day: Week, var isSelected: Boolean)
 
 // FCM

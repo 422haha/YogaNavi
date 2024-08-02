@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:padding="@dimen/padding_medium"
     tools:context=".ui.homeUI.teacher.teacherReservation.TeacherReservationFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="@dimen/padding_medium">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -53,6 +54,7 @@
                 tools:text="#힐링 요가 #요가 마스터 #유연성" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
         <TextView
             android:id="@+id/tv_select_class_method"
             style="@style/BoldSemiMediumText"
@@ -139,15 +141,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:listitem="@layout/list_item_available_class"
-                tools:visibility="gone" />
+                tools:listitem="@layout/list_item_available_class" />
 
             <TextView
-                android:id="@+id/tv_noting"
+                android:id="@+id/tv_nothing"
                 style="@style/commonText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
