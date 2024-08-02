@@ -4,6 +4,8 @@ import com.yoga.backend.common.constants.SecurityConstants;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.repository.UsersRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +29,8 @@ public class JwtUtil {
     public enum TokenStatus {
         VALID,
         INVALID,
-        NOT_FOUND
+        NOT_FOUND,
+        EXPIRED
     }
 
     private final UsersRepository userRepository;
@@ -58,15 +61,23 @@ public class JwtUtil {
 
     // 토큰 검증
     public Claims validateToken(String token) {
-        return Jwts.parser()
-            .verifyWith(key)
-            .build()
-            .parseSignedClaims(token)
-            .getPayload();
+        try {
+            return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        } catch (JwtException e) {
+            log.error("토큰 검증 실패: {}", e.getMessage());
+            throw e;
+        }
     }
 
     public String extractToken(String bearerToken) {
-        return bearerToken.substring(7);
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return bearerToken; // 또는 null을 반환하거나 예외를 던질 수 있습니다.
     }
 
     // 토큰에서 이메일 추출
@@ -87,7 +98,7 @@ public class JwtUtil {
         if (userOptional.isPresent()) {
             return userOptional.get().getId();
         } else {
-            throw new RuntimeException("User not found for email: " + email);
+            throw new RuntimeException("해당 email의 유저를 찾을 수 없음: " + email);
         }
     }
 
@@ -141,10 +152,10 @@ public class JwtUtil {
 
     public TokenStatus isTokenValid(String token) {
         try {
+
             Claims claims = validateToken(token);
             String email = claims.get("email", String.class);
 
-            // Redis에서 토큰 확인 (동시성 고려)
             return redisTemplate.execute(new SessionCallback<TokenStatus>() {
                 @Override
                 public TokenStatus execute(RedisOperations operations) throws DataAccessException {
@@ -162,6 +173,8 @@ public class JwtUtil {
                     return TokenStatus.NOT_FOUND;
                 }
             });
+        } catch (ExpiredJwtException e) {
+            return TokenStatus.EXPIRED;
         } catch (Exception e) {
             return TokenStatus.INVALID;
         }
@@ -183,11 +196,11 @@ public class JwtUtil {
             });
 
             if (result != null && result > 0) {
-                log.info("Successfully logged out user: {}" + email);
+                log.info("사용자 {}가 로그아웃 됨" + email);
                 return true;
             } else {
                 log.warn(
-                    "Failed to logout user: {}. Token might not exist in Redis." + email);
+                    "사용자{} 로그아웃 실패. redis에 토큰이 존재하지 않습니다." + email);
                 return false;
             }
         } catch (Exception e) {
