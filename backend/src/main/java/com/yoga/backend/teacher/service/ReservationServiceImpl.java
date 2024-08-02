@@ -49,7 +49,7 @@ public class ReservationServiceImpl implements ReservationService {
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         LiveLectures liveLecture = liveLectureRepository.findById(
-                (long) reservationRequest.getLiveLectureId())
+                (long) reservationRequest.getLiveId())
             .orElseThrow(() -> new RuntimeException("실시간 강의를 찾을 수 없습니다."));
 
         MyLiveLecture myLiveLecture = new MyLiveLecture();
@@ -76,13 +76,13 @@ public class ReservationServiceImpl implements ReservationService {
     /**
      * 실시간 강의 예약 조회
      *
-     * @param liveLectureId 실시간 강의 ID
+     * @param liveId 실시간 강의 ID
      * @return 실시간 강의의 예약 목록
      */
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-    public List<MyLiveLecture> getLiveLectureReservations(int liveLectureId) {
-        return myLiveLectureRepository.findByLiveLecture_LiveId((long) liveLectureId);
+    public List<MyLiveLecture> getLiveLectureReservations(int liveId) {
+        return myLiveLectureRepository.findByLiveLecture_LiveId((long) liveId);
     }
 
     /**
