@@ -3,6 +3,8 @@ package com.yoga.backend.teacher.service;
 import com.yoga.backend.common.entity.Reservation;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureDto;
 import com.yoga.backend.teacher.dto.ReservationRequestDto;
+
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -28,12 +30,12 @@ public interface ReservationService {
     List<Reservation> getUserReservations(int userId);
 
     /**
-     * 특정 강사 ID로 예약 목록을 조회합니다.
+     * 특정 실시간 강의 ID로 예약 목록을 조회합니다.
      *
-     * @param teacherId 강사 ID
+     * @param liveLectureId 실시간 강의 ID
      * @return 예약 목록
      */
-    List<Reservation> getTeacherReservations(int teacherId);
+    List<Reservation> getLiveLectureReservations(int liveLectureId);
 
     /**
      * 모든 실시간 강의를 조회합니다.
@@ -42,4 +44,16 @@ public interface ReservationService {
      * @return 실시간 강의 목록
      */
     List<LiveLectureDto> getAllLiveLectures(int method);
+
+    /**
+     * 특정 강사 ID로 예약 목록을 조회합니다.
+     *
+     * @param teacherId 강사 ID
+     * @return 예약 목록
+     */
+    List<Reservation> getReservationsByTeacher(int teacherId);
+
+    List<LiveLectureDto> getLiveLecturesByTeacherAndMethod(int teacherId, int method);
+
+    List<Instant> getReservationDatesWithinRange(Long liveId, Instant startDate, Instant endDate);
 }
