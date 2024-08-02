@@ -19,6 +19,7 @@ import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_INSERT
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_UPDATE
 import com.ssafy.yoganavi.ui.utils.REGISTER
+import com.ssafy.yoganavi.ui.utils.UPLOAD_FAIL
 import com.ssafy.yoganavi.ui.utils.getImagePath
 import com.ssafy.yoganavi.ui.utils.loadImageSequentially
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,8 +29,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
-class RegisterNoticeFragment :
-    BaseFragment<FragmentRegisterNoticeBinding>(FragmentRegisterNoticeBinding::inflate) {
+class RegisterNoticeFragment : BaseFragment<FragmentRegisterNoticeBinding>(
+    FragmentRegisterNoticeBinding::inflate
+) {
     private val args by navArgs<RegisterNoticeFragmentArgs>()
     private val viewModel: RegisterNoticeViewModel by viewModels()
     private val imageUriLauncher =
@@ -55,14 +57,14 @@ class RegisterNoticeFragment :
                 val notice = binding.etNotice.text.toString()
 
                 if (notice.isBlank()) showSnackBar(R.string.notice_info)
-                else viewModel.updateNotice(notice, ::goBackStack)
+                else viewModel.updateNotice(notice, ::loadingView, ::goBackStack, ::failToUpload)
             }
         } else {
             setToolbar(false, MANAGEMENT_INSERT, true, REGISTER) {
                 val notice = binding.etNotice.text.toString()
 
                 if (notice.isBlank()) showSnackBar(R.string.notice_info)
-                else viewModel.insertNotice(notice, ::goBackStack)
+                else viewModel.insertNotice(notice, ::loadingView, ::goBackStack, ::failToUpload)
             }
         }
         initCollect()
@@ -126,6 +128,17 @@ class RegisterNoticeFragment :
             action = Intent.ACTION_GET_CONTENT
         }
         imageUriLauncher.launch(intent)
+    }
+
+    private suspend fun loadingView() = withContext(Dispatchers.Main) {
+        binding.vBg.visibility = View.VISIBLE
+        binding.lav.visibility = View.VISIBLE
+    }
+
+    private suspend fun failToUpload() = withContext(Dispatchers.Main) {
+        binding.vBg.visibility = View.VISIBLE
+        binding.lav.visibility = View.GONE
+        showSnackBar(UPLOAD_FAIL)
     }
 
     private suspend fun goBackStack() = withContext(Dispatchers.Main) {

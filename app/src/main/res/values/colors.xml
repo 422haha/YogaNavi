@@ -10,4 +10,5 @@
     <color name="gray_30">#808080</color>
     <color name="light_green">#F8FEFA</color>
     <color name="bottomnav">#fef0f7</color>
+    <color name="clearWhite">#80FFFFFF</color>
 </resources>
