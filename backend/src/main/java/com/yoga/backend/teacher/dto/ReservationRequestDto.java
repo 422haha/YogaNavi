@@ -1,16 +1,41 @@
 package com.yoga.backend.teacher.dto;
 
-import lombok.Builder;
-import lombok.Data;
-
-/**
- * 예약 요청을 위한 DTO 클래스
- */
-@Data
-@Builder
 public class ReservationRequestDto {
+    private int liveLectureId;
+    private Long reservationDateId;
+    private Long startDate;  // 추가
+    private Long endDate;    // 추가
 
-    private String period; // 기간
-    private int method; // 수업 방식 (0: 1대1, 1: 1대다)
-    private Long lectureId; // 수강 가능한 수업 ID
+    // getters and setters
+    public int getLiveLectureId() {
+        return liveLectureId;
+    }
+
+    public void setLiveLectureId(int liveLectureId) {
+        this.liveLectureId = liveLectureId;
+    }
+
+    public Long getReservationDateId() {
+        return reservationDateId;
+    }
+
+    public void setReservationDateId(Long reservationDateId) {
+        this.reservationDateId = reservationDateId;
+    }
+
+    public Long getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Long startDate) {
+        this.startDate = startDate;
+    }
+
+    public Long getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Long endDate) {
+        this.endDate = endDate;
+    }
 }
