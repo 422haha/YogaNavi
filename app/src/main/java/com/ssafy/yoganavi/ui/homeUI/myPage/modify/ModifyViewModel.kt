@@ -11,8 +11,11 @@ import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
 import com.ssafy.yoganavi.ui.utils.LOGO
 import com.ssafy.yoganavi.ui.utils.MINI
+import com.ssafy.yoganavi.ui.utils.uploadFile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -66,8 +69,12 @@ class ModifyViewModel @Inject constructor(
     fun modifyProfile(
         nickname: String,
         password: String,
-        isModified: (DetailResponse<Profile>) -> Unit
+        isModified: (DetailResponse<Profile>) -> Unit,
+        showLoadingView: suspend () -> Unit,
+        uploadFail: suspend () -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
+        showLoadingView()
+
         profile = profile.copy(
             nickname = nickname,
             password = password,
@@ -79,19 +86,15 @@ class ModifyViewModel @Inject constructor(
             val miniFile = File(profile.logoSmallPath)
             val metadata = ObjectMetadata().apply { contentType = "image/webp" }
 
-            transferUtility.upload(
-                BUCKET_NAME,
-                profile.logoKey,
-                thumbnailFile,
-                metadata
+            val uploadResults = awaitAll(
+                async { uploadFile(transferUtility, profile.logoKey, thumbnailFile, metadata) },
+                async { uploadFile(transferUtility, profile.logoSmallKey, miniFile, metadata) }
             )
 
-            transferUtility.upload(
-                BUCKET_NAME,
-                profile.logoSmallKey,
-                miniFile,
-                metadata
-            )
+            if (uploadResults.any { false }) {
+                uploadFail()
+                return@launch
+            }
 
         } else {
             val url = profile.imageUrl?.substringBefore("?")
