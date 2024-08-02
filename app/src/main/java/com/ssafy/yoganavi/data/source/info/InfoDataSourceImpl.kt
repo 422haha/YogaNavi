@@ -7,6 +7,7 @@ import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
+import com.ssafy.yoganavi.data.source.dto.teacher.LiveReserveRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
 import com.ssafy.yoganavi.data.source.response.YogaDetailResponse
@@ -53,6 +54,10 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
         teacherId: Int,
         method: Int
     ): Response<YogaResponse<LiveLectureData>> = infoAPI.getAvailableClass(teacherId, method)
+
+    override suspend fun registerLive(
+        liveReserveRequest: LiveReserveRequest
+    ): Response<YogaDetailResponse<Unit>> = infoAPI.registerLive(liveReserveRequest)
 
     override suspend fun updateProfile(profile: Profile): Response<YogaDetailResponse<Profile>> =
         infoAPI.updateProfile(profile)
