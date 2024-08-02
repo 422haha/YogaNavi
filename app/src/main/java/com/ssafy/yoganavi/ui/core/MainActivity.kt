@@ -25,6 +25,7 @@ import com.ssafy.yoganavi.ui.utils.PermissionHandler
 import com.ssafy.yoganavi.ui.utils.SESSION_END
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -84,9 +85,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initCollect() = lifecycleScope.launch {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
             collectMainEvent()
             collectAuthEvent()
+            collectEmptyEvent()
         }
     }
 
@@ -104,6 +106,17 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this@MainActivity, SESSION_END, Toast.LENGTH_SHORT).show()
             viewModel.clearToken()
             moveToLogin()
+        }
+    }
+
+    private fun CoroutineScope.collectEmptyEvent() = launch {
+        viewModel.emptyEvent.collectLatest { isEmpty ->
+            if (isEmpty) {
+                delay(500)
+                binding.clEmpty.root.visibility = View.VISIBLE
+            } else {
+                binding.clEmpty.root.visibility = View.GONE
+            }
         }
     }
 
@@ -141,4 +154,5 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
+
 }

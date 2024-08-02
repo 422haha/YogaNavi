@@ -18,6 +18,9 @@ class MainViewModel @Inject constructor(
     private val _mainEvent: MutableSharedFlow<MainEvent> = MutableSharedFlow()
     val mainEvent: SharedFlow<MainEvent> = _mainEvent.asSharedFlow()
 
+    private val _emptyEvent: MutableSharedFlow<Boolean> = MutableSharedFlow()
+    val emptyEvent: SharedFlow<Boolean> = _emptyEvent.asSharedFlow()
+
     fun setMainEvent(
         isBottomNavigationVisible: Boolean,
         title: String,
@@ -31,5 +34,9 @@ class MainViewModel @Inject constructor(
 
     fun clearToken() = viewModelScope.launch {
         dataStoreRepository.clearToken()
+    }
+
+    fun setEmptyView(isEmpty: Boolean) = viewModelScope.launch {
+        _emptyEvent.emit(isEmpty)
     }
 }
