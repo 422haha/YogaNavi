@@ -1,27 +1,18 @@
 package com.yoga.backend.common.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
 /**
  * 실시간 강의 엔티티 클래스 강의의 제목, 내용, 시작 및 종료 시간 등을 포함
  */
-
-@Setter
 @Getter
+@Setter
 @Entity
+@Table(name = "live_lectures")
 public class LiveLectures {
 
     @Id
@@ -62,5 +53,4 @@ public class LiveLectures {
 
     @Column(length = 100, nullable = false)
     private String availableDay; // 가능한 강의 요일
-
 }
