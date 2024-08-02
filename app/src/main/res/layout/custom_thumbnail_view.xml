@@ -54,11 +54,12 @@
     <EditText
         android:id="@+id/et_content"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="wrap_content"
         android:background="@null"
         android:gravity="top"
         android:hint="@string/lecture_info"
         android:inputType="textMultiLine"
+        android:minLines="5"
         android:padding="@dimen/padding_medium"
         android:textSize="@dimen/text_medium"
         app:layout_constraintBottom_toTopOf="@id/divider2"
