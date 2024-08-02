@@ -18,6 +18,8 @@ import com.ssafy.yoganavi.databinding.FragmentTeacherReservationBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.teacher.teacherReservation.availableList.AvailableAdapter
 import com.ssafy.yoganavi.ui.utils.NOTHING
+import com.ssafy.yoganavi.ui.utils.ONE_TO_MULTI
+import com.ssafy.yoganavi.ui.utils.ONE_TO_ONE
 import com.ssafy.yoganavi.ui.utils.PICK_DATE
 import com.ssafy.yoganavi.ui.utils.RESERVATION
 import com.ssafy.yoganavi.ui.utils.RESERVE
@@ -111,10 +113,10 @@ class TeacherReservationFragment :
 
     private fun initListener() = with(binding) {
         rbOneToOne.setOnClickListener {
-            clickMethod(0)
+            clickMethod(ONE_TO_ONE)
         }
         rbOneToMulti.setOnClickListener {
-            clickMethod(1)
+            clickMethod(ONE_TO_MULTI)
         }
     }
 

@@ -74,6 +74,17 @@ const val NOTHING = "수강가능한 수업이 없습니다."
 const val PICK_DATE = "날짜를 선택하세요."
 const val UPLOAD_FAIL = "업로드에 실패했습니다."
 
+//강의 분류
+const val ONE_TO_ONE = 0
+const val ONE_TO_MULTI = 1
+const val RECENT = 0
+const val POPULAR = 1
+const val PERIOD_WEEK = 0
+const val PERIOD_MONTH = 1
+const val PERIOD_THREE_MONTH = 2
+const val PERIOD_TOTAL = 3
+
+
 // 캘린더, 타임 Picker
 const val START = 1
 const val END = 2
