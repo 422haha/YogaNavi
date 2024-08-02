@@ -60,6 +60,7 @@ class ManagementLiveFragment :
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.liveList.collectLatest {
+                checkEmptyList(it)
                 liveAdapter.submitList(it)
             }
         }

@@ -58,6 +58,7 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.lectureList.collectLatest {
+                checkEmptyList(it)
                 lectureAdapter.submitList(it)
             }
         }

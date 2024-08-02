@@ -119,6 +119,7 @@ class TeacherListFragment :
             }
             launch {
                 viewModel.teacherList.collectLatest { teacherList ->
+                    checkEmptyList(teacherList)
                     noticeAdapter.submitList(teacherList)
                 }
             }
