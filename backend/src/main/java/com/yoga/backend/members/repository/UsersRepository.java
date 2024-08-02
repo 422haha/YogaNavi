@@ -30,9 +30,8 @@ public interface UsersRepository extends CrudRepository<Users, Long> {
     @Query("SELECT u FROM Users u WHERE u.email = :email")
     Optional<Users> findByEmailWithLock(String email);
 
-    @Query("SELECT u FROM Users u JOIN FETCH u.hashtags h WHERE h.name = :hashtagName")
-    List<Users> findUsersByHashtag(@Param("hashtagName") String hashtagName);
-
     List<Users> findByDeletedAtBeforeAndIsDeletedFalse(Instant dateTime);
 
+    @Query("SELECT tl.teacher FROM TeacherLike tl WHERE tl.user.id = :userId")
+    List<Users> findLikedTeachersByUserId(@Param("userId") int userId);
 }

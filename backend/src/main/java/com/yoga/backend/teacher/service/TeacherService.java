@@ -67,4 +67,6 @@ public interface TeacherService {
      * @return 강사 정보 리스트
      */
     List<TeacherDto> searchTeachersByHashtag(String hashtag, int userId);
+
+    List<TeacherDto> getLikeTeachers(int userId);
 }

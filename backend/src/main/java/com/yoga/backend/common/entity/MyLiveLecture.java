@@ -27,10 +27,10 @@ public class MyLiveLecture {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user; // 사용자 ID (Foreign Key)
 
-    @Column(nullable = false)
+    @Column
     private Instant startDate; // 예약 시작 날짜
 
-    @Column(nullable = false)
+    @Column
     private Instant endDate; // 예약 종료 날짜
 
     public Long getLiveId() {

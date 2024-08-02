@@ -4,12 +4,14 @@ import com.yoga.backend.common.awsS3.S3Service;
 import com.yoga.backend.common.entity.Hashtag;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.entity.TeacherLike;
+import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.recorded.repository.RecordedLectureLikeRepository;
 import com.yoga.backend.teacher.TeacherFilter;
 import com.yoga.backend.teacher.dto.DetailedTeacherDto;
 import com.yoga.backend.teacher.dto.TeacherDto;
 import com.yoga.backend.teacher.repository.TeacherLikeRepository;
 import com.yoga.backend.teacher.repository.TeacherRepository;
+import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -32,16 +34,19 @@ public class TeacherServiceImpl implements TeacherService {
     private final TeacherRepository teacherRepository;
     private final TeacherLikeRepository teacherLikeRepository;
     private final RecordedLectureLikeRepository recordedLectureLikeRepository;
+    private final UsersRepository usersRepository;
     private final S3Service s3Service;
 
     @Autowired
     public TeacherServiceImpl(TeacherRepository teacherRepository,
         TeacherLikeRepository teacherLikeRepository,
         RecordedLectureLikeRepository recordedLectureLikeRepository,
+        UsersRepository usersRepository,
         S3Service s3Service) {
         this.teacherRepository = teacherRepository;
         this.teacherLikeRepository = teacherLikeRepository;
         this.recordedLectureLikeRepository = recordedLectureLikeRepository;
+        this.usersRepository = usersRepository;
         this.s3Service = s3Service;
     }
 
@@ -440,6 +445,41 @@ public class TeacherServiceImpl implements TeacherService {
                     .build();
             })
             .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+    public List<TeacherDto> getLikeTeachers(int userId) {
+        List<Users> teachers = usersRepository.findLikedTeachersByUserId(userId);
+
+        return teachers.stream().map(teacher -> {
+            String profileImageUrl = null;
+            String profileImageUrlSmall = null;
+            try {
+                if (teacher.getProfile_image_url() != null && !teacher.getProfile_image_url().isEmpty()) {
+                    profileImageUrl = s3Service.generatePresignedUrl(
+                        teacher.getProfile_image_url(), URL_EXPIRATION_SECONDS);
+                }
+                if (teacher.getProfile_image_url_small() != null && !teacher.getProfile_image_url_small().isEmpty()) {
+                    profileImageUrlSmall = s3Service.generatePresignedUrl(
+                        teacher.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
+                }
+            } catch (Exception e) {
+                System.err.println("Presigned URL 생성 오류: " + e.getMessage());
+            }
+
+            return TeacherDto.builder()
+                .id(teacher.getId())
+                .email(teacher.getEmail())
+                .nickname(teacher.getNickname())
+                .profileImageUrl(profileImageUrl)
+                .profileImageUrlSmall(profileImageUrlSmall)
+                .content(teacher.getContent())
+                .hashtags(teacher.getHashtags().stream().map(Hashtag::getName).collect(Collectors.toSet()))
+                .liked(true) // 이 목록은 사용자가 좋아요한 강사들이므로 항상 true
+                .likeCount(teacher.getTeacherLikes().size())
+                .build();
+        }).collect(Collectors.toList());
     }
 
     /**

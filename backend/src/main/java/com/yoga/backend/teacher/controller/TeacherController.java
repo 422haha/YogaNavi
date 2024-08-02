@@ -19,7 +19,7 @@ import java.util.Map;
  * 강사 컨트롤러 클래스
  */
 @RestController
-@RequestMapping("/teacher")
+@RequestMapping("")
 public class TeacherController {
 
     @Autowired
@@ -33,7 +33,7 @@ public class TeacherController {
      *
      * @return 강사 목록
      */
-    @GetMapping
+    @GetMapping("/teacher")
     public ResponseEntity<Map<String, Object>> getAllTeachers(
         @RequestParam(value = "sorting", defaultValue = "0") int sorting, // 정렬 기준
         @RequestParam(value = "startTime", defaultValue = "0") long startTime, // 강의 시작 시간
@@ -81,7 +81,7 @@ public class TeacherController {
      * @param token   인증 토큰
      * @return 정렬된 강사 목록
      */
-    @GetMapping("/sort/{sorting}")
+    @GetMapping("/teacher/sort/{sorting}")
     public ResponseEntity<Map<String, Object>> getSortedTeachers(
         @PathVariable int sorting, // 정렬 기준
         @RequestParam(value = "searchKeyword", defaultValue = "") String searchKeyword, // 검색 키워드
@@ -114,7 +114,7 @@ public class TeacherController {
      * @param token     인증 토큰
      * @return 강사 상세 정보
      */
-    @GetMapping("/{teacherId}")
+    @GetMapping("/teacher/{teacherId}")
     public ResponseEntity<Map<String, Object>> getTeacherDetail(@PathVariable int teacherId,
         // 강사 ID
         @RequestHeader("Authorization") String token) { // 인증 토큰
@@ -150,7 +150,7 @@ public class TeacherController {
      * @param token     인증 토큰
      * @return 좋아요 상태
      */
-    @PostMapping("/like/{teacherId}")
+    @PostMapping("/teacher/like/{teacherId}")
     public ResponseEntity<Map<String, Object>> likeTeacher(@PathVariable int teacherId, // 강사 ID
         @RequestHeader("Authorization") String token) { // 인증 토큰
         // 사용자 ID를 토큰에서 추출
@@ -163,6 +163,24 @@ public class TeacherController {
             response.put("message", isLiked ? "좋아요 성공" : "좋아요 취소");
             response.put("data", true);
             return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            // 오류 응답 생성
+            response.put("message", "오류가 발생했습니다: " + e.getMessage());
+            response.put("data", false);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @GetMapping("/mypage/like-teacher")
+    public ResponseEntity<Map<String, Object>> getLikeTeachers(@RequestHeader("Authorization") String token) {
+        int userId = jwtUtil.getUserIdFromToken(token);
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<TeacherDto> likeTeachers = teacherService.getLikeTeachers(userId);
+            // 응답 생성
+            response.put("message", "success");
+            response.put("data", likeTeachers);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             // 오류 응답 생성
             response.put("message", "오류가 발생했습니다: " + e.getMessage());

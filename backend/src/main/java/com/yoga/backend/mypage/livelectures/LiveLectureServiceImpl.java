@@ -19,14 +19,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class LiveLectureServiceImpl implements LiveLectureService {
 
-    @Autowired
-    private LiveLectureRepository liveLecturesRepository;
-    @Autowired
-    private UsersRepository usersRepository;
-    @Autowired
-    private MyLiveLectureRepository myLiveLectureRepository;
-    @Autowired
-    private NotificationService notificationService;
+    private final LiveLectureRepository liveLecturesRepository;
+    private final UsersRepository usersRepository;
+    private final MyLiveLectureRepository myLiveLectureRepository;
+    private final NotificationService notificationService;
+
+    public LiveLectureServiceImpl(LiveLectureRepository liveLecturesRepository,
+        UsersRepository usersRepository, MyLiveLectureRepository myLiveLectureRepository,
+        NotificationService notificationService) {
+        this.liveLecturesRepository = liveLecturesRepository;
+        this.usersRepository = usersRepository;
+        this.myLiveLectureRepository = myLiveLectureRepository;
+        this.notificationService = notificationService;
+    }
 
     /**
      * 라이브 강의 생성
@@ -59,11 +64,6 @@ public class LiveLectureServiceImpl implements LiveLectureService {
 
                 LiveLectures savedLiveLecture = liveLecturesRepository.save(liveLecture);
                 notificationService.handleLectureUpdate(savedLiveLecture);
-
-                MyLiveLecture myLiveLecture = new MyLiveLecture();
-                myLiveLecture.setLiveLecture(savedLiveLecture);
-                myLiveLecture.setUser(user);
-                myLiveLectureRepository.save(myLiveLecture);
 
                 LiveLectureCreateResponseDto responseDto = new LiveLectureCreateResponseDto();
                 responseDto.setMessage("화상강의 생성 성공");
@@ -113,7 +113,6 @@ public class LiveLectureServiceImpl implements LiveLectureService {
         return liveLecturesRepository.findByUserId(userId);
     }
 
-
     /**
      * 화상 강의를 수정
      *
@@ -154,6 +153,9 @@ public class LiveLectureServiceImpl implements LiveLectureService {
 
         LiveLectures updatedLecture = liveLecturesRepository.save(liveLecture);
         notificationService.handleLectureUpdate(updatedLecture);
+
+        notificationService.sendLectureUpdateNotification(updatedLecture);
+
         return updatedLecture;
     }
 
@@ -183,7 +185,6 @@ public class LiveLectureServiceImpl implements LiveLectureService {
         return lectureOpt.isPresent() && Objects.equals(lectureOpt.get().getUser().getId(), userId);
     }
 
-
     /**
      * 화상 강의 삭제
      *
@@ -192,13 +193,22 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void deleteLiveLectureById(Long liveId) {
-        notificationService.handleLectureDelete(liveId);
+        try {
+            LiveLectures lecture = liveLecturesRepository.findById(liveId)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 강의 id: " + liveId));
 
-        List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findByLiveLecture_LiveId(
-            liveId);
+            List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findByLiveLecture_LiveId(
+                liveId);
+            myLiveLectureRepository.deleteAll(myLiveLectures);
 
-        myLiveLectureRepository.deleteAll(myLiveLectures);
-        liveLecturesRepository.deleteById(liveId);
+            liveLecturesRepository.delete(lecture);
+
+            notificationService.handleLectureDelete(liveId);
+
+            notificationService.sendLectureDeletionNotification(lecture, myLiveLectures);
+
+        } catch (Exception e) {
+            throw new RuntimeException("강의 삭제 실패", e);
+        }
     }
-
 }
