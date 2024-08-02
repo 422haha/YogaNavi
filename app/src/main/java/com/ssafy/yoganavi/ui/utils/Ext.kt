@@ -69,6 +69,7 @@ const val LECTURE = "강의"
 const val FAME = "fame"
 const val DATE = "date"
 const val ANY_CHECK_BOX = "찾을 파트를 선택해주세요!"
+const val UPLOAD_FAIL = "업로드에 실패했습니다."
 
 // 캘린더, 타임 Picker
 const val START = 1

@@ -58,6 +58,8 @@ android {
 }
 
 dependencies {
+    //Lottie
+    implementation (libs.lottie)
 
     // ONNX
     implementation(libs.onnxruntime.android)

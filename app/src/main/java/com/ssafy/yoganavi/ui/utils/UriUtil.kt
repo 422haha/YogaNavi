@@ -6,10 +6,16 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.exifinterface.media.ExifInterface
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
+import com.amazonaws.services.s3.model.ObjectMetadata
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.coroutines.resume
 import kotlin.math.sqrt
 
 const val MB = 1_048_576
@@ -106,4 +112,26 @@ fun getCorrectlyOrientedBitmap(filePath: String, bitmap: Bitmap): Bitmap {
         ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
     }
     return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+}
+
+suspend fun uploadFile(
+    transferUtility: TransferUtility,
+    key: String,
+    file: File,
+    meta: ObjectMetadata
+): Boolean = suspendCancellableCoroutine { continuation ->
+    transferUtility.upload(BUCKET_NAME, key, file, meta).apply {
+        setTransferListener(object : TransferListener {
+            override fun onStateChanged(id: Int, state: TransferState?) {
+                if (state == TransferState.COMPLETED) continuation.resume(true)
+            }
+
+            override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
+            }
+
+            override fun onError(id: Int, ex: java.lang.Exception?) {
+                continuation.resume(false)
+            }
+        })
+    }
 }
