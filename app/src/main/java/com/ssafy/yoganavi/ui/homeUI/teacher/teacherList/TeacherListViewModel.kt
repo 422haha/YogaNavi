@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.teacher.FilterData
+import com.ssafy.yoganavi.ui.utils.RECENT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,7 @@ class TeacherListViewModel @Inject constructor(
     private val _teacherList = MutableStateFlow<List<TeacherData>>(emptyList())
     val teacherList = _teacherList.asStateFlow()
     private var searchKeyword: String = ""
-    private val _sorting = MutableStateFlow(0)
+    private val _sorting = MutableStateFlow(RECENT)
     val sorting = _sorting.asStateFlow()
     private var isInit: Boolean = true
 

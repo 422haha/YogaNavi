@@ -16,6 +16,8 @@ import com.ssafy.yoganavi.data.source.teacher.FilterData
 import com.ssafy.yoganavi.databinding.FragmentTeacherListBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.teacher.teacherList.teacher.TeacherAdapter
+import com.ssafy.yoganavi.ui.utils.POPULAR
+import com.ssafy.yoganavi.ui.utils.RECENT
 import com.ssafy.yoganavi.ui.utils.TEACHER
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -59,13 +61,13 @@ class TeacherListFragment :
         binding.svSearch.setQuery(viewModel.getSearchKeyword(), false)
         initListener()
         initCollect()
-        if (args.sorting == 0) {
+        if (args.sorting == RECENT) {
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(0, filter)
+                viewModel.setSorting(RECENT, filter)
             }
         } else {
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(1, filter)
+                viewModel.setSorting(POPULAR, filter)
             }
         }
     }
@@ -93,13 +95,13 @@ class TeacherListFragment :
         })
         binding.rbRecent.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(0, filter)
+                viewModel.setSorting(RECENT, filter)
             }
         }
 
         binding.rbPopular.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(1, filter)
+                viewModel.setSorting(POPULAR, filter)
             }
         }
     }
@@ -108,7 +110,7 @@ class TeacherListFragment :
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             launch {
                 viewModel.sorting.collectLatest { sorting ->
-                    if (sorting == 0) {
+                    if (sorting == RECENT) {
                         binding.rbRecent.isChecked = true
                         binding.rbPopular.isChecked = false
                     } else {

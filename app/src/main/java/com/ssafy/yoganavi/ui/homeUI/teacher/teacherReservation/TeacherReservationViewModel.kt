@@ -24,18 +24,23 @@ class TeacherReservationViewModel @Inject constructor(
             .onFailure { it.printStackTrace() }
     }
 
-    fun registerLive(liveId: Int, startDate: Long?, endDate: Long?, method: Int) =
+    fun registerLive(
+        liveId: Int,
+        startDate: Long?,
+        endDate: Long?,
+        navigateToSchedule: () -> (Unit)
+    ) =
         viewModelScope.launch {
             runCatching {
                 infoRepository.registerLive(
                     LiveReserveRequest(
                         liveId,
                         startDate,
-                        endDate,
-                        method
+                        endDate
                     )
                 )
             }
+                .onSuccess { navigateToSchedule() }
                 .onFailure { it.printStackTrace() }
         }
 }

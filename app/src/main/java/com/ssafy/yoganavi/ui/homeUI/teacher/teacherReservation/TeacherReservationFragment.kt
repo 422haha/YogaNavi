@@ -18,6 +18,8 @@ import com.ssafy.yoganavi.databinding.FragmentTeacherReservationBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.teacher.teacherReservation.availableList.AvailableAdapter
 import com.ssafy.yoganavi.ui.utils.NOTHING
+import com.ssafy.yoganavi.ui.utils.ONE_TO_MULTI
+import com.ssafy.yoganavi.ui.utils.ONE_TO_ONE
 import com.ssafy.yoganavi.ui.utils.PICK_DATE
 import com.ssafy.yoganavi.ui.utils.RESERVATION
 import com.ssafy.yoganavi.ui.utils.RESERVE
@@ -41,7 +43,6 @@ class TeacherReservationFragment :
     private var saveStartDate: CalendarDay? = null
     private var saveEndDate: CalendarDay? = null
     private var liveId = 0
-    private var method = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -57,15 +58,18 @@ class TeacherReservationFragment :
                     liveId,
                     saveEndDate?.toLong(),
                     saveEndDate?.toLong(),
-                    method
+                    ::navigateToSchedule
                 )
-                findNavController().navigate(R.id.action_teacherReservationFragment_to_homeFragment)
             }
         }
         initView()
         binding.rvAvailableClass.adapter = availableAdapter
         initListener()
         initCollect()
+    }
+
+    private fun navigateToSchedule() {
+        findNavController().navigate(R.id.action_teacherReservationFragment_to_homeFragment)
     }
 
     private fun initView() = with(binding) {
@@ -109,17 +113,16 @@ class TeacherReservationFragment :
 
     private fun initListener() = with(binding) {
         rbOneToOne.setOnClickListener {
-            clickMethod()
+            clickMethod(ONE_TO_ONE)
         }
         rbOneToMulti.setOnClickListener {
-            clickMethod()
+            clickMethod(ONE_TO_MULTI)
         }
     }
 
-    private fun clickMethod() {
+    private fun clickMethod(method: Int) {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.getAvailableClass(args.teacherId, 1)
-            method = 1
+            viewModel.getAvailableClass(args.teacherId, method)
             availableAdapter.selectedPosition = -1
         }
         visibleAvailableClass()
