@@ -94,6 +94,11 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
         pvVideo.setBackgroundColor(Color.BLACK)
     }
 
+    private fun closeVideo() = with(binding) {
+        player.release()
+        pvVideo.player = null
+    }
+
     private fun setFullscreen() = with(requireActivity() as MainActivity) {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -128,6 +133,7 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
 
     private fun popBack() {
         exitFullscreen()
+        closeVideo()
         findNavController().popBackStack()
     }
 

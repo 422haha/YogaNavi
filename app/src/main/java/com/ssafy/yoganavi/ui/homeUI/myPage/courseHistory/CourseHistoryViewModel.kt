@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class CourseHistoryViewModel@Inject constructor(
+class CourseHistoryViewModel @Inject constructor(
     private val infoRepository: InfoRepository
 ) : ViewModel() {
     private val _courseHistoryList = MutableStateFlow<List<HomeData>>(emptyList())

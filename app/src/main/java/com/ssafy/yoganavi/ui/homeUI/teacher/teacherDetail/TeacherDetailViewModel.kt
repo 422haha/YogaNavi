@@ -13,6 +13,7 @@ import javax.inject.Inject
 class TeacherDetailViewModel @Inject constructor(
     private val infoRepository: InfoRepository
 ) : ViewModel() {
+
     fun getTeacherDetail(
         teacherId: Int,
         bindData: suspend (TeacherDetailData) -> Unit

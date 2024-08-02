@@ -21,16 +21,24 @@ import kotlinx.coroutines.launch
 class ManagementLiveFragment :
     BaseFragment<FragmentManagementLiveBinding>(FragmentManagementLiveBinding::inflate) {
 
-    private val liveAdapter by lazy { ManagementLiveAdapter(::navigateToLiveFragment, ::navigateToRegisterFragment, ::deleteLive) }
+    private val liveAdapter by lazy {
+        ManagementLiveAdapter(
+            ::navigateToLiveFragment,
+            ::navigateToRegisterFragment,
+            ::deleteLive
+        )
+    }
 
     private val viewModel: ManagementLiveViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setToolbar(isBottomNavigationVisible = false,
+        setToolbar(
+            isBottomNavigationVisible = false,
             title = MANAGEMENT_LIVE,
-            canGoBack = true,)
+            canGoBack = true,
+        )
 
         initListener()
 
@@ -72,7 +80,7 @@ class ManagementLiveFragment :
     }
 
     private fun deleteLive(liveId: Int = -1) {
-        if(liveId != -1) {
+        if (liveId != -1) {
             showDeleteDialog(liveId)
         }
     }
@@ -82,12 +90,14 @@ class ManagementLiveFragment :
             .setTitle("화상강의 삭제")
             .setMessage("정말로 삭제하시겠습니까?")
             .setPositiveButton("확인") { _, _ ->
-                viewModel.deleteLive(liveId) {
-                    viewModel.getLiveList()
-                    showSnackBar(getString(R.string.live_delete_msg))
-                }
+                viewModel.deleteLive(liveId, ::removeLive)
             }
             .setNegativeButton("취소", null)
             .show()
+    }
+
+    private fun removeLive() {
+        viewModel.getLiveList()
+        showSnackBar(getString(R.string.live_delete_msg))
     }
 }

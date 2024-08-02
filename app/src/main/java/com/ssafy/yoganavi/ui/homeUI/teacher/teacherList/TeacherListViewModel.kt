@@ -16,6 +16,7 @@ import javax.inject.Inject
 class TeacherListViewModel @Inject constructor(
     private val infoRepository: InfoRepository
 ) : ViewModel() {
+
     private val _teacherList = MutableStateFlow<List<TeacherData>>(emptyList())
     val teacherList = _teacherList.asStateFlow()
     private var searchKeyword: String = ""
@@ -23,7 +24,7 @@ class TeacherListViewModel @Inject constructor(
     val sorting = _sorting.asStateFlow()
     private var isInit: Boolean = true
 
-    fun initCheckGetTeacherList(filter: FilterData) {
+    private fun initCheckGetTeacherList(filter: FilterData) {
         if (isInit) {
             getAllTeacherList()
         } else {
@@ -43,12 +44,14 @@ class TeacherListViewModel @Inject constructor(
             .onFailure { it.printStackTrace() }
     }
 
-    fun teacherLikeToggle(filter: FilterData, teacherId: Int) =
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching { infoRepository.teacherLikeToggle(teacherId) }
-                .onSuccess { initCheckGetTeacherList(filter) }
-                .onFailure { it.printStackTrace() }
-        }
+    fun teacherLikeToggle(
+        filter: FilterData,
+        teacherId: Int
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        runCatching { infoRepository.teacherLikeToggle(teacherId) }
+            .onSuccess { initCheckGetTeacherList(filter) }
+            .onFailure { it.printStackTrace() }
+    }
 
     fun setSearchKeyword(filter: FilterData, newString: String?) {
         searchKeyword = newString ?: ""

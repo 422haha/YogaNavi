@@ -50,7 +50,7 @@ class LectureListViewModel @Inject constructor(
         likeChange: Boolean? = null
     ) {
         val prevLike = _sortAndKeyword.value.likeChange
-        val newLike = if(likeChange != null) !prevLike else prevLike
+        val newLike = if (likeChange != null) !prevLike else prevLike
         val newValue = SortAndKeyword(sort, keyword, searchInTitle, searchInContent, newLike)
         _sortAndKeyword.value = newValue
     }

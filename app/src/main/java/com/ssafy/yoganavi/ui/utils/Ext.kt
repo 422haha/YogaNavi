@@ -15,17 +15,19 @@ const val MEMBER = "members"
 const val TOKEN = "Authorization"
 const val FCM_TOKEN = "FCM_Token"
 const val REFRESH_TOKEN = "Refresh-Token"
-const val NEED_REFRESH_TOKEN = "refresh_token_required"
-const val TOKEN_REQUIRED = "token_required"
+const val NEED_REFRESH_TOKEN = "세션이 만료되었습니다."
+const val TOKEN_REQUIRED = "Refresh-Token-Request"
 const val PAGE_SIZE = 30
 const val END_TIME = "00:00"
 
 // 수신부
 const val FORBIDDEN = 403
+const val UNAUTHORIZED = 401
 const val NO_AUTH = "권한이 없습니다."
 const val NO_RESPONSE = "에러가 발생했습니다."
 const val IS_BLANK = "빈칸을 확인해주세요!"
 const val PASSWORD_DIFF = "비밀번호가 일치하지 않습니다."
+const val SESSION_END = "세션이 만료되었습니다."
 
 // 타이틀
 const val MY_PAGE = "마이 페이지"

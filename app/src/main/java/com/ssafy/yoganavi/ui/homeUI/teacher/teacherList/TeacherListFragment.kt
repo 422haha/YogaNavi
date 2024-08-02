@@ -60,9 +60,13 @@ class TeacherListFragment :
         initListener()
         initCollect()
         if (args.sorting == 0) {
-            viewLifecycleOwner.lifecycleScope.launch { viewModel.setSorting(0, filter) }
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.setSorting(0, filter)
+            }
         } else {
-            viewLifecycleOwner.lifecycleScope.launch { viewModel.setSorting(1, filter) }
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.setSorting(1, filter)
+            }
         }
     }
 
@@ -88,10 +92,15 @@ class TeacherListFragment :
             }
         })
         binding.rbRecent.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch { viewModel.setSorting(0, filter) }
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.setSorting(0, filter)
+            }
         }
+
         binding.rbPopular.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch { viewModel.setSorting(1, filter) }
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.setSorting(1, filter)
+            }
         }
     }
 

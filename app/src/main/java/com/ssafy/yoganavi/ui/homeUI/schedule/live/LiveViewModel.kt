@@ -6,7 +6,5 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class LiveViewModel @Inject constructor(
-    val sessionManager: WebRtcSessionManager)
-    : ViewModel() {
+class LiveViewModel @Inject constructor(val sessionManager: WebRtcSessionManager) : ViewModel() {
 }

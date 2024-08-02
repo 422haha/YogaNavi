@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ManagementLiveViewModel @Inject constructor(
     private val infoRepository: InfoRepository
-): ViewModel() {
+) : ViewModel() {
     private val _liveList = MutableStateFlow<List<LiveLectureData>>(emptyList())
     val liveList = _liveList.asStateFlow()
 
@@ -24,7 +24,10 @@ class ManagementLiveViewModel @Inject constructor(
             .onFailure { it.printStackTrace() }
     }
 
-    fun deleteLive(liveId: Int, onDeleteComplete: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+    fun deleteLive(
+        liveId: Int,
+        onDeleteComplete: suspend () -> Unit,
+    ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.deleteLive(liveId) }
             .onSuccess { onDeleteComplete() }
             .onFailure { it.printStackTrace() }

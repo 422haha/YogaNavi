@@ -19,32 +19,32 @@ class RegisterLiveViewModel @Inject constructor(
     var dayStatusMap = Week.entries.associateWith { false }.toMutableMap()
 
     fun getLive(liveId: Int, onReadLive: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        runCatching { infoRepository.getLive(liveId) }
-            .onSuccess {
-                it.data?.let { data ->
-                    liveLectureData = data
+        runCatching {
+            infoRepository.getLive(liveId)
+        }.onSuccess {
+            it.data?.let { data ->
+                liveLectureData = data
 
-                    liveLectureData.availableDay.split(",").forEach { parseDayStr ->
-                        val parseDayWeek = Week.valueOf(parseDayStr)
-                        dayStatusMap[parseDayWeek] = true
-                    }
-
-                    onReadLive()
+                liveLectureData.availableDay.split(",").forEach { parseDayStr ->
+                    val parseDayWeek = Week.valueOf(parseDayStr)
+                    dayStatusMap[parseDayWeek] = true
                 }
+
+                onReadLive()
             }
-            .onFailure { it.printStackTrace() }
+        }.onFailure {
+            it.printStackTrace()
+        }
     }
 
     fun createLive(popBack: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        runCatching {
-            infoRepository.createLive(liveLectureData) }
+        runCatching { infoRepository.createLive(liveLectureData) }
             .onSuccess { popBack() }
             .onFailure { it.printStackTrace() }
     }
 
     fun updateLive(popBack: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        runCatching {
-            infoRepository.updateLive(liveLectureData, liveLectureData.liveId) }
+        runCatching { infoRepository.updateLive(liveLectureData, liveLectureData.liveId) }
             .onSuccess { popBack() }
             .onFailure { it.printStackTrace() }
     }

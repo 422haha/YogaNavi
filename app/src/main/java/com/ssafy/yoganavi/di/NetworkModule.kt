@@ -8,6 +8,7 @@ import com.ssafy.yoganavi.data.repository.dataStore.DataStoreRepository
 import com.ssafy.yoganavi.data.source.info.InfoAPI
 import com.ssafy.yoganavi.data.source.lecture.LectureAPI
 import com.ssafy.yoganavi.data.source.user.UserAPI
+import com.ssafy.yoganavi.ui.utils.AuthManager
 import com.ssafy.yoganavi.ui.utils.TIME_OUT
 import dagger.Module
 import dagger.Provides
@@ -27,15 +28,17 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideOkHttpClient(dataStoreRepository: DataStoreRepository): OkHttpClient =
-        OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(dataStoreRepository))
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                setLevel(HttpLoggingInterceptor.Level.BODY)
-            })
-            .readTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
-            .connectTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
-            .build()
+    fun provideOkHttpClient(
+        dataStoreRepository: DataStoreRepository,
+        authManager: AuthManager
+    ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(AuthInterceptor(dataStoreRepository, authManager))
+        .addInterceptor(HttpLoggingInterceptor().apply {
+            setLevel(HttpLoggingInterceptor.Level.BODY)
+        })
+        .readTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
+        .connectTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
+        .build()
 
     @Singleton
     @Provides
@@ -46,8 +49,8 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideUserRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit = Retrofit.Builder()
-//        .baseUrl("http://i11d210.p.ssafy.io:8080")
-        .baseUrl("http://192.168.100.162:8080")
+        .baseUrl("http://i11d210.p.ssafy.io:8080")
+//        .baseUrl("http://192.168.100.162:8080")
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create(gson))
         .build()

@@ -32,5 +32,4 @@ class LikeLectureViewModel @Inject constructor(
             .onFailure { it.printStackTrace() }
     }
 
-
 }

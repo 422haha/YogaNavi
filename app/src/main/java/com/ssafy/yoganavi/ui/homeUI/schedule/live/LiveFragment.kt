@@ -67,7 +67,6 @@ class LiveFragment: BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infla
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
                 viewModel.sessionManager.signalingClient.sessionStateFlow.collect { state ->
                     Timber.d("상태 로그!! $state")
-                    binding.tvState.text = state.toString()
                 }
             }
         }
