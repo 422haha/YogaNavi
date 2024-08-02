@@ -18,7 +18,10 @@ class UserRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : UserRepository {
 
-    override suspend fun logIn(userRequest: UserRequest, fcmToken: String): DetailResponse<Boolean> {
+    override suspend fun logIn(
+        userRequest: UserRequest,
+        fcmToken: String
+    ): DetailResponse<Boolean> {
         val response = withContext(ioDispatcher) { userDataSource.logIn(userRequest, fcmToken) }
         return response.toDetailResponse()
     }

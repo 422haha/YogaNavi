@@ -14,7 +14,9 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class CourseHistoryFragment : BaseFragment<FragmentCourseHistoryBinding>(FragmentCourseHistoryBinding::inflate) {
+class CourseHistoryFragment : BaseFragment<FragmentCourseHistoryBinding>(
+    FragmentCourseHistoryBinding::inflate
+) {
     private val viewModel: CourseHistoryViewModel by viewModels()
 
     private val courseHistoryAdapter by lazy { CourseHistoryAdapter() }
@@ -24,9 +26,11 @@ class CourseHistoryFragment : BaseFragment<FragmentCourseHistoryBinding>(Fragmen
 
         binding.rvMyList.adapter = courseHistoryAdapter
 
-        setToolbar(isBottomNavigationVisible = false,
+        setToolbar(
+            isBottomNavigationVisible = false,
             title = COURSE_HISTORY,
-            canGoBack = true)
+            canGoBack = true
+        )
 
         initCollect()
 
@@ -36,6 +40,7 @@ class CourseHistoryFragment : BaseFragment<FragmentCourseHistoryBinding>(Fragmen
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.courseHistoryList.collectLatest {
+                checkEmptyList(it)
                 courseHistoryAdapter.submitList(it)
             }
         }

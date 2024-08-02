@@ -7,7 +7,9 @@ import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
+import com.ssafy.yoganavi.data.source.dto.teacher.LiveReserveRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
+import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
 import com.ssafy.yoganavi.data.source.response.YogaDetailResponse
 import com.ssafy.yoganavi.data.source.response.YogaResponse
 import com.ssafy.yoganavi.data.source.teacher.FilterData
@@ -31,7 +33,16 @@ interface InfoDataSource {
         searchKeyword: String
     ): Response<YogaResponse<TeacherData>>
 
+    suspend fun getTeacherDetail(teacherId: Int): Response<YogaDetailResponse<TeacherDetailData>>
+
     suspend fun teacherLikeToggle(teacherId: Int): Response<YogaDetailResponse<Boolean>>
+
+    suspend fun getAvailableClass(
+        teacherId: Int,
+        method: Int
+    ): Response<YogaResponse<LiveLectureData>>
+
+    suspend fun registerLive(liveReserveRequest: LiveReserveRequest): Response<YogaDetailResponse<Unit>>
 
     // LECTURE
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>
@@ -74,7 +85,7 @@ interface InfoDataSource {
         articleId: Int
     ): Response<YogaDetailResponse<Unit>>
 
-    suspend fun deleteNotice(articleId: Int): Response<YogaDetailResponse<Unit>>
+    suspend fun deleteNotice(articleId: Int): Response<YogaResponse<Unit>>
 
     // Home
     suspend fun getHomeList(): Response<YogaResponse<HomeData>>

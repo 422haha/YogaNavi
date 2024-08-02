@@ -10,21 +10,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class TeacherListViewModel @Inject constructor(
     private val infoRepository: InfoRepository
 ) : ViewModel() {
+
     private val _teacherList = MutableStateFlow<List<TeacherData>>(emptyList())
     val teacherList = _teacherList.asStateFlow()
     private var searchKeyword: String = ""
-    private var sorting: Int = 0
+    private val _sorting = MutableStateFlow(0)
+    val sorting = _sorting.asStateFlow()
     private var isInit: Boolean = true
 
-    fun initCheckGetTeacherList(filter: FilterData) {
-        Timber.d("싸피 init: ${isInit} sorting:${sorting} serach: ${searchKeyword} filter: ${filter}")
+    private fun initCheckGetTeacherList(filter: FilterData) {
         if (isInit) {
             getAllTeacherList()
         } else {
@@ -33,23 +33,25 @@ class TeacherListViewModel @Inject constructor(
     }
 
     private fun getTeacherList(filter: FilterData) = viewModelScope.launch(Dispatchers.IO) {
-        runCatching { infoRepository.getTeacherList(sorting, filter, searchKeyword) }
+        runCatching { infoRepository.getTeacherList(sorting.value, filter, searchKeyword) }
             .onSuccess { _teacherList.emit(it.data.toMutableList()) }
             .onFailure { it.printStackTrace() }
     }
 
     private fun getAllTeacherList() = viewModelScope.launch(Dispatchers.IO) {
-        runCatching { infoRepository.getAllTeacherList(sorting, searchKeyword) }
-            .onSuccess { _teacherList.emit(it.data.toMutableList())}
+        runCatching { infoRepository.getAllTeacherList(sorting.value, searchKeyword) }
+            .onSuccess { _teacherList.emit(it.data.toMutableList()) }
             .onFailure { it.printStackTrace() }
     }
 
-    fun teacherLikeToggle(filter: FilterData, teacherId: Int) =
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching { infoRepository.teacherLikeToggle(teacherId) }
-                .onSuccess { initCheckGetTeacherList(filter) }
-                .onFailure { it.printStackTrace() }
-        }
+    fun teacherLikeToggle(
+        filter: FilterData,
+        teacherId: Int
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        runCatching { infoRepository.teacherLikeToggle(teacherId) }
+            .onSuccess { initCheckGetTeacherList(filter) }
+            .onFailure { it.printStackTrace() }
+    }
 
     fun setSearchKeyword(filter: FilterData, newString: String?) {
         searchKeyword = newString ?: ""
@@ -60,13 +62,9 @@ class TeacherListViewModel @Inject constructor(
         return searchKeyword
     }
 
-    fun setSorting(newSorting: Int = 0, filter: FilterData) {
-        sorting = newSorting
+    suspend fun setSorting(newSorting: Int, filter: FilterData) {
+        _sorting.emit(newSorting)
         initCheckGetTeacherList(filter)
-    }
-
-    fun getSorting(): Int {
-        return sorting
     }
 
     fun setIsInit() {

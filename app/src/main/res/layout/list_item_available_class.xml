@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:layout_marginVertical="3dp"
-    app:cardCornerRadius="12dp"
-    app:strokeColor="@color/gray_10"
-    app:strokeWidth="1dp">
+    android:layout_height="wrap_content">
 
     <RadioButton
+        android:id="@+id/rv_available_class"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_small"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/custom_radio_selector"
+        android:button="@android:color/transparent"
         android:gravity="center"
         android:padding="@dimen/padding_medium"
         android:textColor="@color/gray_30"
-        android:button="@android:color/transparent"
         android:textSize="@dimen/text_medium"
-        tools:text="월,목 | 초보자도 쉽게 배우는 요가 | 09:00~10:00">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="월,목 | 초보자도 쉽게 배우는 요가 | 09:00~10:00" />
 
-    </RadioButton>
-</com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

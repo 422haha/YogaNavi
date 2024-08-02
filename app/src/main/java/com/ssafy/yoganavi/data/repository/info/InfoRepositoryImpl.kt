@@ -11,7 +11,9 @@ import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
+import com.ssafy.yoganavi.data.source.dto.teacher.LiveReserveRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
+import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
 import com.ssafy.yoganavi.data.source.info.InfoDataSource
 import com.ssafy.yoganavi.data.source.teacher.FilterData
 import com.ssafy.yoganavi.di.IoDispatcher
@@ -60,8 +62,31 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toListResponse()
     }
 
+    override suspend fun getTeacherDetail(teacherId: Int): DetailResponse<TeacherDetailData> {
+        val response = withContext(ioDispatcher) {
+            infoDataSource.getTeacherDetail(teacherId)
+        }
+        return response.toDetailResponse()
+    }
+
     override suspend fun teacherLikeToggle(teacherId: Int): DetailResponse<Boolean> {
         val response = withContext(ioDispatcher) { infoDataSource.teacherLikeToggle(teacherId) }
+        return response.toDetailResponse()
+    }
+
+    override suspend fun getAvailableClass(
+        teacherId: Int,
+        method: Int
+    ): ListResponse<LiveLectureData> {
+        val response =
+            withContext(ioDispatcher) { infoDataSource.getAvailableClass(teacherId, method) }
+        return response.toListResponse()
+    }
+
+    override suspend fun registerLive(
+        liveReserveRequest: LiveReserveRequest
+    ): DetailResponse<Unit> {
+        val response = withContext(ioDispatcher) { infoDataSource.registerLive(liveReserveRequest) }
         return response.toDetailResponse()
     }
 
@@ -159,9 +184,9 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toDetailResponse()
     }
 
-    override suspend fun deleteNotice(articleId: Int): DetailResponse<Unit> {
+    override suspend fun deleteNotice(articleId: Int): ListResponse<Unit> {
         val response = withContext(ioDispatcher) { infoDataSource.deleteNotice(articleId) }
-        return response.toDetailResponse()
+        return response.toListResponse()
     }
 
     override suspend fun getHomeList(): ListResponse<HomeData> {

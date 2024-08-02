@@ -11,8 +11,11 @@ import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
 import com.ssafy.yoganavi.ui.utils.MINI
 import com.ssafy.yoganavi.ui.utils.NOTICE
+import com.ssafy.yoganavi.ui.utils.uploadFile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -66,71 +69,102 @@ class RegisterNoticeViewModel @Inject constructor(
         _notice.emit(notice.value.copy(content = content))
     }
 
-    fun insertNotice(content: String, goBackStack: suspend () -> Unit) =
-        viewModelScope.launch(Dispatchers.IO) {
-            val uuid = UUID.randomUUID()
-            val imageUrlKey = "$NOTICE/$uuid"
-            val imageUrlSmallKey = "$NOTICE/$MINI/$uuid"
-            val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
-            val imageUrlSmall = s3Client.getUrl(BUCKET_NAME, imageUrlSmallKey)
-            if (notice.value.imageUrlPath.isNotBlank()) {
+    fun insertNotice(
+        content: String,
+        showLoadingView: suspend () -> Unit,
+        goBackStack: suspend () -> Unit,
+        uploadFail: suspend () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        showLoadingView()
 
-                val noticeFile = File(notice.value.imageUrlPath)
-                val miniFile = File(notice.value.imageUrlSmallPath)
+        val uuid = UUID.randomUUID()
+        val imageUrlKey = "$NOTICE/$uuid"
+        val imageUrlSmallKey = "$NOTICE/$MINI/$uuid"
+        val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
+        val imageUrlSmall = s3Client.getUrl(BUCKET_NAME, imageUrlSmallKey)
 
-                val metadata = ObjectMetadata().apply { contentType = "image/webp" }
-                transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile, metadata)
-                transferUtility.upload(BUCKET_NAME, imageUrlSmallKey, miniFile, metadata)
+        if (notice.value.imageUrlPath.isNotBlank()) {
+
+            val noticeFile = File(notice.value.imageUrlPath)
+            val miniFile = File(notice.value.imageUrlSmallPath)
+
+            val metadata = ObjectMetadata().apply { contentType = "image/webp" }
+            val uploadResults = awaitAll(
+                async { uploadFile(transferUtility, imageUrlKey, noticeFile, metadata) },
+                async { uploadFile(transferUtility, imageUrlSmallKey, miniFile, metadata) }
+            )
+
+            if (uploadResults.any { false }) {
+                uploadFail()
+                return@launch
             }
-            var request = RegisterNoticeRequest(
-                content = content,
+        }
+
+        var request = RegisterNoticeRequest(
+            content = content,
+            imageUrl = imageUrl.toString(),
+            imageUrlSmall = imageUrlSmall.toString()
+        )
+        if (notice.value.imageUrlPath.isBlank()) {
+            request = RegisterNoticeRequest(content = content, imageUrl = "")
+        }
+
+        runCatching { infoRepository.insertNotice(request) }
+            .onSuccess { goBackStack() }
+            .onFailure { it.printStackTrace() }
+    }
+
+    fun updateNotice(
+        content: String,
+        showLoadingView: suspend () -> Unit,
+        goBackStack: suspend () -> Unit,
+        uploadFail: suspend () -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        showLoadingView()
+
+        val uuid = UUID.randomUUID()
+        val imageUrlKey = "$NOTICE/$uuid"
+        val imageUrlSmallKey = "$NOTICE/$MINI/$uuid"
+        val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
+        val imageUrlSmall = s3Client.getUrl(BUCKET_NAME, imageUrlSmallKey)
+
+        if (notice.value.imageUrlPath.isNotBlank()) {
+            val noticeFile = File(notice.value.imageUrlPath)
+            val miniFile = File(notice.value.imageUrlSmallPath)
+            val metadata = ObjectMetadata().apply { contentType = "image/webp" }
+
+            val uploadResults = awaitAll(
+                async { uploadFile(transferUtility, imageUrlKey, noticeFile, metadata) },
+                async { uploadFile(transferUtility, imageUrlSmallKey, miniFile, metadata) }
+            )
+
+            if (uploadResults.any { false }) {
+                uploadFail()
+                return@launch
+            }
+
+            val newNotice = notice.value.copy(
                 imageUrl = imageUrl.toString(),
-                imageUrlSmall = imageUrlSmall.toString()
+                imageUrlSmall = imageUrlSmall.toString(),
             )
-            if(notice.value.imageUrlPath.isBlank()) {
-                request = RegisterNoticeRequest(content=content, imageUrl = "")
-            }
-            runCatching { infoRepository.insertNotice(request) }
-                .onSuccess { goBackStack() }
-                .onFailure { it.printStackTrace() }
+            _notice.emit(newNotice)
+
+        } else {
+            val prevUrl = notice.value.imageUrl?.substringBefore("?")
+            val prevUrlSmall = notice.value.imageUrlSmall?.substringBefore("?")
+            val newNotice = notice.value.copy(imageUrl = prevUrl, imageUrlSmall = prevUrlSmall)
+            _notice.emit(newNotice)
         }
 
-    fun updateNotice(content: String, goBackStack: suspend () -> Unit) =
-        viewModelScope.launch(Dispatchers.IO) {
-            val uuid = UUID.randomUUID()
-            val imageUrlKey = "$NOTICE/$uuid"
-            val imageUrlSmallKey = "$NOTICE/$MINI/$uuid"
-            val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
-            val imageUrlSmall = s3Client.getUrl(BUCKET_NAME, imageUrlSmallKey)
+        val request = RegisterNoticeRequest(
+            content = content,
+            imageUrl = notice.value.imageUrl,
+            imageUrlSmall = notice.value.imageUrlSmall
+        )
 
-            if (notice.value.imageUrlPath.isNotBlank()) {
-                val noticeFile = File(notice.value.imageUrlPath)
-                val miniFile = File(notice.value.imageUrlSmallPath)
-                val metadata = ObjectMetadata().apply { contentType = "image/webp" }
+        runCatching { infoRepository.updateNotice(request, notice.value.articleId) }
+            .onSuccess { goBackStack() }
+            .onFailure { it.printStackTrace() }
+    }
 
-                transferUtility.upload(BUCKET_NAME, imageUrlKey, noticeFile, metadata)
-                transferUtility.upload(BUCKET_NAME, imageUrlSmallKey, miniFile, metadata)
-
-                val newNotice = notice.value.copy(
-                    imageUrl = imageUrl.toString(),
-                    imageUrlSmall = imageUrlSmall.toString(),
-                )
-                _notice.emit(newNotice)
-            } else {
-                val prevUrl = notice.value.imageUrl?.substringBefore("?")
-                val prevUrlSmall = notice.value.imageUrlSmall?.substringBefore("?")
-                val newNotice = notice.value.copy(imageUrl = prevUrl, imageUrlSmall = prevUrlSmall)
-                _notice.emit(newNotice)
-            }
-
-            val request = RegisterNoticeRequest(
-                content = content,
-                imageUrl = notice.value.imageUrl,
-                imageUrlSmall = notice.value.imageUrlSmall
-            )
-
-            runCatching { infoRepository.updateNotice(request, notice.value.articleId) }
-                .onSuccess { goBackStack() }
-                .onFailure { it.printStackTrace() }
-        }
 }

@@ -15,10 +15,11 @@ import javax.inject.Inject
 class LectureDetailViewModel @Inject constructor(
     private val infoRepository: InfoRepository
 ) : ViewModel() {
+    private val retriever = MediaMetadataRetriever()
 
     fun getLecture(
         recordId: Long,
-        bindData: suspend (LectureDetailData) -> Unit
+        bindData: suspend (LectureDetailData) -> Unit,
     ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.getLecture(recordId) }
             .onSuccess { it.data?.let { data -> bindData(data) } }
@@ -26,7 +27,6 @@ class LectureDetailViewModel @Inject constructor(
     }
 
     fun getVideoInfo(uri: String) = viewModelScope.async(Dispatchers.IO) {
-        val retriever = MediaMetadataRetriever()
         val bitmap = runCatching {
             retriever.setDataSource(uri, HashMap())
             retriever.getFrameAtTime(0L)
@@ -36,8 +36,11 @@ class LectureDetailViewModel @Inject constructor(
             retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()
         }.getOrNull()
 
-        retriever.release()
         return@async Pair(bitmap, duration)
     }
 
+    override fun onCleared() {
+        retriever.release()
+        super.onCleared()
+    }
 }

@@ -39,18 +39,20 @@ class RegisterVideoViewModel @Inject constructor(
 
     private var lectureDetailData = LectureDetailData()
 
-    fun getLecture(recordId: Long, setView: suspend (LectureDetailData) -> Unit) =
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching { infoRepository.getLecture(recordId) }
-                .onSuccess {
-                    it.data?.let { lecture ->
-                        setView(lecture)
-                        lectureDetailData = lecture
-                        _chapterList.emit(lecture.recordedLectureChapters)
-                    }
+    fun getLecture(
+        recordId: Long,
+        setView: suspend (LectureDetailData) -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        runCatching { infoRepository.getLecture(recordId) }
+            .onSuccess {
+                it.data?.let { lecture ->
+                    setView(lecture)
+                    lectureDetailData = lecture
+                    _chapterList.emit(lecture.recordedLectureChapters)
                 }
-                .onFailure { it.printStackTrace() }
-        }
+            }
+            .onFailure { it.printStackTrace() }
+    }
 
     fun deleteChapter(data: VideoChapterData) = viewModelScope.launch(Dispatchers.IO) {
         val list = chapterList.value.toMutableList()
@@ -193,7 +195,7 @@ class RegisterVideoViewModel @Inject constructor(
             }
         }
             .onSuccess { onSuccess() }
-            .onFailure { onFailure(NO_RESPONSE) }
+            .onFailure { it.printStackTrace() }
     }
 
     fun setChapterList(list: MutableList<VideoChapterData>) {

@@ -15,17 +15,19 @@ const val MEMBER = "members"
 const val TOKEN = "Authorization"
 const val FCM_TOKEN = "FCM_Token"
 const val REFRESH_TOKEN = "Refresh-Token"
-const val NEED_REFRESH_TOKEN = "refresh_token_required"
-const val TOKEN_REQUIRED = "token_required"
+const val NEED_REFRESH_TOKEN = "세션이 만료되었습니다."
+const val TOKEN_REQUIRED = "Refresh-Token-Request"
 const val PAGE_SIZE = 30
-
+const val END_TIME = "00:00"
 
 // 수신부
 const val FORBIDDEN = 403
+const val UNAUTHORIZED = 401
 const val NO_AUTH = "권한이 없습니다."
 const val NO_RESPONSE = "에러가 발생했습니다."
 const val IS_BLANK = "빈칸을 확인해주세요!"
 const val PASSWORD_DIFF = "비밀번호가 일치하지 않습니다."
+const val SESSION_END = "세션이 만료되었습니다."
 
 // 타이틀
 const val MY_PAGE = "마이 페이지"
@@ -59,6 +61,7 @@ const val VIDEO = "videos"
 const val REGISTER = "등록"
 const val EDIT = "편집"
 const val DELETE = "삭제"
+const val RESERVATION = "예약"
 const val MAX_HASH_TAG = 5
 const val IS_MAX_HASH_TAG = "해시태그는 5개까지만 등록하실 수 있습니다."
 const val LECTURE_LIST = "강의 찾기"
@@ -66,6 +69,10 @@ const val LECTURE = "강의"
 const val FAME = "fame"
 const val DATE = "date"
 const val ANY_CHECK_BOX = "찾을 파트를 선택해주세요!"
+const val SELECT_CLASS = "수업방식을 선택하세요."
+const val NOTHING = "수강가능한 수업이 없습니다."
+const val PICK_DATE = "날짜를 선택하세요."
+const val UPLOAD_FAIL = "업로드에 실패했습니다."
 
 // 캘린더, 타임 Picker
 const val START = 1
@@ -74,9 +81,12 @@ const val END = 2
 // 강의 Header, Item
 const val HEADER = 1
 const val ITEM = 2
+const val ITEM_LECTURE = 2
+const val ITEM_NOTICE = 3
 
 // 화상강의 등록
 const val END_STR = "종료 날짜"
+
 enum class Week(val hangle: String) {
     MON("월"),
     TUE("화"),
@@ -84,7 +94,9 @@ enum class Week(val hangle: String) {
     THU("목"),
     FRI("금"),
     SAT("토"),
-    SUN("일") }
+    SUN("일")
+}
+
 data class DayStatus(val day: Week, var isSelected: Boolean)
 
 // FCM

@@ -12,7 +12,6 @@ import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.teacher.FilterData
 import com.ssafy.yoganavi.databinding.FragmentFilterBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
-import com.ssafy.yoganavi.ui.homeUI.teacher.teacherList.TeacherListFragmentArgs
 import com.ssafy.yoganavi.ui.utils.END
 import com.ssafy.yoganavi.ui.utils.FILTER
 import com.ssafy.yoganavi.ui.utils.START
@@ -33,7 +32,7 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
             binding.btnStartTime.text = "00:00"
             viewModel.filter.startTime = 0L
             binding.btnEndTime.text = "23:59"
-            viewModel.filter.startTime = 86340000L
+            viewModel.filter.endTime = 86340000L
             binding.ibtnMon.isChecked = true
             binding.ibtnTue.isChecked = true
             binding.ibtnWed.isChecked = true
@@ -75,7 +74,8 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
                 .toString() else "00"
 
         viewModel.filter.day.split(",").forEach {
-            viewModel.dayStatusMap[Week.valueOf(it.trim())] = true
+            if (it.isNotBlank())
+                viewModel.dayStatusMap[Week.valueOf(it.trim())] = true
         }
         weekToggleButtonMap.forEach { (day, toggleBtn) ->
             toggleBtn.isChecked = viewModel.dayStatusMap[day] ?: false
