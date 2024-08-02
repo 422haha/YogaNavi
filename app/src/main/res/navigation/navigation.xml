@@ -238,7 +238,12 @@
         android:id="@+id/modifyFragment"
         android:name="com.ssafy.yoganavi.ui.homeUI.myPage.modify.ModifyFragment"
         android:label="fragment_modify"
-        tools:layout="@layout/fragment_modify" />
+        tools:layout="@layout/fragment_modify">
+        <argument
+            android:name="isTeacher"
+            android:defaultValue="false"
+            app:argType="boolean" />
+    </fragment>
 
     <fragment
         android:id="@+id/managementVideoFragment"

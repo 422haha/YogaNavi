@@ -13,6 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
@@ -28,6 +29,7 @@ import com.ssafy.yoganavi.ui.utils.MAX_HASH_TAG
 import com.ssafy.yoganavi.ui.utils.MODIFY
 import com.ssafy.yoganavi.ui.utils.NO_AUTH
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
+import com.ssafy.yoganavi.ui.utils.UPLOAD_FAIL
 import com.ssafy.yoganavi.ui.utils.getImagePath
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +39,7 @@ import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding::inflate) {
+    private val args by navArgs<ModifyFragmentArgs>()
     private val viewModel: ModifyViewModel by viewModels()
     private val hashTagAdapter by lazy { HashTagAdapter(::deleteHashTag) }
     private val imageUriLauncher =
@@ -60,10 +63,19 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
         super.onViewCreated(view, savedInstanceState)
         setToolbar(false, MODIFY, true)
 
+        checkTeacher()
         initAdapter()
         initListener()
         getProfile()
         initCollect()
+    }
+
+    private fun checkTeacher() = with(binding) {
+        if (!args.isTeacher) {
+            tvHashtag.visibility = View.GONE
+            tilHashTag.visibility = View.GONE
+            tieHashTag.visibility = View.GONE
+        }
     }
 
     private fun deleteHashTag(index: Int) = viewModel.deleteHashTag(index)
@@ -116,7 +128,7 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
         check.setOnClickListener {
             val nickname = tieNn.text?.toString() ?: ""
             val password = tiePw.text?.toString() ?: ""
-            viewModel.modifyProfile(nickname, password, ::isModified)
+            viewModel.modifyProfile(nickname, password, ::isModified, ::loadingView, ::failToUpload)
         }
 
         tiePw.addTextChangedListener { editText ->
@@ -169,5 +181,16 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
             is DetailResponse.Error -> showSnackBar(event.message)
             is DetailResponse.Success -> moveToBackStack()
         }
+    }
+
+    private suspend fun loadingView() = withContext(Dispatchers.Main) {
+        binding.vBg.visibility = View.VISIBLE
+        binding.lav.visibility = View.VISIBLE
+    }
+
+    private suspend fun failToUpload() = withContext(Dispatchers.Main) {
+        binding.vBg.visibility = View.VISIBLE
+        binding.lav.visibility = View.GONE
+        showSnackBar(UPLOAD_FAIL)
     }
 }
