@@ -1,6 +1,5 @@
 package com.yoga.backend.teacher.controller;
 
-import com.yoga.backend.common.entity.Reservation;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureDto;
 import com.yoga.backend.teacher.dto.ReservationRequestDto;
 import com.yoga.backend.teacher.service.ReservationService;
@@ -15,12 +14,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * 예약 컨트롤러 클래스 강의 예약 생성 및 조회에 대한 API 엔드포인트를 제공
+ */
 @RestController
 @RequestMapping("/teacher/reserve")
 public class ReservationController {
 
-    private final ReservationService reservationService;
-    private final JwtUtil jwtUtil;
+    private final ReservationService reservationService; // 예약 서비스
+    private final JwtUtil jwtUtil; // JWT 유틸리티
 
     @Autowired
     public ReservationController(ReservationService reservationService, JwtUtil jwtUtil) {
@@ -28,13 +30,20 @@ public class ReservationController {
         this.jwtUtil = jwtUtil;
     }
 
+    /**
+     * 예약 생성 메서드
+     *
+     * @param reservationRequest 예약 요청 DTO
+     * @param token              인증 토큰
+     * @return 예약 생성 결과
+     */
     @PostMapping
     public ResponseEntity<Map<String, Object>> createReservation(
         @RequestBody ReservationRequestDto reservationRequest,
         @RequestHeader("Authorization") String token) {
-        int userId = jwtUtil.getUserIdFromToken(token);
+        int userId = jwtUtil.getUserIdFromToken(token); // 토큰에서 사용자 ID 추출
         try {
-            reservationService.createReservation(userId, reservationRequest);
+            reservationService.createReservation(userId, reservationRequest); // 예약 생성
             Map<String, Object> response = new HashMap<>();
             response.put("message", "성공");
             response.put("data", null);
@@ -47,15 +56,24 @@ public class ReservationController {
         }
     }
 
+    /**
+     * 실시간 강의 조회 메서드
+     *
+     * @param token  인증 토큰
+     * @param method 조회 방법
+     * @return 실시간 강의 목록
+     */
     @GetMapping
     public ResponseEntity<Map<String, Object>> getLiveLectures(
         @RequestHeader("Authorization") String token,
         @RequestParam int method) {
         try {
-            List<LiveLectureDto> liveLectures = reservationService.getAllLiveLectures(method);
+            List<LiveLectureDto> liveLectures = reservationService.getAllLiveLectures(
+                method); // 모든 실시간 강의 조회
             Map<String, Object> response = new HashMap<>();
             response.put("message", "성공");
-            response.put("data", liveLectures.stream().map(this::convertToResponse).collect(Collectors.toList()));
+            response.put("data",
+                liveLectures.stream().map(this::convertToResponse).collect(Collectors.toList()));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();
@@ -65,33 +83,24 @@ public class ReservationController {
         }
     }
 
-    @GetMapping("/user")
-    public ResponseEntity<Map<String, Object>> getUserReservations(
-        @RequestHeader("Authorization") String token) {
-        int userId = jwtUtil.getUserIdFromToken(token);
-        try {
-            List<Reservation> reservations = reservationService.getUserReservations(userId);
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "성공");
-            response.put("data", reservations);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "서버 내부 오류가 발생했습니다: " + e.getMessage());
-            errorResponse.put("data", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
-    }
-
+    /**
+     * 강사별 실시간 강의 조회 메서드
+     *
+     * @param teacherId 강사 ID
+     * @param method    조회 방법
+     * @return 강사의 실시간 강의 목록
+     */
     @GetMapping("/{teacherId}")
     public ResponseEntity<Map<String, Object>> getLiveLecturesByTeacherAndMethod(
         @PathVariable int teacherId,
         @RequestParam int method) {
         try {
-            List<LiveLectureDto> liveLectures = reservationService.getLiveLecturesByTeacherAndMethod(teacherId, method);
+            List<LiveLectureDto> liveLectures = reservationService.getLiveLecturesByTeacherAndMethod(
+                teacherId, method); // 강사별 실시간 강의 조회
             Map<String, Object> response = new HashMap<>();
             response.put("message", "성공");
-            response.put("data", liveLectures.stream().map(this::convertToResponse).collect(Collectors.toList()));
+            response.put("data",
+                liveLectures.stream().map(this::convertToResponse).collect(Collectors.toList()));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();
@@ -101,15 +110,21 @@ public class ReservationController {
         }
     }
 
+    /**
+     * LiveLectureDto를 Map 형태로 변환하는 메서드
+     *
+     * @param dto LiveLectureDto 객체
+     * @return 변환된 Map 객체
+     */
     private Map<String, Object> convertToResponse(LiveLectureDto dto) {
         Map<String, Object> response = new HashMap<>();
-        response.put("liveId", dto.getLiveId());
-        response.put("liveTitle", dto.getLiveTitle());
-        response.put("availableDay", dto.getAvailableDay());
-        response.put("startDate", dto.getStartDate().toEpochMilli());
-        response.put("endDate", dto.getEndDate().toEpochMilli());
-        response.put("startTime", dto.getStartTime().toEpochMilli());
-        response.put("endTime", dto.getEndTime().toEpochMilli());
+        response.put("liveId", dto.getLiveId()); // 실시간 강의 ID
+        response.put("liveTitle", dto.getLiveTitle()); // 실시간 강의 제목
+        response.put("availableDay", dto.getAvailableDay()); // 실시간 강의 가능한 요일
+        response.put("startDate", dto.getStartDate().toEpochMilli()); // 실시간 강의 시작 날짜
+        response.put("endDate", dto.getEndDate().toEpochMilli()); // 실시간 강의 종료 날짜
+        response.put("startTime", dto.getStartTime().toEpochMilli()); // 실시간 강의 시작 시간
+        response.put("endTime", dto.getEndTime().toEpochMilli()); // 실시간 강의 종료 시간
         return response;
     }
 }
