@@ -44,6 +44,7 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.noticeList.collectLatest {
+                checkEmptyList(it)
                 noticeAdapter.submitList(it)
             }
         }

@@ -8,6 +8,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.yoganavi.databinding.FragmentLectureListBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
@@ -53,6 +54,14 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
                     super.onItemRangeChanged(positionStart, itemCount)
                 }
             })
+
+            addLoadStateListener { loadState ->
+                val isListEmpty = loadState.refresh is LoadState.NotLoading &&
+                        this.itemCount == 0 && loadState.append.endOfPaginationReached
+
+                if (isListEmpty) setEmptyView(true)
+                else setEmptyView(false)
+            }
         }
     }
 

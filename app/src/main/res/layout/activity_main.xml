@@ -78,6 +78,12 @@
         app:layout_constraintTop_toBottomOf="@id/divider"
         app:navGraph="@navigation/navigation" />
 
+
+    <include
+        android:id="@+id/cl_empty"
+        layout="@layout/fragment_empty"
+        android:visibility="invisible" />
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bnv"
         style="@style/BottomNavigationViewNoRipple"

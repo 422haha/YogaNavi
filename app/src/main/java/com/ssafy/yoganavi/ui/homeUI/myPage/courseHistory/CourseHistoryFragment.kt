@@ -40,6 +40,7 @@ class CourseHistoryFragment : BaseFragment<FragmentCourseHistoryBinding>(
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.courseHistoryList.collectLatest {
+                checkEmptyList(it)
                 courseHistoryAdapter.submitList(it)
             }
         }
