@@ -355,4 +355,66 @@ public class NotificationService {
                 throw new IllegalArgumentException("Invalid day: " + day);
         }
     }
+
+    /**
+     * 강의 일정 업데이트 알림 전송
+     *
+     * @param updatedLecture 업데이트된 강의 정보
+     */
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void sendLectureUpdateNotification(LiveLectures updatedLecture) {
+        List<MyLiveLecture> participants = myLiveLectureRepository.findByLiveLectureIdWithUser(updatedLecture.getLiveId());
+
+        Map<String, Map<String, String>> notifications = new HashMap<>();
+        String message = String.format("%s 강의의 일정이 업데이트되었습니다.", updatedLecture.getLiveTitle());
+
+        for (MyLiveLecture participant : participants) {
+            Users user = participant.getUser();
+            if (user != null && user.getFcmToken() != null) {
+                Map<String, String> notificationData = new HashMap<>();
+                notificationData.put("body", message);
+                notificationData.put("liveId", updatedLecture.getLiveId().toString());
+                notifications.put(user.getFcmToken(), notificationData);
+            }
+        }
+
+        try {
+            if (!notifications.isEmpty()) {
+                fcmService.sendBatchMessagesWithData("강의 일정 업데이트", notifications);
+                log.info("강의 ID: {}의 일정 업데이트 알림 {} 명에게 전송", updatedLecture.getLiveId(), notifications.size());
+            }
+        } catch (FirebaseMessagingException e) {
+            log.error("강의 일정 업데이트 알림 전송 중 오류 발생", e);
+        }
+    }
+
+    /**
+     * 강의 삭제 알림 전송
+     *
+     * @param myLiveLectures 삭제할 강의들 정보
+     */
+    public void sendLectureDeletionNotification(LiveLectures lecture,
+        List<MyLiveLecture> myLiveLectures) {
+        String message = String.format("강의 '%s'가 삭제되었습니다.", lecture.getLiveTitle());
+        Map<String, Map<String, String>> notifications = new HashMap<>();
+
+        for (MyLiveLecture myLiveLecture : myLiveLectures) {
+            Users user = myLiveLecture.getUser();
+            if (user != null && user.getFcmToken() != null) {
+                Map<String, String> notificationData = new HashMap<>();
+                notificationData.put("body", message);
+                notificationData.put("liveId", lecture.getLiveId().toString());
+                notifications.put(user.getFcmToken(), notificationData);
+            }
+        }
+
+        try {
+            if (!notifications.isEmpty()) {
+                fcmService.sendBatchMessagesWithData("강의 삭제 알림", notifications);
+                log.info("강의 삭제 알림 {} 명에게 전송", notifications.size());
+            }
+        } catch (Exception e) {
+            log.error("강의 삭제 알림 전송 중 오류 발생", e);
+        }
+    }
 }

@@ -3,11 +3,16 @@ package com.yoga.backend.teacher.dto;
 import java.util.Set;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * 강사 DTO 클래스
  */
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Builder
 public class TeacherDto {
 

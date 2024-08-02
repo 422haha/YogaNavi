@@ -81,24 +81,9 @@ public class LiveLectureController {
 
         List<LiveLectures> lectureList = liveLectureService.getLiveLecturesByUserId(userId);
 
-        List<LiveLectureResponseDto> responseList = lectureList.stream().map(lecture -> {
-            LiveLectureResponseDto dto = new LiveLectureResponseDto();
-            dto.setLiveId(lecture.getLiveId());
-            dto.setRegDate(lecture.getRegDate().toEpochMilli());
-            dto.setUserId(lecture.getUser().getId());
-            dto.setNickname(lecture.getUser().getNickname());
-            dto.setProfileImageUrl(lecture.getUser().getProfile_image_url());
-            dto.setProfileImageUrlSmall(lecture.getUser().getProfile_image_url_small());
-            dto.setLiveTitle(lecture.getLiveTitle());
-            dto.setLiveContent(lecture.getLiveContent());
-            dto.setAvailableDay(lecture.getAvailableDay());
-            dto.setStartDate(lecture.getStartDate().toEpochMilli());
-            dto.setStartTime(lecture.getStartTime().toEpochMilli());
-            dto.setEndDate(lecture.getEndDate().toEpochMilli());
-            dto.setEndTime(lecture.getEndTime().toEpochMilli());
-            dto.setMaxLiveNum(lecture.getMaxLiveNum());
-            return dto;
-        }).collect(Collectors.toList());
+        List<LiveLectureResponseDto> responseList = lectureList.stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
 
         response.put("message", "화상 강의 조회 성공");
         response.put("data", responseList);
@@ -151,21 +136,7 @@ public class LiveLectureController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
             }
 
-            LiveLectureResponseDto dto = new LiveLectureResponseDto();
-            dto.setLiveId(lecture.getLiveId());
-            dto.setRegDate(lecture.getRegDate().toEpochMilli());
-            dto.setUserId(lecture.getUser().getId());
-            dto.setNickname(lecture.getUser().getNickname());
-            dto.setProfileImageUrl(lecture.getUser().getProfile_image_url());
-            dto.setProfileImageUrlSmall(lecture.getUser().getProfile_image_url_small());
-            dto.setLiveTitle(lecture.getLiveTitle());
-            dto.setLiveContent(lecture.getLiveContent());
-            dto.setAvailableDay(lecture.getAvailableDay());
-            dto.setStartDate(lecture.getStartDate().toEpochMilli());
-            dto.setStartTime(lecture.getStartTime().toEpochMilli());
-            dto.setEndDate(lecture.getEndDate().toEpochMilli());
-            dto.setEndTime(lecture.getEndTime().toEpochMilli());
-            dto.setMaxLiveNum(lecture.getMaxLiveNum());
+            LiveLectureResponseDto dto = convertToDto(lecture);
 
             response.put("message", "조회에 성공했습니다");
             response.put("data", dto);
@@ -207,5 +178,24 @@ public class LiveLectureController {
             response.put("data", null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+
+    private LiveLectureResponseDto convertToDto(LiveLectures lecture) {
+        LiveLectureResponseDto dto = new LiveLectureResponseDto();
+        dto.setLiveId(lecture.getLiveId());
+        dto.setRegDate(lecture.getRegDate().toEpochMilli());
+        dto.setUserId(lecture.getUser().getId());
+        dto.setNickname(lecture.getUser().getNickname());
+        dto.setProfileImageUrl(lecture.getUser().getProfile_image_url());
+        dto.setProfileImageUrlSmall(lecture.getUser().getProfile_image_url_small());
+        dto.setLiveTitle(lecture.getLiveTitle());
+        dto.setLiveContent(lecture.getLiveContent());
+        dto.setAvailableDay(lecture.getAvailableDay());
+        dto.setStartDate(lecture.getStartDate().toEpochMilli());
+        dto.setStartTime(lecture.getStartTime().toEpochMilli());
+        dto.setEndDate(lecture.getEndDate().toEpochMilli());
+        dto.setEndTime(lecture.getEndTime().toEpochMilli());
+        dto.setMaxLiveNum(lecture.getMaxLiveNum());
+        return dto;
     }
 }
