@@ -1,4 +1,4 @@
-package com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter
+package com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,6 +6,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ssafy.yoganavi.databinding.CustomChapterViewBinding
 import com.ssafy.yoganavi.databinding.CustomThumbnailViewBinding
+import com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.data.ChapterItem
+import com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.viewHolder.ThumbnailViewHolder
+import com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.viewHolder.VideoViewHolder
 import com.ssafy.yoganavi.ui.utils.HEADER
 import com.ssafy.yoganavi.ui.utils.ITEM
 
@@ -13,14 +16,17 @@ class ChapterAdapter(
     private val addImage: () -> Unit,
     private val addVideoListener: (Int) -> Unit,
     private val deleteListener: (Int) -> Unit,
-    private val getVideo: (String, CustomChapterViewBinding) -> Unit
+    private val changeThumbnailTitle: (String) -> Unit,
+    private val changeThumbnailContent: (String) -> Unit,
+    private val changeVideoTitle: (String, Int) -> Unit,
+    private val changeVideoContent: (String, Int) -> Unit
 ) : ListAdapter<ChapterItem, ViewHolder>(ChapterDiffUtil()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            HEADER -> makeThumbnailViewHolder(inflater, parent, addImage)
-            ITEM -> makeVideoViewHolder(inflater, parent, addVideoListener, deleteListener, getVideo)
+            HEADER -> makeThumbnailViewHolder(inflater, parent)
+            ITEM -> makeVideoViewHolder(inflater, parent)
             else -> throw ClassCastException("Unknown viewType $viewType")
         }
     }
@@ -29,7 +35,7 @@ class ChapterAdapter(
         val item: ChapterItem = currentList[position]
         when (holder) {
             is ThumbnailViewHolder -> holder.bind((item as ChapterItem.ImageItem).thumbnailData)
-            is VideoViewHolder -> holder.bind((item as ChapterItem.VideoItem).videoChapterData)
+            is VideoViewHolder -> holder.bind((item as ChapterItem.VideoItem).videoData)
         }
     }
 
@@ -42,21 +48,28 @@ class ChapterAdapter(
 
     private fun makeThumbnailViewHolder(
         inflater: LayoutInflater,
-        parent: ViewGroup,
-        addImage: () -> Unit
+        parent: ViewGroup
     ): ThumbnailViewHolder {
         val binding = CustomThumbnailViewBinding.inflate(inflater, parent, false)
-        return ThumbnailViewHolder(binding, addImage)
+        return ThumbnailViewHolder(
+            binding = binding,
+            addImage = addImage,
+            changeThumbnailTitle = changeThumbnailTitle,
+            changeThumbnailContent = changeThumbnailContent
+        )
     }
 
     private fun makeVideoViewHolder(
         inflater: LayoutInflater,
-        parent: ViewGroup,
-        addVideoListener: (Int) -> Unit,
-        deleteListener: (Int) -> Unit,
-        getVideo: (String, CustomChapterViewBinding) -> Unit
+        parent: ViewGroup
     ): VideoViewHolder {
         val binding = CustomChapterViewBinding.inflate(inflater, parent, false)
-        return VideoViewHolder(binding, addVideoListener, deleteListener, getVideo)
+        return VideoViewHolder(
+            binding = binding,
+            addVideoListener = addVideoListener,
+            deleteListener = deleteListener,
+            changeVideoTitle = changeVideoTitle,
+            changeVideoContent = changeVideoContent
+        )
     }
 }
