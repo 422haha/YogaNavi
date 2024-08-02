@@ -1,6 +1,5 @@
 package com.ssafy.yoganavi.data.source.info
 
-import com.ssafy.yoganavi.data.repository.response.ListResponse
 import com.ssafy.yoganavi.data.source.dto.home.HomeData
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
@@ -8,6 +7,7 @@ import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
+import com.ssafy.yoganavi.data.source.dto.teacher.LiveReserveRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
 import com.ssafy.yoganavi.data.source.response.YogaDetailResponse
@@ -37,7 +37,12 @@ interface InfoDataSource {
 
     suspend fun teacherLikeToggle(teacherId: Int): Response<YogaDetailResponse<Boolean>>
 
-    suspend fun getAvailableClass(teacherId: Int,method: Int): Response<YogaResponse<LiveLectureData>>
+    suspend fun getAvailableClass(
+        teacherId: Int,
+        method: Int
+    ): Response<YogaResponse<LiveLectureData>>
+
+    suspend fun registerLive(liveReserveRequest: LiveReserveRequest): Response<YogaDetailResponse<Unit>>
 
     // LECTURE
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>

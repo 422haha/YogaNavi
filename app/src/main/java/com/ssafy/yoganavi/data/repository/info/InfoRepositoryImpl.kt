@@ -11,6 +11,7 @@ import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
+import com.ssafy.yoganavi.data.source.dto.teacher.LiveReserveRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
 import com.ssafy.yoganavi.data.source.info.InfoDataSource
@@ -80,6 +81,13 @@ class InfoRepositoryImpl @Inject constructor(
         val response =
             withContext(ioDispatcher) { infoDataSource.getAvailableClass(teacherId, method) }
         return response.toListResponse()
+    }
+
+    override suspend fun registerLive(
+        liveReserveRequest: LiveReserveRequest
+    ): DetailResponse<Unit> {
+        val response = withContext(ioDispatcher) { infoDataSource.registerLive(liveReserveRequest) }
+        return response.toDetailResponse()
     }
 
     // LECTURE
