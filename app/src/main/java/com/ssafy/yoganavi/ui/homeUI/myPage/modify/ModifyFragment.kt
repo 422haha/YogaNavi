@@ -102,8 +102,8 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.hashtagList.collectLatest { hashtagList ->
-                hashTagAdapter.submitList(hashtagList)
+            viewModel.hashtagList.collectLatest { hashtagSet ->
+                hashTagAdapter.submitList(hashtagSet.toList())
             }
         }
     }

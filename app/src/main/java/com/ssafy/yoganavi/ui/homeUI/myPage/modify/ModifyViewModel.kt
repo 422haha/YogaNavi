@@ -28,8 +28,8 @@ class ModifyViewModel @Inject constructor(
     private val s3Client: AmazonS3Client
 ) : ViewModel() {
 
-    private val _hashtagList: MutableStateFlow<List<String>> = MutableStateFlow(emptyList())
-    val hashtagList: StateFlow<List<String>> = _hashtagList.asStateFlow()
+    private val _hashtagList: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet())
+    val hashtagList: StateFlow<Set<String>> = _hashtagList.asStateFlow()
     var profile = Profile()
 
     fun getProfile(bindData: suspend (Profile) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
@@ -43,7 +43,7 @@ class ModifyViewModel @Inject constructor(
                     imageUrlSmall = data.imageUrlSmall,
                     teacher = data.teacher
                 )
-                _hashtagList.emit(data.hashTags)
+                _hashtagList.emit(data.hashTags.toSet())
                 bindData(data)
             }
         }.onFailure {
@@ -52,7 +52,7 @@ class ModifyViewModel @Inject constructor(
     }
 
     fun addHashTag(hashTag: String) = viewModelScope.launch(Dispatchers.IO) {
-        val newList = hashtagList.value.toMutableList()
+        val newList = hashtagList.value.toMutableSet()
         newList.add(hashTag)
         _hashtagList.emit(newList)
     }
@@ -60,7 +60,7 @@ class ModifyViewModel @Inject constructor(
     fun deleteHashTag(index: Int) = viewModelScope.launch(Dispatchers.IO) {
         val newList = hashtagList.value.toMutableList()
         newList.removeAt(index)
-        _hashtagList.emit(newList)
+        _hashtagList.emit(newList.toSet())
     }
 
     fun modifyProfile(
@@ -71,7 +71,7 @@ class ModifyViewModel @Inject constructor(
         profile = profile.copy(
             nickname = nickname,
             password = password,
-            hashTags = hashtagList.value
+            hashTags = hashtagList.value.toList()
         )
 
         if (profile.logoPath.isNotBlank()) {
