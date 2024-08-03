@@ -110,4 +110,9 @@
     <style name="DialogButtonStyled" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">@color/black</item>
     </style>
+
+    <style name="GoButtonStyle" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:backgroundTint">@color/primary</item>
+    </style>
 </resources>

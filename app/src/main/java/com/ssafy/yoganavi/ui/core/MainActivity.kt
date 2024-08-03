@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -20,6 +21,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.snackbar.Snackbar
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.ActivityMainBinding
+import com.ssafy.yoganavi.ui.homeUI.schedule.home.HomeFragment
 import com.ssafy.yoganavi.ui.utils.AuthManager
 import com.ssafy.yoganavi.ui.utils.PermissionHandler
 import com.ssafy.yoganavi.ui.utils.SESSION_END
@@ -112,6 +114,18 @@ class MainActivity : AppCompatActivity() {
     private fun CoroutineScope.collectEmptyEvent() = launch {
         viewModel.emptyEvent.collectLatest { isEmpty ->
             if (isEmpty) {
+                binding.clEmpty.tvEmpty.text = viewModel.emptyData.value.emptyName
+                if (viewModel.emptyData.value.gotoBtnName.isNullOrEmpty() || viewModel.emptyData.value.gotoClass == null) {
+                    binding.clEmpty.button2.isVisible = false
+                } else {
+                    binding.clEmpty.button2.isVisible = true
+                    binding.clEmpty.button2.text = viewModel.emptyData.value.gotoBtnName
+                    binding.clEmpty.button2.setOnClickListener {
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.fl, viewModel.emptyData.value.gotoClass ?: HomeFragment())
+                            .commit()
+                    }
+                }
                 delay(500)
                 binding.clEmpty.root.visibility = View.VISIBLE
             } else {
