@@ -3,9 +3,10 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.viewHolder
 import android.view.View
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.databinding.CustomThumbnailViewBinding
 import com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.data.ThumbnailData
+import com.ssafy.yoganavi.ui.utils.loadImageSequentially
+import com.ssafy.yoganavi.ui.utils.loadOriginalImage
 
 class ThumbnailViewHolder(
     private val binding: CustomThumbnailViewBinding,
@@ -17,22 +18,19 @@ class ThumbnailViewHolder(
     fun bind(thumbnailData: ThumbnailData) = with(binding) {
         initListener()
 
-        etTitle.setText(thumbnailData.recordTitle)
-        etContent.setText(thumbnailData.recordContent)
+        thumbnailData.recordTitle?.let { etTitle.setText(it) }
+        thumbnailData.recordContent?.let { etContent.setText(it) }
 
-        val uri = when {
-            thumbnailData.recordThumbnailPath.isNotBlank() -> thumbnailData.recordThumbnailPath
-            thumbnailData.recordThumbnail.isNotBlank() -> thumbnailData.recordThumbnail
-            else -> ""
-        }
+        val thumbnail = thumbnailData.recordThumbnail
+        val miniThumbnail = thumbnailData.recordThumbnailSmall
+        val thumbnailPath = thumbnailData.recordThumbnailPath
 
-        if (uri.isNotBlank()) {
+        if (thumbnailPath.isNotBlank()) {
             tvAddThumbnail.visibility = View.GONE
-
-            Glide.with(binding.root)
-                .load(uri)
-                .into(ivImage)
-
+            ivImage.loadOriginalImage(thumbnailPath)
+        } else if (thumbnail.isNotBlank() && miniThumbnail.isNotBlank()) {
+            tvAddThumbnail.visibility = View.GONE
+            ivImage.loadImageSequentially(miniThumbnail, thumbnail)
         } else {
             tvAddThumbnail.visibility = View.VISIBLE
         }

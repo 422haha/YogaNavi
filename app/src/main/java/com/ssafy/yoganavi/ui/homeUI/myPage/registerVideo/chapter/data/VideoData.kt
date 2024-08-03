@@ -6,6 +6,6 @@ data class VideoData(
     val recordPath: String = "",
     val recordKey: String = ""
 ) {
-    var chapterTitle: String = ""
-    var chapterDescription: String = ""
+    var chapterTitle: String? = null
+    var chapterDescription: String? = null
 }

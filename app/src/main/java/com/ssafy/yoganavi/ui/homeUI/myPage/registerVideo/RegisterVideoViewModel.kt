@@ -18,10 +18,10 @@ import com.ssafy.yoganavi.ui.utils.MINI
 import com.ssafy.yoganavi.ui.utils.NO_AUTH
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.THUMBNAIL
-import com.ssafy.yoganavi.ui.utils.UPLOAD_ERROR
 import com.ssafy.yoganavi.ui.utils.VIDEO
 import com.ssafy.yoganavi.ui.utils.uploadFile
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -89,11 +89,14 @@ class RegisterVideoViewModel @Inject constructor(
         val newChapterList = chapterList.value.toMutableList()
         val thumbnailItem = newChapterList[0] as ChapterItem.ImageItem
         val originalThumbnailData = thumbnailItem.thumbnailData
+
         val newThumbnailData = originalThumbnailData.copy(
             recordThumbnail = recordThumbnail.toString(),
             recordThumbnailSmall = miniThumbnail.toString(),
             recordThumbnailPath = path,
-            miniThumbnailPath = miniPath
+            miniThumbnailPath = miniPath,
+            thumbnailKey = thumbnailKey,
+            miniThumbnailKey = miniKey
         ).apply {
             recordTitle = originalThumbnailData.recordTitle
             recordContent = originalThumbnailData.recordContent
@@ -102,34 +105,42 @@ class RegisterVideoViewModel @Inject constructor(
         _chapterList.emit(newChapterList)
     }
 
-    fun setThumbnailTitle(title: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun setThumbnailTitle(title: String?) = viewModelScope.launch(Dispatchers.IO) {
+        if (title == null) return@launch
         (chapterList.value[0] as ChapterItem.ImageItem).thumbnailData.recordTitle = title
     }
 
-    fun setThumbnailContent(content: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun setThumbnailContent(content: String?) = viewModelScope.launch(Dispatchers.IO) {
+        if (content == null) return@launch
         (chapterList.value[0] as ChapterItem.ImageItem).thumbnailData.recordContent = content
     }
 
-    fun setVideoTitle(title: String, position: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun setVideoTitle(title: String?, position: Int) = viewModelScope.launch(Dispatchers.IO) {
+        if (title == null) return@launch
         (chapterList.value[position] as ChapterItem.VideoItem).videoData.chapterTitle = title
     }
 
-    fun setVideoContent(content: String, position: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun setVideoContent(content: String?, position: Int) = viewModelScope.launch(Dispatchers.IO) {
+        if (content == null) return@launch
         (chapterList.value[position] as ChapterItem.VideoItem).videoData.chapterDescription =
             content
     }
 
     fun makeLecture(
         recordId: Long,
+        loadingView: suspend () -> Unit,
         successToUpload: suspend () -> Unit,
         failToUpload: suspend (String) -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching {
+            loadingView()
+
             if (isChapterEmpty()) {
                 failToUpload(BLANK_CHAPTER)
                 return@launch
             }
-            var lectureDetailData = chapterList.value.toLectureDetail()
+            var lectureDetailData: LectureDetailData = chapterList.value.toLectureDetail()
+            val deferredList = mutableListOf<Deferred<Boolean>>()
 
             if (lectureDetailData.recordThumbnailPath.isNotBlank()) {
                 val thumbnailFile = File(lectureDetailData.recordThumbnailPath)
@@ -138,16 +149,13 @@ class RegisterVideoViewModel @Inject constructor(
                 val thumbnailKey = lectureDetailData.thumbnailKey
                 val miniKey = lectureDetailData.miniThumbnailKey
 
-                val uploadResults = awaitAll(
-                    async { uploadFile(transferUtility, thumbnailKey, thumbnailFile, metadata) },
+                val uploadImage =
+                    async { uploadFile(transferUtility, thumbnailKey, thumbnailFile, metadata) }
+                val uploadMiniImage =
                     async { uploadFile(transferUtility, miniKey, miniFile, metadata) }
 
-                )
-
-                if (uploadResults.any { false }) {
-                    failToUpload(UPLOAD_ERROR)
-                    return@launch
-                }
+                deferredList.add(uploadImage)
+                deferredList.add(uploadMiniImage)
             } else {
                 val thumbnailUrl = lectureDetailData.recordThumbnail.substringBefore("?")
                 val miniUrl = lectureDetailData.recordThumbnailSmall.substringBefore("?")
@@ -162,13 +170,20 @@ class RegisterVideoViewModel @Inject constructor(
             lectureDetailData.recordedLectureChapters.forEachIndexed { index, chapter ->
                 if (chapter.recordPath.isNotBlank()) {
                     val recordFile = File(chapter.recordPath)
-                    uploadFile(transferUtility, chapter.recordKey, recordFile)
-
+                    val uploadVideo =
+                        async { uploadFile(transferUtility, chapter.recordKey, recordFile) }
+                    deferredList.add(uploadVideo)
                 } else {
                     val videoUrl = chapter.recordVideo.substringBefore("?")
                     val newChapter = chapter.copy(recordVideo = videoUrl)
                     lectureDetailData.recordedLectureChapters[index] = newChapter
                 }
+            }
+
+            val result = deferredList.awaitAll()
+            if (result.any { false }) {
+                failToUpload(NO_RESPONSE)
+                return@launch
             }
 
             val response = if (recordId == -1L) {
@@ -197,13 +212,13 @@ class RegisterVideoViewModel @Inject constructor(
             .ifEmpty { return true }
             .map { it.videoData }
             .any {
-                it.chapterTitle.isBlank() || it.chapterDescription.isBlank() || it.recordVideo.isBlank()
+                it.chapterTitle.isNullOrBlank() || it.chapterDescription.isNullOrBlank() || it.recordVideo.isBlank()
             }
 
         if (isEmpty) return true
 
         val thumbnailData = (chapterItemList[0] as ChapterItem.ImageItem).thumbnailData
-        return thumbnailData.recordTitle.isBlank() || thumbnailData.recordContent.isBlank()
+        return thumbnailData.recordTitle.isNullOrBlank() || thumbnailData.recordContent.isNullOrBlank()
     }
 
     private fun LectureDetailData.toChapterItem(): List<ChapterItem> {
@@ -244,20 +259,19 @@ class RegisterVideoViewModel @Inject constructor(
             .map {
                 val videoData = it.videoData
                 VideoChapterData(
-                    id = if (videoData.recordPath.isNotBlank()) -1 else videoData.id,
-                    chapterTitle = videoData.chapterTitle,
-                    chapterDescription = videoData.chapterDescription,
+                    id = if (videoData.recordPath.isNotBlank()) null else videoData.id,
+                    chapterTitle = videoData.chapterTitle ?: "",
+                    chapterDescription = videoData.chapterDescription ?: "",
                     recordVideo = videoData.recordVideo,
                     recordPath = videoData.recordPath,
                     recordKey = videoData.recordKey
-
                 )
             }.toMutableList()
 
         return LectureDetailData(
             recordedId = thumbnailData.recordedId,
-            recordTitle = thumbnailData.recordTitle,
-            recordContent = thumbnailData.recordContent,
+            recordTitle = thumbnailData.recordTitle ?: "",
+            recordContent = thumbnailData.recordContent ?: "",
             recordThumbnail = thumbnailData.recordThumbnail,
             recordThumbnailSmall = thumbnailData.recordThumbnailSmall,
             recordedLectureChapters = recordedLectureChapters,

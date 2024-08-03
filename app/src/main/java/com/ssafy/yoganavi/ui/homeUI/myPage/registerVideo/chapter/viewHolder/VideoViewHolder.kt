@@ -3,12 +3,9 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.viewHolder
 import android.view.View
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
 import com.ssafy.yoganavi.databinding.CustomChapterViewBinding
 import com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.data.VideoData
+import com.ssafy.yoganavi.ui.utils.loadVideoFrame
 
 class VideoViewHolder(
     private val binding: CustomChapterViewBinding,
@@ -37,29 +34,12 @@ class VideoViewHolder(
     }
 
     private fun getVideo(uri: String) = with(binding) {
-        val requestOptions = RequestOptions()
-            .frame(0)
-            .diskCacheStrategy(DiskCacheStrategy.DATA)
-
-        val circularProgressDrawable = CircularProgressDrawable(root.context).apply {
-            strokeWidth = 5f
-            centerRadius = 30f
-            start()
-        }
-
-        Glide.with(binding.root)
-            .load(uri)
-            .apply(requestOptions)
-            .placeholder(circularProgressDrawable)
-            .into(ivVideo)
-
+        ivVideo.loadVideoFrame(uri, 0)
         tvAddVideo.visibility = View.GONE
     }
 
     private fun cleanVideo() = with(binding) {
-        Glide.with(binding.root)
-            .clear(ivVideo)
-
+        ivVideo.setImageDrawable(null)
         tvAddVideo.visibility = View.VISIBLE
     }
 

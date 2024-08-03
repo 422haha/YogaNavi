@@ -130,6 +130,7 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
 
     private fun makeLecture() = viewModel.makeLecture(
         args.recordedId,
+        ::loadingView,
         ::successToUpload,
         ::failToUpload
     )
@@ -137,11 +138,19 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
     private fun addChapter() = viewModel.addChapter()
     private fun deleteChapter(position: Int) = viewModel.deleteChapter(position)
 
+
     private suspend fun successToUpload() = withContext(Dispatchers.Main) {
         findNavController().popBackStack()
     }
 
+    private suspend fun loadingView() = withContext(Dispatchers.Main) {
+        binding.vBg.visibility = View.VISIBLE
+        binding.lav.visibility = View.VISIBLE
+    }
+
     private suspend fun failToUpload(message: String) = withContext(Dispatchers.Main) {
+        binding.vBg.visibility = View.GONE
+        binding.lav.visibility = View.GONE
         showSnackBar(message)
     }
 }

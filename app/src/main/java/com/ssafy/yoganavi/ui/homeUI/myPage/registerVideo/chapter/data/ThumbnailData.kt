@@ -9,6 +9,6 @@ data class ThumbnailData(
     val thumbnailKey: String = "",
     val miniThumbnailKey: String = ""
 ) {
-    var recordTitle: String = ""
-    var recordContent: String = ""
+    var recordTitle: String? = null
+    var recordContent: String? = null
 }
