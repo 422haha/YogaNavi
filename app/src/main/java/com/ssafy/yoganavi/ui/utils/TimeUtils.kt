@@ -38,19 +38,19 @@ fun formatZeroDate(hour: Int, minute: Int): String {
 
     return "$hourStr:$minuteStr"
 }
-
-fun convertLongToCalendarDay(epochMillis: Long): CalendarDay {
-    val date = Date(epochMillis)
+// CalendarDay를 Long으로 변환하는 확장 함수
+fun CalendarDay.toLong(): Long {
     val calendar = Calendar.getInstance()
-    calendar.time = date
-
-    val year = calendar.get(Calendar.YEAR)
-    val month = calendar.get(Calendar.MONTH) + 1 // 월은 0부터 시작하므로 1을 더해줍니다.
-    val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-    return CalendarDay.from(year, month, day)
+    calendar.set(this.year, this.month - 1, this.day)
+    return calendar.timeInMillis
 }
 
+// Long 값을 CalendarDay로 변환하는 확장 함수
+fun Long.toCalendarDay(): CalendarDay {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = this
+    return CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH))
+}
 fun convertDaysToHangle(days: String): String {
     val dayList = days.split(",")
     val hangleDays = dayList.map { day ->
@@ -75,6 +75,23 @@ fun addYear(currentMillis: Long): Long {
     calendar.add(Calendar.YEAR, 1)
 
     return calendar.timeInMillis
+}
+
+fun parseDay(englishDays: String): String {
+    val dayMapping = mapOf(
+        "MON" to "월",
+        "TUE" to "화",
+        "WED" to "수",
+        "THU" to "목",
+        "FRI" to "금",
+        "SAT" to "토",
+        "SUN" to "일"
+    )
+
+    val englishDayList = englishDays.split(",")
+    val koreanDayList = englishDayList.map { dayMapping[it] ?: it }
+
+    return koreanDayList.joinToString(",")
 }
 
 fun Long.msToDuration(): String {

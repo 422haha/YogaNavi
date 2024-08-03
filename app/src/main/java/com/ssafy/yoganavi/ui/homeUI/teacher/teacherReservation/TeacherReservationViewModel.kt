@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
 import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
+import com.ssafy.yoganavi.data.source.dto.teacher.LiveReserveRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,4 +23,24 @@ class TeacherReservationViewModel @Inject constructor(
             .onSuccess { _availableList.emit(it.data.toMutableList()) }
             .onFailure { it.printStackTrace() }
     }
+
+    fun registerLive(
+        liveId: Int,
+        startDate: Long?,
+        endDate: Long?,
+        navigateToSchedule: () -> (Unit)
+    ) =
+        viewModelScope.launch {
+            runCatching {
+                infoRepository.registerLive(
+                    LiveReserveRequest(
+                        liveId,
+                        startDate,
+                        endDate
+                    )
+                )
+            }
+                .onSuccess { navigateToSchedule() }
+                .onFailure { it.printStackTrace() }
+        }
 }

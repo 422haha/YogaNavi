@@ -14,6 +14,13 @@ import com.ssafy.yoganavi.databinding.FragmentFilterBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.END
 import com.ssafy.yoganavi.ui.utils.FILTER
+import com.ssafy.yoganavi.ui.utils.ONE_TO_MULTI
+import com.ssafy.yoganavi.ui.utils.ONE_TO_ONE
+import com.ssafy.yoganavi.ui.utils.PERIOD_MONTH
+import com.ssafy.yoganavi.ui.utils.PERIOD_THREE_MONTH
+import com.ssafy.yoganavi.ui.utils.PERIOD_TOTAL
+import com.ssafy.yoganavi.ui.utils.PERIOD_WEEK
+import com.ssafy.yoganavi.ui.utils.RECENT
 import com.ssafy.yoganavi.ui.utils.START
 import com.ssafy.yoganavi.ui.utils.Week
 import com.ssafy.yoganavi.ui.utils.formatZeroDate
@@ -24,7 +31,7 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
     private lateinit var weekToggleButtonMap: Map<Week, CheckBox>
     private val args by navArgs<FilterFragmentArgs>()
     private var isInit: Boolean = true
-    private var sorting: Int = 0
+    private var sorting: Int = RECENT
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -82,10 +89,10 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
         }
 
         when (viewModel.filter.period) {
-            0 -> binding.rbWeek.isChecked = true
-            1 -> binding.rbMonth.isChecked = true
-            2 -> binding.rbThreeMonth.isChecked = true
-            3 -> binding.rbTotal.isChecked = true
+            PERIOD_WEEK -> binding.rbWeek.isChecked = true
+            PERIOD_MONTH -> binding.rbMonth.isChecked = true
+            PERIOD_THREE_MONTH -> binding.rbThreeMonth.isChecked = true
+            PERIOD_TOTAL -> binding.rbTotal.isChecked = true
         }
         if (viewModel.filter.maxLiveNum == 0) {
             binding.rbOneToOne.isChecked = true
@@ -161,19 +168,19 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
         viewModel.filter.day =
             viewModel.dayStatusMap.filter { it.value }.keys.joinToString(",") // “MON,WED,SUN” 처럼 저장됨
         if (binding.rbWeek.isChecked) {
-            viewModel.filter.period = 0
+            viewModel.filter.period = PERIOD_WEEK
         } else if (binding.rbMonth.isChecked) {
-            viewModel.filter.period = 1
+            viewModel.filter.period = PERIOD_MONTH
         } else if (binding.rbThreeMonth.isChecked) {
-            viewModel.filter.period = 2
+            viewModel.filter.period = PERIOD_THREE_MONTH
         } else {
-            viewModel.filter.period = 3
+            viewModel.filter.period = PERIOD_TOTAL
         }
 
         if (binding.rbOneToOne.isChecked) {
-            viewModel.filter.maxLiveNum = 0
+            viewModel.filter.maxLiveNum = ONE_TO_ONE
         } else {
-            viewModel.filter.maxLiveNum = 1
+            viewModel.filter.maxLiveNum = ONE_TO_MULTI
         }
         isInit = false
         val directions = FilterFragmentDirections
