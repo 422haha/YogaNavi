@@ -3,21 +3,17 @@ package com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
 import com.ssafy.yoganavi.databinding.FragmentLectureDetailBinding
-import com.ssafy.yoganavi.databinding.ListItemLectureBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail.lecture.LectureDetailAdapter
 import com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail.lecture.LectureDetailItem
 import com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail.lecture.LectureHeader
 import com.ssafy.yoganavi.ui.utils.LECTURE
-import com.ssafy.yoganavi.ui.utils.msToDuration
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
@@ -26,12 +22,7 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
 ) {
     private val viewModel: LectureDetailViewModel by viewModels()
     private val args by navArgs<LectureDetailFragmentArgs>()
-    private val lectureDetailAdapter by lazy {
-        LectureDetailAdapter(
-            bindVideoInfo = ::bindVideoInfo,
-            goChapterVideo = ::moveToVideo
-        )
-    }
+    private val lectureDetailAdapter by lazy { LectureDetailAdapter(::moveToVideo) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -63,20 +54,6 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
         }
 
         lectureDetailAdapter.submitList(itemList)
-    }
-
-    private fun bindVideoInfo(
-        uri: String,
-        binding: ListItemLectureBinding
-    ) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.getVideoInfo(uri).await().let { (bitmap, duration) ->
-                withContext(Dispatchers.Main) {
-                    binding.ivLecture.setImageBitmap(bitmap)
-                    binding.tvVideoLength.text = duration?.msToDuration()
-                }
-            }
-        }
     }
 
     private fun moveToVideo(start: Int) {
