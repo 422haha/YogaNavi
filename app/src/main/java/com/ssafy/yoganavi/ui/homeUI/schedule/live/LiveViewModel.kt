@@ -19,6 +19,17 @@ class LiveViewModel @Inject constructor(val sessionManager: WebRtcSessionManager
     private val _sessionState = MutableStateFlow(WebRTCSessionState.Offline)
     val sessionState: StateFlow<WebRTCSessionState> = _sessionState
 
+    private val _offsetX = MutableStateFlow(0f)
+    val offsetX: StateFlow<Float> get() = _offsetX
+
+    private val _offsetY = MutableStateFlow(0f)
+    val offsetY: StateFlow<Float> get() = _offsetY
+
+    fun updateOffset(x: Float, y: Float) {
+        _offsetX.value = x
+        _offsetY.value = y
+    }
+
     init {
         viewModelScope.launch {
             sessionManager.signalingClient.sessionStateFlow.collect { state ->

@@ -1,8 +1,13 @@
 package com.ssafy.yoganavi.ui.homeUI.schedule.live
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
+import android.widget.FrameLayout
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -32,16 +37,32 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     private lateinit var localRenderer: VideoTextureViewRenderer
     private lateinit var remoteRenderer: VideoTextureViewRenderer
 
-    private val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { _: Boolean -> }
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var permissionHandler: PermissionHandler
+    private lateinit var permissionHelper: PermissionHelper
 
-    private val permissionHandler: PermissionHandler by lazy {
-        PermissionHandler(
+    private lateinit var draggableContainer: FrameLayout
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        initPermission()
+    }
+
+    private fun initPermission() {
+        requestPermissionLauncher =
+            registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { _: Boolean -> }
+
+        permissionHandler = PermissionHandler(
             requireActivity(),
             requestPermissionLauncher
         )
+
+        permissionHelper = PermissionHelper(this, arrayOf(Manifest.permission.CAMERA), ::popBack).apply {
+            launchPermission()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -50,6 +71,10 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         setToolbar(false, "", false)
 
         initListener()
+
+        initInMoveLocalView()
+
+        observeCallMediaState()
 
         observeSessionState()
 
@@ -67,12 +92,69 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             }
 
             ibtnCamSwitch.setOnClickListener {
-                viewModel.sessionManager.flipCamera()
+                if(viewModel.sessionState.value == WebRTCSessionState.Active)
+                    viewModel.sessionManager.flipCamera()
             }
 
             ibtnCancel.setOnClickListener {
-                viewModel.sessionManager.disconnect()
+                if(viewModel.sessionState.value == WebRTCSessionState.Active)
+                    viewModel.sessionManager.disconnect()
+
                 findNavController().popBackStack()
+            }
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initOutMoveLocalView() {
+        draggableContainer = binding.draggableContainer
+        draggableContainer.setOnTouchListener { view, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    viewModel.updateOffset(view.x - event.rawX, view.y - event.rawY)
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    view.animate()
+                        .x(event.rawX + viewModel.offsetX.value)
+                        .y(event.rawY + viewModel.offsetY.value)
+                        .setDuration(0)
+                        .start()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initInMoveLocalView() {
+        draggableContainer = binding.draggableContainer
+        draggableContainer.setOnTouchListener { view, event ->
+            val parent = view.parent as View
+            val parentWidth = parent.width
+            val parentHeight = parent.height
+
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    viewModel.updateOffset(view.x - event.rawX, view.y - event.rawY)
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val newX = event.rawX + viewModel.offsetX.value
+                    val newY = event.rawY + viewModel.offsetY.value
+
+                    val clampedX = newX.coerceIn(0f, parentWidth - view.width.toFloat())
+                    val clampedY = newY.coerceIn(0f, parentHeight - view.height.toFloat())
+
+                    view.animate()
+                        .x(clampedX)
+                        .y(clampedY)
+                        .setDuration(0)
+                        .start()
+                    true
+                }
+                else -> false
             }
         }
     }
@@ -91,14 +173,11 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         binding.tvState.text = state.toString()
 
         when (state) {
-            WebRTCSessionState.Active -> { observeCallMediaState() }
+            WebRTCSessionState.Active -> { }
             WebRTCSessionState.Ready -> { }
             WebRTCSessionState.Creating -> { }
             WebRTCSessionState.Impossible,
-            WebRTCSessionState.Offline -> {
-                callMediaStateJob?.cancel()
-                callMediaStateJob = null
-            }
+            WebRTCSessionState.Offline -> { }
         }
     }
 
@@ -108,7 +187,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
                 viewModel.callMediaState.collect { state ->
                         handleMicrophoneState(state.isMicrophoneEnabled)
                         handleCameraState(state.isCameraEnabled)
-                    }
+                }
             }
         }
     }
@@ -116,15 +195,17 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     private fun handleMicrophoneState(isEnabled: Boolean) {
         if(isEnabled) permissionHandler.branchPermission(Manifest.permission.RECORD_AUDIO, "오디오")
 
-        viewModel.sessionManager.enableMicrophone(isEnabled)
+        if(viewModel.sessionState.value == WebRTCSessionState.Active)
+            viewModel.sessionManager.enableMicrophone(isEnabled)
 
         binding.ibtnMic.setImageResource(if (isEnabled) R.drawable.baseline_mic_24 else R.drawable.baseline_mic_off_24)
     }
 
     private fun handleCameraState(isEnabled: Boolean) {
-        if(isEnabled) PermissionHelper(this, arrayOf(Manifest.permission.CAMERA), ::popBack).launchPermission()
+        if(isEnabled) permissionHelper.launchPermission()
 
-        viewModel.sessionManager.enableCamera(isEnabled)
+        if(viewModel.sessionState.value == WebRTCSessionState.Active)
+            viewModel.sessionManager.enableCamera(isEnabled)
 
         binding.ibtnVideo.setImageResource(if (isEnabled) R.drawable.baseline_videocam_24 else R.drawable.baseline_videocam_off_24)
     }

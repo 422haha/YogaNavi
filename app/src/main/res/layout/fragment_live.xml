@@ -23,14 +23,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <io.getstream.webrtc.android.ui.VideoTextureViewRenderer
-        android:id="@+id/localVideoCallScreen"
+    <FrameLayout
+        android:id="@+id/draggable_container"
         android:layout_width="150dp"
         android:layout_height="200dp"
+        android:background="@color/gray_20"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent">
+        <io.getstream.webrtc.android.ui.VideoTextureViewRenderer
+            android:id="@+id/localVideoCallScreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
 
     <ImageButton
         android:id="@+id/ibtn_mic"
