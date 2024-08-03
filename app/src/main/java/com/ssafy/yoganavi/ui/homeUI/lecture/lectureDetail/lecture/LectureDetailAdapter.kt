@@ -10,7 +10,6 @@ import com.ssafy.yoganavi.ui.utils.HEADER
 import com.ssafy.yoganavi.ui.utils.ITEM
 
 class LectureDetailAdapter(
-    private val bindVideoInfo: (uri: String, binding: ListItemLectureBinding) -> Unit,
     private val goChapterVideo: (Int) -> Unit
 ) : ListAdapter<LectureDetailItem, ViewHolder>(LectureDetailItemItemCallBack()) {
 
@@ -51,6 +50,6 @@ class LectureDetailAdapter(
         parent: ViewGroup
     ): LectureDetailItemViewHolder {
         val binding = ListItemLectureBinding.inflate(inflater, parent, false)
-        return LectureDetailItemViewHolder(binding, bindVideoInfo, goChapterVideo)
+        return LectureDetailItemViewHolder(binding, goChapterVideo)
     }
 }

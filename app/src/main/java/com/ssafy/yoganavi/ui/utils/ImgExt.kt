@@ -37,15 +37,15 @@ fun ImageView.loadOriginalImage(url: String) {
         .into(this)
 }
 
-fun ImageView.loadVideoFrame(uri: String, time: Long) {
+fun ImageView.loadVideoFrame(uri: String, time: Long, isCircularOn: Boolean = true) {
     val requestOptions = RequestOptions()
         .frame(time)
 
-    val circularProgressDrawable = CircularProgressDrawable(context).apply {
+    val circularProgressDrawable = if (isCircularOn) CircularProgressDrawable(context).apply {
         strokeWidth = 5f
         centerRadius = 30f
         start()
-    }
+    } else null
 
     Glide.with(this)
         .load(uri)
