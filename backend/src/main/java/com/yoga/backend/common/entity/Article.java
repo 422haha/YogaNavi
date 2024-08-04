@@ -24,7 +24,7 @@ public class Article {
     private Users user;  // 작성자 (강사)
 
     private String content; // 게시글 내용
-    private LocalDateTime createdAt; // 생성일자
+    private LocalDateTime createdAt; // 생성일자. redis, spring scheduler를 사용하지 않으므로 LocalDateTime
     private LocalDateTime updatedAt; // 수정일자
     @Column(length = 512)
     private String imageUrl; // 이미지 URL

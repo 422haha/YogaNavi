@@ -12,7 +12,7 @@ import lombok.Data;
 @Builder
 public class DetailedTeacherDto {
 
-    private int id;
+    private Integer id;
     private String email;
     private String nickname;
     private String profileImageUrl;
@@ -21,8 +21,8 @@ public class DetailedTeacherDto {
     private Set<String> hashtags;
     private List<LectureDto> recordedLectures;
     private List<NoticeDto> notices;
-    private int likeCount;
-    private boolean liked;
+    private Integer likeCount;
+    private Boolean liked;
 
     /**
      * DetailedTeacherDto 생성자
@@ -39,10 +39,10 @@ public class DetailedTeacherDto {
      * @param likeCount            좋아요 수
      * @param liked                좋아요 여부
      */
-    public DetailedTeacherDto(int id, String email, String nickname, String profileImageUrl,
+    public DetailedTeacherDto(Integer id, String email, String nickname, String profileImageUrl,
         String profileImageUrlSmall, String content, Set<String> hashtags,
-        List<LectureDto> recordedLectures, List<NoticeDto> notices, int likeCount,
-        boolean liked) {
+        List<LectureDto> recordedLectures, List<NoticeDto> notices, Integer likeCount,
+        Boolean liked) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
@@ -67,8 +67,8 @@ public class DetailedTeacherDto {
         private String recordTitle;
         private String recordThumbnail;
         private String recordThumbnailSmall;
-        private int likeCount;
-        private boolean myLike;
+        private Integer likeCount;
+        private Boolean myLike;
 
         /**
          * LectureDto 생성자
@@ -81,7 +81,7 @@ public class DetailedTeacherDto {
          * @param myLike               사용자에 의한 좋아요 여부
          */
         public LectureDto(String recordedId, String recordTitle, String recordThumbnail,
-            String recordThumbnailSmall, int likeCount, boolean myLike) {
+            String recordThumbnailSmall, Integer likeCount, Boolean myLike) {
             this.recordedId = recordedId;
             this.recordTitle = recordTitle;
             this.recordThumbnail = recordThumbnail;
@@ -102,8 +102,8 @@ public class DetailedTeacherDto {
         private String content;
         private String imageUrl;
         private String imageUrlSmall;
-        private long createdAt;
-        private long updatedAt;
+        private Long createdAt;
+        private Long updatedAt;
         private String userName;
         private String profileImageUrl;
         private String profileImageSmallUrl;
@@ -122,7 +122,7 @@ public class DetailedTeacherDto {
          * @param profileImageSmallUrl 프로필 작은 이미지 URL
          */
         public NoticeDto(String articleId, String content, String imageUrl, String imageUrlSmall,
-            long createdAt, long updatedAt, String userName, String profileImageUrl,
+            Long createdAt, Long updatedAt, String userName, String profileImageUrl,
             String profileImageSmallUrl) {
             this.articleId = articleId;
             this.content = content;

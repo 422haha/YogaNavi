@@ -7,9 +7,9 @@ import lombok.Setter;
 @Setter
 public class ChapterDto {
 
-    private long id;
+    private Long id;
     private String chapterTitle;
     private String chapterDescription;
     private String recordVideo;
-    private int chapterNumber;
+    private Integer chapterNumber;
 }

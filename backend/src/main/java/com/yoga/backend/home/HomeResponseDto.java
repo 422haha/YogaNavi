@@ -1,18 +1,20 @@
 package com.yoga.backend.home;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.NumberSerializers.LongSerializer;
 import lombok.Getter;
 import lombok.Setter;
 
 
 /**
- * 홈 페이지 응답 DTO 클래스.
- * 홈 페이지에 대한 데이터를 담고 있습니다.
+ * 홈 페이지 응답 DTO 클래스. 홈 페이지에 대한 데이터 담고있음.
  */
 @Getter
 @Setter
 public class HomeResponseDto {
+
     private Long liveId;
-    private int userId;
+    private Integer userId;
     private String nickname;
     private String profileImageUrl;
     private String profileImageUrlSmall;
@@ -24,4 +26,13 @@ public class HomeResponseDto {
     private Long regDate;
     private String lectureDay;
     private Integer maxLiveNum;
+    private Boolean teacher;
+
+    public boolean isTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(boolean teacher) {
+        this.teacher = teacher;
+    }
 }

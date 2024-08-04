@@ -44,7 +44,7 @@ public class RecordedLecture {
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdDate;
+    private LocalDateTime createdDate; // redis, spring scheduler를 사용하지 않으므로 LocalDateTime
 
     @LastModifiedDate
     @Column(name = "last_modified_at", nullable = false)
