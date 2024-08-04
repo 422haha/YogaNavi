@@ -16,15 +16,15 @@ import lombok.Setter;
 @Builder
 public class TeacherDto {
 
-    private int id;
+    private Integer id;
     private String email;
     private String nickname;
     private String profileImageUrl;
     private String profileImageUrlSmall;
     private String content;
     private Set<String> hashtags;
-    private boolean liked;
-    private int likeCount;
+    private Boolean liked;
+    private Integer likeCount;
 
     /**
      * TeacherDto 생성자
@@ -39,8 +39,8 @@ public class TeacherDto {
      * @param liked                좋아요 여부
      * @param likeCount            좋아요 수
      */
-    public TeacherDto(int id, String email, String nickname, String profileImageUrl,
-        String profileImageUrlSmall, String content, Set<String> hashtags, boolean liked,
+    public TeacherDto(Integer id, String email, String nickname, String profileImageUrl,
+        String profileImageUrlSmall, String content, Set<String> hashtags, Boolean liked,
         int likeCount) {
         this.id = id;
         this.email = email;

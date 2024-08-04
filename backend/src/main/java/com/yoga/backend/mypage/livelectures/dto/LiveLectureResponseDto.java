@@ -4,8 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 화상 강의 응답을 위한 DTO 클래스
- * 화상 강의의 세부 정보를 포함
+ * 화상 강의 응답을 위한 DTO 클래스 화상 강의의 세부 정보를 포함
  */
 @Setter
 @Getter
@@ -14,7 +13,7 @@ public class LiveLectureResponseDto {
     private Long liveId; // 화상 강의 ID
     private Long regDate; // 강의 등록 시간
 
-    private int userId; // 강사 ID
+    private Integer userId; // 강사 ID
 
     private String nickname; // 강사 이름
     private String profileImageUrl; // 강사 프로필 이미지 URL

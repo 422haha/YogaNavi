@@ -1,5 +1,6 @@
 package com.yoga.backend.mypage.file;
 
+/*
 import com.yoga.backend.common.awsS3.S3Service;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +19,15 @@ public class FileUploadController {
     @Autowired
     private S3Service s3Service;
 
-    /**
+    */
+/**
      * 파일을 S3에 업로드하고 URL을 반환
      *
      * @param file 업로드할 파일
      * @param directory S3 버킷 내 저장될 디렉토리
      * @return 업로드된 파일의 URL
-     */
+     *//*
+
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file,
         @RequestParam("directory") String directory) {
@@ -37,3 +40,4 @@ public class FileUploadController {
         }
     }
 }
+*/

@@ -44,8 +44,8 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
         String jwt = request.getHeader(SecurityConstants.JWT_HEADER);
         String refreshToken = request.getHeader(SecurityConstants.REFRESH_TOKEN_HEADER);
 
-        System.out.println("================================     jwt" + jwt);
-        System.out.println("================================     refreshtoekn" + refreshToken);
+        System.out.println("===================================== JWTTokenValidatorFilter jwt : " + jwt);
+        System.out.println("===================================== JWTTokenValidatorFilter refreshtoken : " + refreshToken);
 
         if (null != jwt && jwt.startsWith("Bearer ")) {
             jwt = jwtUtil.extractToken(jwt);
