@@ -44,6 +44,7 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
         initAdapter()
         initListener()
         initCollect()
+        viewModel.updateSortAndKeyword()
     }
 
     private fun initAdapter() = with(binding.rvLecture) {
