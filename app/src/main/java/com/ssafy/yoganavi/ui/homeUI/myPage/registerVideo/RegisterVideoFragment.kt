@@ -10,11 +10,16 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.ssafy.yoganavi.databinding.FragmentRegisterVideoBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.adapter.ChapterAdapter
+import com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.viewHolder.VideoViewHolder
 import com.ssafy.yoganavi.ui.utils.CREATE
 import com.ssafy.yoganavi.ui.utils.REGISTER_VIDEO
 import com.ssafy.yoganavi.ui.utils.UPDATE
@@ -25,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.abs
 
 @AndroidEntryPoint
 class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
@@ -32,9 +38,13 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
 ) {
     private val args by navArgs<RegisterVideoFragmentArgs>()
     private val viewModel: RegisterVideoViewModel by viewModels()
+    private val exoPlayer: ExoPlayer by lazy { ExoPlayer.Builder(requireContext()).build() }
+    private var prevPosition = RecyclerView.NO_POSITION
+    private var currentPosition = RecyclerView.NO_POSITION
     private var handleVideoResult: ((Uri) -> Unit)? = null
     private val chapterAdapter by lazy {
         ChapterAdapter(
+            exoPlayer = exoPlayer,
             addImage = ::addThumbnail,
             addVideoListener = ::addVideo,
             deleteListener = ::deleteChapter,
@@ -82,6 +92,19 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
 
     private fun initListener() = with(binding) {
         btnAddChapter.setOnClickListener { addChapter() }
+        rvLecture.addOnScrollListener(object : OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val manager = recyclerView.layoutManager as? LinearLayoutManager ?: return
+                val newCenterPosition = findCenterItemPosition(manager)
+
+                if (newCenterPosition != currentPosition) {
+                    prevPosition = currentPosition
+                    currentPosition = newCenterPosition
+                    handleCenterItem()
+                }
+            }
+        })
     }
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
@@ -112,6 +135,51 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
         }
 
         videoUriLauncher.launch(intent)
+    }
+
+    private fun findCenterItemPosition(layoutManager: LinearLayoutManager): Int {
+        val firstPosition = layoutManager.findFirstVisibleItemPosition()
+        val lastPosition = layoutManager.findLastVisibleItemPosition()
+
+        var closestPosition = RecyclerView.NO_POSITION
+        var closestDistance = Int.MAX_VALUE
+
+        for (i in firstPosition..lastPosition) {
+            val viewHolder = binding.rvLecture.findViewHolderForAdapterPosition(i) ?: continue
+            val itemView = viewHolder.itemView
+
+            val itemCenterY = (itemView.top + itemView.bottom) / 2
+            val screenCenterY = binding.rvLecture.height / 2
+
+            val distance = abs(itemCenterY - screenCenterY)
+            if (distance < closestDistance) {
+                closestDistance = distance
+                closestPosition = i
+            }
+        }
+
+        return closestPosition
+    }
+
+    private fun handleCenterItem() {
+        stopVideoAboutPrevCenterItem()
+        startVideoAboutCurrentCenterItem()
+    }
+
+    private fun stopVideoAboutPrevCenterItem() {
+        if (prevPosition == RecyclerView.NO_POSITION) return
+        val prevViewHolder = binding.rvLecture.findViewHolderForAdapterPosition(prevPosition)
+                as? VideoViewHolder ?: return
+
+        prevViewHolder.getFirstFrame()
+    }
+
+    private fun startVideoAboutCurrentCenterItem() {
+        if (currentPosition == RecyclerView.NO_POSITION) return
+        val currentViewHolder = binding.rvLecture.findViewHolderForAdapterPosition(currentPosition)
+                as? VideoViewHolder ?: return
+
+        currentViewHolder.getVideo()
     }
 
     private fun changeThumbnailTitle(title: String) = viewModel.setThumbnailTitle(title)

@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ssafy.yoganavi.databinding.CustomChapterViewBinding
@@ -13,6 +14,7 @@ import com.ssafy.yoganavi.ui.utils.HEADER
 import com.ssafy.yoganavi.ui.utils.ITEM
 
 class ChapterAdapter(
+    private val exoPlayer: ExoPlayer,
     private val addImage: () -> Unit,
     private val addVideoListener: (Int) -> Unit,
     private val deleteListener: (Int) -> Unit,
@@ -66,6 +68,7 @@ class ChapterAdapter(
         val binding = CustomChapterViewBinding.inflate(inflater, parent, false)
         return VideoViewHolder(
             binding = binding,
+            exoPlayer= exoPlayer,
             addVideoListener = addVideoListener,
             deleteListener = deleteListener,
             changeVideoTitle = changeVideoTitle,

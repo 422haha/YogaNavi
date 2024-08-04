@@ -53,6 +53,17 @@
         app:layout_constraintStart_toStartOf="@id/iv_video"
         app:layout_constraintTop_toTopOf="@id/iv_video" />
 
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/pv_video"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="false"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/iv_video"
+        app:layout_constraintEnd_toEndOf="@id/iv_video"
+        app:layout_constraintStart_toStartOf="@id/iv_video"
+        app:layout_constraintTop_toTopOf="@id/iv_video"
+        app:use_controller="false" />
 
     <EditText
         android:id="@+id/et_title"
