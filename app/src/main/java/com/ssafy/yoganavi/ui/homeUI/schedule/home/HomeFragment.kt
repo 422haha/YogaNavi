@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.databinding.FragmentHomeBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.schedule.home.dialog.EnterDialog
+import com.ssafy.yoganavi.ui.utils.EMPTY_LIVE
 import com.ssafy.yoganavi.ui.utils.HOME
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -24,9 +25,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setToolbar(isBottomNavigationVisible = true,
+        setToolbar(
+            isBottomNavigationVisible = true,
             title = HOME,
-            canGoBack = false)
+            canGoBack = false
+        )
 
         binding.rvMyList.adapter = homeAdapter
 
@@ -38,13 +41,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.homeList.collectLatest {
-                checkEmptyList(it)
+                checkEmptyList(it, EMPTY_LIVE)
                 homeAdapter.submitList(it)
             }
         }
     }
 
-    private fun alertLiveDetailDialog(id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String) {
+    private fun alertLiveDetailDialog(
+        id: Int,
+        smallImageUri: String?,
+        imageUri: String?,
+        title: String,
+        content: String
+    ) {
         EnterDialog(requireContext(), id, smallImageUri, imageUri, title, content) {
             val directions = HomeFragmentDirections
                 .actionHomeFragmentToLiveFragment(it)

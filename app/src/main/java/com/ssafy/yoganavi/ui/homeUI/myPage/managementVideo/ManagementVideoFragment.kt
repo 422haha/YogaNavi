@@ -15,6 +15,7 @@ import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.lecture.LectureAdapter
 import com.ssafy.yoganavi.ui.utils.DELETE
 import com.ssafy.yoganavi.ui.utils.EDIT
+import com.ssafy.yoganavi.ui.utils.EMPTY_MY_LECTURE
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_VIDEO
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -58,7 +59,7 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.lectureList.collectLatest {
-                checkEmptyList(it)
+                checkEmptyList(it, EMPTY_MY_LECTURE)
                 lectureAdapter.submitList(it)
             }
         }

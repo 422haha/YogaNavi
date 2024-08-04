@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.snackbar.Snackbar
+import com.ssafy.yoganavi.data.source.dto.home.EmptyData
 import com.ssafy.yoganavi.ui.loginUI.find.FindFragment
 import com.ssafy.yoganavi.ui.loginUI.join.JoinFragment
 import com.ssafy.yoganavi.ui.loginUI.login.LoginFragment
@@ -33,7 +34,7 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setEmptyView(false)
+        setEmptyView(EmptyData(false))
     }
 
     override fun onDestroyView() {
@@ -85,12 +86,13 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
         }
     }
 
-    fun checkEmptyList(list: List<Any>) {
+    fun checkEmptyList(list: List<Any>, emptyString: String) {
         if (activity == null || requireActivity() !is MainActivity) return
 
-        if (list.isEmpty()) setEmptyView(true)
-        else setEmptyView(false)
+        if (list.isEmpty()) setEmptyView(EmptyData(true, emptyString))
+        else setEmptyView(EmptyData(false, emptyString))
     }
 
-    fun setEmptyView(isEmpty: Boolean) = activityViewModel.setEmptyView(isEmpty)
+    fun setEmptyView(emptyData: EmptyData) =
+        activityViewModel.setEmptyView(emptyData)
 }

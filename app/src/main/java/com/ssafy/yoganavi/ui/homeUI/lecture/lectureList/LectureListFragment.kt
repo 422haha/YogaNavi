@@ -10,11 +10,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
+import com.ssafy.yoganavi.data.source.dto.home.EmptyData
 import com.ssafy.yoganavi.databinding.FragmentLectureListBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.lecture.lectureList.lecture.LectureAdapter
 import com.ssafy.yoganavi.ui.utils.ANY_CHECK_BOX
 import com.ssafy.yoganavi.ui.utils.DATE
+import com.ssafy.yoganavi.ui.utils.EMPTY_LECTURE
 import com.ssafy.yoganavi.ui.utils.FAME
 import com.ssafy.yoganavi.ui.utils.LECTURE_LIST
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,8 +62,8 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
                 val isListEmpty = loadState.refresh is LoadState.NotLoading &&
                         this.itemCount == 0 && loadState.append.endOfPaginationReached
 
-                if (isListEmpty) setEmptyView(true)
-                else setEmptyView(false)
+                if (isListEmpty) setEmptyView(EmptyData(true, EMPTY_LECTURE))
+                else setEmptyView(EmptyData(false))
             }
         }
     }

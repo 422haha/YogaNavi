@@ -3,6 +3,7 @@ package com.ssafy.yoganavi.ui.core
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.dataStore.DataStoreRepository
+import com.ssafy.yoganavi.data.source.dto.home.EmptyData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -18,8 +19,8 @@ class MainViewModel @Inject constructor(
     private val _mainEvent: MutableSharedFlow<MainEvent> = MutableSharedFlow()
     val mainEvent: SharedFlow<MainEvent> = _mainEvent.asSharedFlow()
 
-    private val _emptyEvent: MutableSharedFlow<Boolean> = MutableSharedFlow()
-    val emptyEvent: SharedFlow<Boolean> = _emptyEvent.asSharedFlow()
+    private val _emptyEvent: MutableSharedFlow<EmptyData> = MutableSharedFlow()
+    val emptyEvent: SharedFlow<EmptyData> = _emptyEvent.asSharedFlow()
 
     fun setMainEvent(
         isBottomNavigationVisible: Boolean,
@@ -36,7 +37,7 @@ class MainViewModel @Inject constructor(
         dataStoreRepository.clearToken()
     }
 
-    fun setEmptyView(isEmpty: Boolean) = viewModelScope.launch {
-        _emptyEvent.emit(isEmpty)
+    fun setEmptyView(emptyData: EmptyData) = viewModelScope.launch {
+        _emptyEvent.emit(emptyData)
     }
 }

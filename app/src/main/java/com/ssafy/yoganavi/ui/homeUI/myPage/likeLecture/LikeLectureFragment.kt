@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.databinding.FragmentLikeLectureBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.lecture.LectureAdapter
+import com.ssafy.yoganavi.ui.utils.EMPTY_LIKE_LECTURE
 import com.ssafy.yoganavi.ui.utils.LIKE_LECTURE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -43,7 +44,7 @@ class LikeLectureFragment : BaseFragment<FragmentLikeLectureBinding>(
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.lectureList.collectLatest { lectureList ->
-                checkEmptyList(lectureList)
+                checkEmptyList(lectureList, EMPTY_LIKE_LECTURE)
                 lectureAdapter.submitList(lectureList)
             }
         }

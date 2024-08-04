@@ -110,9 +110,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun CoroutineScope.collectEmptyEvent() = launch {
-        viewModel.emptyEvent.collectLatest { isEmpty ->
-            if (isEmpty) {
+        viewModel.emptyEvent.collectLatest {
+            if (it.isEmpty) {
                 delay(500)
+                binding.clEmpty.tvEmpty.text = it.emptyName
                 binding.clEmpty.root.visibility = View.VISIBLE
             } else {
                 binding.clEmpty.root.visibility = View.GONE

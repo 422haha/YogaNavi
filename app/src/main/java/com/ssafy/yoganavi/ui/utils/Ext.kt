@@ -76,6 +76,20 @@ const val NOTHING = "수강가능한 수업이 없습니다."
 const val PICK_DATE = "날짜를 선택하세요."
 const val UPLOAD_FAIL = "업로드에 실패했습니다."
 
+// empty 관리
+const val EMPTY_LIVE = "예정된 실시간 강의가 없습니다 \uD83D\uDE0C"
+const val GO_TEACHER = "수강신청 하러가기"
+const val EMPTY_NOTICE = "아직 등록된 공지가 없습니다 \uD83D\uDE0C"
+const val EMPTY_LECTURE = "아직 등록된 강의가 없습니다 \uD83D\uDE0C"
+const val EMPTY_MY_LIVE = "아직 생성된 실시간 강의가 없습니다 \uD83D\uDE0C"
+const val EMPTY_MY_LECTURE = "아직 생성된 녹화 강의가 없습니다 \uD83D\uDE0C"
+const val EMPTY_TEACHER = "아직 등록된 선생님이 없습니다 \uD83D\uDE0C"
+const val EMPTY_LIKE_LECTURE = "아직 좋아요 표시한 강의가 없습니다 \uD83D\uDE0C"
+const val GO_LIKE_LECTURE = "강의 좋아요 하러 가기"
+const val EMPTY_LIKE_TEACHER = "아직 좋아요 표시한 강사가 없습니다.\uD83D\uDE0C"
+const val EMPTY_COURSE = "아직 수강한 실시간 강의가 없습니다 \uD83D\uDE0C"
+
+
 //강의 분류
 const val ONE_TO_ONE = 0
 const val ONE_TO_MULTI = 1

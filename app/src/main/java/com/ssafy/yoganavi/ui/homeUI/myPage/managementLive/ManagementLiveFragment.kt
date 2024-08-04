@@ -12,6 +12,7 @@ import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentManagementLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.CREATE
+import com.ssafy.yoganavi.ui.utils.EMPTY_MY_LIVE
 import com.ssafy.yoganavi.ui.utils.MANAGEMENT_LIVE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -60,7 +61,7 @@ class ManagementLiveFragment :
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.liveList.collectLatest {
-                checkEmptyList(it)
+                checkEmptyList(it,EMPTY_MY_LIVE)
                 liveAdapter.submitList(it)
             }
         }

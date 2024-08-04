@@ -9,6 +9,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.ssafy.yoganavi.databinding.FragmentCourseHistoryBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.COURSE_HISTORY
+import com.ssafy.yoganavi.ui.utils.EMPTY_COURSE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -40,7 +41,7 @@ class CourseHistoryFragment : BaseFragment<FragmentCourseHistoryBinding>(
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.courseHistoryList.collectLatest {
-                checkEmptyList(it)
+                checkEmptyList(it, EMPTY_COURSE)
                 courseHistoryAdapter.submitList(it)
             }
         }
