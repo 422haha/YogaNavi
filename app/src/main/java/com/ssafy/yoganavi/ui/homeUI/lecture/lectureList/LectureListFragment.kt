@@ -61,8 +61,8 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
                 val isListEmpty = loadState.refresh is LoadState.NotLoading &&
                         this.itemCount == 0 && loadState.append.endOfPaginationReached
 
-                if (isListEmpty) setEmptyView(true, EmptyData(EMPTY_LECTURE))
-                else setEmptyView(false, EmptyData())
+                if (isListEmpty) setEmptyView(EmptyData(true, EMPTY_LECTURE))
+                else setEmptyView(EmptyData(false))
             }
         }
     }

@@ -6,10 +6,8 @@ import com.ssafy.yoganavi.data.repository.dataStore.DataStoreRepository
 import com.ssafy.yoganavi.data.source.dto.home.EmptyData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,11 +19,8 @@ class MainViewModel @Inject constructor(
     private val _mainEvent: MutableSharedFlow<MainEvent> = MutableSharedFlow()
     val mainEvent: SharedFlow<MainEvent> = _mainEvent.asSharedFlow()
 
-    private val _emptyEvent: MutableSharedFlow<Boolean> = MutableSharedFlow()
-    val emptyEvent: SharedFlow<Boolean> = _emptyEvent.asSharedFlow()
-
-    private val _emptyData: MutableStateFlow<EmptyData> = MutableStateFlow(EmptyData())
-    val emptyData = _emptyData.asStateFlow()
+    private val _emptyEvent: MutableSharedFlow<EmptyData> = MutableSharedFlow()
+    val emptyEvent: SharedFlow<EmptyData> = _emptyEvent.asSharedFlow()
 
     fun setMainEvent(
         isBottomNavigationVisible: Boolean,
@@ -42,10 +37,7 @@ class MainViewModel @Inject constructor(
         dataStoreRepository.clearToken()
     }
 
-    fun setEmptyView(isEmpty: Boolean, emptyData: EmptyData) = viewModelScope.launch {
-        if (isEmpty) {
-            _emptyData.emit(emptyData)
-        }
-        _emptyEvent.emit(isEmpty)
+    fun setEmptyView(emptyData: EmptyData) = viewModelScope.launch {
+        _emptyEvent.emit(emptyData)
     }
 }

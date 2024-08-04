@@ -87,7 +87,7 @@ const val EMPTY_TEACHER = "아직 등록된 선생님이 없습니다 \uD83D\uDE
 const val EMPTY_LIKE_LECTURE = "아직 좋아요 표시한 강의가 없습니다 \uD83D\uDE0C"
 const val GO_LIKE_LECTURE = "강의 좋아요 하러 가기"
 const val EMPTY_LIKE_TEACHER = "아직 좋아요 표시한 강사가 없습니다.\uD83D\uDE0C"
-const val EMTPY_COURSE = "아직 수강한 실시간 강의가 없습니다 \uD83D\uDE0C"
+const val EMPTY_COURSE = "아직 수강한 실시간 강의가 없습니다 \uD83D\uDE0C"
 
 
 //강의 분류

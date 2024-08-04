@@ -9,7 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
-import com.ssafy.yoganavi.data.source.dto.home.EmptyData
 import com.ssafy.yoganavi.databinding.FragmentManagementLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.CREATE
@@ -62,7 +61,7 @@ class ManagementLiveFragment :
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.liveList.collectLatest {
-                checkEmptyList(it, EmptyData(EMPTY_MY_LIVE))
+                checkEmptyList(it,EMPTY_MY_LIVE)
                 liveAdapter.submitList(it)
             }
         }

@@ -7,7 +7,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.ssafy.yoganavi.data.source.dto.home.EmptyData
 import com.ssafy.yoganavi.databinding.FragmentHomeBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.schedule.home.dialog.EnterDialog
@@ -42,7 +41,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.homeList.collectLatest {
-                checkEmptyList(it, EmptyData(EMPTY_LIVE))
+                checkEmptyList(it, EMPTY_LIVE)
                 homeAdapter.submitList(it)
             }
         }

@@ -12,7 +12,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.ssafy.yoganavi.data.source.dto.home.EmptyData
 import com.ssafy.yoganavi.data.source.teacher.FilterData
 import com.ssafy.yoganavi.databinding.FragmentTeacherListBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
@@ -123,7 +122,7 @@ class TeacherListFragment :
             }
             launch {
                 viewModel.teacherList.collectLatest { teacherList ->
-                    checkEmptyList(teacherList, EmptyData(EMPTY_TEACHER))
+                    checkEmptyList(teacherList, EMPTY_TEACHER)
                     noticeAdapter.submitList(teacherList)
                 }
             }

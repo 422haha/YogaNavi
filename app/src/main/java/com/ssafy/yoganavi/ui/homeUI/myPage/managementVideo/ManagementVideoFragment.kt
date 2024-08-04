@@ -10,7 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
-import com.ssafy.yoganavi.data.source.dto.home.EmptyData
 import com.ssafy.yoganavi.databinding.FragmentManagementVideoBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.lecture.LectureAdapter
@@ -60,7 +59,7 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.lectureList.collectLatest {
-                checkEmptyList(it, EmptyData(EMPTY_MY_LECTURE))
+                checkEmptyList(it, EMPTY_MY_LECTURE)
                 lectureAdapter.submitList(it)
             }
         }
