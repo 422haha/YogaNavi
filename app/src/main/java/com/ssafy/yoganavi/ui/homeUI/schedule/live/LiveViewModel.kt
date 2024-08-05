@@ -34,9 +34,6 @@ class LiveViewModel @Inject constructor(val sessionManager: WebRtcSessionManager
         viewModelScope.launch {
             sessionManager.signalingClient.sessionStateFlow.collect { state ->
                 _sessionState.value = state
-                if (state == WebRTCSessionState.Ready) {
-                    sessionManager.onSessionScreenReady()
-                }
             }
         }
     }

@@ -28,7 +28,6 @@ import com.ssafy.yoganavi.ui.utils.PermissionHandler
 import com.ssafy.yoganavi.ui.utils.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
 import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.webrtc.RendererCommon
@@ -38,7 +37,6 @@ import org.webrtc.VideoTrack
 class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::inflate) {
 
     private val viewModel: LiveViewModel by viewModels()
-    private var callMediaStateJob: Job? = null
 
     private lateinit var localRenderer: VideoTextureViewRenderer
     private lateinit var remoteRenderer: VideoTextureViewRenderer
@@ -87,6 +85,10 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         observeSessionState()
 
         renderInit()
+
+        binding.tvState.setOnClickListener {
+            viewModel.sessionManager.onSessionScreenReady()
+        }
     }
 
     private fun initListener() {
@@ -99,11 +101,11 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
         with(binding) {
             ibtnMic.setOnClickListener {
-                viewModel.toggleMicrophoneState(!viewModel.callMediaState.value.isMicrophoneEnabled)
+                viewModel.toggleMicrophoneState(viewModel.callMediaState.value.isMicrophoneEnabled.not())
             }
 
             ibtnVideo.setOnClickListener {
-                viewModel.toggleCameraState(!viewModel.callMediaState.value.isCameraEnabled)
+                viewModel.toggleCameraState(viewModel.callMediaState.value.isCameraEnabled.not())
             }
 
             ibtnCamSwitch.setOnClickListener {
@@ -172,7 +174,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     }
 
     private fun observeSessionState() {
-        callMediaStateJob = viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.sessionState.collect { state ->
                     handleSessionState(state)
@@ -186,10 +188,18 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
         when (state) {
             WebRTCSessionState.Active -> { }
-            WebRTCSessionState.Ready -> { }
-            WebRTCSessionState.Creating -> { }
-            WebRTCSessionState.Impossible -> { }
-            WebRTCSessionState.Offline -> { }
+            WebRTCSessionState.Ready -> {
+                binding.tvState.isEnabled = true
+            }
+            WebRTCSessionState.Creating -> {
+                binding.tvState.isEnabled = true
+            }
+            WebRTCSessionState.Impossible -> {
+                binding.tvState.isEnabled = false
+            }
+            WebRTCSessionState.Offline -> {
+                binding.tvState.isEnabled = false
+            }
         }
     }
 
