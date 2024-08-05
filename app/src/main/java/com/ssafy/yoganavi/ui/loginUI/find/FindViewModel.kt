@@ -8,6 +8,7 @@ import com.ssafy.yoganavi.data.repository.response.ListResponse
 import com.ssafy.yoganavi.data.repository.user.UserRepository
 import com.ssafy.yoganavi.data.source.user.UserRequest
 import com.ssafy.yoganavi.ui.utils.END_TIME
+import com.ssafy.yoganavi.ui.utils.HAS_SPACE
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.IS_NOT_EMAIL
 import com.ssafy.yoganavi.ui.utils.NOT_USER
@@ -93,6 +94,11 @@ class FindViewModel @Inject constructor(private val userRepository: UserReposito
                 return@launch
             }
 
+            if(hasSpace(password)){
+                emitError(HAS_SPACE)
+                return@launch
+            }
+
             if (password != passwordAgain) {
                 emitError(PASSWORD_DIFF)
                 return@launch
@@ -142,6 +148,11 @@ class FindViewModel @Inject constructor(private val userRepository: UserReposito
 
     private fun isEmail(email: String): Boolean =
         email.isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+
+    private fun hasSpace(input: String): Boolean {
+        val regex = "\\s".toRegex()
+        return regex.containsMatchIn(input)
+    }
 
     fun timerStart(): CountDownTimer = timer.start()
 

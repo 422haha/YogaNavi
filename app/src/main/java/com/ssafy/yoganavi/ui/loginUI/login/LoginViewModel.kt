@@ -7,6 +7,7 @@ import com.ssafy.yoganavi.data.repository.dataStore.DataStoreRepository
 import com.ssafy.yoganavi.data.repository.response.DetailResponse
 import com.ssafy.yoganavi.data.repository.user.UserRepository
 import com.ssafy.yoganavi.data.source.user.UserRequest
+import com.ssafy.yoganavi.ui.utils.HAS_SPACE
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.IS_NOT_EMAIL
 import com.ssafy.yoganavi.ui.utils.NO_AUTH
@@ -40,6 +41,11 @@ class LoginViewModel @Inject constructor(
             return@launch
         }
 
+        if(hasSpace(password)){
+            emitError(HAS_SPACE)
+            return@launch
+        }
+
         val request = UserRequest(email = email, password = password)
         runCatching { userRepository.logIn(request, dataStoreRepository.getFirebaseToken()) }
             .onSuccess { emitResponse(it) }
@@ -60,5 +66,10 @@ class LoginViewModel @Inject constructor(
 
     private fun isEmail(email: String): Boolean =
         email.isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+
+    private fun hasSpace(input: String): Boolean {
+        val regex = "\\s".toRegex()
+        return regex.containsMatchIn(input)
+    }
 
 }

@@ -139,3 +139,4 @@ const val IS_NOT_EMAIL = "유효하지 않은 이메일 형식입니다."
 const val NOT_USER = "존재하지 않는 회원입니다."
 const val MAX_NAME = 20
 const val NAME_IS_MAX = "닉네임은 20자까지만 가능합니다"
+const val HAS_SPACE = "비밀번호에 공백이 있습니다."
