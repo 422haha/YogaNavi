@@ -136,7 +136,7 @@ class RegisterNoticeFragment : BaseFragment<FragmentRegisterNoticeBinding>(
     }
 
     private suspend fun failToUpload() = withContext(Dispatchers.Main) {
-        binding.vBg.visibility = View.VISIBLE
+        binding.vBg.visibility = View.GONE
         binding.lav.visibility = View.GONE
         showSnackBar(UPLOAD_FAIL)
     }
