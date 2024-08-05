@@ -25,9 +25,10 @@
         app:layout_constraintTop_toTopOf="parent" />
     <FrameLayout
         android:id="@+id/draggable_container"
-        android:layout_width="150dp"
-        android:layout_height="200dp"
+        android:layout_width="200dp"
+        android:layout_height="150dp"
         android:background="@color/gray_20"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
         <io.getstream.webrtc.android.ui.VideoTextureViewRenderer
