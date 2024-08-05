@@ -35,6 +35,7 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
         }
 
         binding.btnSend.setOnClickListener {
+            binding.btnSend.isEnabled = false
             hideKeyboard()
 
             val email = binding.tieId.text.toString()
@@ -74,6 +75,7 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
                 is JoinEvent.SignUpSuccess -> signUpSuccess(it)
                 is JoinEvent.Error -> error(it.message)
             }
+            binding.btnSend.isEnabled = true
         }
     }
 

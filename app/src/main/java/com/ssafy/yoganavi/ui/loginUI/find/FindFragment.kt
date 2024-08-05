@@ -31,6 +31,7 @@ class FindFragment : BaseFragment<FragmentFindBinding>(FragmentFindBinding::infl
 
     private fun initListener() {
         binding.btnSend.setOnClickListener {
+            binding.btnSend.isEnabled = false
             hideKeyboard()
 
             val email = binding.tieId.text.toString()
@@ -68,6 +69,7 @@ class FindFragment : BaseFragment<FragmentFindBinding>(FragmentFindBinding::infl
                 is FindEvent.RegisterPasswordSuccess -> registerPasswordSuccess(it)
                 is FindEvent.Error -> error(it.message)
             }
+            binding.btnSend.isEnabled = true
         }
     }
 
