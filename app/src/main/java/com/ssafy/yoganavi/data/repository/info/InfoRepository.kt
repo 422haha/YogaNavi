@@ -84,7 +84,6 @@ interface InfoRepository {
 
     suspend fun updateLiveOnAir(state: Boolean, liveId: Int): DetailResponse<Unit>
 
-
     // CourseHistory
     suspend fun getCourseHistoryList(): ListResponse<HomeData>
 }
