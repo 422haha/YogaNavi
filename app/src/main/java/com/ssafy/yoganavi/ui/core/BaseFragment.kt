@@ -37,6 +37,12 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
         setEmptyView(EmptyData(false))
     }
 
+    override fun onPause() {
+        super.onPause()
+        if (activity == null || requireActivity() !is MainActivity) return
+        (requireActivity() as MainActivity).setBottomNavClickable(false)
+    }
+
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
