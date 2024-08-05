@@ -2,10 +2,16 @@ package com.ssafy.yoganavi.ui.homeUI.schedule.live
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
+import android.os.Build
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
+import android.view.WindowManager
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
@@ -16,6 +22,7 @@ import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
+import com.ssafy.yoganavi.ui.core.MainActivity
 import com.ssafy.yoganavi.ui.homeUI.schedule.live.webRtc.WebRTCSessionState
 import com.ssafy.yoganavi.ui.utils.PermissionHandler
 import com.ssafy.yoganavi.ui.utils.PermissionHelper
@@ -69,6 +76,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
         setToolbar(false, "", false)
 
+        setFullscreen()
+
         initListener()
 
         initInMoveLocalView()
@@ -81,6 +90,13 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     }
 
     private fun initListener() {
+        requireActivity().onBackPressedDispatcher
+            .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    popBack()
+                }
+            })
+
         with(binding) {
             ibtnMic.setOnClickListener {
                 viewModel.toggleMicrophoneState(!viewModel.callMediaState.value.isMicrophoneEnabled)
@@ -96,7 +112,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             }
 
             ibtnCancel.setOnClickListener {
-                findNavController().popBackStack()
+                popBack()
             }
         }
     }
@@ -172,7 +188,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             WebRTCSessionState.Active -> { }
             WebRTCSessionState.Ready -> { }
             WebRTCSessionState.Creating -> { }
-            WebRTCSessionState.Impossible,
+            WebRTCSessionState.Impossible -> { }
             WebRTCSessionState.Offline -> { }
         }
     }
@@ -259,7 +275,40 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         videoTrack?.removeSink(remoteRenderer)
     }
 
+    private fun setFullscreen() = with(requireActivity() as MainActivity) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.let { controller ->
+                controller.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+                controller.systemBarsBehavior =
+                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+        }
+        supportActionBar?.hide()
+    }
+
+    private fun exitFullscreen() = with(requireActivity() as MainActivity) {
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.show(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+        }
+        supportActionBar?.show()
+    }
+
     private fun popBack() {
+        exitFullscreen()
         findNavController().popBackStack()
     }
 }
