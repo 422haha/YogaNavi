@@ -201,7 +201,7 @@ public class TeacherServiceImpl implements TeacherService {
             .nickname(user.getNickname())
             .profileImageUrl(profileImageUrl)
             .profileImageUrlSmall(profileImageUrlSmall)
-            .content(user.getContent())
+            .content(user.getContent() != null ? user.getContent() : "안녕하세요! " + user.getNickname() + "입니다.")
             .hashtags(user.getHashtags().stream().map(Hashtag::getName).collect(Collectors.toSet()))
             .recordedLectures(sortedRecordedLectures)
             .notices(user.getArticles().stream().map(article -> {
