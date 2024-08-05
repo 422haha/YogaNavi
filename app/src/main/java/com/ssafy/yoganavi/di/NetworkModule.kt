@@ -49,8 +49,8 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideUserRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit = Retrofit.Builder()
-        .baseUrl("http://i11d210.p.ssafy.io:8080")
-//        .baseUrl("http://192.168.100.162:8080")
+//        .baseUrl("http://i11d210.p.ssafy.io:8080")
+        .baseUrl("http://192.168.100.162:8080")
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create(gson))
         .build()

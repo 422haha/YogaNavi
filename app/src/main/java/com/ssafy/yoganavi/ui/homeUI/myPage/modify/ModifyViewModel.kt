@@ -44,7 +44,8 @@ class ModifyViewModel @Inject constructor(
                     nickname = data.nickname,
                     imageUrl = data.imageUrl,
                     imageUrlSmall = data.imageUrlSmall,
-                    teacher = data.teacher
+                    teacher = data.teacher,
+                    content = data.content
                 )
                 _hashtagList.emit(data.hashTags?.toSet() ?: emptySet())
                 bindData(data)
@@ -69,6 +70,7 @@ class ModifyViewModel @Inject constructor(
     fun modifyProfile(
         nickname: String,
         password: String,
+        content: String,
         isModified: (DetailResponse<Profile>) -> Unit,
         showLoadingView: suspend () -> Unit,
         uploadFail: suspend () -> Unit
@@ -78,6 +80,7 @@ class ModifyViewModel @Inject constructor(
         profile = profile.copy(
             nickname = nickname,
             password = password,
+            content = content,
             hashTags = hashtagList.value.toList()
         )
 

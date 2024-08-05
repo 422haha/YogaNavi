@@ -41,6 +41,7 @@
     <string name="quit">회원 탈퇴</string>
     <string name="save">저장</string>
     <string name="hash_tag">해시 태그</string>
+    <string name="teacher_content">강사 50자 소개글</string>
 
     <string name="choose_week">가능 요일 선택</string>
     <string name="choose_date">날짜 선택</string>
