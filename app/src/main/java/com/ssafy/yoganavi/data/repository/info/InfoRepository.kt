@@ -82,6 +82,9 @@ interface InfoRepository {
     // Home
     suspend fun getHomeList(): ListResponse<HomeData>
 
+    suspend fun updateLiveOnAir(state: Boolean, liveId: Int): DetailResponse<Unit>
+
+
     // CourseHistory
     suspend fun getCourseHistoryList(): ListResponse<HomeData>
 }

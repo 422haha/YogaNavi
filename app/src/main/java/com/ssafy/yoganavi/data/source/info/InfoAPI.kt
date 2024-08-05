@@ -132,6 +132,12 @@ interface InfoAPI {
     @GET("home")
     suspend fun getHomeList(): Response<YogaResponse<HomeData>>
 
+    @PUT("home/update/{live_id}")
+    suspend fun updateLiveOnAir(
+        @Body state: Boolean,
+        @Path("live_id") liveId: Int
+    ): Response<YogaDetailResponse<Unit>>
+
     // CourseHistory
     @GET("mypage/course-history")
     suspend fun getCourseHistoryList(): Response<YogaResponse<HomeData>>
