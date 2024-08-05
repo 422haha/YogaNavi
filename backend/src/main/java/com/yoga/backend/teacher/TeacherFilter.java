@@ -1,5 +1,7 @@
 package com.yoga.backend.teacher;
 
+import java.time.Instant;
+
 /**
  * 강사 필터 클래스
  */
@@ -60,5 +62,13 @@ public class TeacherFilter {
 
     public void setSearchKeyword(String searchKeyword) {
         this.searchKeyword = searchKeyword;
+    }
+
+    public Instant getStartTimeAsInstant() {
+        return Instant.ofEpochMilli(startTime);
+    }
+
+    public Instant getEndTimeAsInstant() {
+        return Instant.ofEpochMilli(endTime);
     }
 }
