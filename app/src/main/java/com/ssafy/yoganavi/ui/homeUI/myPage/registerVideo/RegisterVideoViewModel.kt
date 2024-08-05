@@ -241,7 +241,8 @@ class RegisterVideoViewModel @Inject constructor(
                 id = it.id,
                 recordVideo = it.recordVideo,
                 recordPath = it.recordPath,
-                recordKey = it.recordKey
+                recordKey = it.recordKey,
+                chapterNumber = it.chapterNumber
             ).apply {
                 chapterTitle = it.chapterTitle
                 chapterDescription = it.chapterDescription
@@ -259,7 +260,8 @@ class RegisterVideoViewModel @Inject constructor(
             .map {
                 val videoData = it.videoData
                 VideoChapterData(
-                    id = if (videoData.recordPath.isNotBlank()) null else videoData.id,
+                    id = if (videoData.recordPath.isNotBlank()) 0 else videoData.id,
+                    chapterNumber = videoData.chapterNumber,
                     chapterTitle = videoData.chapterTitle ?: "",
                     chapterDescription = videoData.chapterDescription ?: "",
                     recordVideo = videoData.recordVideo,

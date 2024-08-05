@@ -5,6 +5,7 @@ data class VideoChapterData(
     val chapterTitle: String = "",
     val chapterDescription: String = "",
     val recordVideo: String = "",
+    val chapterNumber : Int = 0,
 
     @Transient
     val recordPath: String = "",
