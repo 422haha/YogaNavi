@@ -25,6 +25,8 @@ import com.ssafy.yoganavi.databinding.FragmentLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.core.MainActivity
 import com.ssafy.yoganavi.ui.homeUI.schedule.live.webRtc.WebRTCSessionState
+import com.ssafy.yoganavi.ui.utils.NO_BROADCAST
+import com.ssafy.yoganavi.ui.utils.NO_CONNECT_SERVER
 import com.ssafy.yoganavi.ui.utils.PermissionHandler
 import com.ssafy.yoganavi.ui.utils.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,24 +79,29 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
         setToolbar(false, "", false)
 
-        setFullscreen()
-
         initListener()
+
+        setFullscreen()
 
         initInMoveLocalView()
 
-        observeCallMediaState()
-
         observeSessionState()
 
-        renderInit()
+        observeCallMediaState()
 
-        binding.tvState.setOnClickListener {
-            viewModel.sessionManager.onSessionScreenReady()
-        }
+        localRenderInit()
+
+        remoteRenderInit()
     }
 
     private fun initListener() {
+        requireActivity().onBackPressedDispatcher
+            .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    popBack()
+                }
+            })
+
         with(binding) {
             ibtnMic.setOnClickListener {
                 viewModel.toggleMicrophoneState(viewModel.callMediaState.value.isMicrophoneEnabled.not())
@@ -178,16 +185,17 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     }
 
     private fun handleSessionState(state: WebRTCSessionState) {
-        binding.tvState.text = state.toString()
+        binding.tvState.text = state.name
 
         when (state) {
-            WebRTCSessionState.Offline -> { }
-            WebRTCSessionState.Impossible -> {
-                // 학생 입장에서 종료
-            }
+            WebRTCSessionState.Offline -> { binding.tvState.text = NO_CONNECT_SERVER }
+            WebRTCSessionState.Impossible -> { }
             WebRTCSessionState.Ready -> {
-                viewModel.sessionManager.onSessionScreenReady().apply {
-                    // TODO. API로 화상강의 Live 켜짐 보내기
+                if(args.isTeacher) {
+                    viewModel.sessionManager.onSessionScreenReady().apply {
+                        // TODO. 비정상 종료에서 Live 상태를 OFF로 변경해야함
+                        viewModel.updateLive(true, args.getLiveId)
+                    }
                 }
             }
             WebRTCSessionState.Creating -> {
@@ -227,18 +235,10 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         binding.ibtnVideo.setImageResource(if (isEnabled) R.drawable.baseline_videocam_24 else R.drawable.baseline_videocam_off_24)
     }
 
-    private fun renderInit() {
+    private fun localRenderInit() {
         localRenderer = binding.localVideoCallScreen
-        remoteRenderer = binding.remoteVideoCallScreen
 
         localRenderer.init(viewModel.sessionManager.peerConnectionFactory.eglBaseContext,
-            object: RendererCommon.RendererEvents {
-                override fun onFirstFrameRendered() = Unit
-
-                override fun onFrameResolutionChanged(width: Int, height: Int, rotation: Int) = Unit
-            })
-
-        remoteRenderer.init(viewModel.sessionManager.peerConnectionFactory.eglBaseContext,
             object: RendererCommon.RendererEvents {
                 override fun onFirstFrameRendered() = Unit
 
@@ -253,7 +253,22 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
                         setupLocalVideo(it)
                     }
                 }
+            }
+        }
+    }
 
+    private fun remoteRenderInit() {
+        remoteRenderer = binding.remoteVideoCallScreen
+
+        remoteRenderer.init(viewModel.sessionManager.peerConnectionFactory.eglBaseContext,
+            object: RendererCommon.RendererEvents {
+                override fun onFirstFrameRendered() = Unit
+
+                override fun onFrameResolutionChanged(width: Int, height: Int, rotation: Int) = Unit
+            })
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.sessionManager.remoteVideoTrackFlow.collectLatest {
                         cleanRemoteTrack(it)
@@ -316,5 +331,12 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         exitFullscreen()
 
         findNavController().popBackStack()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        if(args.isTeacher)
+            viewModel.updateLive(false, args.getLiveId)
     }
 }
