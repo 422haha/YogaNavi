@@ -172,7 +172,8 @@ public class TeacherController {
     }
 
     @GetMapping("/mypage/like-teacher")
-    public ResponseEntity<Map<String, Object>> getLikeTeachers(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<Map<String, Object>> getLikeTeachers(
+        @RequestHeader("Authorization") String token) {
         int userId = jwtUtil.getUserIdFromToken(token);
         Map<String, Object> response = new HashMap<>();
         try {
