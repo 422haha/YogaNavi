@@ -17,6 +17,7 @@
     <!-- EditText -->
     <dimen name="ti_extra_large_width">300dp</dimen>
     <dimen name="ti_height">60dp</dimen>
+    <dimen name="ti_multi_height">100dp</dimen>
 
     <dimen name="text_size_semi_large">22sp</dimen>
 

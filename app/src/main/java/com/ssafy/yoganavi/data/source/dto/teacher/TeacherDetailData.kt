@@ -22,4 +22,5 @@ data class TeacherDetailData(
     val teacherRecorded: MutableList<LectureData> = mutableListOf(),
     @SerializedName("notices")
     val teacherNotice: MutableList<NoticeData> = mutableListOf(),
+    val content:String
 )

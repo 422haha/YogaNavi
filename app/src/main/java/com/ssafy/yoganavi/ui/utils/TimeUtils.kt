@@ -39,9 +39,14 @@ fun formatZeroDate(hour: Int, minute: Int): String {
     return "$hourStr:$minuteStr"
 }
 // CalendarDay를 Long으로 변환하는 확장 함수
-fun CalendarDay.toLong(): Long {
+fun CalendarDay.toLong(flag:Int): Long {
     val calendar = Calendar.getInstance()
-    calendar.set(this.year, this.month - 1, this.day)
+    if(flag== START){
+        calendar.set(this.year, this.month - 1, this.day,0,0,0)
+    }
+    else{//END
+        calendar.set(this.year, this.month - 1, this.day,23,59,59)
+    }
     return calendar.timeInMillis
 }
 
