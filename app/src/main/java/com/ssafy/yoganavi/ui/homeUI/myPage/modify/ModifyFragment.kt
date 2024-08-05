@@ -167,7 +167,7 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
                 val currentText = tieContent.text.toString()
                 val length = currentText.length
-                if (length < 30) {
+                if (length < 50) {
                     tieContent.append("\n")
                 } else {
                     tieHashTag.requestFocus()

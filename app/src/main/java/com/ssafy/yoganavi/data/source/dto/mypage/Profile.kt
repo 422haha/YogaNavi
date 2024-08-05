@@ -7,7 +7,7 @@ data class Profile(
     val imageUrlSmall: String? = "",
     val hashTags: List<String>? = emptyList(),
     val teacher: Boolean = false,
-    val content: String = "",
+    val content: String? = "",
 
     @Transient
     val logoPath: String = "",
