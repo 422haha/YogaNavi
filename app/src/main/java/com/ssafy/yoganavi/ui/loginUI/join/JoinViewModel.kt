@@ -33,7 +33,7 @@ class JoinViewModel @Inject constructor(
             return@launch
         }
 
-        if(!isEmail(toString())){
+        if(!isEmail(email)){
             emitError(IS_NOT_EMAIL)
             return@launch
         }
@@ -45,7 +45,7 @@ class JoinViewModel @Inject constructor(
     }
 
     fun checkAuthEmail(email: String, checkNumber: Int?) = viewModelScope.launch(Dispatchers.IO) {
-        if(!isEmail(toString())){
+        if(!isEmail(email)){
             emitError(IS_NOT_EMAIL)
             return@launch
         }
@@ -70,7 +70,7 @@ class JoinViewModel @Inject constructor(
             return@launch
         }
 
-        if(!isEmail(toString())){
+        if(!isEmail(email)){
             emitError(IS_NOT_EMAIL)
             return@launch
         }

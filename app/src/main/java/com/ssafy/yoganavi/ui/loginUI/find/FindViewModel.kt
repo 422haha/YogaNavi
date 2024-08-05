@@ -31,7 +31,7 @@ class FindViewModel @Inject constructor(private val userRepository: UserReposito
             return@launch
         }
 
-        if(!isEmail(toString())){
+        if(!isEmail(email)){
             emitError(IS_NOT_EMAIL)
             return@launch
         }
@@ -43,7 +43,7 @@ class FindViewModel @Inject constructor(private val userRepository: UserReposito
     }
 
     fun checkAuthEmail(email: String, checkNumber: Int?) = viewModelScope.launch(Dispatchers.IO) {
-        if(!isEmail(toString())){
+        if(!isEmail(email)){
             emitError(IS_NOT_EMAIL)
             return@launch
         }
@@ -63,7 +63,7 @@ class FindViewModel @Inject constructor(private val userRepository: UserReposito
                 return@launch
             }
 
-            if(!isEmail(toString())){
+            if(!isEmail(email)){
                 emitError(IS_NOT_EMAIL)
                 return@launch
             }
