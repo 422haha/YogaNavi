@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.activity.result.contract.ActivityResultContracts
@@ -75,6 +76,9 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
             tvHashtag.visibility = View.GONE
             tilHashTag.visibility = View.GONE
             tieHashTag.visibility = View.GONE
+            tvContent.visibility = View.GONE
+            tilContent.visibility = View.GONE
+            tieContent.visibility = View.GONE
         }
     }
 
@@ -108,6 +112,10 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
             if (data.teacher) {
                 tvHashtag.visibility = View.VISIBLE
                 tilHashTag.visibility = View.VISIBLE
+                tvContent.visibility = View.VISIBLE
+                tilContent.visibility = View.VISIBLE
+                tieContent.visibility = View.VISIBLE
+                tieContent.setText(data.content)
             }
         }
     }
@@ -128,7 +136,15 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
         check.setOnClickListener {
             val nickname = tieNn.text?.toString() ?: ""
             val password = tiePw.text?.toString() ?: ""
-            viewModel.modifyProfile(nickname, password, ::isModified, ::loadingView, ::failToUpload)
+            val content = tieContent.text?.toString() ?: ""
+            viewModel.modifyProfile(
+                nickname,
+                password,
+                content,
+                ::isModified,
+                ::loadingView,
+                ::failToUpload
+            )
         }
 
         tiePw.addTextChangedListener { editText ->
@@ -145,6 +161,20 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
             } else {
                 tiePwAgain.error = null
                 check.isEnabled = true
+            }
+        }
+        tieContent.setOnKeyListener { v, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
+                val currentText = tieContent.text.toString()
+                val length = currentText.length
+                if (length < 30) {
+                    tieContent.append("\n")
+                } else {
+                    tieHashTag.requestFocus()
+                }
+                true
+            } else {
+                false
             }
         }
 

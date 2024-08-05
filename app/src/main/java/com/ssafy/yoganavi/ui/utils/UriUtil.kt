@@ -27,7 +27,8 @@ fun getVideoPath(context: Context, uri: Uri): String {
     } ?: ""
 
     if (fileName.isBlank()) return ""
-    val file = File(context.cacheDir, fileName)
+    val yogaDir = getYogaDirectory(context)
+    val file = File(yogaDir, fileName)
     file.createNewFile()
 
     context.contentResolver.openInputStream(uri)?.use { inputStream ->
@@ -54,7 +55,8 @@ suspend fun getImagePath(
     if (fileName.isBlank()) return@withContext Pair("", "")
 
     // 임시 파일 생성
-    val tempFile = File(context.cacheDir, fileName)
+    val yogaDir = getYogaDirectory(context)
+    val tempFile = File(yogaDir, fileName)
     tempFile.createNewFile()
 
     contentResolver.openInputStream(uri)?.use { inputStream ->
@@ -63,7 +65,7 @@ suspend fun getImagePath(
         }
     } ?: return@withContext Pair("", "")
 
-    val originalPath = tempFile.absolutePath
+    val originalPath = tempFile.path
 
     val bmp = BitmapFactory.decodeFile(originalPath) ?: return@withContext Pair("", "")
     val rotatedBitmap = getCorrectlyOrientedBitmap(originalPath, bmp)
@@ -84,7 +86,7 @@ suspend fun getImagePath(
         true
     )
 
-    val miniWebpFile = File(context.filesDir, "${fileName.substringBeforeLast('.')}_mini.webp")
+    val miniWebpFile = File(yogaDir, "${fileName.substringBeforeLast('.')}_mini.webp")
     try {
         FileOutputStream(miniWebpFile).use { outputStream ->
             miniBitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
@@ -136,4 +138,10 @@ suspend fun uploadFile(
             continuation.resume(false)
         }
     })
+}
+
+private fun getYogaDirectory(context: Context): File {
+    val yogaDir = File(context.cacheDir, YOGA)
+    if (!yogaDir.exists()) yogaDir.mkdirs()
+    return yogaDir
 }

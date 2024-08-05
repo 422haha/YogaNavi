@@ -48,7 +48,6 @@
             android:layout_marginStart="@dimen/padding_medium"
             android:layout_marginTop="@dimen/padding_extra_large"
             android:text="@string/nickname"
-            app:layout_constraintBottom_toTopOf="@id/til_nn"
             app:layout_constraintStart_toStartOf="@id/til_nn"
             app:layout_constraintTop_toBottomOf="@id/cv_icon" />
 
@@ -56,7 +55,6 @@
             android:id="@+id/til_nn"
             style="@style/boxCornerRadiusStyle"
             app:errorEnabled="true"
-            app:layout_constraintBottom_toTopOf="@id/tv_pw"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_nickname">
@@ -76,7 +74,6 @@
             android:layout_marginStart="@dimen/padding_medium"
             android:layout_marginTop="@dimen/padding_small"
             android:text="@string/password"
-            app:layout_constraintBottom_toTopOf="@id/til_pw"
             app:layout_constraintStart_toStartOf="@id/til_pw"
             app:layout_constraintTop_toBottomOf="@id/til_nn" />
 
@@ -84,7 +81,6 @@
             android:id="@+id/til_pw"
             style="@style/boxCornerRadiusStyle"
             app:errorEnabled="true"
-            app:layout_constraintBottom_toTopOf="@id/tv_pw_again"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_pw"
@@ -105,7 +101,6 @@
             android:layout_marginStart="@dimen/padding_medium"
             android:layout_marginTop="@dimen/padding_small"
             android:text="@string/check_password"
-            app:layout_constraintBottom_toTopOf="@id/til_pw_again"
             app:layout_constraintStart_toStartOf="@id/til_pw_again"
             app:layout_constraintTop_toBottomOf="@id/til_pw" />
 
@@ -113,7 +108,6 @@
             android:id="@+id/til_pw_again"
             style="@style/boxCornerRadiusStyle"
             app:errorEnabled="true"
-            app:layout_constraintBottom_toTopOf="@id/tv_hashtag"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_pw_again">
@@ -127,21 +121,51 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
+            android:id="@+id/tv_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_medium"
+            android:layout_marginTop="@dimen/padding_small"
+            android:text="@string/teacher_content"
+            app:layout_constraintStart_toStartOf="@+id/til_content"
+            app:layout_constraintTop_toBottomOf="@id/til_pw_again" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_content"
+            style="@style/boxCornerMultiLengthRadiusStyle"
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tie_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:inputType="textMultiLine"
+                android:lines="3"
+                android:maxLength="50"
+                android:maxLines="3"
+                android:overScrollMode="always"
+                android:scrollbars="vertical" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
             android:id="@+id/tv_hashtag"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/padding_medium"
             android:layout_marginTop="@dimen/padding_small"
             android:text="@string/hash_tag"
-            app:layout_constraintBottom_toTopOf="@id/til_hash_tag"
             app:layout_constraintStart_toStartOf="@+id/til_hash_tag"
-            app:layout_constraintTop_toBottomOf="@id/til_pw_again" />
+            app:layout_constraintTop_toBottomOf="@id/til_content" />
+
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til_hash_tag"
             style="@style/boxCornerRadiusStyle"
             app:errorEnabled="true"
-            app:layout_constraintBottom_toTopOf="@id/rv_hash_tag"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_hashtag">

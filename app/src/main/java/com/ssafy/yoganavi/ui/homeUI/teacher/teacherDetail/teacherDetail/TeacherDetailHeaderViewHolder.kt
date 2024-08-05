@@ -21,6 +21,7 @@ class TeacherDetailHeaderViewHolder(
             ivProfile.isVisible = false
         }
         tvNickname.text = teacherDetailHeader.teacherName
+        tvContent.text = teacherDetailHeader.content
         btnReserve.isVisible = tvNickname.text != "공지사항"
         if (teacherDetailHeader.content.isBlank()) {
             tvContent.isVisible = false

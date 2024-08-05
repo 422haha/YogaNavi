@@ -17,6 +17,7 @@ import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentTeacherReservationBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.teacher.teacherReservation.availableList.AvailableAdapter
+import com.ssafy.yoganavi.ui.utils.END
 import com.ssafy.yoganavi.ui.utils.NOTHING
 import com.ssafy.yoganavi.ui.utils.ONE_TO_MULTI
 import com.ssafy.yoganavi.ui.utils.ONE_TO_ONE
@@ -24,6 +25,7 @@ import com.ssafy.yoganavi.ui.utils.PICK_DATE
 import com.ssafy.yoganavi.ui.utils.RESERVATION
 import com.ssafy.yoganavi.ui.utils.RESERVE
 import com.ssafy.yoganavi.ui.utils.SELECT_CLASS
+import com.ssafy.yoganavi.ui.utils.START
 import com.ssafy.yoganavi.ui.utils.toCalendarDay
 import com.ssafy.yoganavi.ui.utils.toLong
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,8 +58,8 @@ class TeacherReservationFragment :
             } else {
                 viewModel.registerLive(
                     liveId,
-                    saveEndDate?.toLong(),
-                    saveEndDate?.toLong(),
+                    saveStartDate?.toLong(START),
+                    saveEndDate?.toLong(END),
                     ::navigateToSchedule
                 )
             }
@@ -176,7 +178,8 @@ class TeacherReservationFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             liveId = lectureId
             calendar.clearSelection()
-            calendar.state().edit().setMinimumDate(startDate.toCalendarDay())
+            calendar.state().edit()
+                .setMinimumDate(Math.max(startDate, System.currentTimeMillis()).toCalendarDay())
                 .setMaximumDate(endDate.toCalendarDay())
                 .commit()
             tvSelectTerm.apply {
