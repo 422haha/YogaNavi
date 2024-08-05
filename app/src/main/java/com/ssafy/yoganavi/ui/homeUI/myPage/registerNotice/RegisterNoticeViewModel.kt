@@ -111,7 +111,7 @@ class RegisterNoticeViewModel @Inject constructor(
 
         runCatching { infoRepository.insertNotice(request) }
             .onSuccess { goBackStack() }
-            .onFailure { it.printStackTrace() }
+            .onFailure { uploadFail() }
     }
 
     fun updateNotice(
@@ -164,7 +164,7 @@ class RegisterNoticeViewModel @Inject constructor(
 
         runCatching { infoRepository.updateNotice(request, notice.value.articleId) }
             .onSuccess { goBackStack() }
-            .onFailure { it.printStackTrace() }
+            .onFailure { uploadFail() }
     }
 
 }

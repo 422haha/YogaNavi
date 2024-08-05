@@ -201,7 +201,7 @@ class RegisterVideoViewModel @Inject constructor(
             }
         }
             .onSuccess { successToUpload() }
-            .onFailure { it.printStackTrace() }
+            .onFailure { failToUpload(NO_RESPONSE) }
 
     }
 
