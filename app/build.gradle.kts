@@ -131,7 +131,7 @@ dependencies {
     // FCM
     implementation (libs.firebase.messaging.ktx)
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.analytics);
 
     // Web RTC
     implementation("io.getstream:stream-webrtc-android:1.1.3")

@@ -1,8 +1,12 @@
 package com.ssafy.yoganavi.ui.homeUI.schedule.live
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
+import android.widget.FrameLayout
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -17,6 +21,7 @@ import com.ssafy.yoganavi.ui.utils.PermissionHandler
 import com.ssafy.yoganavi.ui.utils.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
 import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.webrtc.RendererCommon
@@ -26,20 +31,37 @@ import org.webrtc.VideoTrack
 class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::inflate) {
 
     private val viewModel: LiveViewModel by viewModels()
+    private var callMediaStateJob: Job? = null
 
     private lateinit var localRenderer: VideoTextureViewRenderer
     private lateinit var remoteRenderer: VideoTextureViewRenderer
 
-    private val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { _: Boolean -> }
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var permissionHandler: PermissionHandler
+    private lateinit var permissionHelper: PermissionHelper
 
-    private val permissionHandler: PermissionHandler by lazy {
-        PermissionHandler(
+    private lateinit var draggableContainer: FrameLayout
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        initPermission()
+    }
+
+    private fun initPermission() {
+        requestPermissionLauncher =
+            registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { _: Boolean -> }
+
+        permissionHandler = PermissionHandler(
             requireActivity(),
             requestPermissionLauncher
         )
+
+        permissionHelper = PermissionHelper(this, arrayOf(Manifest.permission.CAMERA), ::popBack).apply {
+            launchPermission()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -47,20 +69,15 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
         setToolbar(false, "", false)
 
-        checkPermission()
-
         initListener()
+
+        initInMoveLocalView()
+
+        observeCallMediaState()
 
         observeSessionState()
 
         renderInit()
-    }
-
-    private fun checkPermission() {
-        PermissionHelper(this, arrayOf(Manifest.permission.CAMERA), ::popBack)
-            .launchPermission()
-
-        permissionHandler.branchPermission(Manifest.permission.RECORD_AUDIO, "오디오")
     }
 
     private fun initListener() {
@@ -74,57 +91,119 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             }
 
             ibtnCamSwitch.setOnClickListener {
-                viewModel.sessionManager.flipCamera()
+                if(viewModel.sessionState.value == WebRTCSessionState.Active)
+                    viewModel.sessionManager.flipCamera()
             }
 
             ibtnCancel.setOnClickListener {
-                viewModel.sessionManager.disconnect()
                 findNavController().popBackStack()
             }
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initOutMoveLocalView() {
+        draggableContainer = binding.draggableContainer
+        draggableContainer.setOnTouchListener { view, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    viewModel.updateOffset(view.x - event.rawX, view.y - event.rawY)
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    view.animate()
+                        .x(event.rawX + viewModel.offsetX.value)
+                        .y(event.rawY + viewModel.offsetY.value)
+                        .setDuration(0)
+                        .start()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initInMoveLocalView() {
+        draggableContainer = binding.draggableContainer
+        draggableContainer.setOnTouchListener { view, event ->
+            val parent = view.parent as View
+            val parentWidth = parent.width
+            val parentHeight = parent.height
+
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    viewModel.updateOffset(view.x - event.rawX, view.y - event.rawY)
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val newX = event.rawX + viewModel.offsetX.value
+                    val newY = event.rawY + viewModel.offsetY.value
+
+                    val clampedX = newX.coerceIn(0f, parentWidth - view.width.toFloat())
+                    val clampedY = newY.coerceIn(0f, parentHeight - view.height.toFloat())
+
+                    view.animate()
+                        .x(clampedX)
+                        .y(clampedY)
+                        .setDuration(0)
+                        .start()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
     private fun observeSessionState() {
-        viewLifecycleOwner.lifecycleScope.launch {
+        callMediaStateJob = viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.sessionManager.signalingClient.sessionStateFlow.collect { state ->
-                    if (state == WebRTCSessionState.Ready) {
-                        viewModel.sessionManager.onSessionScreenReady().apply {
-                            observeCallMediaState()
-                        }
-                    }
-                    // TODO 연결 상태에 따라 실행 예시로 disconnect
-                    binding.tvState.text = state.toString()
+                viewModel.sessionState.collect { state ->
+                    handleSessionState(state)
                 }
             }
+        }
+    }
+
+    private fun handleSessionState(state: WebRTCSessionState) {
+        binding.tvState.text = state.toString()
+
+        when (state) {
+            WebRTCSessionState.Active -> { }
+            WebRTCSessionState.Ready -> { }
+            WebRTCSessionState.Creating -> { }
+            WebRTCSessionState.Impossible,
+            WebRTCSessionState.Offline -> { }
         }
     }
 
     private fun observeCallMediaState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.callMediaState.collect { state ->
+                viewModel.callMediaState.collectLatest { state ->
                         handleMicrophoneState(state.isMicrophoneEnabled)
                         handleCameraState(state.isCameraEnabled)
-                    }
+                }
             }
         }
     }
 
     private fun handleMicrophoneState(isEnabled: Boolean) {
-        viewModel.sessionManager.enableMicrophone(isEnabled)
+        if(isEnabled) permissionHandler.branchPermission(Manifest.permission.RECORD_AUDIO, "오디오")
+
+        if(viewModel.sessionState.value == WebRTCSessionState.Active)
+            viewModel.sessionManager.enableMicrophone(isEnabled)
 
         binding.ibtnMic.setImageResource(if (isEnabled) R.drawable.baseline_mic_24 else R.drawable.baseline_mic_off_24)
     }
 
     private fun handleCameraState(isEnabled: Boolean) {
-        viewModel.sessionManager.enableCamera(isEnabled)
+        if(isEnabled) permissionHelper.launchPermission()
+
+        if(viewModel.sessionState.value == WebRTCSessionState.Active)
+            viewModel.sessionManager.enableCamera(isEnabled)
 
         binding.ibtnVideo.setImageResource(if (isEnabled) R.drawable.baseline_videocam_24 else R.drawable.baseline_videocam_off_24)
-    }
-
-    private fun popBack() {
-        findNavController().popBackStack()
     }
 
     private fun renderInit() {
@@ -132,14 +211,14 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         remoteRenderer = binding.remoteVideoCallScreen
 
         localRenderer.init(viewModel.sessionManager.peerConnectionFactory.eglBaseContext,
-            object : RendererCommon.RendererEvents {
+            object: RendererCommon.RendererEvents {
                 override fun onFirstFrameRendered() = Unit
 
                 override fun onFrameResolutionChanged(width: Int, height: Int, rotation: Int) = Unit
             })
 
         remoteRenderer.init(viewModel.sessionManager.peerConnectionFactory.eglBaseContext,
-            object : RendererCommon.RendererEvents {
+            object: RendererCommon.RendererEvents {
                 override fun onFirstFrameRendered() = Unit
 
                 override fun onFrameResolutionChanged(width: Int, height: Int, rotation: Int) = Unit
@@ -149,12 +228,14 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.sessionManager.localVideoTrackFlow.collectLatest {
+                        cleanLocalTrack(it)
                         setupLocalVideo(it)
                     }
                 }
 
                 launch {
                     viewModel.sessionManager.remoteVideoTrackFlow.collectLatest {
+                        cleanRemoteTrack(it)
                         setupRemoteVideo(it)
                     }
                 }
@@ -170,7 +251,15 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         videoTrack?.addSink(remoteRenderer)
     }
 
-    private fun cleanTrack() {
-//        viewModel.sessionManager.remoteVideoTrackFlow.removeSink(localRenderer)
+    private fun cleanLocalTrack(videoTrack: VideoTrack?) {
+        videoTrack?.removeSink(localRenderer)
+    }
+
+    private fun cleanRemoteTrack(videoTrack: VideoTrack?) {
+        videoTrack?.removeSink(remoteRenderer)
+    }
+
+    private fun popBack() {
+        findNavController().popBackStack()
     }
 }
