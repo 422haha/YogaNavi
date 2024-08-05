@@ -9,7 +9,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.databinding.FragmentLikeTeacherBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
-import com.ssafy.yoganavi.ui.homeUI.teacher.teacherList.TeacherListFragmentDirections
 import com.ssafy.yoganavi.ui.homeUI.teacher.teacherList.teacher.TeacherAdapter
 import com.ssafy.yoganavi.ui.utils.EMPTY_LIKE_TEACHER
 import com.ssafy.yoganavi.ui.utils.LIKE_TEACHER
@@ -47,8 +46,8 @@ class LikeTeacherFragment : BaseFragment<FragmentLikeTeacherBinding>(
     }
 
     private fun navigateToTeacherFragment(userId: Int = -1) {
-        val directions = TeacherListFragmentDirections
-            .actionTeacherListFragmentToTeacherDetailFragment(userId)
+        val directions = LikeTeacherFragmentDirections
+            .actionLikeTeacherFragmentToTeacherDetailFragment(userId)
         findNavController().navigate(directions)
     }
 

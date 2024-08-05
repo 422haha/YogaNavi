@@ -18,12 +18,16 @@ class TeacherDetailHeaderViewHolder(
                 teacherDetailHeader.teacherSmallProfile,
                 teacherDetailHeader.teacherProfile
             )
-        } else {
+        }
+        else if(teacherDetailHeader.teacherId==-1){
+            ivProfile.isVisible = false
+        }
+        else {
             ivProfile.setImageResource(R.drawable.profilenull)
         }
         tvNickname.text = teacherDetailHeader.teacherName
         btnReserve.isVisible = tvNickname.text != "공지사항"
-        if (teacherDetailHeader.content.isBlank()) {
+        if (teacherDetailHeader.content.isNullOrBlank()) {
             tvContent.isVisible = false
         } else {
             tvContent.text = teacherDetailHeader.content

@@ -69,8 +69,11 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
     }
 
     private fun initView() {
-        viewModel.filter = args.filter ?: FilterData()
         isInit = args.isInit
+        if (isInit) {
+            viewModel.filter = FilterData()
+        } else
+            viewModel.filter = args.filter ?: FilterData()
         sorting = args.sorting
         binding.btnStartTime.text =
             (if (viewModel.filter.startTime > 0L) (viewModel.filter.startTime / 3600000).toInt()

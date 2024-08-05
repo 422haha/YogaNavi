@@ -56,7 +56,7 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
         if (data.teacherNotice.isNotEmpty()) {
             val header2 = TeacherData(
                 teacherName = "공지사항",
-                teacherId = 0,
+                teacherId = -1,
                 content = "",
                 teacherProfile = "",
                 teacherSmallProfile = "",
