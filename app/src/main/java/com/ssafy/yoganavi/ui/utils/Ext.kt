@@ -132,3 +132,7 @@ data class DayStatus(val day: Week, var isSelected: Boolean)
 const val CHANNEL_ID = "YogaNaviChannelId"
 const val CHANNEL_NAME = "YogaNavi"
 const val CHANNEL_DESCRIPTION = "YogaNavi Live Notification"
+
+
+// 에러 모음집
+const val IS_NOT_EMAIL = "유효하지 않은 이메일 형식입니다."

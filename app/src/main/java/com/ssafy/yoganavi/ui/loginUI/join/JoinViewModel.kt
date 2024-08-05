@@ -1,11 +1,13 @@
 package com.ssafy.yoganavi.ui.loginUI.join
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.response.ListResponse
 import com.ssafy.yoganavi.data.repository.user.UserRepository
 import com.ssafy.yoganavi.data.source.user.UserRequest
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
+import com.ssafy.yoganavi.ui.utils.IS_NOT_EMAIL
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
 import com.ssafy.yoganavi.ui.utils.isBlank
@@ -31,6 +33,11 @@ class JoinViewModel @Inject constructor(
             return@launch
         }
 
+        if(!isEmail(toString())){
+            emitError(IS_NOT_EMAIL)
+            return@launch
+        }
+
         val userRequest = UserRequest(email = email)
         runCatching { userRepository.registerEmail(userRequest) }
             .onSuccess { emitResponse(it, JoinEvent.RegisterEmailSuccess::class.java) }
@@ -38,6 +45,11 @@ class JoinViewModel @Inject constructor(
     }
 
     fun checkAuthEmail(email: String, checkNumber: Int?) = viewModelScope.launch(Dispatchers.IO) {
+        if(!isEmail(toString())){
+            emitError(IS_NOT_EMAIL)
+            return@launch
+        }
+
         checkNumber?.let {
             val userRequest = UserRequest(email = email, authnumber = checkNumber)
             runCatching { userRepository.checkAuthEmail(userRequest) }
@@ -55,6 +67,11 @@ class JoinViewModel @Inject constructor(
     ) = viewModelScope.launch(Dispatchers.IO) {
         if (arrayOf(email, password, nickname).isBlank()) {
             emitError(IS_BLANK)
+            return@launch
+        }
+
+        if(!isEmail(toString())){
+            emitError(IS_NOT_EMAIL)
             return@launch
         }
 
@@ -105,5 +122,8 @@ class JoinViewModel @Inject constructor(
 
     private suspend fun emitError(message: String) =
         _joinEvent.emit(JoinEvent.Error(message = message))
+
+    private fun isEmail(email: String): Boolean =
+        email.isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
 }
