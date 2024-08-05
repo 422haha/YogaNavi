@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.forEach
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -95,6 +96,7 @@ class MainActivity : AppCompatActivity() {
     private fun CoroutineScope.collectMainEvent() = launch {
         viewModel.mainEvent.collectLatest { event ->
             setBottomNavigationVisible(event.isBottomNavigationVisible)
+            setBottomNavClickable(event.isBottomNavigationVisible)
             setTitle(event.title)
             setMenuItem(event.menuItem, event.menuListener)
             checkGoBack(event.canGoBack)
@@ -156,4 +158,7 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 
+    fun setBottomNavClickable(canClick: Boolean) {
+        binding.bnv.menu.forEach { item -> item.isEnabled = canClick }
+    }
 }
