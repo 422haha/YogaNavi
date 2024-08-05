@@ -81,10 +81,14 @@ class TeacherReservationFragment :
         }
         circularProgressDrawable.start()
 
-        Glide.with(binding.root)
-            .load(args.teacherSmallProfile)
-            .placeholder(circularProgressDrawable)
-            .into(ivProfile)
+        if (args.teacherSmallProfile.isBlank()) {
+            binding.ivProfile.setImageResource(R.drawable.profilenull)
+        } else {
+            Glide.with(binding.root)
+                .load(args.teacherSmallProfile)
+                .placeholder(circularProgressDrawable)
+                .into(ivProfile)
+        }
         tvTeacherNickname.text = args.teacherName
         if (args.hashtags.isNotBlank()) {
             tvHashtag.text = args.hashtags
