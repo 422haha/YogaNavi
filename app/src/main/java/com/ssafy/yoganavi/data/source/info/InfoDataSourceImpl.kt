@@ -50,6 +50,9 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun teacherLikeToggle(teacherId: Int): Response<YogaDetailResponse<Boolean>> =
         infoAPI.teacherLikeToggle(teacherId)
 
+    override suspend fun getLikeTeacherList(): Response<YogaResponse<TeacherData>> =
+        infoAPI.getLikeTeacherList()
+
     override suspend fun getAvailableClass(
         teacherId: Int,
         method: Int
