@@ -94,4 +94,6 @@ interface InfoDataSource {
 
     // CourseHistory
     suspend fun getCourseHistoryList(): Response<YogaResponse<HomeData>>
+
+    suspend fun checkPassword(password: HashMap<String, String>): Response<YogaDetailResponse<Boolean>>
 }
