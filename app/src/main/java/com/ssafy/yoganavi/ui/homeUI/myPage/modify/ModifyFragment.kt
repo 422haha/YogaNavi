@@ -136,8 +136,15 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
         check.setOnClickListener {
             val nickname = tieNn.text?.toString() ?: ""
             val password = tiePw.text?.toString() ?: ""
-            val content = tieContent.text?.toString()?:""
-            viewModel.modifyProfile(nickname, password, content, ::isModified, ::loadingView, ::failToUpload)
+            val content = tieContent.text?.toString() ?: ""
+            viewModel.modifyProfile(
+                nickname,
+                password,
+                content,
+                ::isModified,
+                ::loadingView,
+                ::failToUpload
+            )
         }
 
         tiePw.addTextChangedListener { editText ->
@@ -162,17 +169,13 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
                 val length = currentText.length
                 if (length < 30) {
                     tieContent.append("\n")
-                }
-                else{
+                } else {
                     tieHashTag.requestFocus()
                 }
                 true
             } else {
                 false
             }
-        }
-        tieContent.addTextChangedListener{
-
         }
 
         tieHashTag.setOnEditorActionListener { _, actionId, _ ->

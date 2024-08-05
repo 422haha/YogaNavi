@@ -111,7 +111,7 @@ class ModifyViewModel @Inject constructor(
 
         runCatching { infoRepository.updateProfile(profile) }
             .onSuccess { isModified(it) }
-            .onFailure {  uploadFail() }
+            .onFailure { uploadFail() }
     }
 
     fun setThumbnail(path: String, miniPath: String) = viewModelScope.launch(Dispatchers.IO) {

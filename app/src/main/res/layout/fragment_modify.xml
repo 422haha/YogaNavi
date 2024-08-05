@@ -142,13 +142,13 @@
                 android:id="@+id/tie_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
                 android:inputType="textMultiLine"
                 android:lines="3"
-                android:maxLines="3"
                 android:maxLength="50"
-                android:scrollbars="vertical"
+                android:maxLines="3"
                 android:overScrollMode="always"
-                android:imeOptions="actionDone" />
+                android:scrollbars="vertical" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView

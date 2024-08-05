@@ -15,7 +15,7 @@ data class Profile(
     val logoKey: String = "",
 
     @Transient
-    val logoSmallPath : String = "",
+    val logoSmallPath: String = "",
     @Transient
-    val logoSmallKey : String = ""
+    val logoSmallKey: String = ""
 )
