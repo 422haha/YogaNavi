@@ -11,6 +11,8 @@ import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.databinding.FragmentJoinBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.END_TIME
+import com.ssafy.yoganavi.ui.utils.MAX_NAME
+import com.ssafy.yoganavi.ui.utils.NAME_IS_MAX
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -56,6 +58,16 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(FragmentJoinBinding::infl
             val nickname = binding.tieNn.text.toString()
             val isTeacher = binding.tvTeacher.isChecked
             viewModel.signUp(email, password, passwordAgain, nickname, isTeacher)
+        }
+
+        binding.tieNn.addTextChangedListener { newText ->
+            if (newText.toString().length > MAX_NAME) {
+                binding.tieNn.error = NAME_IS_MAX
+                binding.btnSignup.isEnabled = false
+            }else{
+                binding.tieNn.error = null
+                binding.btnSignup.isEnabled = true
+            }
         }
     }
 
