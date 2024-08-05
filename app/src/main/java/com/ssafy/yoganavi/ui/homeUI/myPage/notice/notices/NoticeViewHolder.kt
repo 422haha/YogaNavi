@@ -19,7 +19,7 @@ class NoticeViewHolder(
             .into(ivProfile)
 
         if (item.imageUrl?.isNotBlank() == true && item.imageUrlSmall?.isNotBlank() == true) {
-            ivNotice.loadImageSequentially(item.imageUrl, item.imageUrlSmall)
+            ivNotice.loadImageSequentially(item.imageUrlSmall, item.imageUrl)
         }
 
         tvTeacherNickname.text = item.userName

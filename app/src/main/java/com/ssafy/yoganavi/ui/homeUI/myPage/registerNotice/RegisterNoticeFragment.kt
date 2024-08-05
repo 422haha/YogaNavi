@@ -91,7 +91,7 @@ class RegisterNoticeFragment : BaseFragment<FragmentRegisterNoticeBinding>(
             viewModel.notice.collectLatest { notice ->
                 binding.etNotice.setText(notice.content)
                 if (notice.imageUrl?.isNotBlank() == true && notice.imageUrlSmall?.isNotBlank() == true) {
-                    binding.ivPhoto.loadImageSequentially(notice.imageUrl, notice.imageUrlSmall)
+                    binding.ivPhoto.loadImageSequentially(notice.imageUrlSmall, notice.imageUrl)
                     binding.ivPhoto.visibility = View.VISIBLE
                     binding.btnDeletePhoto.visibility = View.VISIBLE
                     binding.btnAddPhoto.visibility = View.GONE
