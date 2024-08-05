@@ -42,7 +42,7 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
         val header = TeacherData(
             teacherName = data.teacherName,
             teacherId = data.teacherId,
-            content = "기본에 충실한 하타요가를 가르칩니다.\n todo) content 생성창 만들기",
+            content = data.content,
             teacherProfile = data.teacherProfile ?: "",
             teacherSmallProfile = data.teacherSmallProfile ?: "",
             hashtags = data.hashtags,
