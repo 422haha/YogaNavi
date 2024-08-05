@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.teacher.teacherDetail.teacherDetail
 
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.databinding.ListItemTeacherHeaderBinding
 import com.ssafy.yoganavi.ui.utils.loadImageSequentially
@@ -11,17 +12,16 @@ class TeacherDetailHeaderViewHolder(
     private val goReserve: (Int, String, String, String) -> (Unit)
 ) : ViewHolder(binding.root) {
     fun bind(teacherDetailHeader: TeacherData) = with(binding) {
+        ivProfile.isVisible = true
         if (teacherDetailHeader.teacherProfile.isNotBlank() && teacherDetailHeader.teacherSmallProfile.isNotBlank()) {
             ivProfile.loadImageSequentially(
                 teacherDetailHeader.teacherSmallProfile,
                 teacherDetailHeader.teacherProfile
             )
-            ivProfile.isVisible = true
         } else {
-            ivProfile.isVisible = false
+            ivProfile.setImageResource(R.drawable.profilenull)
         }
         tvNickname.text = teacherDetailHeader.teacherName
-        tvContent.text = teacherDetailHeader.content
         btnReserve.isVisible = tvNickname.text != "공지사항"
         if (teacherDetailHeader.content.isBlank()) {
             tvContent.isVisible = false
