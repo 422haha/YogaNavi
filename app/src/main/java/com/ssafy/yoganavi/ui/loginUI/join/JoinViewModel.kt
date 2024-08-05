@@ -1,22 +1,29 @@
 package com.ssafy.yoganavi.ui.loginUI.join
 
+import android.os.CountDownTimer
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.response.ListResponse
 import com.ssafy.yoganavi.data.repository.user.UserRepository
 import com.ssafy.yoganavi.data.source.user.UserRequest
+import com.ssafy.yoganavi.ui.utils.END_TIME
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
 import com.ssafy.yoganavi.ui.utils.IS_NOT_EMAIL
 import com.ssafy.yoganavi.ui.utils.NO_RESPONSE
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
+import com.ssafy.yoganavi.ui.utils.TIME_OUT
 import com.ssafy.yoganavi.ui.utils.isBlank
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +33,23 @@ class JoinViewModel @Inject constructor(
 
     private val _joinEvent: MutableSharedFlow<JoinEvent<Unit>> = MutableSharedFlow()
     val joinEvent: SharedFlow<JoinEvent<Unit>> = _joinEvent.asSharedFlow()
+
+    private val _timeFlow: MutableStateFlow<String> = MutableStateFlow("")
+    val timeFlow: StateFlow<String> = _timeFlow.asStateFlow()
+
+    private val timer = object : CountDownTimer(TIME_OUT * 60, 1000) {
+        override fun onTick(time: Long) {
+            val secondsRemaining = time / 1000
+            val minutes = secondsRemaining / 60
+            val seconds = secondsRemaining % 60
+            val remainTime = String.format(Locale.KOREA, "%02d:%02d", minutes, seconds)
+            _timeFlow.value = remainTime
+        }
+
+        override fun onFinish() {
+            _timeFlow.value = END_TIME
+        }
+    }
 
     fun registerEmail(email: String) = viewModelScope.launch(Dispatchers.IO) {
         if (arrayOf(email).isBlank()) {
@@ -126,4 +150,7 @@ class JoinViewModel @Inject constructor(
     private fun isEmail(email: String): Boolean =
         email.isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
+    fun timerStart(): CountDownTimer = timer.start()
+
+    fun timerEnd() = timer.cancel()
 }
