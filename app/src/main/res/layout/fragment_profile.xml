@@ -16,7 +16,7 @@
             android:layout_height="@dimen/icon_large"
             android:layout_marginTop="@dimen/padding_large"
             android:scaleType="centerCrop"
-            android:src="@drawable/user"
+            android:src="@drawable/profilenull"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -129,9 +129,9 @@
             android:text="@string/logout"
             android:textSize="16sp"
             app:drawableStartCompat="@drawable/logout"
+            app:layout_constraintBottom_toTopOf="@id/tv_quit"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/tv_quit"
             app:layout_constraintTop_toBottomOf="@id/tv_register_notice"
             tools:ignore="RtlSymmetry" />
 
