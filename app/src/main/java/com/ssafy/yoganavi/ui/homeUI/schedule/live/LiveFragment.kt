@@ -186,10 +186,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
                 // 학생 입장에서 종료
             }
             WebRTCSessionState.Ready -> {
-                if (args.isTeacher) {
-                    viewModel.sessionManager.onSessionScreenReady().apply { 
-                        // TODO. API로 화상강의 Live 켜짐 보내기
-                    }
+                viewModel.sessionManager.onSessionScreenReady().apply {
+                    // TODO. API로 화상강의 Live 켜짐 보내기
                 }
             }
             WebRTCSessionState.Creating -> {
@@ -315,12 +313,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     }
 
     private fun popBack() {
-        findNavController().popBackStack()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-
         exitFullscreen()
+
+        findNavController().popBackStack()
     }
 }
