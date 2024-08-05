@@ -53,9 +53,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         imageUri: String?,
         title: String,
         content: String,
-        isTeacher: Boolean
+        isTeacher: Boolean,
+        isOnAir: Boolean
     ) {
-        EnterDialog(requireContext(), smallImageUri, imageUri, title, content) {
+        EnterDialog(requireContext(), smallImageUri, imageUri, title, content, isOnAir) {
             val directions = HomeFragmentDirections
                 .actionHomeFragmentToLiveFragment(id, isTeacher)
 

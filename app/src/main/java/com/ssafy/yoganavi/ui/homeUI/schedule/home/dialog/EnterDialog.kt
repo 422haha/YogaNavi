@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.DialogEnterBinding
+import com.ssafy.yoganavi.ui.utils.NO_BROADCAST
 import com.ssafy.yoganavi.ui.utils.loadImageSequentially
 
 class EnterDialog(
@@ -17,6 +18,7 @@ class EnterDialog(
     private val imageUri: String?,
     private val title: String,
     private val content: String,
+    private val isOnAir: Boolean,
     private val okCallback: () -> Unit,
 ): AlertDialog(context) {
 
@@ -50,6 +52,11 @@ class EnterDialog(
 
             tvContent.text = content
             tvContent.movementMethod = ScrollingMovementMethod()
+
+            btnEnter.isEnabled = isOnAir
+
+            if(!isOnAir)
+                btnEnter.text = NO_BROADCAST
         }
 
         btnEnter.setOnClickListener {
