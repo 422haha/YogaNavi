@@ -176,7 +176,7 @@ class TeacherReservationFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             liveId = lectureId
             calendar.clearSelection()
-            calendar.state().edit().setMinimumDate(startDate.toCalendarDay())
+            calendar.state().edit().setMinimumDate(Math.max(startDate,System.currentTimeMillis()).toCalendarDay())
                 .setMaximumDate(endDate.toCalendarDay())
                 .commit()
             tvSelectTerm.apply {
