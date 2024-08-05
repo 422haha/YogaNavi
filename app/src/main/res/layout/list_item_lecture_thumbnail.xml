@@ -42,7 +42,7 @@
     <!-- TODO 만약 999보다 크면 999+ 이런식으로 해야할듯 -->
     <TextView
         android:id="@+id/tv_count"
-        style="@style/commonText"
+        style="@style/BorderedText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxLength="4"
@@ -64,7 +64,7 @@
 
     <TextView
         android:id="@+id/tv_title"
-        style="@style/commonText"
+        style="@style/BorderedText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/padding_small"
