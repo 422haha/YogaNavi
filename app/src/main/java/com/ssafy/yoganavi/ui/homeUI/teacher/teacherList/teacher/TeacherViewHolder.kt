@@ -3,6 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.teacher.teacherList.teacher
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
+import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.databinding.ListItemTeacherBinding
 import com.ssafy.yoganavi.ui.utils.toK
@@ -21,9 +22,13 @@ class TeacherViewHolder(
         } else {
             tvHashtag.isVisible = false
         }
-        Glide.with(binding.root)
-            .load(item.teacherSmallProfile)
-            .into(binding.ivProfile)
+        if (item.teacherSmallProfile == null) {
+            binding.ivProfile.setImageResource(R.drawable.profilenull)
+        } else {
+            Glide.with(binding.root)
+                .load(item.teacherSmallProfile)
+                .into(binding.ivProfile)
+        }
         if (item.liked) {
             ivFavoriteColor.isVisible = true
             ivFavorite.isVisible = false
