@@ -19,6 +19,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
@@ -35,6 +36,8 @@ import org.webrtc.VideoTrack
 
 @AndroidEntryPoint
 class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::inflate) {
+
+    private val args: LiveFragmentArgs by navArgs()
 
     private val viewModel: LiveViewModel by viewModels()
 
@@ -92,13 +95,6 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     }
 
     private fun initListener() {
-        requireActivity().onBackPressedDispatcher
-            .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    popBack()
-                }
-            })
-
         with(binding) {
             ibtnMic.setOnClickListener {
                 viewModel.toggleMicrophoneState(viewModel.callMediaState.value.isMicrophoneEnabled.not())
@@ -113,9 +109,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
                     viewModel.sessionManager.flipCamera()
             }
 
-            ibtnCancel.setOnClickListener {
-                popBack()
-            }
+            ibtnCancel.setOnClickListener { popBack() }
         }
     }
 
@@ -187,19 +181,22 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         binding.tvState.text = state.toString()
 
         when (state) {
-            WebRTCSessionState.Active -> { }
+            WebRTCSessionState.Offline -> { }
+            WebRTCSessionState.Impossible -> {
+                // 학생 입장에서 종료
+            }
             WebRTCSessionState.Ready -> {
-                binding.tvState.isEnabled = true
+                if (args.isTeacher) {
+                    viewModel.sessionManager.onSessionScreenReady().apply { 
+                        // TODO. API로 화상강의 Live 켜짐 보내기
+                    }
+                }
             }
             WebRTCSessionState.Creating -> {
-                binding.tvState.isEnabled = true
+                if(!args.isTeacher)
+                    viewModel.sessionManager.onSessionScreenReady()
             }
-            WebRTCSessionState.Impossible -> {
-                binding.tvState.isEnabled = false
-            }
-            WebRTCSessionState.Offline -> {
-                binding.tvState.isEnabled = false
-            }
+            WebRTCSessionState.Active -> { }
         }
     }
 
@@ -318,7 +315,12 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     }
 
     private fun popBack() {
-        exitFullscreen()
         findNavController().popBackStack()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        exitFullscreen()
     }
 }

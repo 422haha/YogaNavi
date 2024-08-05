@@ -67,9 +67,9 @@ class ManagementLiveFragment :
         }
     }
 
-    private fun navigateToLiveFragment(liveId: Int = -1) {
+    private fun navigateToLiveFragment(liveId: Int = -1, isTeacher: Boolean) {
         val directions = ManagementLiveFragmentDirections
-            .actionManagementLiveFragmentToLiveFragment(liveId)
+            .actionManagementLiveFragmentToLiveFragment(liveId, isTeacher)
 
         findNavController().navigate(directions)
     }

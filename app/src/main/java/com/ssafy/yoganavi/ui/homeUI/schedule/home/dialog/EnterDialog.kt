@@ -13,12 +13,11 @@ import com.ssafy.yoganavi.ui.utils.loadImageSequentially
 
 class EnterDialog(
     context: Context,
-    private val id: Int,
     private val smallImageUri: String?,
     private val imageUri: String?,
     private val title: String,
     private val content: String,
-    private val okCallback: (Int) -> Unit,
+    private val okCallback: () -> Unit,
 ): AlertDialog(context) {
 
     private lateinit var binding: DialogEnterBinding
@@ -54,7 +53,7 @@ class EnterDialog(
         }
 
         btnEnter.setOnClickListener {
-            okCallback(id)
+            okCallback()
             dismiss()
         }
 

@@ -302,6 +302,10 @@
             android:name="getLiveId"
             android:defaultValue="-1"
             app:argType="integer" />
+        <argument
+            android:name="isTeacher"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
     <fragment
         android:id="@+id/managementLiveFragment"

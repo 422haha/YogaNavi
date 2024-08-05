@@ -32,8 +32,8 @@ class LiveViewModel @Inject constructor(val sessionManager: WebRtcSessionManager
 
     init {
         viewModelScope.launch {
-            sessionManager.signalingClient.sessionStateFlow.collect { state ->
-                _sessionState.value = state
+            sessionManager.signalingClient.sessionStateFlow.collect {
+                _sessionState.value = it
             }
         }
     }
@@ -49,6 +49,6 @@ class LiveViewModel @Inject constructor(val sessionManager: WebRtcSessionManager
     override fun onCleared() {
         super.onCleared()
 
-        sessionManager.disconnect()
+        runCatching { sessionManager.disconnect() }
     }
 }

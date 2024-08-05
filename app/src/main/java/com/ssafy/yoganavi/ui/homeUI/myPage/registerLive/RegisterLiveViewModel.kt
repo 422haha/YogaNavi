@@ -15,7 +15,7 @@ class RegisterLiveViewModel @Inject constructor(
     private val infoRepository: InfoRepository
 ) : ViewModel() {
 
-    var liveLectureData = LiveLectureData(teacherProfile = "", teacherSmallProfile = "")
+    var liveLectureData = LiveLectureData(teacherProfile = "", teacherSmallProfile = "", isTeacher = false)
     var dayStatusMap = Week.entries.associateWith { false }.toMutableMap()
 
     fun getLive(liveId: Int, onReadLive: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {

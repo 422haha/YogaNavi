@@ -15,7 +15,7 @@ import com.ssafy.yoganavi.ui.utils.startTildeEnd
 import com.ssafy.yoganavi.ui.utils.startVerticalEnd
 
 class ManagementLiveAdapter(
-    private val navigateToLiveFragment: (Int) -> Unit,
+    private val navigateToLiveFragment: (Int, Boolean) -> Unit,
     private val navigateToRegisterFragment: (String, Int) -> Unit,
     private val deleteLive: (Int) -> Unit,
 ) : ListAdapter<LiveLectureData, ManagementLiveAdapter.ViewHolder>(LiveDiffCallback()) {
@@ -30,7 +30,7 @@ class ManagementLiveAdapter(
 
     class ViewHolder(
         private val binding: ListItemLiveBinding,
-        private val navigateToLiveFragment: (Int) -> Unit,
+        private val navigateToLiveFragment: (Int, Boolean) -> Unit,
         private val navigateToRegisterFragment: (String, Int) -> Unit,
         private val deleteLive: (Int) -> Unit
     ) :
@@ -50,7 +50,7 @@ class ManagementLiveAdapter(
 
                 tvLectureTime.text = startVerticalEnd(weekData, timeData)
 
-                vEnterBtn.setOnClickListener { navigateToLiveFragment(item.liveId) }
+                vEnterBtn.setOnClickListener { navigateToLiveFragment(item.liveId, item.isTeacher) }
 
                 tvEditBtn.setOnClickListener { navigateToRegisterFragment(UPDATE, item.liveId) }
 
@@ -60,7 +60,7 @@ class ManagementLiveAdapter(
 
         companion object {
             fun from(parent: ViewGroup,
-                     navigateToLiveFragment: (Int) -> Unit,
+                     navigateToLiveFragment: (Int, Boolean) -> Unit,
                      navigateToUpdateFragment: (String, Int) -> Unit,
                      deleteLive: (Int) -> Unit): ViewHolder {
                 return ViewHolder(

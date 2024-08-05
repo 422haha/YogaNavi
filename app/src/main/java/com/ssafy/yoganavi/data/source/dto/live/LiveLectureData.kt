@@ -12,6 +12,8 @@ data class LiveLectureData(
     val teacherSmallProfile: String?,
     @SerializedName("profileImageUrl")
     val teacherProfile: String?,
+    @SerializedName("teacher")
+    val isTeacher: Boolean,
     var liveTitle: String = "",
     var liveContent : String = "",
     var availableDay: String = "",
