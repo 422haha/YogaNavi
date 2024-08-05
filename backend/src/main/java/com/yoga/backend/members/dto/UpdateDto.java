@@ -15,5 +15,6 @@ public class UpdateDto {
     private String imageUrl;
     private String imageUrlSmall;
     private List<String> hashTags;
+    private String content;
 
 }
