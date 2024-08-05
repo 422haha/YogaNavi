@@ -180,7 +180,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     private fun observeCallMediaState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.callMediaState.collect { state ->
+                viewModel.callMediaState.collectLatest { state ->
                         handleMicrophoneState(state.isMicrophoneEnabled)
                         handleCameraState(state.isCameraEnabled)
                 }
