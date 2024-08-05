@@ -63,6 +63,9 @@ interface InfoAPI {
     @POST("teacher/reserve")
     suspend fun registerLive(@Body liveReserveRequest: LiveReserveRequest): Response<YogaDetailResponse<Unit>>
 
+    @GET("mypage/like-teacher")
+    suspend fun getLikeTeacherList(): Response<YogaResponse<TeacherData>>
+
     // LECTURE
     @GET("recorded-lecture/mypage/list")
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>

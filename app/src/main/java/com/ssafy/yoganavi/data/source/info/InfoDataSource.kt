@@ -37,6 +37,8 @@ interface InfoDataSource {
 
     suspend fun teacherLikeToggle(teacherId: Int): Response<YogaDetailResponse<Boolean>>
 
+    suspend fun getLikeTeacherList(): Response<YogaResponse<TeacherData>>
+
     suspend fun getAvailableClass(
         teacherId: Int,
         method: Int
