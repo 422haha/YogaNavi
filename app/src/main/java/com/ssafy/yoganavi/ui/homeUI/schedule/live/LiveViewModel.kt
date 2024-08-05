@@ -48,4 +48,10 @@ class LiveViewModel @Inject constructor(val sessionManager: WebRtcSessionManager
     fun toggleCameraState(isEnabled: Boolean) {
         _callMediaState.value = _callMediaState.value.copy(isCameraEnabled = isEnabled)
     }
+
+    override fun onCleared() {
+        super.onCleared()
+
+        sessionManager.disconnect()
+    }
 }

@@ -215,6 +215,9 @@ class WebRtcSessionManagerImpl(
     videoCapturer.stopCapture()
     videoCapturer.dispose()
 
+    peerConnection.connection.close()
+    peerConnection.connection.dispose()
+
     // dispose signaling clients and socket.
     signalingClient.dispose()
   }

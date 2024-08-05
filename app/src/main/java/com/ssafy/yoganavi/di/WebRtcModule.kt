@@ -8,27 +8,27 @@ import com.ssafy.yoganavi.ui.homeUI.schedule.live.webRtc.sessions.WebRtcSessionM
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 object WebRtcModule {
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun provideSignalingClient(): SignalingClient {
         return SignalingClient()
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun providePeerConnectionFactory(@ApplicationContext context: Context): StreamPeerConnectionFactory {
         return StreamPeerConnectionFactory(context)
     }
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun provideWebRtcSessionManager(
         @ApplicationContext context: Context,
         signalingClient: SignalingClient,

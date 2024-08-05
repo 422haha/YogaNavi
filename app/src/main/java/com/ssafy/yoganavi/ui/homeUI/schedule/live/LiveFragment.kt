@@ -2,7 +2,6 @@ package com.ssafy.yoganavi.ui.homeUI.schedule.live
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
@@ -97,9 +96,6 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             }
 
             ibtnCancel.setOnClickListener {
-                if(viewModel.sessionState.value == WebRTCSessionState.Active)
-                    viewModel.sessionManager.disconnect()
-
                 findNavController().popBackStack()
             }
         }
