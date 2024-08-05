@@ -48,7 +48,5 @@ interface UserAPI {
     suspend fun quit(): Response<YogaResponse<Unit>>
 
     @PUT("fcm")
-    suspend fun updateFcmToken(
-        @Header("FCM-TOKEN") fcmToken: String
-    ): Response<YogaResponse<Unit>>
+    suspend fun updateFcmToken(@Header("FCM-TOKEN") fcmToken: String): Response<YogaResponse<Unit>>
 }

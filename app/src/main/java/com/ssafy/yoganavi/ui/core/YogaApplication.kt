@@ -1,6 +1,7 @@
 package com.ssafy.yoganavi.ui.core
 
 import android.app.Application
+import com.ssafy.yoganavi.ui.utils.YOGA
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,24 +15,36 @@ class YogaApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
-        CoroutineScope(Dispatchers.IO).launch { clearAllCaches() }
+        CoroutineScope(Dispatchers.IO).launch { clearYogaCaches() }
     }
 
-    private fun clearAllCaches() = runCatching {
-        deleteDirectory(cacheDir)
-        externalCacheDir?.let { deleteDirectory(it) }
-        codeCacheDir?.let { deleteDirectory(it) }
+    private fun clearYogaCaches() = runCatching {
+        deleteYogaDirectory(cacheDir)
+        externalCacheDir?.let { deleteYogaDirectory(it) }
     }.onFailure {
         it.printStackTrace()
     }
 
-    private fun deleteDirectory(dir: File): Boolean {
-        if (!dir.exists()) return dir.delete()
+    private fun deleteYogaDirectory(dir: File) {
+        if (!dir.exists() || !dir.isDirectory) return
 
         dir.listFiles()?.forEach { file ->
-            if (file.isDirectory) deleteDirectory(file)
-            else file.delete()
+            if (file.isDirectory && file.name.startsWith(YOGA)) {
+                deleteDirectoryContents(file)
+            }
         }
-        return dir.delete()
+    }
+
+    private fun deleteDirectoryContents(dir: File) {
+        if (!dir.exists() || !dir.isDirectory) return
+
+        dir.listFiles()?.forEach { file ->
+            if (file.isDirectory) {
+                deleteDirectoryContents(file)
+                file.delete()
+            } else {
+                file.delete()
+            }
+        }
     }
 }
