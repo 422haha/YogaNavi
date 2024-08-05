@@ -31,10 +31,10 @@
     <!-- TODO 상황에 따라 흰색, 검은색 설정하기 -->
     <ImageView
         android:id="@+id/iv_favorite"
-        android:layout_width="@dimen/icon_extra_small"
-        android:layout_height="@dimen/icon_extra_small"
-        android:layout_marginTop="@dimen/padding_small"
-        android:layout_marginEnd="@dimen/padding_small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/padding_small"
+        android:paddingHorizontal="@dimen/padding_small"
         android:src="@drawable/selector_toggle"
         app:layout_constraintEnd_toEndOf="@id/cv_content"
         app:layout_constraintTop_toTopOf="@id/cv_content" />
