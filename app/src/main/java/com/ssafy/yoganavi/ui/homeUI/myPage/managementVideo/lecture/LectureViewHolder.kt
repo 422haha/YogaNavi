@@ -9,7 +9,7 @@ import com.ssafy.yoganavi.ui.utils.toK
 
 class LectureViewHolder(
     private val binding: ListItemLectureThumbnailBinding,
-    private val navigateToLectureDetailFragment: ((Long) -> Unit)? = null,
+    private val navigateToLectureDetailFragment: ((Long, String) -> Unit)? = null,
     private val navigateToRegisterVideoFragment: ((Long) -> Unit)? = null,
     private val sendLikeLecture: (Long) -> Unit
 ) : ViewHolder(binding.root) {
@@ -47,7 +47,7 @@ class LectureViewHolder(
 
         ivThumbnail.setOnClickListener {
             navigateToRegisterVideoFragment?.invoke(data.recordedId)
-            navigateToLectureDetailFragment?.invoke(data.recordedId)
+            navigateToLectureDetailFragment?.invoke(data.recordedId, data.nickname)
         }
     }
 }

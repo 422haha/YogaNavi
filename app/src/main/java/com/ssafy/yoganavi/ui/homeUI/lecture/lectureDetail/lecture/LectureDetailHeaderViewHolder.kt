@@ -9,7 +9,6 @@ class LectureDetailHeaderViewHolder(
 ) : ViewHolder(binding.root) {
 
     fun bind(lectureHeader: LectureHeader) = with(binding) {
-        tvNickname.text = lectureHeader.nickname.toNickname()
         tvTitle.text = lectureHeader.recordTitle
         tvContent.text = lectureHeader.recordContent
         ivLecturePicture.loadImageSequentially(
@@ -17,6 +16,4 @@ class LectureDetailHeaderViewHolder(
             lectureHeader.recordThumbnail
         )
     }
-
-    private fun String.toNickname() = "$this 님의 강의"
 }

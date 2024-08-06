@@ -115,9 +115,9 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
         return@with cbTitle.isChecked || cbContent.isChecked
     }
 
-    private fun navigateToLectureDetailFragment(recordedId: Long = -1L) {
+    private fun navigateToLectureDetailFragment(recordedId: Long = -1L, nickname: String = "") {
         val directions = LectureListFragmentDirections
-            .actionLectureListFragmentToLectureDetailFragment(recordedId)
+            .actionLectureListFragmentToLectureDetailFragment(recordedId, nickname)
 
         findNavController().navigate(directions)
     }

@@ -203,6 +203,10 @@
             android:name="recordedId"
             android:defaultValue="-1L"
             app:argType="long" />
+        <argument
+            android:name="teacher"
+            android:defaultValue=""
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/lectureVideoFragment"

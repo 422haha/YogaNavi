@@ -50,9 +50,9 @@ class LikeLectureFragment : BaseFragment<FragmentLikeLectureBinding>(
         }
     }
 
-    private fun navigateToLectureDetailFragment(recordedId: Long = -1L) {
+    private fun navigateToLectureDetailFragment(recordedId: Long = -1L, teacher: String = "") {
         val directions = LikeLectureFragmentDirections
-            .actionLikeLectureFragmentToLectureDetailFragment(recordedId)
+            .actionLikeLectureFragmentToLectureDetailFragment(recordedId, teacher)
 
         findNavController().navigate(directions)
     }

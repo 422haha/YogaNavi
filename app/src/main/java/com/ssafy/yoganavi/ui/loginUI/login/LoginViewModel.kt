@@ -36,10 +36,11 @@ class LoginViewModel @Inject constructor(
             return@launch
         }
 
-        if(!isEmail(email)){
-            emitError(IS_NOT_EMAIL)
-            return@launch
-        }
+        // TODO 우선 테스트 로그인 할 때에는 로긴 되게 나중에는 수행해야 함!
+//        if(!isEmail(email)){
+//            emitError(IS_NOT_EMAIL)
+//            return@launch
+//        }
 
         if(hasSpace(password)){
             emitError(HAS_SPACE)
