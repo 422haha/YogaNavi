@@ -13,7 +13,7 @@ class TeacherDetailHeaderViewHolder(
 ) : ViewHolder(binding.root) {
     fun bind(teacherDetailHeader: TeacherData) = with(binding) {
         ivProfile.isVisible = true
-        if (teacherDetailHeader.teacherProfile.isNotBlank() && teacherDetailHeader.teacherSmallProfile.isNotBlank()) {
+        if (!teacherDetailHeader.teacherProfile.isNullOrBlank() && !teacherDetailHeader.teacherSmallProfile.isNullOrBlank()) {
             ivProfile.loadImageSequentially(
                 teacherDetailHeader.teacherSmallProfile,
                 teacherDetailHeader.teacherProfile
@@ -49,7 +49,7 @@ class TeacherDetailHeaderViewHolder(
                 teacherDetailHeader.teacherId,
                 teacherDetailHeader.teacherName,
                 hashtagString,
-                teacherDetailHeader.teacherSmallProfile
+                teacherDetailHeader.teacherSmallProfile ?: ""
             )
         }
     }

@@ -22,13 +22,15 @@ class TeacherViewHolder(
         } else {
             tvHashtag.isVisible = false
         }
-        if (item.teacherSmallProfile == null) {
+
+        if (item.teacherSmallProfile.isNullOrBlank()) {
             binding.ivProfile.setImageResource(R.drawable.profilenull)
         } else {
             Glide.with(binding.root)
                 .load(item.teacherSmallProfile)
                 .into(binding.ivProfile)
         }
+
         if (item.liked) {
             ivFavoriteColor.isVisible = true
             ivFavorite.isVisible = false
@@ -36,9 +38,11 @@ class TeacherViewHolder(
             ivFavoriteColor.isVisible = false
             ivFavorite.isVisible = true
         }
+
         root.setOnClickListener {
             navigateToTeacherDetailFragment(item.teacherId)
         }
+
         ivFavorite.setOnClickListener {
             ivFavoriteColor.isVisible = true
             ivFavorite.isVisible = false
@@ -46,6 +50,7 @@ class TeacherViewHolder(
             tvCount.text = count.toString()
             teacherLikeToggle(item.teacherId)
         }
+
         ivFavoriteColor.setOnClickListener {
             ivFavoriteColor.isVisible = false
             ivFavorite.isVisible = true

@@ -17,7 +17,7 @@ class EnterDialog(
     private val title: String,
     private val content: String,
     private val okCallback: () -> Unit,
-): AlertDialog(context) {
+) : AlertDialog(context) {
 
     private lateinit var binding: DialogEnterBinding
 
@@ -42,11 +42,11 @@ class EnterDialog(
         window?.setBackgroundDrawableResource(R.drawable.rounded_dialog_background)
 
         with(binding) {
-            if (!imageUri.isNullOrBlank())
-                ivProfile.loadImageSequentially(imageUri, smallImageUri ?: "")
+            if (!imageUri.isNullOrBlank() && !smallImageUri.isNullOrBlank()) {
+                ivProfile.loadImageSequentially(smallImageUri, imageUri)
+            }
 
             tvTitle.text = title
-
             tvContent.text = content
             tvContent.movementMethod = ScrollingMovementMethod()
         }
