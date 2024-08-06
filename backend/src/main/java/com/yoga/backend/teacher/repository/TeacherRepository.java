@@ -74,7 +74,7 @@ public interface TeacherRepository extends JpaRepository<Users, Integer> {
         "  CASE WHEN :maxLiveNum = 1 THEN l.max_live_num > 0 ELSE l.max_live_num = 1 END" +
         ")" +
         "AND (" +
-        "  SELECT COUNT(mll) FROM MyLiveLecture mll WHERE mll.liveLecture = l AND mll.endDate > CURRENT_TIMESTAMP < l.maxLiveNum"
+        "  (SELECT COUNT(*) FROM my_live_lecture mll WHERE mll.live_id = l.live_id AND mll.end_date > CURRENT_TIMESTAMP) < l.max_live_num "
         +
         ")", nativeQuery = true)
     List<Users> findTeachersByLectureFilter(
