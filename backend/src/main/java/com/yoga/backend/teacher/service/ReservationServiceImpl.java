@@ -52,13 +52,6 @@ public class ReservationServiceImpl implements ReservationService {
                 (long) reservationRequest.getLiveId())
             .orElseThrow(() -> new RuntimeException("실시간 강의를 찾을 수 없습니다."));
 
-        // 최대 인원수 확인
-        int currentParticipants = myLiveLectureRepository.countByLiveLectureAndEndDateAfter(
-            liveLecture, Instant.now());
-        if (currentParticipants >= liveLecture.getMaxLiveNum()) {
-            throw new RuntimeException("최대 인원수를 초과하였습니다.");
-        }
-
         MyLiveLecture myLiveLecture = new MyLiveLecture();
         myLiveLecture.setUser(user);
         myLiveLecture.setLiveLecture(liveLecture);
