@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="사용자 정보를 수정하시려면\n비밀번호를 입력하세요"
+        android:text="비밀번호를 입력하세요"
         app:layout_constraintBottom_toTopOf="@id/til_pw"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

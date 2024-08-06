@@ -7,9 +7,10 @@ import com.ssafy.yoganavi.data.repository.info.InfoRepository
 import com.ssafy.yoganavi.data.repository.user.UserRepository
 import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,15 +46,11 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    suspend fun checkPassword(password: String): Boolean? = withContext(Dispatchers.IO) {
-        runCatching {
-            userRepository.checkPassword(password)
-        }.fold(
-            onSuccess = { it.data },
-            onFailure = {
-                it.printStackTrace()
-                null
-            }
-        )
-    }
+    suspend fun checkPassword(password: String): Deferred<Boolean> =
+        viewModelScope.async(Dispatchers.IO) {
+            runCatching { userRepository.checkPassword(password) }.fold(
+                onSuccess = { result -> return@async result.data == true },
+                onFailure = { return@async false }
+            )
+        }
 }
