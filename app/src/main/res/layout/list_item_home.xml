@@ -90,17 +90,21 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/padding_small"
+                app:layout_constraintBottom_toTopOf="@+id/tv_lecture_time"
                 app:layout_constraintEnd_toStartOf="@id/btn_go_detail"
+                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
                 tools:text="초보자도 쉽게 배우는 요가초보자도 쉽게 배우는 요가" />
 
             <TextView
                 android:id="@+id/tv_lecture_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@id/tv_lecture_title"
-                app:layout_constraintTop_toBottomOf="@id/tv_lecture_title"
+                app:layout_constraintTop_toBottomOf="@+id/tv_lecture_title"
                 tools:text="19:00~20:00" />
 
             <ImageButton
