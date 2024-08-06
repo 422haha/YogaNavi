@@ -1,5 +1,6 @@
 package com.yoga.backend.mypage.livelectures;
 
+import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import java.time.Instant;
 import java.util.List;
@@ -25,4 +26,7 @@ public interface MyLiveLectureRepository extends JpaRepository<MyLiveLecture, Lo
     List<MyLiveLecture> findByLiveLectureIdWithUser(@Param("liveId") Long liveId);
 
     List<MyLiveLecture> findByUserIdAndStartDateBetween(int userId, Instant start, Instant end);
+
+    @Query("SELECT COUNT(mll) FROM MyLiveLecture mll WHERE mll.liveLecture = :liveLecture AND mll.endDate > :currentDate")
+    int countByLiveLectureAndEndDateAfter(@Param("liveLecture") LiveLectures liveLecture, @Param("currentDate") Instant currentDate);
 }
