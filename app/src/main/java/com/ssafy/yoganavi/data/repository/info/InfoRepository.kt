@@ -12,7 +12,7 @@ import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.LiveReserveRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
-import com.ssafy.yoganavi.data.source.teacher.FilterData
+import com.ssafy.yoganavi.data.source.dto.teacher.FilterData
 
 interface InfoRepository {
 

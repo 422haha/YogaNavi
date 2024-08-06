@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
-import com.ssafy.yoganavi.data.source.teacher.FilterData
+import com.ssafy.yoganavi.data.source.dto.teacher.FilterData
 import com.ssafy.yoganavi.ui.utils.RECENT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
