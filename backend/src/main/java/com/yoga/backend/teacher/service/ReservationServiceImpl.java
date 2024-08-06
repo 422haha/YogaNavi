@@ -48,9 +48,14 @@ public class ReservationServiceImpl implements ReservationService {
         Users user = usersRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        LiveLectures liveLecture = liveLectureRepository.findById(
-                (long) reservationRequest.getLiveId())
+        LiveLectures liveLecture = liveLectureRepository.findById((long) reservationRequest.getLiveId())
             .orElseThrow(() -> new RuntimeException("실시간 강의를 찾을 수 없습니다."));
+
+        // 최대 인원수 확인
+        int currentParticipants = myLiveLectureRepository.countByLiveLectureAndEndDateAfter(liveLecture, Instant.now());
+        if (currentParticipants >= liveLecture.getMaxLiveNum()) {
+            throw new RuntimeException("최대 인원수를 초과하였습니다.");
+        }
 
         MyLiveLecture myLiveLecture = new MyLiveLecture();
         myLiveLecture.setUser(user);
@@ -95,16 +100,21 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LiveLectureDto> getAllLiveLectures(int method) {
         Instant now = Instant.now();
+        List<LiveLectures> lectures;
+
         if (method == 0) {
-            return liveLectureRepository.findAllByMaxLiveNumAndEndDateAfter(1, now).stream()
-                .map(LiveLectureDto::fromEntity)
-                .collect(Collectors.toList());
+            lectures = liveLectureRepository.findAllByMaxLiveNumAndEndDateAfter(1, now);
         } else {
-            return liveLectureRepository.findAllByMaxLiveNumGreaterThanAndEndDateAfter(1, now)
-                .stream()
-                .map(LiveLectureDto::fromEntity)
-                .collect(Collectors.toList());
+            lectures = liveLectureRepository.findAllByMaxLiveNumGreaterThanAndEndDateAfter(1, now);
         }
+
+        return lectures.stream()
+            .filter(lecture -> {
+                int currentParticipants = myLiveLectureRepository.countByLiveLectureAndEndDateAfter(lecture, now);
+                return currentParticipants < lecture.getMaxLiveNum();
+            })
+            .map(LiveLectureDto::fromEntity)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -118,17 +128,21 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LiveLectureDto> getLiveLecturesByTeacherAndMethod(int teacherId, int method) {
         Instant now = Instant.now();
+        List<LiveLectures> lectures;
+
         if (method == 0) {
-            return liveLectureRepository.findByUserIdAndMaxLiveNumAndEndDateAfter(teacherId, 1, now)
-                .stream()
-                .map(LiveLectureDto::fromEntity)
-                .collect(Collectors.toList());
+            lectures = liveLectureRepository.findByUserIdAndMaxLiveNumAndEndDateAfter(teacherId, 1, now);
         } else {
-            return liveLectureRepository.findByUserIdAndMaxLiveNumGreaterThanAndEndDateAfter(
-                    teacherId, 1, now).stream()
-                .map(LiveLectureDto::fromEntity)
-                .collect(Collectors.toList());
+            lectures = liveLectureRepository.findByUserIdAndMaxLiveNumGreaterThanAndEndDateAfter(teacherId, 1, now);
         }
+
+        return lectures.stream()
+            .filter(lecture -> {
+                int currentParticipants = myLiveLectureRepository.countByLiveLectureAndEndDateAfter(lecture, now);
+                return currentParticipants < lecture.getMaxLiveNum();
+            })
+            .map(LiveLectureDto::fromEntity)
+            .collect(Collectors.toList());
     }
 
     /**
