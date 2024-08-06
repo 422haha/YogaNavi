@@ -105,25 +105,26 @@ class RegisterLiveFragment :
     }
 
     private fun setModifyInfo() {
-        viewModel.getLive(args.liveId, ::onReadLive)
+        viewModel.getLive(args.liveId, ::onReadLive, ::setModifyUI)
+    }
+
+    private suspend fun setModifyUI() = withContext(Dispatchers.Main) {
         if (viewModel.liveLectureData.endDate < System.currentTimeMillis()) {//끝난강의
-            binding.etTitle.isEnabled = false
-            binding.etContent.isEnabled = false
-        } else {
-            binding.cbMon.isEnabled = false
-            binding.cbTue.isEnabled = false
-            binding.cbWed.isEnabled = false
-            binding.cbThu.isEnabled = false
-            binding.cbFri.isEnabled = false
-            binding.cbSat.isEnabled = false
-            binding.cbSun.isEnabled = false
-            binding.tieStart.isEnabled = false
-            binding.cbEndDateUnlimited.isEnabled = false
-            binding.btnStart.isEnabled = false
-            binding.btnEnd.isEnabled = false
-            binding.spMaxNum.isEnabled = false
+            binding.tieEnd.isEnabled = false
         }
-        binding.tieEnd
+        binding.cbMon.isEnabled = false
+        binding.cbTue.isEnabled = false
+        binding.cbWed.isEnabled = false
+        binding.cbThu.isEnabled = false
+        binding.cbFri.isEnabled = false
+        binding.cbSat.isEnabled = false
+        binding.cbSun.isEnabled = false
+        binding.tieStart.isEnabled = false
+        binding.cbEndDateUnlimited.isEnabled = false
+        binding.btnStart.isEnabled = false
+        binding.btnEnd.isEnabled = false
+        binding.spMaxNum.isEnabled = false
+
     }
 
     private fun setRegister() {
