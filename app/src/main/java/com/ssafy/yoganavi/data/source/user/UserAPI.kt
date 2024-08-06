@@ -49,4 +49,7 @@ interface UserAPI {
 
     @PUT("fcm")
     suspend fun updateFcmToken(@Header("FCM-TOKEN") fcmToken: String): Response<YogaResponse<Unit>>
+
+    @POST("mypage/check")
+    suspend fun checkPassword(@Body body: HashMap<String, String>): Response<YogaDetailResponse<Boolean>>
 }

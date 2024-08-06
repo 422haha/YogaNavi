@@ -75,4 +75,10 @@ class UserRepositoryImpl @Inject constructor(
         val response = withContext(ioDispatcher) { userDataSource.updateFcmToken(fcmToken) }
         return response.toListResponse()
     }
+
+    override suspend fun checkPassword(password: String): DetailResponse<Boolean> {
+        val passwordMap = hashMapOf("password" to password)
+        val response = withContext(ioDispatcher) { userDataSource.checkPassword(passwordMap) }
+        return response.toDetailResponse()
+    }
 }

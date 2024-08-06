@@ -128,8 +128,6 @@ enum class Week(val hangle: String) {
     SUN("일")
 }
 
-data class DayStatus(val day: Week, var isSelected: Boolean)
-
 // FCM
 const val CHANNEL_ID = "YogaNaviChannelId"
 const val CHANNEL_NAME = "YogaNavi"
@@ -140,3 +138,4 @@ const val CHANNEL_DESCRIPTION = "YogaNavi Live Notification"
 const val IS_NOT_EMAIL = "유효하지 않은 이메일 형식입니다."
 const val NOT_USER = "존재하지 않는 회원입니다."
 const val HAS_SPACE = "비밀번호에 공백이 있습니다."
+const val WRONG_PASSWORD = "비밀번호가 틀렸습니다."
