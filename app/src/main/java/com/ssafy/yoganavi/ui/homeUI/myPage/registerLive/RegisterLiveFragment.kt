@@ -52,7 +52,7 @@ class RegisterLiveFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initListener()
+        initListener(args.state)
 
         if (args.state == UPDATE)
             setModifyInfo()
@@ -64,11 +64,11 @@ class RegisterLiveFragment :
             menuListener = { setRegister() })
     }
 
-    private fun initListener() {
+    private fun initListener(state: String) {
         with(binding) {
-            tieStart.setOnClickListener { showCalendar(START) }
+            tieStart.setOnClickListener { showCalendar(START, state) }
 
-            tieEnd.setOnClickListener { showCalendar(END) }
+            tieEnd.setOnClickListener { showCalendar(END, state) }
 
             btnStart.setOnClickListener { showTimePicker(START) }
 
@@ -106,6 +106,24 @@ class RegisterLiveFragment :
 
     private fun setModifyInfo() {
         viewModel.getLive(args.liveId, ::onReadLive)
+        if (viewModel.liveLectureData.endDate < System.currentTimeMillis()) {//끝난강의
+            binding.etTitle.isEnabled = false
+            binding.etContent.isEnabled = false
+        } else {
+            binding.cbMon.isEnabled = false
+            binding.cbTue.isEnabled = false
+            binding.cbWed.isEnabled = false
+            binding.cbThu.isEnabled = false
+            binding.cbFri.isEnabled = false
+            binding.cbSat.isEnabled = false
+            binding.cbSun.isEnabled = false
+            binding.tieStart.isEnabled = false
+            binding.cbEndDateUnlimited.isEnabled = false
+            binding.btnStart.isEnabled = false
+            binding.btnEnd.isEnabled = false
+            binding.spMaxNum.isEnabled = false
+        }
+        binding.tieEnd
     }
 
     private fun setRegister() {
@@ -143,7 +161,7 @@ class RegisterLiveFragment :
         }
     }
 
-    private fun showCalendar(state: Int) {
+    private fun showCalendar(state: Int, isUpdate: String) {
         val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"), Locale.KOREA)
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
@@ -179,7 +197,11 @@ class RegisterLiveFragment :
                     viewModel.liveLectureData.endDate = calendar.timeInMillis
                 }, year, month, day
             ).apply {
-                datePicker.minDate = viewModel.liveLectureData.startDate
+                if (isUpdate == UPDATE) {
+                    datePicker.minDate = viewModel.liveLectureData.endDate
+                } else {
+                    datePicker.minDate = viewModel.liveLectureData.startDate
+                }
                 show()
             }
         }

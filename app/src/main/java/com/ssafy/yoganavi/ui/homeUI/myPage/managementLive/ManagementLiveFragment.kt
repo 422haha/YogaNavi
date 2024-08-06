@@ -26,7 +26,8 @@ class ManagementLiveFragment :
         ManagementLiveAdapter(
             ::navigateToLiveFragment,
             ::navigateToRegisterFragment,
-            ::deleteLive
+            ::deleteLive,
+            ::showSnackBar
         )
     }
 
@@ -61,7 +62,7 @@ class ManagementLiveFragment :
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.liveList.collectLatest {
-                checkEmptyList(it,EMPTY_MY_LIVE)
+                checkEmptyList(it, EMPTY_MY_LIVE)
                 liveAdapter.submitList(it)
             }
         }
