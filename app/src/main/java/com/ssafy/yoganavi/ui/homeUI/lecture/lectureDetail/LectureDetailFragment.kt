@@ -28,7 +28,7 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
         super.onViewCreated(view, savedInstanceState)
         setToolbar(
             isBottomNavigationVisible = false,
-            title = LECTURE,
+            title = args.teacher.toTitle(),
             canGoBack = true
         )
 
@@ -70,5 +70,10 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
             .actionLectureDetailFragmentToLectureVideoFragment(uriList = uriList)
 
         findNavController().navigate(directions)
+    }
+
+    private fun String.toTitle(): String {
+        val name = if (length > 10) substring(0, 10) else this
+        return "${name}님의 $LECTURE"
     }
 }

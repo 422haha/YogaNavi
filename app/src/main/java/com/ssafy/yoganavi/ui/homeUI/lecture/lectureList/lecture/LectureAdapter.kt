@@ -9,7 +9,7 @@ import com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.lecture.LectureItemCa
 import com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.lecture.LectureViewHolder
 
 class LectureAdapter(
-    private val navigateToLectureDetailFragment: ((Long) -> Unit)? = null,
+    private val navigateToLectureDetailFragment: ((Long, String) -> Unit)? = null,
     private val sendLikeLecture: (Long) -> Unit
 ) : PagingDataAdapter<LectureData, LectureViewHolder>(LectureItemCallback()) {
 

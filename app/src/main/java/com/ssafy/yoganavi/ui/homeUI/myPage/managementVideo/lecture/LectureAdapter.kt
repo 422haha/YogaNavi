@@ -7,7 +7,7 @@ import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.databinding.ListItemLectureThumbnailBinding
 
 class LectureAdapter(
-    private val navigateToLectureDetailFragment: ((Long) -> Unit)? = null,
+    private val navigateToLectureDetailFragment: ((Long, String) -> Unit)? = null,
     private val navigateToRegisterVideoFragment: ((Long) -> Unit)? = null,
     private val sendLikeLecture: (Long) -> Unit
 ) : ListAdapter<LectureData, LectureViewHolder>(LectureItemCallback()) {

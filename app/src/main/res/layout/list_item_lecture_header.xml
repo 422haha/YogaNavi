@@ -6,16 +6,6 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/padding_medium">
 
-    <TextView
-        android:id="@+id/tv_nickname"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/iv_lecture_picture"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="여긴 닉네임이 들어갑니다." />
-
     <ImageView
         android:id="@+id/iv_lecture_picture"
         android:layout_width="0dp"
@@ -26,7 +16,7 @@
         app:layout_constraintDimensionRatio="4:3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_nickname" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/title"
