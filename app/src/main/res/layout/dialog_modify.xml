@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
+    android:focusable="true">
+
+    <TextView
+        android:id="@+id/tv_inst"
+        style="@style/LargeText"
+        android:layout_marginTop="@dimen/bottom_button_padding"
+        android:layout_marginBottom="@dimen/dialog_padding_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="사용자 정보를 수정하시려면\n비밀번호를 입력하세요"
+        app:layout_constraintBottom_toTopOf="@id/til_pw"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_pw"
+        style="@style/boxCornerRadiusStyle"
+        app:errorEnabled="true"
+        android:layout_marginVertical="@dimen/padding_medium"
+        app:layout_constraintBottom_toTopOf="@id/btn_go_modify"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_inst">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/tie_pw"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:lines="1"
+            android:focusable="true"
+            android:focusableInTouchMode="true"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/btn_go_modify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="확인"
+        android:textColor="@color/black"
+        android:layout_marginBottom="@dimen/dialog_padding_medium"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/til_pw" />
+</androidx.constraintlayout.widget.ConstraintLayout>

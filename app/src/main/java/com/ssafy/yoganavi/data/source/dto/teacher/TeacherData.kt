@@ -7,9 +7,9 @@ data class TeacherData(
     @SerializedName("nickname")
     val teacherName: String,
     @SerializedName("profileImageUrl")
-    val teacherProfile: String,
+    val teacherProfile: String?,
     @SerializedName("profileImageUrlSmall")
-    val teacherSmallProfile: String,
+    val teacherSmallProfile: String?,
     @SerializedName("id")
     val teacherId: Int,
     @SerializedName("hashtags")

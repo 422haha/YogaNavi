@@ -128,13 +128,13 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun getHomeList(): Response<YogaResponse<HomeData>> =
         infoAPI.getHomeList()
 
-    override suspend fun updateLiveOnAir(state: Boolean, liveId: Int): Response<YogaDetailResponse<Unit>> =
+    override suspend fun updateLiveOnAir(
+        state: Boolean,
+        liveId: Int
+    ): Response<YogaDetailResponse<Unit>> =
         infoAPI.updateLiveOnAir(state, liveId)
 
     // CourseHistory
     override suspend fun getCourseHistoryList(): Response<YogaResponse<HomeData>> =
         infoAPI.getCourseHistoryList()
-
-    override suspend fun checkPassword(password: HashMap<String, String>): Response<YogaDetailResponse<Boolean>> =
-        infoAPI.checkPassword(password)
 }

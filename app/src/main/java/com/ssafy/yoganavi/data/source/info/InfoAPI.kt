@@ -142,6 +142,4 @@ interface InfoAPI {
     @GET("mypage/course-history")
     suspend fun getCourseHistoryList(): Response<YogaResponse<HomeData>>
 
-    @POST("mypage/check")
-    suspend fun checkPassword(@Body body: HashMap<String, String>): Response<YogaDetailResponse<Boolean>>
 }

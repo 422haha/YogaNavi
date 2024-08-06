@@ -13,17 +13,15 @@ class TeacherDetailHeaderViewHolder(
 ) : ViewHolder(binding.root) {
     fun bind(teacherDetailHeader: TeacherData) = with(binding) {
         ivProfile.isVisible = true
-        if (teacherDetailHeader.teacherProfile.isNotBlank() && teacherDetailHeader.teacherSmallProfile.isNotBlank()) {
+        if (teacherDetailHeader.teacherId == -1) {
+            ivProfile.isVisible = false
+        } else if (teacherDetailHeader.teacherProfile.isNullOrBlank() || teacherDetailHeader.teacherSmallProfile.isNullOrBlank()) {
+            ivProfile.setImageResource(R.drawable.profilenull)
+        } else if (teacherDetailHeader.teacherProfile.isNotBlank() && teacherDetailHeader.teacherSmallProfile.isNotBlank()) {
             ivProfile.loadImageSequentially(
                 teacherDetailHeader.teacherSmallProfile,
                 teacherDetailHeader.teacherProfile
             )
-        }
-        else if(teacherDetailHeader.teacherId==-1){
-            ivProfile.isVisible = false
-        }
-        else {
-            ivProfile.setImageResource(R.drawable.profilenull)
         }
         tvNickname.text = teacherDetailHeader.teacherName
         btnReserve.isVisible = tvNickname.text != "공지사항"
@@ -49,7 +47,7 @@ class TeacherDetailHeaderViewHolder(
                 teacherDetailHeader.teacherId,
                 teacherDetailHeader.teacherName,
                 hashtagString,
-                teacherDetailHeader.teacherSmallProfile
+                teacherDetailHeader.teacherSmallProfile ?: ""
             )
         }
     }

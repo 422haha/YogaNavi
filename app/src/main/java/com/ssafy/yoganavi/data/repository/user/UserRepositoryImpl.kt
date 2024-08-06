@@ -75,4 +75,9 @@ class UserRepositoryImpl @Inject constructor(
         val response = withContext(ioDispatcher) { userDataSource.updateFcmToken(fcmToken) }
         return response.toListResponse()
     }
+
+    override suspend fun checkPassword(password: String): DetailResponse<Boolean> {
+        val response = withContext(ioDispatcher) { userDataSource.checkPassword(password) }
+        return response.toDetailResponse()
+    }
 }
