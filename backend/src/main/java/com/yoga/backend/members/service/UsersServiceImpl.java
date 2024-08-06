@@ -1,6 +1,6 @@
 package com.yoga.backend.members.service;
 
-import com.yoga.backend.common.awsS3.S3Service;
+import com.yoga.backend.common.service.S3Service;
 import com.yoga.backend.common.entity.Hashtag;
 import com.yoga.backend.common.entity.TempAuthInfo;
 import com.yoga.backend.common.entity.Users;
@@ -21,8 +21,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;

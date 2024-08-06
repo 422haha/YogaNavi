@@ -1,7 +1,7 @@
 package com.yoga.backend.mypage.article;
 
 import com.yoga.backend.common.entity.Article;
-import com.yoga.backend.common.awsS3.S3Service;
+import com.yoga.backend.common.service.S3Service;
 import com.yoga.backend.common.entity.Users;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;

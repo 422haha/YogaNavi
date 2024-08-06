@@ -1,6 +1,6 @@
 package com.yoga.backend.mypage.recorded;
 
-import com.yoga.backend.common.awsS3.S3Service;
+import com.yoga.backend.common.service.S3Service;
 import com.yoga.backend.common.entity.RecordedLectures.RecordedLecture;
 import com.yoga.backend.common.entity.RecordedLectures.RecordedLectureChapter;
 import com.yoga.backend.common.entity.RecordedLectures.RecordedLectureLike;
@@ -16,6 +16,7 @@ import com.yoga.backend.mypage.recorded.repository.RecordedLectureListRepository
 import com.yoga.backend.mypage.recorded.repository.RecordedLectureRepository;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -230,35 +231,34 @@ public class RecordedServiceImpl implements RecordedService {
      * @param chapterDtos 새로운 챕터 정보가 담긴 DTO 리스트
      */
     private void updateChapters(RecordedLecture lecture, List<ChapterDto> chapterDtos) {
-        // 현재 강의의 모든 챕터 ID를 Set으로 저장
-        Set<Long> existingChapterIds = lecture.getChapters().stream()
-            .map(RecordedLectureChapter::getId)
-            .collect(Collectors.toSet());
+        // 현재 강의의 모든 챕터 id set으로
+        Set<Long> existingChapterIds = new HashSet<>();
+        for (RecordedLectureChapter chapter : lecture.getChapters()) {
+            existingChapterIds.add(chapter.getId());
+        }
 
-        // 프론트에서 보낸 챕터 ID를 Set으로 저장
-        Set<Long> receivedChapterIds = chapterDtos.stream()
-            .map(ChapterDto::getId)
-            .filter(id -> id != 0) // 새로 추가된 챕터는 ID가 0이므로 제외
-            .collect(Collectors.toSet());
+        // 프론트에서 보낸 챕터 ID를 set으로 저장
+        Set<Long> receivedChapterIds = new HashSet<>();
+        for (ChapterDto chapterDto : chapterDtos) {
+            if (chapterDto.getId() != 0) { // 새로 추가된 챕터는 ID가 0이므로 제외
+                receivedChapterIds.add(chapterDto.getId());
+            }
+        }
 
-        // 삭제될 챕터 ID (기존 ID 중 받지 않은 ID)
+        // 삭제될 챕터 ID
         Set<Long> chapterIdsToDelete = new HashSet<>(existingChapterIds);
         chapterIdsToDelete.removeAll(receivedChapterIds);
 
         // 챕터 삭제 처리
-        for (Long chapterId : chapterIdsToDelete) {
-            RecordedLectureChapter chapterToDelete = lecture.getChapters().stream()
-                .filter(chapter -> chapter.getId().equals(chapterId))
-                .findFirst()
-                .orElse(null);
-
-            if (chapterToDelete != null) {
-                if (chapterToDelete.getVideoUrl() != null && !chapterToDelete.getVideoUrl()
-                    .isEmpty()) {
-                    s3Service.deleteFile(chapterToDelete.getVideoUrl());
+        Iterator<RecordedLectureChapter> iterator = lecture.getChapters().iterator();
+        while (iterator.hasNext()) {
+            RecordedLectureChapter chapter = iterator.next();
+            if (chapterIdsToDelete.contains(chapter.getId())) {
+                if (chapter.getVideoUrl() != null && !chapter.getVideoUrl().isEmpty()) {
+                    s3Service.deleteFile(chapter.getVideoUrl());
                 }
-                lecture.getChapters().remove(chapterToDelete);
-                log.info("챕터 삭제: {}", chapterId);
+                iterator.remove();
+                log.info("챕터 삭제: {}", chapter.getId());
             }
         }
 
@@ -266,11 +266,13 @@ public class RecordedServiceImpl implements RecordedService {
         for (ChapterDto chapterDto : chapterDtos) {
             if (chapterDto.getId() != 0) {
                 // 기존 챕터 업데이트
-                RecordedLectureChapter chapter = lecture.getChapters().stream()
-                    .filter(c -> c.getId() == chapterDto.getId())
-                    .findFirst()
-                    .orElse(null);
-
+                RecordedLectureChapter chapter = null;
+                for (RecordedLectureChapter c : lecture.getChapters()) {
+                    if (c.getId() == chapterDto.getId()) {
+                        chapter = c;
+                        break;
+                    }
+                }
                 if (chapter != null) {
                     updateChapter(chapter, chapterDto);
                 }

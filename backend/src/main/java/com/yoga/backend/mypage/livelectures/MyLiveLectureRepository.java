@@ -81,4 +81,14 @@ public interface MyLiveLectureRepository extends JpaRepository<MyLiveLecture, Lo
         @Param("currentDate") Instant currentDate,
         @Param("dayOfWeek") String dayOfWeek
     );
+
+    @Query("SELECT ml FROM MyLiveLecture ml JOIN FETCH ml.liveLecture l " +
+        "WHERE ml.user.id = :userId " +
+        "AND l.endDate < :currentDate " +
+        "AND l.availableDay LIKE %:dayOfWeek%")
+    List<MyLiveLecture> findCurrentLecturesByUserIdBefore(
+        @Param("userId") int userId,
+        @Param("currentDate") Instant currentDate,
+        @Param("dayOfWeek") String dayOfWeek
+    );
 }
