@@ -42,17 +42,20 @@ public class ReservationController {
         @RequestBody ReservationRequestDto reservationRequest,
         @RequestHeader("Authorization") String token) {
         int userId = jwtUtil.getUserIdFromToken(token); // 토큰에서 사용자 ID 추출
+        Map<String, Object> response = new HashMap<>();
         try {
-            reservationService.createReservation(userId, reservationRequest); // 예약 생성
-            Map<String, Object> response = new HashMap<>();
+            reservationService.createReservation(userId, reservationRequest);
             response.put("message", "성공");
             response.put("data", null);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException e) {
+            response.put("message", e.getMessage());
+            response.put("data", null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "서버 내부 오류가 발생했습니다: " + e.getMessage());
-            errorResponse.put("data", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            response.put("message", "서버 내부 오류가 발생했습니다: " + e.getMessage());
+            response.put("data", null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
