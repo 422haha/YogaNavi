@@ -9,7 +9,6 @@ import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,15 +44,13 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    suspend fun checkPassword(password: String): Boolean? = withContext(Dispatchers.IO) {
+    suspend fun checkPassword(
+        password: String,
+        getBoolean: suspend (Boolean?) -> Unit
+    ) = viewModelScope.launch(Dispatchers.IO) {
         runCatching {
-            userRepository.checkPassword(password)
-        }.fold(
-            onSuccess = { it.data },
-            onFailure = {
-                it.printStackTrace()
-                null
-            }
-        )
+            userRepository.checkPassword(hashMapOf("password" to password))
+        }.onSuccess { getBoolean(it.data) }
+            .onFailure { it.printStackTrace() }
     }
 }

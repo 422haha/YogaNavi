@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.R
@@ -14,12 +15,20 @@ import com.ssafy.yoganavi.ui.homeUI.myPage.profile.dialog.ModifyDialog
 import com.ssafy.yoganavi.ui.utils.MY_PAGE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBinding::inflate) {
     private val viewModel: ProfileViewModel by viewModels()
     private var isTeacher: Boolean = false
+
+    private val dialog: ModifyDialog by lazy {
+        ModifyDialog(
+            requireContext(),
+            ::checkPassword
+        )
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -61,12 +70,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
             tvLogout.setOnClickListener { viewModel.clearUserData(::logout) }
             tvQuit.setOnClickListener { viewModel.quitUser(::quitDialog) }
             tvModify.setOnClickListener {
-                ModifyDialog(
-                    requireContext(),
-                    ::navigateToModifyFragment,
-                    ::checkPassword,
-                    ::showSnackBar
-                ).show()
+                dialog.show()
             }
         }
     }
@@ -80,10 +84,28 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
     }
 
     private fun navigateToModifyFragment() {
-        val action = ProfileFragmentDirections.actionProfileFragmentToModifyFragment(isTeacher)
+        val action =
+            ProfileFragmentDirections.actionProfileFragmentToModifyFragment(isTeacher)
         findNavController().navigate(action)
     }
 
-    private suspend fun checkPassword(password: String): Boolean? =
-        viewModel.checkPassword(password)
+    private fun checkPassword(password: String) = viewLifecycleOwner.lifecycleScope.launch {
+        viewModel.checkPassword(password, ::getBoolean)
+    }
+
+    private suspend fun getBoolean(check: Boolean?) = withContext(Dispatchers.Main) {
+        when (check) {
+            true -> {
+                navigateToModifyFragment()
+                dialog.binding.tiePw.setText("")
+                dialog.dismiss()
+            }
+
+            false -> {
+                showSnackBar("비밀번호가 틀렸습니다.")
+            }
+
+            else -> {}
+        }
+    }
 }
