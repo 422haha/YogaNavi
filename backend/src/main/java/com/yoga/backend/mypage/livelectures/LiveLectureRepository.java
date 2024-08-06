@@ -22,18 +22,30 @@ public interface LiveLectureRepository extends JpaRepository<LiveLectures, Long>
         @Param("endOfDay") Instant endOfDay, @Param("dayAbbreviation") String dayAbbreviation);
 
     @Query("SELECT ll FROM LiveLectures ll WHERE ll.maxLiveNum = :maxLiveNum AND ll.endDate > :currentDate")
-    List<LiveLectures> findAllByMaxLiveNumAndEndDateAfter(@Param("maxLiveNum") int maxLiveNum, @Param("currentDate") Instant currentDate);
+    List<LiveLectures> findAllByMaxLiveNumAndEndDateAfter(@Param("maxLiveNum") int maxLiveNum,
+        @Param("currentDate") Instant currentDate);
 
     @Query("SELECT ll FROM LiveLectures ll WHERE ll.maxLiveNum > :maxLiveNum AND ll.endDate > :currentDate")
-    List<LiveLectures> findAllByMaxLiveNumGreaterThanAndEndDateAfter(@Param("maxLiveNum") int maxLiveNum, @Param("currentDate") Instant currentDate);
+    List<LiveLectures> findAllByMaxLiveNumGreaterThanAndEndDateAfter(
+        @Param("maxLiveNum") int maxLiveNum, @Param("currentDate") Instant currentDate);
 
     @Query("SELECT ll FROM LiveLectures ll WHERE ll.user.id = :userId AND ll.maxLiveNum = :maxLiveNum AND ll.endDate > :now")
     List<LiveLectures> findByUserIdAndMaxLiveNumAndEndDateAfter(@Param("userId") int userId,
         @Param("maxLiveNum") int maxLiveNum, @Param("now") Instant now);
 
     @Query("SELECT ll FROM LiveLectures ll WHERE ll.user.id = :userId AND ll.maxLiveNum > :maxLiveNum AND ll.endDate > :now")
-    List<LiveLectures> findByUserIdAndMaxLiveNumGreaterThanAndEndDateAfter(@Param("userId") int userId,
+    List<LiveLectures> findByUserIdAndMaxLiveNumGreaterThanAndEndDateAfter(
+        @Param("userId") int userId,
         @Param("maxLiveNum") int maxLiveNum, @Param("now") Instant now);
 
-    List<LiveLectures> findByUserIdAndStartDateBetween(int userId, Instant start, Instant end);
+    @Query("SELECT l FROM LiveLectures l WHERE l.user.id = :userId " +
+        "AND l.endDate >= :currentDate " +
+        "AND l.startDate <= :endDate " +
+        "AND l.availableDay LIKE %:dayOfWeek%")
+    List<LiveLectures> findLecturesByUserAndDateRange(
+        @Param("userId") int userId,
+        @Param("currentDate") Instant currentDate,
+        @Param("endDate") Instant endDate,
+        @Param("dayOfWeek") String dayOfWeek
+    );
 }

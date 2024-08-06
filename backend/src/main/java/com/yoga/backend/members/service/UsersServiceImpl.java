@@ -21,6 +21,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -162,17 +164,31 @@ public class UsersServiceImpl implements UsersService {
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public String sendEmailVerificationToken(String email) {
         if (checkUser(email)) {
-            String token = generateToken();
-            TempAuthInfo tempAuthInfo = new TempAuthInfo();
-            tempAuthInfo.setEmail(email);
-            tempAuthInfo.setAuthToken(token);
-            tempAuthInfo.setExpirationTime(Instant.now().plus(TOKEN_VALIDITY_DURATION));
-            tempAuthInfoRepository.save(tempAuthInfo);
+            try {
+                String token = generateToken();
 
-            sendSimpleMessage(email, "Yoga Navi 회원가입 인증번호",
-                "회원가입 인증번호 : " + token + "\n이 인증번호는 5분 동안 유효합니다.");
+                tempAuthInfoRepository.deleteByEmail(email);
 
-            return "인증 번호 전송";
+                Optional<TempAuthInfo> existingInfo = tempAuthInfoRepository.findByEmail(email);
+                if (existingInfo.isPresent()) {
+                    TempAuthInfo tempAuthInfo = existingInfo.get();
+                    tempAuthInfo.setAuthToken(token);
+                    tempAuthInfo.setExpirationTime(Instant.now().plus(TOKEN_VALIDITY_DURATION));
+                } else {
+                    TempAuthInfo tempAuthInfo = new TempAuthInfo();
+                    tempAuthInfo.setEmail(email);
+                    tempAuthInfo.setAuthToken(token);
+                    tempAuthInfo.setExpirationTime(Instant.now().plus(TOKEN_VALIDITY_DURATION));
+                    tempAuthInfoRepository.save(tempAuthInfo);
+                }
+
+                sendSimpleMessage(email, "Yoga Navi 회원가입 인증번호",
+                    "회원가입 인증번호 : " + token + "\n이 인증번호는 5분 동안 유효합니다.");
+
+                return "인증 번호 전송";
+            } catch (Exception e) {
+                return "인증 번호 전송 실패. 잠시 후 다시 시도해 주세요.";
+            }
         } else {
             return "이미 존재하는 회원입니다.";
         }
@@ -484,4 +500,27 @@ public class UsersServiceImpl implements UsersService {
             }
         }
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean checkPwd(int userId, String password) {
+        Optional<Users> userOpt = usersRepository.findById(userId);
+        try {
+            if (userOpt.isPresent()) {
+                Users user = userOpt.get();
+                if (passwordEncoder.matches(password, user.getPwd())) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            log.error("비밀번호 확인 중 에러 발생", e);
+            return false;
+        }
+
+    }
+
 }

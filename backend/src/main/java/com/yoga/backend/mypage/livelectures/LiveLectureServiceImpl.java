@@ -23,17 +23,14 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     private final UsersRepository usersRepository;
     private final MyLiveLectureRepository myLiveLectureRepository;
     private final NotificationService notificationService;
-    private final HomeService homeService;
 
     public LiveLectureServiceImpl(LiveLectureRepository liveLecturesRepository,
         UsersRepository usersRepository, MyLiveLectureRepository myLiveLectureRepository,
-        NotificationService notificationService,
-        HomeService homeService) {
+        NotificationService notificationService) {
         this.liveLecturesRepository = liveLecturesRepository;
         this.usersRepository = usersRepository;
         this.myLiveLectureRepository = myLiveLectureRepository;
         this.notificationService = notificationService;
-        this.homeService = homeService;
     }
 
     /**
@@ -50,13 +47,24 @@ public class LiveLectureServiceImpl implements LiveLectureService {
         LiveLectures liveLecture = new LiveLectures();
         liveLecture.setLiveTitle(liveLectureCreateDto.getLiveTitle());
         liveLecture.setLiveContent(liveLectureCreateDto.getLiveContent());
-        liveLecture.setStartDate(Instant.ofEpochMilli(liveLectureCreateDto.getStartDate()));
-        liveLecture.setEndDate(Instant.ofEpochMilli(liveLectureCreateDto.getEndDate()));
-        liveLecture.setStartTime(Instant.ofEpochMilli(liveLectureCreateDto.getStartTime()));
-        liveLecture.setEndTime(Instant.ofEpochMilli(liveLectureCreateDto.getEndTime()));
+        liveLecture.setStartDate(Instant.ofEpochMilli(liveLectureCreateDto.getStartDate()));//하루 앞
+        liveLecture.setEndDate(Instant.ofEpochMilli(liveLectureCreateDto.getEndDate()));// 하루 앞
+        liveLecture.setStartTime(Instant.ofEpochMilli(liveLectureCreateDto.getStartTime()));//한국 시간
+        liveLecture.setEndTime(Instant.ofEpochMilli(liveLectureCreateDto.getEndTime()));// 한국 시간
         liveLecture.setMaxLiveNum(liveLectureCreateDto.getMaxLiveNum());
         liveLecture.setRegDate(Instant.now());
         liveLecture.setAvailableDay(liveLectureCreateDto.getAvailableDay());
+
+        System.out.println("== "+liveLecture.getLiveTitle());
+        System.out.println("== "+liveLecture.getLiveContent());
+        System.out.println("== "+liveLecture.getStartDate());
+        System.out.println("== "+liveLecture.getEndDate());
+        System.out.println("== "+liveLecture.getStartTime());
+        System.out.println("== "+liveLecture.getEndTime());
+        System.out.println("== "+liveLecture.getMaxLiveNum());
+        System.out.println("== "+liveLecture.getRegDate());
+        System.out.println("== "+liveLecture.getAvailableDay());
+
 
         if (liveLectureCreateDto.getUserId() != 0) {
             Optional<Users> userOptional = usersRepository.findById(
@@ -67,7 +75,6 @@ public class LiveLectureServiceImpl implements LiveLectureService {
 
                 LiveLectures savedLiveLecture = liveLecturesRepository.save(liveLecture);
                 notificationService.handleLectureUpdate(savedLiveLecture);
-                homeService.handleLectureCreation(savedLiveLecture);
 
                 LiveLectureCreateResponseDto responseDto = new LiveLectureCreateResponseDto();
                 responseDto.setMessage("화상강의 생성 성공");
@@ -160,8 +167,6 @@ public class LiveLectureServiceImpl implements LiveLectureService {
 
         notificationService.sendLectureUpdateNotification(updatedLecture);
 
-        homeService.handleLectureUpdate(updatedLecture);
-
         return updatedLecture;
     }
 
@@ -208,8 +213,6 @@ public class LiveLectureServiceImpl implements LiveLectureService {
             myLiveLectureRepository.deleteAll(myLiveLectures);
 
             liveLecturesRepository.delete(lecture);
-
-            homeService.handleLectureDeletion(lecture.getLiveId());
 
             notificationService.handleLectureDelete(liveId);
 

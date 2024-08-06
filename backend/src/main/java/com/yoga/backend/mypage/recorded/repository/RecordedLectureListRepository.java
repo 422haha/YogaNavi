@@ -3,7 +3,6 @@ package com.yoga.backend.mypage.recorded.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yoga.backend.common.entity.RecordedLectures.QRecordedLecture;
 import com.yoga.backend.common.entity.RecordedLectures.QRecordedLectureLike;
@@ -29,6 +28,7 @@ public class RecordedLectureListRepository {
         return queryFactory
             .select(Projections.constructor(LectureDto.class,
                 lecture.id.as("recordedId"),
+                lecture.user.id.as("userId"),
                 lecture.title.as("recordTitle"),
                 lecture.thumbnailSmall.as("recordThumbnailSmall"),
                 lecture.thumbnail.as("recordThumbnail"),
@@ -59,6 +59,7 @@ public class RecordedLectureListRepository {
         var query = queryFactory
             .select(Projections.constructor(LectureDto.class,
                 lecture.id.as("recordedId"),
+                lecture.user.id.as("userId"),
                 lecture.title.as("recordTitle"),
                 lecture.content.as("recordContent"),
                 lecture.thumbnailSmall.as("recordThumbnailSmall"),
