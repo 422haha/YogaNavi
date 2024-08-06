@@ -9,16 +9,17 @@ import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.DialogEnterBinding
+import com.ssafy.yoganavi.ui.utils.NO_BROADCAST
 import com.ssafy.yoganavi.ui.utils.loadImageSequentially
 
 class EnterDialog(
     context: Context,
-    private val id: Int,
     private val smallImageUri: String?,
     private val imageUri: String?,
     private val title: String,
     private val content: String,
-    private val okCallback: (Int) -> Unit,
+    private val isOnAir: Boolean,
+    private val okCallback: () -> Unit,
 ): AlertDialog(context) {
 
     private lateinit var binding: DialogEnterBinding
@@ -51,10 +52,15 @@ class EnterDialog(
 
             tvContent.text = content
             tvContent.movementMethod = ScrollingMovementMethod()
+
+            btnEnter.isEnabled = isOnAir
+
+            if(!isOnAir)
+                btnEnter.text = NO_BROADCAST
         }
 
         btnEnter.setOnClickListener {
-            okCallback(id)
+            okCallback()
             dismiss()
         }
 

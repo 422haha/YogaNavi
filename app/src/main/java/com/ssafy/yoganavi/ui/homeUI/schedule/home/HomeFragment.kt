@@ -52,11 +52,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         smallImageUri: String?,
         imageUri: String?,
         title: String,
-        content: String
+        content: String,
+        isTeacher: Boolean,
+        isOnAir: Boolean
     ) {
-        EnterDialog(requireContext(), id, smallImageUri, imageUri, title, content) {
+        EnterDialog(requireContext(), smallImageUri, imageUri, title, content, isOnAir) {
             val directions = HomeFragmentDirections
-                .actionHomeFragmentToLiveFragment(it)
+                .actionHomeFragmentToLiveFragment(id, isTeacher)
 
             findNavController().navigate(directions)
         }.show()
