@@ -134,4 +134,7 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     // CourseHistory
     override suspend fun getCourseHistoryList(): Response<YogaResponse<HomeData>> =
         infoAPI.getCourseHistoryList()
+
+    override suspend fun checkPassword(password: HashMap<String, String>): Response<YogaDetailResponse<Boolean>> =
+        infoAPI.checkPassword(password)
 }

@@ -210,4 +210,10 @@ class InfoRepositoryImpl @Inject constructor(
         val response = withContext(ioDispatcher) { infoDataSource.getCourseHistoryList() }
         return response.toListResponse()
     }
+
+    override suspend fun checkPassword(password: HashMap<String, String>): DetailResponse<Boolean> {
+        val response = withContext(ioDispatcher) { infoDataSource.checkPassword(password) }
+        return response.toDetailResponse()
+    }
+
 }

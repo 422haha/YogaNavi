@@ -1,7 +1,6 @@
 package com.ssafy.yoganavi.ui.loginUI.find
 
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.view.View
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -13,28 +12,14 @@ import com.ssafy.yoganavi.databinding.FragmentFindBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.END_TIME
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
-import com.ssafy.yoganavi.ui.utils.TIME_OUT
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 @AndroidEntryPoint
 class FindFragment : BaseFragment<FragmentFindBinding>(FragmentFindBinding::inflate) {
     private val viewModel: FindViewModel by viewModels()
-    private val timer = object : CountDownTimer(TIME_OUT * 60, 1000) {
-        override fun onTick(time: Long) {
-            val secondsRemaining = time / 1000
-            val minutes = secondsRemaining / 60
-            val seconds = secondsRemaining % 60
-            binding.tvTime.text = String.format(Locale.KOREA, "%02d:%02d", minutes, seconds)
-        }
-
-        override fun onFinish() {
-            binding.tvTime.text = END_TIME
-            binding.btnCheck.isEnabled = false
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -46,6 +31,7 @@ class FindFragment : BaseFragment<FragmentFindBinding>(FragmentFindBinding::infl
 
     private fun initListener() {
         binding.btnSend.setOnClickListener {
+            binding.btnSend.isEnabled = false
             hideKeyboard()
 
             val email = binding.tieId.text.toString()
@@ -70,14 +56,27 @@ class FindFragment : BaseFragment<FragmentFindBinding>(FragmentFindBinding::infl
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.findPasswordEvent.collectLatest {
-                when (it) {
-                    is FindEvent.SendEmailSuccess -> sendEmailSuccess(it)
-                    is FindEvent.CheckEmailSuccess -> checkEmailSuccess(it)
-                    is FindEvent.RegisterPasswordSuccess -> registerPasswordSuccess(it)
-                    is FindEvent.Error -> error(it.message)
-                }
+            collectFindEvent()
+            collectTimer()
+        }
+    }
+
+    private fun CoroutineScope.collectFindEvent() = launch {
+        viewModel.findPasswordEvent.collectLatest {
+            when (it) {
+                is FindEvent.SendEmailSuccess -> sendEmailSuccess(it)
+                is FindEvent.CheckEmailSuccess -> checkEmailSuccess(it)
+                is FindEvent.RegisterPasswordSuccess -> registerPasswordSuccess(it)
+                is FindEvent.Error -> error(it.message)
             }
+            binding.btnSend.isEnabled = true
+        }
+    }
+
+    private fun CoroutineScope.collectTimer() = launch {
+        viewModel.timeFlow.collect { remainTime ->
+            if (remainTime == END_TIME) binding.btnCheck.isEnabled = false
+            binding.tvTime.text = remainTime
         }
     }
 
@@ -85,14 +84,14 @@ class FindFragment : BaseFragment<FragmentFindBinding>(FragmentFindBinding::infl
         binding.btnCheck.isEnabled = true
         binding.btnSignup.isEnabled = false
         showSnackBar(data.message)
-        timer.start()
+        viewModel.timerStart()
     }
 
     private fun checkEmailSuccess(data: FindEvent<Unit>) {
         binding.btnCheck.isEnabled = false
         binding.btnSignup.isEnabled = true
         showSnackBar(data.message)
-        timer.cancel()
+        viewModel.timerEnd()
     }
 
     private fun registerPasswordSuccess(data: FindEvent<Unit>) {

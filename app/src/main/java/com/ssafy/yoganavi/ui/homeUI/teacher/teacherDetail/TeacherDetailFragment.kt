@@ -42,7 +42,7 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
         val header = TeacherData(
             teacherName = data.teacherName,
             teacherId = data.teacherId,
-            content = data.content,
+            content = data.content ?: "",
             teacherProfile = data.teacherProfile ?: "",
             teacherSmallProfile = data.teacherSmallProfile ?: "",
             hashtags = data.hashtags,

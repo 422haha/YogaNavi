@@ -86,4 +86,7 @@ interface InfoRepository {
 
     // CourseHistory
     suspend fun getCourseHistoryList(): ListResponse<HomeData>
+
+    suspend fun checkPassword(password: HashMap<String, String>): DetailResponse<Boolean>
+
 }
