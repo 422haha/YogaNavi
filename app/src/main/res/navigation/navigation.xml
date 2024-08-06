@@ -125,7 +125,13 @@
         tools:layout="@layout/fragment_filter">
         <action
             android:id="@+id/action_filterFragment_to_teacherListFragment"
-            app:destination="@id/teacherListFragment" />
+            app:destination="@id/teacherListFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_right"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/teacherListFragment"
+            app:popUpToInclusive="true" />
         <argument
             android:name="filter"
             android:defaultValue="@null"
@@ -317,8 +323,8 @@
             app:argType="integer" />
         <argument
             android:name="isTeacher"
-            app:argType="boolean"
-            android:defaultValue="false" />
+            android:defaultValue="false"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/managementLiveFragment"
