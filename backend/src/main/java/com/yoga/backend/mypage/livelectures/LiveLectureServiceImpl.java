@@ -4,6 +4,7 @@ import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.fcm.NotificationService;
+import com.yoga.backend.home.HomeService;
 import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateDto;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateResponseDto;
@@ -11,7 +12,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,14 +23,17 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     private final UsersRepository usersRepository;
     private final MyLiveLectureRepository myLiveLectureRepository;
     private final NotificationService notificationService;
+    private final HomeService homeService;
 
     public LiveLectureServiceImpl(LiveLectureRepository liveLecturesRepository,
         UsersRepository usersRepository, MyLiveLectureRepository myLiveLectureRepository,
-        NotificationService notificationService) {
+        NotificationService notificationService,
+        HomeService homeService) {
         this.liveLecturesRepository = liveLecturesRepository;
         this.usersRepository = usersRepository;
         this.myLiveLectureRepository = myLiveLectureRepository;
         this.notificationService = notificationService;
+        this.homeService = homeService;
     }
 
     /**
@@ -64,6 +67,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
 
                 LiveLectures savedLiveLecture = liveLecturesRepository.save(liveLecture);
                 notificationService.handleLectureUpdate(savedLiveLecture);
+                homeService.handleLectureCreation(savedLiveLecture);
 
                 LiveLectureCreateResponseDto responseDto = new LiveLectureCreateResponseDto();
                 responseDto.setMessage("화상강의 생성 성공");
@@ -156,6 +160,8 @@ public class LiveLectureServiceImpl implements LiveLectureService {
 
         notificationService.sendLectureUpdateNotification(updatedLecture);
 
+        homeService.handleLectureUpdate(updatedLecture);
+
         return updatedLecture;
     }
 
@@ -202,6 +208,8 @@ public class LiveLectureServiceImpl implements LiveLectureService {
             myLiveLectureRepository.deleteAll(myLiveLectures);
 
             liveLecturesRepository.delete(lecture);
+
+            homeService.handleLectureDeletion(lecture.getLiveId());
 
             notificationService.handleLectureDelete(liveId);
 

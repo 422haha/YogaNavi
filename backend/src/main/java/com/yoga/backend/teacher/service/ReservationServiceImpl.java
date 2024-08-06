@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Isolation;
 
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -95,12 +94,14 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LiveLectureDto> getAllLiveLectures(int method) {
+        Instant now = Instant.now();
         if (method == 0) {
-            return liveLectureRepository.findAllByMaxLiveNum(1).stream()
+            return liveLectureRepository.findAllByMaxLiveNumAndEndDateAfter(1, now).stream()
                 .map(LiveLectureDto::fromEntity)
                 .collect(Collectors.toList());
         } else {
-            return liveLectureRepository.findAllByMaxLiveNumGreaterThan(1).stream()
+            return liveLectureRepository.findAllByMaxLiveNumGreaterThanAndEndDateAfter(1, now)
+                .stream()
                 .map(LiveLectureDto::fromEntity)
                 .collect(Collectors.toList());
         }
@@ -116,12 +117,15 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LiveLectureDto> getLiveLecturesByTeacherAndMethod(int teacherId, int method) {
+        Instant now = Instant.now();
         if (method == 0) {
-            return liveLectureRepository.findByUserIdAndMaxLiveNum(teacherId, 1).stream()
+            return liveLectureRepository.findByUserIdAndMaxLiveNumAndEndDateAfter(teacherId, 1, now)
+                .stream()
                 .map(LiveLectureDto::fromEntity)
                 .collect(Collectors.toList());
         } else {
-            return liveLectureRepository.findByUserIdAndMaxLiveNumGreaterThan(teacherId, 1).stream()
+            return liveLectureRepository.findByUserIdAndMaxLiveNumGreaterThanAndEndDateAfter(
+                    teacherId, 1, now).stream()
                 .map(LiveLectureDto::fromEntity)
                 .collect(Collectors.toList());
         }

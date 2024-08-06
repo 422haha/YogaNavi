@@ -196,6 +196,7 @@ public class UserController {
                     Set<String> myTags = usersService.getUserHashtags(userId);
                     List<String> tags = new ArrayList<>(myTags);
                     responseDto.setHashTags(tags);
+                    responseDto.setContent(user.getContent());
                 }
 
                 response.put("message", "조회 성공");
@@ -238,6 +239,7 @@ public class UserController {
                     Set<String> myTags = usersService.getUserHashtags(userId);
                     List<String> tags = new ArrayList<>(myTags);
                     responseDto.setHashTags(tags);
+                    responseDto.setContent(user.getContent());
                 }
 
                 response.put("message", "수정 완료");

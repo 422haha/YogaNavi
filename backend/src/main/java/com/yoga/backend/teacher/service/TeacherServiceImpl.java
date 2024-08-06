@@ -61,22 +61,16 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<TeacherDto> getAllTeachers(TeacherFilter filter, int sorting, int userId) {
-        LocalDate now = LocalDate.now();
-        long weekAfter = now.plusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toInstant()
-            .toEpochMilli();
-        long monthAfter = now.plusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant()
-            .toEpochMilli();
-        long threeMonthsAfter = now.plusMonths(3).atStartOfDay(ZoneId.systemDefault()).toInstant()
-            .toEpochMilli();
+
+        // days에서 끝에 쉼표가 있다면 제거
+        String days = filter.getDay().endsWith(",") ? filter.getDay()
+            .substring(0, filter.getDay().length() - 1) : filter.getDay();
 
         List<Users> users = teacherRepository.findTeachersByLectureFilter(
-            filter.getStartTime(),
-            filter.getEndTime(),
-            filter.getDay(),
+            filter.getStartTimeAsInstant(),
+            filter.getEndTimeAsInstant(),
+            days,
             filter.getPeriod(),
-            weekAfter,
-            monthAfter,
-            threeMonthsAfter,
             filter.getMaxLiveNum()
         );
 
@@ -207,7 +201,8 @@ public class TeacherServiceImpl implements TeacherService {
             .nickname(user.getNickname())
             .profileImageUrl(profileImageUrl)
             .profileImageUrlSmall(profileImageUrlSmall)
-            .content(user.getContent())
+            .content(user.getContent() != null ? user.getContent()
+                : "안녕하세요! " + user.getNickname() + "입니다.")
             .hashtags(user.getHashtags().stream().map(Hashtag::getName).collect(Collectors.toSet()))
             .recordedLectures(sortedRecordedLectures)
             .notices(user.getArticles().stream().map(article -> {
@@ -456,11 +451,13 @@ public class TeacherServiceImpl implements TeacherService {
             String profileImageUrl = null;
             String profileImageUrlSmall = null;
             try {
-                if (teacher.getProfile_image_url() != null && !teacher.getProfile_image_url().isEmpty()) {
+                if (teacher.getProfile_image_url() != null && !teacher.getProfile_image_url()
+                    .isEmpty()) {
                     profileImageUrl = s3Service.generatePresignedUrl(
                         teacher.getProfile_image_url(), URL_EXPIRATION_SECONDS);
                 }
-                if (teacher.getProfile_image_url_small() != null && !teacher.getProfile_image_url_small().isEmpty()) {
+                if (teacher.getProfile_image_url_small() != null
+                    && !teacher.getProfile_image_url_small().isEmpty()) {
                     profileImageUrlSmall = s3Service.generatePresignedUrl(
                         teacher.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
                 }
@@ -475,7 +472,8 @@ public class TeacherServiceImpl implements TeacherService {
                 .profileImageUrl(profileImageUrl)
                 .profileImageUrlSmall(profileImageUrlSmall)
                 .content(teacher.getContent())
-                .hashtags(teacher.getHashtags().stream().map(Hashtag::getName).collect(Collectors.toSet()))
+                .hashtags(teacher.getHashtags().stream().map(Hashtag::getName)
+                    .collect(Collectors.toSet()))
                 .liked(true) // 이 목록은 사용자가 좋아요한 강사들이므로 항상 true
                 .likeCount(teacher.getTeacherLikes().size())
                 .build();

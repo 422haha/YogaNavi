@@ -10,7 +10,7 @@ import lombok.Data;
 @Builder
 public class ReservationRequestDto {
 
-    private int liveId;        // 실시간 강의 ID
+    private Integer liveId;        // 실시간 강의 ID
     private Long startDate;    // 시작 날짜 (밀리초 단위)
     private Long endDate;      // 종료 날짜 (밀리초 단위)
 }

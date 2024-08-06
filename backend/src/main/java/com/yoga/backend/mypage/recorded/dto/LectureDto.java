@@ -15,14 +15,14 @@ import org.springframework.data.annotation.LastModifiedDate;
 public class LectureDto {
 
     private Long recordedId;
-    private int userId;
+    private Integer userId;
     private String recordTitle;
     private String recordContent;
     private String recordThumbnail;
     private String recordThumbnailSmall;
     private List<ChapterDto> recordedLectureChapters;
-    private long likeCount;
-    private boolean myLike;
+    private Long likeCount;
+    private Boolean myLike;
     private String creationStatus;
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
@@ -69,7 +69,7 @@ public class LectureDto {
         this.myLike = myLike;
     }
 
-    public LectureDto(Long recordedId, String recordTitle, String recordThumbnail, long likeCount,
+    public LectureDto(Long recordedId, String recordTitle, String recordThumbnail, Long likeCount,
         Boolean myLike, String creationStatus) {
         this.recordedId = recordedId;
         this.recordTitle = recordTitle;

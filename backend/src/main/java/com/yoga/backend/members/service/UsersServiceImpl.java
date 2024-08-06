@@ -378,6 +378,12 @@ public class UsersServiceImpl implements UsersService {
                 log.debug("사용자 {}의 해시태그 수정: {}", userId, updateDto.getHashTags());
                 updateUserHashtags(userId, Set.copyOf(updateDto.getHashTags()));
             }
+
+            if (updateDto.getContent() != null && !updateDto.getContent().isEmpty()) {
+                log.debug("사용자 {}의 소개 내용 수정: {}", userId, updateDto.getContent());
+                user.setContent(updateDto.getContent());
+            }
+
             Users updatedUser = usersRepository.save(user);
             log.info("사용자 {}의 정보 수정", userId);
             return updatedUser;
