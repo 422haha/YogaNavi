@@ -200,9 +200,7 @@ class InfoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateLiveOnAir(state: Boolean, liveId: Int): DetailResponse<Unit> {
-        val response = withContext(ioDispatcher) {
-            infoDataSource.updateLiveOnAir(state, liveId)
-        }
+        val response = withContext(ioDispatcher) { infoDataSource.updateLiveOnAir(state, liveId) }
         return response.toDetailResponse()
     }
 

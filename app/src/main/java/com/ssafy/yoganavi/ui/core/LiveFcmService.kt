@@ -3,7 +3,6 @@ package com.ssafy.yoganavi.ui.core
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
@@ -49,7 +48,7 @@ class LiveFcmService: FirebaseMessagingService() {
     private fun sendNotification(remoteMessage: RemoteMessage) {
         val channelId = CHANNEL_ID
         val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val uniId: Int = UUID.randomUUID().hashCode()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -62,7 +61,7 @@ class LiveFcmService: FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        val intent = Intent(this, MainActivity::class.java).apply {
+        val intent = Intent(this, SplashActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             remoteMessage.data.forEach { (key, value) ->
                 putExtra(key, value)
