@@ -37,7 +37,6 @@ import org.webrtc.VideoTrack
 
 @AndroidEntryPoint
 class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::inflate) {
-
     private val args: LiveFragmentArgs by navArgs()
 
     private val viewModel: LiveViewModel by viewModels()
@@ -51,10 +50,14 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
     private lateinit var draggableContainer: FrameLayout
 
+    private var prevState: WebRTCSessionState = WebRTCSessionState.Offline
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         initPermission()
+
+        viewModel.sessionManager.signalingClient.liveId = args.getLiveId
     }
 
     private fun initPermission() {
@@ -187,15 +190,16 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         binding.tvState.text = state.name
 
         when (state) {
-            WebRTCSessionState.Offline -> { binding.tvState.text = NO_CONNECT_SERVER }
-            WebRTCSessionState.Impossible -> { }
+            WebRTCSessionState.Offline -> {
+                binding.tvState.text = NO_CONNECT_SERVER
+            }
+            WebRTCSessionState.Impossible -> {
+                if(prevState == WebRTCSessionState.Active)
+                    viewModel.sessionManager.disconnect()
+            }
             WebRTCSessionState.Ready -> {
-                if(args.isTeacher) {
-                    viewModel.sessionManager.onSessionScreenReady().apply {
-                        // TODO. 비정상 종료에서 Live 상태를 OFF로 변경해야함
-                        viewModel.updateLive(true, args.getLiveId)
-                    }
-                }
+                if(args.isTeacher)
+                    viewModel.sessionManager.onSessionScreenReady()
             }
             WebRTCSessionState.Creating -> {
                 if(!args.isTeacher)
@@ -203,6 +207,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             }
             WebRTCSessionState.Active -> { }
         }
+
+        prevState = state
     }
 
     private fun observeCallMediaState() {
@@ -330,12 +336,5 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         exitFullscreen()
 
         findNavController().popBackStack()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        if(args.isTeacher)
-            viewModel.updateLive(false, args.getLiveId)
     }
 }
