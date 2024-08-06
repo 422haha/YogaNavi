@@ -1,7 +1,8 @@
- package com.ssafy.yoganavi.ui.homeUI.schedule.home
+package com.ssafy.yoganavi.ui.homeUI.schedule.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -17,34 +18,49 @@ import com.ssafy.yoganavi.ui.utils.startTildeEnd
 
 class HomeAdapter(
     private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit
-): ListAdapter<HomeData, HomeAdapter.ViewHolder>(HomeDiffCallback()) {
+) : ListAdapter<HomeData, HomeAdapter.ViewHolder>(HomeDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent, alertLiveDetailDialog)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(currentList[position])
+        if (position != 0)
+            holder.bind(currentList[position], currentList[position - 1].lectureDate)
+        else
+            holder.bind(currentList[position], currentList[position].lectureDate)
     }
 
     class ViewHolder(
         private val binding: ListItemHomeBinding,
         private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit
-    ): RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: HomeData) {
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: HomeData, preDay: Long) {
             with(binding) {
-                if(!item.teacherSmallProfile.isNullOrBlank()) {
+                if (!item.teacherSmallProfile.isNullOrBlank()) {
                     Glide.with(binding.root)
                         .load(item.teacherSmallProfile)
                         .circleCrop()
                         .into(ivProfile)
+                } else {
+                    ivProfile.setImageResource(R.drawable.profilenull)
                 }
 
-                if(false) onAir.setBackgroundResource(R.color.red) else onAir.setBackgroundResource(R.color.gray_20)
+                if (item.lectureDate != preDay)
+                    dateDivider.isVisible = true
+                else
+                    dateDivider.isVisible = false
+
+                if (false) onAir.setBackgroundResource(R.color.red) else onAir.setBackgroundResource(
+                    R.color.gray_20
+                )
 
                 tvTeacherNickname.text = item.teacherName
 
-                binding.tvDate.text = startSpaceEnd(formatDashDate(item.lectureDate), convertDaysToHangle(item.lectureDay))
+                binding.tvDate.text = startSpaceEnd(
+                    formatDashDate(item.lectureDate),
+                    convertDaysToHangle(item.lectureDay)
+                )
 
                 tvLectureTitle.text = item.liveTitle
 
@@ -52,22 +68,33 @@ class HomeAdapter(
                 tvLectureTime.text = timeData
 
                 clDetail.setOnClickListener {
-                    alertLiveDetailDialog(item.liveId, item.teacherSmallProfile,item.teacherProfile, item.liveTitle, item.liveContent, item.isMyClass)
+                    alertLiveDetailDialog(
+                        item.liveId,
+                        item.teacherSmallProfile,
+                        item.teacherProfile,
+                        item.liveTitle,
+                        item.liveContent,
+                        item.isMyClass
+                    )
                 }
             }
         }
 
         companion object {
-            fun from(parent: ViewGroup,
-                     alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit): ViewHolder {
-                return ViewHolder(ListItemHomeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                    alertLiveDetailDialog = alertLiveDetailDialog)
+            fun from(
+                parent: ViewGroup,
+                alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit
+            ): ViewHolder {
+                return ViewHolder(
+                    ListItemHomeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                    alertLiveDetailDialog = alertLiveDetailDialog
+                )
             }
         }
     }
 }
 
-class HomeDiffCallback: DiffUtil.ItemCallback<HomeData>() {
+class HomeDiffCallback : DiffUtil.ItemCallback<HomeData>() {
     override fun areItemsTheSame(oldItem: HomeData, newItem: HomeData): Boolean {
         return oldItem.liveId == newItem.liveId
     }
