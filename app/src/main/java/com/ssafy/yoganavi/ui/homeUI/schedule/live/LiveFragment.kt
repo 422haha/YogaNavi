@@ -25,7 +25,6 @@ import com.ssafy.yoganavi.databinding.FragmentLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.core.MainActivity
 import com.ssafy.yoganavi.ui.homeUI.schedule.live.webRtc.WebRTCSessionState
-import com.ssafy.yoganavi.ui.utils.NO_BROADCAST
 import com.ssafy.yoganavi.ui.utils.NO_CONNECT_SERVER
 import com.ssafy.yoganavi.ui.utils.PermissionHandler
 import com.ssafy.yoganavi.ui.utils.PermissionHelper
@@ -112,7 +111,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             }
 
             ibtnCamSwitch.setOnClickListener {
-                if(viewModel.sessionState.value == WebRTCSessionState.Active)
+                if(viewModel.sessionManager.signalingClient.sessionStateFlow.value == WebRTCSessionState.Active)
                     viewModel.sessionManager.flipCamera()
             }
 
@@ -177,7 +176,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     private fun observeSessionState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.sessionState.collect { state ->
+                viewModel.sessionManager.signalingClient.sessionStateFlow.collect { state ->
                     handleSessionState(state)
                 }
             }
@@ -220,7 +219,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     private fun handleMicrophoneState(isEnabled: Boolean) {
         if(isEnabled) permissionHandler.branchPermission(Manifest.permission.RECORD_AUDIO, "오디오")
 
-        if(viewModel.sessionState.value == WebRTCSessionState.Active)
+        if(viewModel.sessionManager.signalingClient.sessionStateFlow.value == WebRTCSessionState.Active)
             viewModel.sessionManager.enableMicrophone(isEnabled)
 
         binding.ibtnMic.setImageResource(if (isEnabled) R.drawable.baseline_mic_24 else R.drawable.baseline_mic_off_24)
@@ -229,7 +228,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     private fun handleCameraState(isEnabled: Boolean) {
         if(isEnabled) permissionHelper.launchPermission()
 
-        if(viewModel.sessionState.value == WebRTCSessionState.Active)
+        if(viewModel.sessionManager.signalingClient.sessionStateFlow.value == WebRTCSessionState.Active)
             viewModel.sessionManager.enableCamera(isEnabled)
 
         binding.ibtnVideo.setImageResource(if (isEnabled) R.drawable.baseline_videocam_24 else R.drawable.baseline_videocam_off_24)

@@ -52,7 +52,7 @@ class HomeAdapter(
                 tvLectureTime.text = timeData
 
                 clDetail.setOnClickListener {
-                    alertLiveDetailDialog(item.liveId, item.teacherSmallProfile,item.teacherProfile, item.liveTitle, item.liveContent, item.isTeacher, item.isOnAir)
+                    alertLiveDetailDialog(item.liveId, item.teacherSmallProfile,item.teacherProfile, item.liveTitle, item.liveContent, item.isMyClass, item.isOnAir)
                 }
             }
         }

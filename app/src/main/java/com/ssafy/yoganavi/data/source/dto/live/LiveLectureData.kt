@@ -13,7 +13,7 @@ data class LiveLectureData(
     @SerializedName("profileImageUrl")
     val teacherProfile: String?,
     @SerializedName("teacher")
-    val isTeacher: Boolean,
+    val isMyClass: Boolean,
     var liveTitle: String = "",
     var liveContent : String = "",
     var availableDay: String = "",

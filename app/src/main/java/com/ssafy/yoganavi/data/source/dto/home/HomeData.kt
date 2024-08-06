@@ -13,7 +13,7 @@ data class HomeData(
     @SerializedName("profileImageUrl")
     val teacherProfile: String?,
     @SerializedName("teacher")
-    val isTeacher: Boolean = false,
+    val isMyClass: Boolean = false,
     @SerializedName("onAir")
     val isOnAir: Boolean= false,
     var liveTitle: String = "",

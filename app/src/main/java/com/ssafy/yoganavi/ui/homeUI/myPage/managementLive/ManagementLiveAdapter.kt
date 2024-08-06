@@ -50,7 +50,7 @@ class ManagementLiveAdapter(
 
                 tvLectureTime.text = startVerticalEnd(weekData, timeData)
 
-                vEnterBtn.setOnClickListener { navigateToLiveFragment(item.liveId, item.isTeacher) }
+                vEnterBtn.setOnClickListener { navigateToLiveFragment(item.liveId, item.isMyClass) }
 
                 tvEditBtn.setOnClickListener { navigateToRegisterFragment(UPDATE, item.liveId) }
 

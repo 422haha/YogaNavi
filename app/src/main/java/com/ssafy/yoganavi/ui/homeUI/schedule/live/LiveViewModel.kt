@@ -3,7 +3,6 @@ package com.ssafy.yoganavi.ui.homeUI.schedule.live
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
-import com.ssafy.yoganavi.ui.homeUI.schedule.live.webRtc.WebRTCSessionState
 import com.ssafy.yoganavi.ui.homeUI.schedule.live.webRtc.sessions.WebRtcSessionManager
 import com.ssafy.yoganavi.ui.utils.CallMediaState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,9 +20,6 @@ class LiveViewModel @Inject constructor(
     private val _callMediaState = MutableStateFlow(CallMediaState())
     val callMediaState: StateFlow<CallMediaState> = _callMediaState
 
-    private val _sessionState = MutableStateFlow(WebRTCSessionState.Offline)
-    val sessionState: StateFlow<WebRTCSessionState> = _sessionState
-
     private val _offsetX = MutableStateFlow(0f)
     val offsetX: StateFlow<Float> get() = _offsetX
 
@@ -33,14 +29,6 @@ class LiveViewModel @Inject constructor(
     fun updateOffset(x: Float, y: Float) {
         _offsetX.value = x
         _offsetY.value = y
-    }
-
-    init {
-        viewModelScope.launch {
-            sessionManager.signalingClient.sessionStateFlow.collect {
-                _sessionState.value = it
-            }
-        }
     }
 
     fun toggleMicrophoneState(isEnabled: Boolean) {
