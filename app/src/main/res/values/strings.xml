@@ -57,6 +57,7 @@
     <string name="click_thumbnail_info">클릭해서 썸네일을 추가하세요</string>
     <string name="click_video_info">클릭해서 영상을 추가하세요</string>
     <string name="notice_info">공지를 입력하세요</string>
+    <string name="password_info">비밀번호를 입력하세요</string>
 
 
     <!-- 필터 시작 -->
