@@ -28,5 +28,6 @@ public interface MyLiveLectureRepository extends JpaRepository<MyLiveLecture, Lo
     List<MyLiveLecture> findByUserIdAndStartDateBetween(int userId, Instant start, Instant end);
 
     @Query("SELECT COUNT(mll) FROM MyLiveLecture mll WHERE mll.liveLecture = :liveLecture AND mll.endDate > :currentDate")
-    int countByLiveLectureAndEndDateAfter(@Param("liveLecture") LiveLectures liveLecture, @Param("currentDate") Instant currentDate);
+    int countByLiveLectureAndEndDateAfter(@Param("liveLecture") LiveLectures liveLecture,
+        @Param("currentDate") Instant currentDate);
 }
