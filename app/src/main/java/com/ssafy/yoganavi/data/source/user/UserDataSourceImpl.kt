@@ -45,6 +45,6 @@ class UserDataSourceImpl @Inject constructor(private val userAPI: UserAPI) : Use
     override suspend fun updateFcmToken(fcmToken: String): Response<YogaResponse<Unit>> =
         userAPI.updateFcmToken(fcmToken)
 
-    override suspend fun checkPassword(password: String): Response<YogaDetailResponse<Boolean>> =
+    override suspend fun checkPassword(password: HashMap<String, String>): Response<YogaDetailResponse<Boolean>> =
         userAPI.checkPassword(password)
 }

@@ -31,5 +31,5 @@ interface UserDataSource {
 
     suspend fun updateFcmToken(fcmToken: String): Response<YogaResponse<Unit>>
 
-    suspend fun checkPassword(password: String): Response<YogaDetailResponse<Boolean>>
+    suspend fun checkPassword(password: HashMap<String, String>): Response<YogaDetailResponse<Boolean>>
 }
