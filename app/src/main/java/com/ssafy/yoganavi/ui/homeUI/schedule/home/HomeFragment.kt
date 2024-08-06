@@ -12,7 +12,10 @@ import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.schedule.home.dialog.EnterDialog
 import com.ssafy.yoganavi.ui.utils.EMPTY_LIVE
 import com.ssafy.yoganavi.ui.utils.HOME
+import com.ssafy.yoganavi.ui.utils.REPEAT_TIME
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -40,10 +43,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.homeList.collectLatest {
-                checkEmptyList(it, EMPTY_LIVE)
-                homeAdapter.submitList(it)
-            }
+            collectAdapterList()
+            repeatCollect()
+        }
+    }
+
+    private fun CoroutineScope.collectAdapterList() = launch {
+        viewModel.homeList.collectLatest { list ->
+            checkEmptyList(list, EMPTY_LIVE)
+            homeAdapter.submitList(list)
+        }
+    }
+
+    private fun CoroutineScope.repeatCollect() = launch {
+        while (true) {
+            delay(REPEAT_TIME)
+            viewModel.getHomeList()
         }
     }
 
@@ -57,10 +72,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         isOnAir: Boolean
     ) {
         EnterDialog(requireContext(), smallImageUri, imageUri, title, content, isOnAir) {
-            val directions = HomeFragmentDirections
-                .actionHomeFragmentToLiveFragment(id, isTeacher)
-
-            findNavController().navigate(directions)
+            moveToLiveFragment(id, isTeacher)
         }.show()
+    }
+
+    private fun moveToLiveFragment(id: Int, isTeacher: Boolean) {
+        val directions = HomeFragmentDirections.actionHomeFragmentToLiveFragment(id, isTeacher)
+        findNavController().navigate(directions)
     }
 }
