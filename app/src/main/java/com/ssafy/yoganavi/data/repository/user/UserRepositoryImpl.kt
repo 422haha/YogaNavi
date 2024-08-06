@@ -76,8 +76,9 @@ class UserRepositoryImpl @Inject constructor(
         return response.toListResponse()
     }
 
-    override suspend fun checkPassword(password: HashMap<String, String>): DetailResponse<Boolean> {
-        val response = withContext(ioDispatcher) { userDataSource.checkPassword(password) }
+    override suspend fun checkPassword(password: String): DetailResponse<Boolean> {
+        val passwordMap = hashMapOf("password" to password)
+        val response = withContext(ioDispatcher) { userDataSource.checkPassword(passwordMap) }
         return response.toDetailResponse()
     }
 }

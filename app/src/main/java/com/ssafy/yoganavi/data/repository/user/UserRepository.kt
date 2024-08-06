@@ -28,6 +28,6 @@ interface UserRepository {
 
     suspend fun updateFcmToken(fcmToken: String): ListResponse<Unit>
 
-    suspend fun checkPassword(password: HashMap<String, String>): DetailResponse<Boolean>
+    suspend fun checkPassword(password: String): DetailResponse<Boolean>
 
 }

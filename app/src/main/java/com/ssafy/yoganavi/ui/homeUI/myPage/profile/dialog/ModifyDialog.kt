@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.snackbar.Snackbar
 import com.ssafy.yoganavi.databinding.DialogModifyBinding
-import com.ssafy.yoganavi.ui.utils.WRONG_PASSWORD
+import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -43,13 +43,13 @@ class ModifyDialog(
             dialogScope.launch {
                 val isCorrect = checkPassword(password)
 
-                if (isCorrect) navigateToModifyFragment()
-                else showSnackBar(WRONG_PASSWORD)
+                if (isCorrect) {
+                    dismiss()
+                    navigateToModifyFragment()
+                } else {
+                    Snackbar.make(binding.root, PASSWORD_DIFF, Snackbar.LENGTH_SHORT).show()
+                }
             }
         }
-    }
-
-    private fun showSnackBar(message: String) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
     }
 }
