@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.TypedValue
 import android.view.ViewGroup
-import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.DialogEnterBinding
 import com.ssafy.yoganavi.ui.utils.NO_BROADCAST
@@ -20,7 +19,7 @@ class EnterDialog(
     private val content: String,
     private val isOnAir: Boolean,
     private val okCallback: () -> Unit,
-): AlertDialog(context) {
+) : AlertDialog(context) {
 
     private lateinit var binding: DialogEnterBinding
 
@@ -45,18 +44,16 @@ class EnterDialog(
         window?.setBackgroundDrawableResource(R.drawable.rounded_dialog_background)
 
         with(binding) {
-            if (!imageUri.isNullOrBlank())
-                ivProfile.loadImageSequentially(imageUri, smallImageUri ?: "")
+            if (!imageUri.isNullOrBlank() && !smallImageUri.isNullOrBlank()) {
+                ivProfile.loadImageSequentially(smallImageUri, imageUri)
+            }
 
             tvTitle.text = title
-
             tvContent.text = content
             tvContent.movementMethod = ScrollingMovementMethod()
-
             btnEnter.isEnabled = isOnAir
 
-            if(!isOnAir)
-                btnEnter.text = NO_BROADCAST
+            if (!isOnAir) btnEnter.text = NO_BROADCAST
         }
 
         btnEnter.setOnClickListener {

@@ -19,6 +19,7 @@ const val NEED_REFRESH_TOKEN = "세션이 만료되었습니다."
 const val TOKEN_REQUIRED = "Refresh-Token-Request"
 const val PAGE_SIZE = 30
 const val END_TIME = "00:00"
+const val REPEAT_TIME = 5000L
 
 // 수신부
 const val FORBIDDEN = 403
@@ -138,6 +139,4 @@ const val CHANNEL_DESCRIPTION = "YogaNavi Live Notification"
 // 에러 모음집
 const val IS_NOT_EMAIL = "유효하지 않은 이메일 형식입니다."
 const val NOT_USER = "존재하지 않는 회원입니다."
-const val MAX_NAME = 20
-const val NAME_IS_MAX = "닉네임은 20자까지만 가능합니다"
 const val HAS_SPACE = "비밀번호에 공백이 있습니다."
