@@ -26,10 +26,12 @@ public class UserDeletionService {
 
     private void anonymizeUserData(Users user) {
         user.setEmail("deleted_" + user.getId() + "@yoganavi.com");
-        user.setNickname("삭제된 사용자"+ user.getId());
+        user.setNickname("삭제된 사용자" + user.getId());
         user.setProfile_image_url(null);
         user.setProfile_image_url_small(null);
+        user.setContent(null);
+        user.setFcmToken(null);
         usersRepository.save(user);
-        log.info("사용자 {} 익명화 완료",user.getId());
+        log.info("사용자 {} 익명화 완료", user.getId());
     }
 }

@@ -138,67 +138,54 @@ public class NotificationService {
         log.info("강의 삭제 완료 - ID: {}", liveId);
     }
 
+
     /**
-     * 매일 자정에 실행, 캐시 정리와 추가
+     * 매일 23:55에 실행, 내일 할 강의 캐시
      */
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 55 23 * * *")
     @Transactional
-    public void dailyCacheManagement() {
+    public void cacheTomorrowLectures() {
         try {
-            cleanExpiredCache();
-            cacheTodayLectures();
-        } catch (Exception e) {
-            log.error("알림 전송용 일일 캐시 관리 중 오류 발생", e);
-        }
-    }
+            LocalDate tomorrowKorea = LocalDate.now(KOREA_ZONE).plusDays(1);
+            String dayAbbreviation = tomorrowKorea.getDayOfWeek().toString().substring(0, 3);
+            Instant startOfTomorrowKorea = tomorrowKorea.atStartOfDay(KOREA_ZONE).toInstant();
+            Instant endOfTomorrowKorea = tomorrowKorea.plusDays(1).atStartOfDay(KOREA_ZONE)
+                .toInstant();
 
-    /**
-     * 매일 자정에 실행, 오늘 할 강의 캐시
-     */
-    @Transactional(readOnly = true)
-    public void cacheTodayLectures() {
-        try {
-            LocalDate todayKorea = LocalDate.now(KOREA_ZONE);
-            String dayAbbreviation = todayKorea.getDayOfWeek().toString().substring(0, 3);
-            Instant startOfDayKorea = todayKorea.atStartOfDay(KOREA_ZONE).toInstant();
-            Instant endOfDayKorea = todayKorea.plusDays(1).atStartOfDay(KOREA_ZONE).toInstant();
-
-            // 오늘 강의 목록
-            List<LiveLectureDto> todayLectures = liveLectureRepository.findLecturesForToday(
-                    startOfDayKorea, endOfDayKorea, dayAbbreviation)
+            // 내일 강의 목록
+            List<LiveLectureDto> tomorrowLectures = liveLectureRepository.findLecturesForToday(
+                    startOfTomorrowKorea, endOfTomorrowKorea, dayAbbreviation)
                 .stream()
                 .map(LiveLectureDto::fromEntity)
                 .collect(Collectors.toList());
 
-            // redis에 오늘의 강의 목록 저장
-            String redisKey = REDIS_KEY_PREFIX + todayKorea.toString();
-            redisTemplate.opsForValue().set(redisKey, todayLectures);
-            redisTemplate.expireAt(redisKey, Date.from(endOfDayKorea));
-            log.info("오늘 강의 목록 Redis 캐시 갱신 완료. 강의 개수: {}", todayLectures.size());
+            // Redis에 내일의 강의 목록 저장
+            String redisKey = REDIS_KEY_PREFIX + tomorrowKorea.toString();
+            redisTemplate.opsForValue().set(redisKey, tomorrowLectures);
+            redisTemplate.expireAt(redisKey, Date.from(endOfTomorrowKorea));
+            log.info("내일 강의 목록 Redis 캐시 갱신 완료. 강의 개수: {}", tomorrowLectures.size());
         } catch (Exception e) {
-            log.error("오늘 강의 목록 Redis 캐시 갱신중 에러 발생 :{}", e.getMessage());
+            log.error("내일 강의 목록 Redis 캐시 갱신 중 에러 발생: {}", e.getMessage());
         }
     }
 
     /**
-     * 매일 자정에 실행, 만료된 캐시 삭제
+     * 매일 00:05에 실행, 만료된 캐시 삭제
      */
-    public void cleanExpiredCache() {
+    @Scheduled(cron = "0 5 0 * * *")
+    public void cleanYesterdayCache() {
         try {
+            LocalDate yesterday = LocalDate.now(KOREA_ZONE).minusDays(1);
+            String redisKey = REDIS_KEY_PREFIX + yesterday.toString();
 
-            LocalDate today = LocalDate.now(KOREA_ZONE);
-            String pattern = REDIS_KEY_PREFIX + "*";
-            Set<String> keys = redisTemplate.keys(pattern);
-
-            for (String key : keys) {
-                LocalDate keyDate = LocalDate.parse(key.substring(REDIS_KEY_PREFIX.length()));
-                if (keyDate.isBefore(today)) {
-                    redisTemplate.delete(key);
-                    log.info("만료된 캐시 {} 삭제", key);
-                }
+            Boolean deleted = redisTemplate.delete(redisKey);
+            if (Boolean.TRUE.equals(deleted)) {
+                log.info("전날({})의 캐시 삭제 완료", yesterday);
+            } else {
+                log.warn("전날({})의 캐시가 존재하지 않거나 삭제 실패", yesterday);
             }
         } catch (Exception e) {
-            log.error("만로된 캐시 삭제중 에러 발생 :{}", e.getMessage());
+            log.error("전날 캐시 삭제 중 에러 발생: {}", e.getMessage());
         }
     }
 

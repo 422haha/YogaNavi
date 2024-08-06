@@ -508,11 +508,7 @@ public class UsersServiceImpl implements UsersService {
         try {
             if (userOpt.isPresent()) {
                 Users user = userOpt.get();
-                if (passwordEncoder.matches(password, user.getPwd())) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return passwordEncoder.matches(password, user.getPwd());
             } else {
                 return false;
             }
@@ -520,7 +516,6 @@ public class UsersServiceImpl implements UsersService {
             log.error("비밀번호 확인 중 에러 발생", e);
             return false;
         }
-
     }
 
 }
