@@ -16,7 +16,7 @@ import com.ssafy.yoganavi.ui.utils.startSpaceEnd
 import com.ssafy.yoganavi.ui.utils.startTildeEnd
 
 class HomeAdapter(
-    private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean, isOnAir: Boolean) -> Unit
+    private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit
 ): ListAdapter<HomeData, HomeAdapter.ViewHolder>(HomeDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -29,7 +29,7 @@ class HomeAdapter(
 
     class ViewHolder(
         private val binding: ListItemHomeBinding,
-        private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean, isOnAir: Boolean) -> Unit
+        private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit
     ): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: HomeData) {
             with(binding) {
@@ -40,7 +40,7 @@ class HomeAdapter(
                         .into(ivProfile)
                 }
 
-                if(item.isOnAir) onAir.setBackgroundResource(R.color.red) else onAir.setBackgroundResource(R.color.gray_20)
+                if(false) onAir.setBackgroundResource(R.color.red) else onAir.setBackgroundResource(R.color.gray_20)
 
                 tvTeacherNickname.text = item.teacherName
 
@@ -52,14 +52,14 @@ class HomeAdapter(
                 tvLectureTime.text = timeData
 
                 clDetail.setOnClickListener {
-                    alertLiveDetailDialog(item.liveId, item.teacherSmallProfile,item.teacherProfile, item.liveTitle, item.liveContent, item.isMyClass, item.isOnAir)
+                    alertLiveDetailDialog(item.liveId, item.teacherSmallProfile,item.teacherProfile, item.liveTitle, item.liveContent, item.isMyClass)
                 }
             }
         }
 
         companion object {
             fun from(parent: ViewGroup,
-                     alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean, isOnAir: Boolean) -> Unit): ViewHolder {
+                     alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit): ViewHolder {
                 return ViewHolder(ListItemHomeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
                     alertLiveDetailDialog = alertLiveDetailDialog)
             }

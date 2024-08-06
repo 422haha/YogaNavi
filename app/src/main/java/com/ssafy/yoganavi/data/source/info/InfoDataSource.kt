@@ -92,8 +92,6 @@ interface InfoDataSource {
     // Home
     suspend fun getHomeList(): Response<YogaResponse<HomeData>>
 
-    suspend fun updateLiveOnAir(state: Boolean, liveId: Int): Response<YogaDetailResponse<Unit>>
-
     // CourseHistory
     suspend fun getCourseHistoryList(): Response<YogaResponse<HomeData>>
 }

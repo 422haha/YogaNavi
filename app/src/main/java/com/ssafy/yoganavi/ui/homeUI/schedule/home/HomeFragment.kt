@@ -69,9 +69,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         title: String,
         content: String,
         isTeacher: Boolean,
-        isOnAir: Boolean
     ) {
-        EnterDialog(requireContext(), smallImageUri, imageUri, title, content, isOnAir) {
+
+        EnterDialog(requireContext(), smallImageUri, imageUri, title, content) {
             moveToLiveFragment(id, isTeacher)
         }.show()
     }

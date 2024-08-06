@@ -223,6 +223,8 @@ class WebRtcSessionManagerImpl(
         // dispose signaling clients and socket.
         signalingClient.dispose()
 
+        offer = null
+
         peerConnection.connection.close()
         peerConnection.connection.dispose()
 
