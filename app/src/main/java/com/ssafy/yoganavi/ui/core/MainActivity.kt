@@ -3,9 +3,12 @@ package com.ssafy.yoganavi.ui.core
 import android.Manifest
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -160,5 +163,20 @@ class MainActivity : AppCompatActivity() {
 
     fun setBottomNavClickable(canClick: Boolean) {
         binding.bnv.menu.forEach { item -> item.isEnabled = canClick }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        val currentFocus = currentFocus ?: return super.dispatchTouchEvent(ev)
+        val rect = Rect()
+        currentFocus.getGlobalVisibleRect(rect)
+        val x = ev.x.toInt()
+        val y = ev.y.toInt()
+        if (rect.contains(x, y)) return super.dispatchTouchEvent(ev)
+
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
+        imm?.let { imm.hideSoftInputFromWindow(currentFocus.windowToken, 0) }
+
+        currentFocus.clearFocus()
+        return super.dispatchTouchEvent(ev)
     }
 }
