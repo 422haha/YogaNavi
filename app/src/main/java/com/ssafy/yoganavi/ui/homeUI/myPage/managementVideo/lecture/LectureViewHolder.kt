@@ -1,10 +1,9 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.lecture
 
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
-import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.databinding.ListItemLectureThumbnailBinding
+import com.ssafy.yoganavi.ui.utils.loadImage
 import com.ssafy.yoganavi.ui.utils.toK
 
 class LectureViewHolder(
@@ -22,16 +21,7 @@ class LectureViewHolder(
         ivFavorite.isSelected = data.myLike
         likeCount = data.likeCount
 
-        val circularProgressDrawable = CircularProgressDrawable(binding.root.context).apply {
-            strokeWidth = 5f
-            centerRadius = 30f
-        }
-        circularProgressDrawable.start()
-
-        Glide.with(binding.root)
-            .load(data.recordThumbnailSmall)
-            .placeholder(circularProgressDrawable)
-            .into(ivThumbnail)
+        ivThumbnail.loadImage(data.recordThumbnailSmall)
 
         setListener(data)
     }
@@ -47,7 +37,7 @@ class LectureViewHolder(
 
         ivThumbnail.setOnClickListener {
             navigateToRegisterVideoFragment?.invoke(data.recordedId)
-            navigateToLectureDetailFragment?.invoke(data.recordedId, data.nickname)
+            navigateToLectureDetailFragment?.invoke(data.recordedId, data.nickname ?: "")
         }
     }
 }
