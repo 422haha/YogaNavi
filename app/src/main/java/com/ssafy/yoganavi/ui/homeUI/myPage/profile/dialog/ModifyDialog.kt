@@ -1,13 +1,14 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.profile.dialog
 
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import com.google.android.material.snackbar.Snackbar
+import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.DialogModifyBinding
-import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
+import com.ssafy.yoganavi.ui.utils.WRONG_PASSWORD
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -36,6 +37,17 @@ class ModifyDialog(
         initListener()
     }
 
+    override fun onStart() {
+        super.onStart()
+        val width = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 330f, context?.resources?.displayMetrics
+        ).toInt()
+        dialog?.window?.apply {
+            setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+            setBackgroundDrawableResource(R.drawable.rounded_dialog_background)
+        }
+    }
+
     fun initListener() = with(binding) {
         btnGoModify.setOnClickListener {
             val password = tiePw.text.toString()
@@ -47,7 +59,7 @@ class ModifyDialog(
                     dismiss()
                     navigateToModifyFragment()
                 } else {
-                    Snackbar.make(binding.root, PASSWORD_DIFF, Snackbar.LENGTH_SHORT).show()
+                    tilPw.error = WRONG_PASSWORD
                 }
             }
         }
