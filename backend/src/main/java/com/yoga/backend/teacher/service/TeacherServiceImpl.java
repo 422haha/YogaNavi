@@ -1,6 +1,6 @@
 package com.yoga.backend.teacher.service;
 
-import com.yoga.backend.common.awsS3.S3Service;
+import com.yoga.backend.common.service.S3Service;
 import com.yoga.backend.common.entity.Hashtag;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.entity.TeacherLike;
@@ -11,13 +11,11 @@ import com.yoga.backend.teacher.dto.DetailedTeacherDto;
 import com.yoga.backend.teacher.dto.TeacherDto;
 import com.yoga.backend.teacher.repository.TeacherLikeRepository;
 import com.yoga.backend.teacher.repository.TeacherRepository;
-import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;

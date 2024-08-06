@@ -46,4 +46,13 @@ public interface LiveLectureRepository extends JpaRepository<LiveLectures, Long>
         @Param("endDate") Instant endDate,
         @Param("dayOfWeek") String dayOfWeek
     );
+
+    @Query("SELECT l FROM LiveLectures l WHERE l.user.id = :userId " +
+        "AND l.endDate < :currentDate " +
+        "AND l.availableDay LIKE %:dayOfWeek%")
+    List<LiveLectures> findLecturesByUserAndDateRangeBefore(
+        @Param("userId") int userId,
+        @Param("currentDate") Instant currentDate,
+        @Param("dayOfWeek") String dayOfWeek
+    );
 }

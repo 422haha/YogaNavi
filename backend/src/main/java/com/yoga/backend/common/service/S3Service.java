@@ -1,4 +1,4 @@
-package com.yoga.backend.common.awsS3;
+package com.yoga.backend.common.service;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
