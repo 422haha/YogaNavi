@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.yoganavi.data.source.teacher.FilterData
 import com.ssafy.yoganavi.databinding.FragmentTeacherListBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
@@ -33,7 +34,14 @@ class TeacherListFragment :
         TeacherAdapter(
             ::navigateToTeacherFragment,
             ::teacherLikeToggle
-        )
+        ).apply {
+            registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                    binding.rvTeacherList.scrollToPosition(0)
+                    super.onItemRangeChanged(positionStart, itemCount)
+                }
+            })
+        }
     }
     private val args by navArgs<TeacherListFragmentArgs>()
     private var filter = FilterData()
