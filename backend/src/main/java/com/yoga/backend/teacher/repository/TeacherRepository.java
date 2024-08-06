@@ -44,6 +44,7 @@ public interface TeacherRepository extends JpaRepository<Users, Integer> {
         "JOIN live_lectures l ON u.user_id = l.user_id " +
         "WHERE l.start_time >= :startTime " +
         "AND l.end_time <= :endTime " +
+        "AND l.end_date > CURRENT_TIMESTAMP " + // end_date가 현재 시점 이후인 조건 추가
         "AND NOT EXISTS (" +
         "  SELECT 1 FROM (" +
         "    SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(l.available_day, ',', numbers.n), ',', -1) AS available_day "
@@ -71,6 +72,10 @@ public interface TeacherRepository extends JpaRepository<Users, Integer> {
         ") " +
         "AND (" +
         "  CASE WHEN :maxLiveNum = 1 THEN l.max_live_num > 0 ELSE l.max_live_num = 1 END" +
+        ")" +
+        "AND (" +
+        "  (SELECT COUNT(*) FROM my_live_lecture mll WHERE mll.live_id = l.live_id AND mll.end_date > CURRENT_TIMESTAMP) < l.max_live_num "
+        +
         ")", nativeQuery = true)
     List<Users> findTeachersByLectureFilter(
         @Param("startTime") Instant startTime,

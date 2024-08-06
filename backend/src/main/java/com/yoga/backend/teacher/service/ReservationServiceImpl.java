@@ -97,15 +97,23 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LiveLectureDto> getAllLiveLectures(int method) {
+        Instant now = Instant.now();
+        List<LiveLectures> lectures;
+
         if (method == 0) {
-            return liveLectureRepository.findAllByMaxLiveNum(1).stream()
-                .map(LiveLectureDto::fromEntity)
-                .collect(Collectors.toList());
+            lectures = liveLectureRepository.findAllByMaxLiveNumAndEndDateAfter(1, now);
         } else {
-            return liveLectureRepository.findAllByMaxLiveNumGreaterThan(1).stream()
-                .map(LiveLectureDto::fromEntity)
-                .collect(Collectors.toList());
+            lectures = liveLectureRepository.findAllByMaxLiveNumGreaterThanAndEndDateAfter(1, now);
         }
+
+        return lectures.stream()
+            .filter(lecture -> {
+                int currentParticipants = myLiveLectureRepository.countByLiveLectureAndEndDateAfter(
+                    lecture, now);
+                return currentParticipants < lecture.getMaxLiveNum();
+            })
+            .map(LiveLectureDto::fromEntity)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -118,15 +126,25 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LiveLectureDto> getLiveLecturesByTeacherAndMethod(int teacherId, int method) {
+        Instant now = Instant.now();
+        List<LiveLectures> lectures;
+
         if (method == 0) {
-            return liveLectureRepository.findByUserIdAndMaxLiveNum(teacherId, 1).stream()
-                .map(LiveLectureDto::fromEntity)
-                .collect(Collectors.toList());
+            lectures = liveLectureRepository.findByUserIdAndMaxLiveNumAndEndDateAfter(teacherId, 1,
+                now);
         } else {
-            return liveLectureRepository.findByUserIdAndMaxLiveNumGreaterThan(teacherId, 1).stream()
-                .map(LiveLectureDto::fromEntity)
-                .collect(Collectors.toList());
+            lectures = liveLectureRepository.findByUserIdAndMaxLiveNumGreaterThanAndEndDateAfter(
+                teacherId, 1, now);
         }
+
+        return lectures.stream()
+            .filter(lecture -> {
+                int currentParticipants = myLiveLectureRepository.countByLiveLectureAndEndDateAfter(
+                    lecture, now);
+                return currentParticipants < lecture.getMaxLiveNum();
+            })
+            .map(LiveLectureDto::fromEntity)
+            .collect(Collectors.toList());
     }
 
     /**
