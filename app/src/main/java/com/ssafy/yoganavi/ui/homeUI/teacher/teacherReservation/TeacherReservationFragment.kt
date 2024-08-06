@@ -10,8 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
-import com.bumptech.glide.Glide
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.FragmentTeacherReservationBinding
@@ -26,6 +24,7 @@ import com.ssafy.yoganavi.ui.utils.RESERVATION
 import com.ssafy.yoganavi.ui.utils.RESERVE
 import com.ssafy.yoganavi.ui.utils.SELECT_CLASS
 import com.ssafy.yoganavi.ui.utils.START
+import com.ssafy.yoganavi.ui.utils.loadImage
 import com.ssafy.yoganavi.ui.utils.toCalendarDay
 import com.ssafy.yoganavi.ui.utils.toLong
 import dagger.hilt.android.AndroidEntryPoint
@@ -75,20 +74,13 @@ class TeacherReservationFragment :
     }
 
     private fun initView() = with(binding) {
-        val circularProgressDrawable = CircularProgressDrawable(binding.root.context).apply {
-            strokeWidth = 5f
-            centerRadius = 30f
-        }
-        circularProgressDrawable.start()
 
         if (args.teacherSmallProfile.isBlank()) {
-            binding.ivProfile.setImageResource(R.drawable.profilenull)
+            ivProfile.setImageResource(R.drawable.profilenull)
         } else {
-            Glide.with(binding.root)
-                .load(args.teacherSmallProfile)
-                .placeholder(circularProgressDrawable)
-                .into(ivProfile)
+            ivProfile.loadImage(args.teacherSmallProfile)
         }
+        
         tvTeacherNickname.text = args.teacherName
         if (args.hashtags.isNotBlank()) {
             tvHashtag.text = args.hashtags

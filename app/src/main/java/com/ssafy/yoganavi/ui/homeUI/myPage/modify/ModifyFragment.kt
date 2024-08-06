@@ -15,7 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.bumptech.glide.Glide
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -32,6 +31,7 @@ import com.ssafy.yoganavi.ui.utils.NO_AUTH
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
 import com.ssafy.yoganavi.ui.utils.UPLOAD_FAIL
 import com.ssafy.yoganavi.ui.utils.getImagePath
+import com.ssafy.yoganavi.ui.utils.loadImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -103,11 +103,7 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
         with(binding) {
             tieNn.setText(data.nickname)
 
-            if (data.imageUrlSmall?.isNotBlank() == true) {
-                Glide.with(requireContext())
-                    .load(data.imageUrlSmall)
-                    .into(ivIcon)
-            }
+            if (!data.imageUrlSmall.isNullOrBlank()) ivIcon.loadImage(data.imageUrlSmall)
 
             if (data.teacher) {
                 tvHashtag.visibility = View.VISIBLE
