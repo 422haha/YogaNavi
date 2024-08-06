@@ -37,7 +37,7 @@ class LectureViewHolder(
 
         ivThumbnail.setOnClickListener {
             navigateToRegisterVideoFragment?.invoke(data.recordedId)
-            navigateToLectureDetailFragment?.invoke(data.recordedId, data.nickname)
+            navigateToLectureDetailFragment?.invoke(data.recordedId, data.nickname ?: "")
         }
     }
 }
