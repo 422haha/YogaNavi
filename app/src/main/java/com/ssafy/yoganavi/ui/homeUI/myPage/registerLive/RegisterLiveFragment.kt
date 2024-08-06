@@ -239,6 +239,7 @@ class RegisterLiveFragment :
                 ((materialTimePicker.hour * 3600 * 1000) + (materialTimePicker.minute * 60 * 1000)).toLong()
 
             if (state == START) {
+                setDefaultEndTime(pickTime)
                 binding.btnStart.text = timeStr
                 viewModel.liveLectureData.startTime = pickTime
             } else if (state == END) {
@@ -248,6 +249,15 @@ class RegisterLiveFragment :
         }
 
         materialTimePicker.show(childFragmentManager, "fragment_tag")
+    }
+
+    private fun setDefaultEndTime(startTime: Long) = with(binding) {
+        val oneHourInMillis: Long = 60 * 60 * 1000L
+        val endTime = startTime + oneHourInMillis
+        val endHour = (endTime / (3600 * 1000)).toInt()
+        val endMinute = (endTime / (60 * 1000) % 60).toInt()
+        btnEnd.text = formatZeroDate(endHour, endMinute)
+        viewModel.liveLectureData.endTime = endTime
     }
 
     private fun onReadLive() = lifecycleScope.launch {
