@@ -25,9 +25,23 @@ public interface MyLiveLectureRepository extends JpaRepository<MyLiveLecture, Lo
     @Query("SELECT mll FROM MyLiveLecture mll JOIN FETCH mll.user WHERE mll.liveLecture.liveId = :liveId")
     List<MyLiveLecture> findByLiveLectureIdWithUser(@Param("liveId") Long liveId);
 
+
+    @Query("SELECT ml FROM MyLiveLecture ml JOIN FETCH ml.liveLecture l " +
+        "WHERE ml.user.id = :userId " +
+        "AND ml.startDate <= :currentDate " +
+        "AND ml.endDate >= :currentDate " +
+        "AND l.availableDay LIKE %:dayOfWeek%")
+    List<MyLiveLecture> findCurrentLecturesByUserId(
+        @Param("userId") int userId,
+        @Param("currentDate") Instant currentDate,
+        @Param("dayOfWeek") String dayOfWeek
+    );
+}
+
     List<MyLiveLecture> findByUserIdAndStartDateBetween(int userId, Instant start, Instant end);
 
     @Query("SELECT COUNT(mll) FROM MyLiveLecture mll WHERE mll.liveLecture = :liveLecture AND mll.endDate > :currentDate")
     int countByLiveLectureAndEndDateAfter(@Param("liveLecture") LiveLectures liveLecture,
         @Param("currentDate") Instant currentDate);
 }
+

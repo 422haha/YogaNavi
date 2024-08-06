@@ -26,8 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 실시간 강의 컨트롤러 클래스.
- * 실시간 강의 생성 및 조회에 대한 API 엔드포인트를 제공.
+ * 실시간 강의 컨트롤러 클래스. 실시간 강의 생성 및 조회에 대한 API 엔드포인트를 제공.
  */
 @RestController
 @RequestMapping("/mypage/live-lecture-manage")
@@ -58,7 +57,8 @@ public class LiveLectureController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
         }
 
-        LiveLectureCreateResponseDto responseDto = liveLectureService.createLiveLecture(liveLectureCreateDto);
+        LiveLectureCreateResponseDto responseDto = liveLectureService.createLiveLecture(
+            liveLectureCreateDto);
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", responseDto.getMessage());

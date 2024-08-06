@@ -257,12 +257,6 @@ public class RecordedController {
         log.info("사용자 ID: {}", userId);
         List<LectureDto> lectureList = recordedService.getAllLectures(userId, page, size, sort);
 
-        for(LectureDto lecture : lectureList) {
-            System.out.println(lecture.getRecordThumbnailSmall());
-            System.out.println(lecture.getRecordThumbnail());
-            System.out.println(lecture.getRecordTitle());
-        }
-
         if (!lectureList.isEmpty()) {
             response.put("message", "녹화강의 조회 성공");
             response.put("data", lectureList);

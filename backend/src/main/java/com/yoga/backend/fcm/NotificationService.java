@@ -11,16 +11,16 @@ import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import com.google.firebase.messaging.FirebaseMessagingException;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * fcm 알림 전송 서비스
+ * <p>
+ * todo 캐시 관리 시간에서 캐시 추가는 23:55, 캐시 삭제는 다음날 자정으로
  */
 @Slf4j
 @Service
@@ -51,7 +51,7 @@ public class NotificationService {
      *
      * @param updatedLecture 업데이트된 강의 정보
      */
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public void handleLectureUpdate(LiveLectures updatedLecture) {
         LiveLectureDto lectureDTO = LiveLectureDto.fromEntity(updatedLecture);
         LocalDate startDate = lectureDTO.getStartDate().atZone(KOREA_ZONE).toLocalDate();
@@ -114,7 +114,7 @@ public class NotificationService {
      *
      * @param liveId 삭제할 강의 ID
      */
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public void handleLectureDelete(Long liveId) {
         log.info("강의 삭제 시작 - ID: {}", liveId);
         Set<String> keys = redisTemplate.keys(REDIS_KEY_PREFIX + "*");
@@ -142,6 +142,7 @@ public class NotificationService {
      * 매일 자정에 실행, 캐시 정리와 추가
      */
     @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
     public void dailyCacheManagement() {
         try {
             cleanExpiredCache();
@@ -154,6 +155,7 @@ public class NotificationService {
     /**
      * 매일 자정에 실행, 오늘 할 강의 캐시
      */
+    @Transactional(readOnly = true)
     public void cacheTodayLectures() {
         try {
             LocalDate todayKorea = LocalDate.now(KOREA_ZONE);
@@ -183,6 +185,7 @@ public class NotificationService {
      */
     public void cleanExpiredCache() {
         try {
+
             LocalDate today = LocalDate.now(KOREA_ZONE);
             String pattern = REDIS_KEY_PREFIX + "*";
             Set<String> keys = redisTemplate.keys(pattern);
@@ -203,6 +206,7 @@ public class NotificationService {
      * 1분마다 실행, 예정된 강의를 확인 및 알림 전송
      */
     @Scheduled(cron = "0 */1 * * * *")
+    @Transactional
     public void checkUpcomingLecturesAndNotify() {
         try {
             ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE);
@@ -246,6 +250,7 @@ public class NotificationService {
                         nowKorea.isBefore(notificationTime.plusSeconds(30));
                 })
                 .collect(Collectors.toList());
+
             log.info("알림을 보낼 강의 수: {}", upcomingLectures.size());
 
             // 곧 시작할 강의가 있다면 FCM 전송
@@ -262,37 +267,6 @@ public class NotificationService {
      *
      * @param lectures 알림 보낼 강의 목록
      */
-/*    private void sendNotificationsWithoutDuplication(List<LiveLectureDto> lectures) {
-        Map<String, Map<String, String>> notifications = new HashMap<>();
-
-        for (LiveLectureDto lecture : lectures) {
-            String message = String.format("%s 강의가 10분 후에 시작됩니다.", lecture.getLiveTitle());
-
-            Map<String, String> notificationData = new HashMap<>();
-            notificationData.put("body", message);
-            notificationData.put("liveId", lecture.getLiveId().toString());
-
-            // 강사, 학생 알림 준비
-            List<MyLiveLecture> participants = myLiveLectureRepository.findByLiveLectureIdWithUser(
-                lecture.getLiveId());
-            for (MyLiveLecture participant : participants) {
-                Users user = participant.getUser();
-                if (user != null && user.getFcmToken() != null) {
-                    notifications.put(user.getFcmToken(), notificationData);
-                }
-            }
-        }
-
-        // 배치로 알림 전송
-        try {
-            if (!notifications.isEmpty()) {
-                fcmService.sendBatchMessagesWithData("강의 시작 10분 전입니다.", notifications);
-                log.info("총 {} 명에게 알림 전송 완료", notifications.size());
-            }
-        } catch (FirebaseMessagingException e) {
-            log.error("배치 알림 전송 중 오류 발생", e);
-        }
-    }*/
     private void sendNotificationsWithoutDuplication(List<LiveLectureDto> lectures) {
         Map<String, Map<String, String>> notifications = new HashMap<>();
 
@@ -442,7 +416,6 @@ public class NotificationService {
      *
      * @param updatedLecture 업데이트된 강의 정보
      */
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void sendLectureUpdateNotification(LiveLectures updatedLecture) {
         List<MyLiveLecture> participants = myLiveLectureRepository.findByLiveLectureIdWithUser(
             updatedLecture.getLiveId());
