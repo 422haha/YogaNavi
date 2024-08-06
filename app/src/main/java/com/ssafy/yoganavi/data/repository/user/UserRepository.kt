@@ -27,4 +27,7 @@ interface UserRepository {
     suspend fun quit(): ListResponse<Unit>
 
     suspend fun updateFcmToken(fcmToken: String): ListResponse<Unit>
+
+    suspend fun checkPassword(password: String): DetailResponse<Boolean>
+
 }

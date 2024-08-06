@@ -10,6 +10,8 @@ import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.databinding.FragmentProfileBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
+import com.ssafy.yoganavi.ui.homeUI.myPage.profile.dialog.ModifyDialog
+import com.ssafy.yoganavi.ui.utils.MODIFY
 import com.ssafy.yoganavi.ui.utils.MY_PAGE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -59,10 +61,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
             tvRegisterNotice.setOnClickListener { findNavController().navigate(R.id.action_profileFragment_to_noticeFragment) }
             tvLogout.setOnClickListener { viewModel.clearUserData(::logout) }
             tvQuit.setOnClickListener { viewModel.quitUser(::quitDialog) }
-            tvModify.setOnClickListener {
-                val action = ProfileFragmentDirections.actionProfileFragmentToModifyFragment(isTeacher)
-                findNavController().navigate(action)
-            }
+            tvModify.setOnClickListener { makeModifyDialog() }
         }
     }
 
@@ -73,4 +72,18 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
             .setCancelable(false)
             .show()
     }
+
+    private fun makeModifyDialog() = ModifyDialog(
+        navigateToModifyFragment = ::navigateToModifyFragment,
+        checkPassword = ::checkPassword
+    ).show(parentFragmentManager, MODIFY)
+
+    private fun navigateToModifyFragment() {
+        val action = ProfileFragmentDirections.actionProfileFragmentToModifyFragment(isTeacher)
+        findNavController().navigate(action)
+    }
+
+    private suspend fun checkPassword(password: String): Boolean =
+        viewModel.checkPassword(password).await()
+
 }

@@ -209,9 +209,4 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toListResponse()
     }
 
-    override suspend fun checkPassword(password: HashMap<String, String>): DetailResponse<Boolean> {
-        val response = withContext(ioDispatcher) { infoDataSource.checkPassword(password) }
-        return response.toDetailResponse()
-    }
-
 }

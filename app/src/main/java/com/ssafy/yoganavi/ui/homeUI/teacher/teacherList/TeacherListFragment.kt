@@ -29,7 +29,7 @@ class TeacherListFragment :
     BaseFragment<FragmentTeacherListBinding>(FragmentTeacherListBinding::inflate) {
 
     private val viewModel: TeacherListViewModel by viewModels()
-    private val noticeAdapter by lazy {
+    private val teacherAdapter by lazy {
         TeacherAdapter(
             ::navigateToTeacherFragment,
             ::teacherLikeToggle
@@ -52,7 +52,7 @@ class TeacherListFragment :
             binding.ivFilter.isVisible = false
             binding.ivFilterSet.isVisible = true
         }
-        binding.rvTeacherList.adapter = noticeAdapter
+        binding.rvTeacherList.adapter = teacherAdapter
         binding.rvTeacherList.addItemDecoration(
             DividerItemDecoration(
                 context,
@@ -123,7 +123,7 @@ class TeacherListFragment :
             launch {
                 viewModel.teacherList.collectLatest { teacherList ->
                     checkEmptyList(teacherList, EMPTY_TEACHER)
-                    noticeAdapter.submitList(teacherList)
+                    teacherAdapter.submitList(teacherList)
                 }
             }
         }
