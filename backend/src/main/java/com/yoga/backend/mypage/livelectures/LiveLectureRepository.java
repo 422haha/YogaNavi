@@ -33,5 +33,14 @@ public interface LiveLectureRepository extends JpaRepository<LiveLectures, Long>
     List<LiveLectures> findByUserIdAndMaxLiveNumGreaterThan(@Param("userId") int userId,
         @Param("maxLiveNum") int maxLiveNum);
 
-    List<LiveLectures> findByUserIdAndStartDateBetween(int userId, Instant start, Instant end);
+    @Query("SELECT l FROM LiveLectures l WHERE l.user.id = :userId " +
+        "AND l.endDate >= :currentDate " +
+        "AND l.startDate <= :endDate " +
+        "AND l.availableDay LIKE %:dayOfWeek%")
+    List<LiveLectures> findLecturesByUserAndDateRange(
+        @Param("userId") int userId,
+        @Param("currentDate") Instant currentDate,
+        @Param("endDate") Instant endDate,
+        @Param("dayOfWeek") String dayOfWeek
+    );
 }

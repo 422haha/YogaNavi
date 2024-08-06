@@ -31,8 +31,6 @@ import java.util.List;
 
 
 /**
- *
- *
  * 녹화 강의 관련 비즈니스 로직을 처리하는 서비스 구현 클래스. 강의 목록 조회, 강의 생성, 수정, 삭제 및 좋아요 기능 제공.
  */
 @Slf4j
@@ -111,6 +109,7 @@ public class RecordedServiceImpl implements RecordedService {
         lecture.setThumbnail(lectureDto.getRecordThumbnail());
         lecture.setThumbnailSmall(lectureDto.getRecordThumbnailSmall());
 
+        int chapteurNum = 1;
         List<RecordedLectureChapter> chapters = new ArrayList<>();
         for (ChapterDto chapterDto : lectureDto.getRecordedLectureChapters()) {
             RecordedLectureChapter chapter = new RecordedLectureChapter();
@@ -118,8 +117,9 @@ public class RecordedServiceImpl implements RecordedService {
             chapter.setDescription(chapterDto.getChapterDescription());
             chapter.setVideoUrl(chapterDto.getRecordVideo());
             chapter.setLecture(lecture);
-            chapter.setChapterNumber(chapterDto.getChapterNumber());
+            chapter.setChapterNumber(chapteurNum);
             chapters.add(chapter);
+            chapteurNum++;
         }
         lecture.setChapters(chapters);
         recordedLectureRepository.save(lecture);
@@ -141,7 +141,9 @@ public class RecordedServiceImpl implements RecordedService {
         Users user = usersRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자 찾을 수 없음"));
 
+        String nickname = user.getNickname();
         LectureDto dto = convertToDto(lecture);
+        dto.setNickname(nickname);
         dto.setLikeCount(lecture.getLikeCount());
         dto.setMyLike(lectureLikeRepository.existsByLectureAndUser(lecture, user));
 
@@ -451,13 +453,15 @@ public class RecordedServiceImpl implements RecordedService {
     public List<LectureDto> getAllLectures(int userId, int page, int size, String sort) {
         List<LectureDto> lectures = allRecordedLecturesRepository.findAllLectures(userId, page,
             size, sort);
-        return applyPresignedUrls(lectures);
+        return applyPresignedUrls(setNickname(lectures));
     }
 
     @Transactional(readOnly = true)
-    public List<LectureDto> searchLectures(int userId, String keyword, String sort, int page, int size, boolean searchTitle, boolean searchContent) {
-        List<LectureDto> lectures = recordedLectureListRepository.searchLectures(userId, keyword, sort, page, size, searchTitle, searchContent);
-        return applyPresignedUrls(lectures);
+    public List<LectureDto> searchLectures(int userId, String keyword, String sort, int page,
+        int size, boolean searchTitle, boolean searchContent) {
+        List<LectureDto> lectures = recordedLectureListRepository.searchLectures(userId, keyword,
+            sort, page, size, searchTitle, searchContent);
+        return applyPresignedUrls(setNickname(lectures));
     }
 
     private LectureDto convertToDto(RecordedLecture lecture) {
@@ -546,5 +550,16 @@ public class RecordedServiceImpl implements RecordedService {
             return parts.length > 3 ? parts[3] : "";
         }
         return url;
+    }
+
+    private List<LectureDto> setNickname(List<LectureDto> lectures) {
+        for (LectureDto lecture : lectures) {
+            int teacherId = lecture.getUserId();
+            Users teacher = usersRepository.findById(teacherId)
+                .orElseThrow(() -> new RuntimeException("선생님을 찾을 수 없습니다."));
+            String nickname = teacher.getNickname();
+            lecture.setNickname(nickname);
+        }
+        return lectures;
     }
 }

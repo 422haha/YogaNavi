@@ -16,6 +16,7 @@ public class LectureDto {
 
     private Long recordedId;
     private Integer userId;
+    private String nickname;
     private String recordTitle;
     private String recordContent;
     private String recordThumbnail;
@@ -54,6 +55,22 @@ public class LectureDto {
         this.myLike = myLike != null && myLike;
     }
 
+    public LectureDto(Long id, Integer userId, String title, String content,
+        String thumbnail, String thumbnailSmall, Long likeCount,
+        LocalDateTime createdDate, LocalDateTime lastModifiedDate,
+        Boolean myLike) {
+        this.recordedId = id;
+        this.userId = userId;
+        this.recordTitle = title;
+        this.recordContent = content;
+        this.recordThumbnailSmall = thumbnailSmall;
+        this.recordThumbnail = thumbnail;
+        this.likeCount = likeCount;
+        this.createdDate = createdDate;
+        this.lastModifiedDate = lastModifiedDate;
+        this.myLike = myLike;
+    }
+
     public LectureDto(Long recordedId, String recordTitle, String recordContent,
         String recordThumbnail, String recordThumbnailSmall,
         Long likeCount, LocalDateTime createdDate, LocalDateTime lastModifiedDate,
@@ -77,6 +94,33 @@ public class LectureDto {
         this.likeCount = likeCount;
         this.myLike = myLike != null && myLike;
         this.creationStatus = creationStatus;
+    }
+
+    public LectureDto(Long recordedId, Integer userId, String recordTitle,
+        String recordThumbnailSmall, String recordThumbnail,
+        Long likeCount, Boolean myLike) {
+        this.recordedId = recordedId;
+        this.userId = userId;
+        this.recordTitle = recordTitle;
+        this.recordThumbnailSmall = recordThumbnailSmall;
+        this.recordThumbnail = recordThumbnail;
+        this.likeCount = likeCount;
+        this.myLike = myLike;
+    }
+
+    public LectureDto(Long recordedId, Integer userId, String recordTitle,
+        String recordContent, String recordThumbnailSmall,
+        Long likeCount, LocalDateTime createdDate,
+        LocalDateTime lastModifiedDate, Boolean myLike) {
+        this.recordedId = recordedId;
+        this.userId = userId;
+        this.recordTitle = recordTitle;
+        this.recordContent = recordContent;
+        this.recordThumbnailSmall = recordThumbnailSmall;
+        this.likeCount = likeCount;
+        this.createdDate = createdDate;
+        this.lastModifiedDate = lastModifiedDate;
+        this.myLike = myLike;
     }
 
     public LectureDto() {

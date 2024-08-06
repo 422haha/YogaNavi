@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class AllRecordedLecturesRepository {
+
     private final JPAQueryFactory queryFactory;
 
     public AllRecordedLecturesRepository(JPAQueryFactory queryFactory) {
@@ -25,6 +26,7 @@ public class AllRecordedLecturesRepository {
         JPQLQuery<LectureDto> query = queryFactory
             .select(Projections.constructor(LectureDto.class,
                 lecture.id,
+                lecture.user.id.as("userId"),
                 lecture.title,
                 lecture.content,
                 lecture.thumbnail,

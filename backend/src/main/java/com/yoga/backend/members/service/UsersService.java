@@ -43,4 +43,6 @@ public interface UsersService {
     void requestDeleteUser(int userId);
 
     void processDeletedUsers();
+
+    boolean checkPwd(int userId, String password);
 }

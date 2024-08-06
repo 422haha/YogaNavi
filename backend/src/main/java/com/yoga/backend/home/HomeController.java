@@ -1,13 +1,9 @@
 package com.yoga.backend.home;
 
 import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.members.repository.UsersRepository;
-import com.yoga.backend.mypage.livelectures.LiveLectureService;
-import com.yoga.backend.mypage.livelectures.MyLiveLectureRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,32 +12,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 홈 컨트롤러 클래스.
- * 홈 관련 요청을 처리합니다.
+ * 홈 컨트롤러 클래스. 홈 관련 요청을 처리합니다.
  */
 @RestController
 @RequestMapping("/home")
 public class HomeController {
 
-    // LiveLectureService 인스턴스를 주입받습니다.
-    @Autowired
-    private LiveLectureService liveLectureService;
+    private final JwtUtil jwtUtil;
+    private final HomeService homeService;
 
-    // MyLiveLectureRepository 인스턴스를 주입받습니다.
-    @Autowired
-    private MyLiveLectureRepository myLiveLectureRepository;
-
-    // UsersRepository 인스턴스를 주입받습니다.
-    @Autowired
-    private UsersRepository usersRepository;
-
-    // JwtUtil 인스턴스를 주입받습니다.
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    // HomeService 인스턴스를 주입받습니다.
-    @Autowired
-    private HomeService homeService;
+    public HomeController(JwtUtil jwtUtil, HomeService homeService) {
+        this.jwtUtil = jwtUtil;
+        this.homeService = homeService;
+    }
 
 
     /**
@@ -51,7 +34,8 @@ public class HomeController {
      * @return 홈 페이지에 대한 응답 DTO를 포함한 ResponseEntity 객체
      */
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getHomeData(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<Map<String, Object>> getHomeData(
+        @RequestHeader("Authorization") String token) {
         int userId = jwtUtil.getUserIdFromToken(token);
         List<HomeResponseDto> homeData = homeService.getHomeData(userId);
 

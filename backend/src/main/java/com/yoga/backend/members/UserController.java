@@ -86,7 +86,8 @@ public class UserController {
      * @return 인증번호 전송 결과
      */
     @PostMapping("/members/register/email")
-    public ResponseEntity<Map<String, Object>> registerUserEmail(@RequestBody RegisterDto registerDto) {
+    public ResponseEntity<Map<String, Object>> registerUserEmail(
+        @RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
         String result = usersService.sendEmailVerificationToken(registerDto.getEmail());
         response.put("message", result);
@@ -101,9 +102,11 @@ public class UserController {
      * @return 인증번호 확인 결과
      */
     @PostMapping("/members/register/authnumber")
-    public ResponseEntity<Map<String, Object>> checkAuthNumber(@RequestBody RegisterDto registerDto) {
+    public ResponseEntity<Map<String, Object>> checkAuthNumber(
+        @RequestBody RegisterDto registerDto) {
         Map<String, Object> response = new HashMap<>();
-        boolean isValid = usersService.validateEmailAuthToken(registerDto.getEmail(), String.valueOf(registerDto.getAuthnumber()));
+        boolean isValid = usersService.validateEmailAuthToken(registerDto.getEmail(),
+            String.valueOf(registerDto.getAuthnumber()));
         if (isValid) {
             response.put("message", "인증 완료");
             response.put("data", new Object[]{});
@@ -213,10 +216,24 @@ public class UserController {
         }
     }
 
+    @PostMapping("/mypage/check")
+    public ResponseEntity<Map<String, Object>> checkBeforeUpdate(
+        @RequestHeader("Authorization") String token, @RequestBody UpdateDto updateDto) {
+        Map<String, Object> response = new HashMap<>();
+
+        int userId = jwtUtil.getUserIdFromToken(token);
+
+        boolean result = usersService.checkPwd(userId,
+            updateDto.getPassword());
+        response.put("message", result);
+        response.put("data", new Object[]{});
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     /**
      * 사용자 정보 수정
      *
-     * @param token 사용자 인증 토큰
+     * @param token     사용자 인증 토큰
      * @param updateDto 수정할 사용자 정보를 담은 DTO
      * @return 수정된 사용자 정보를 담은 ResponseEntity
      */
@@ -263,7 +280,8 @@ public class UserController {
      * @return 로그아웃 처리 결과
      */
     @PostMapping("/mylogout")
-    public ResponseEntity<Map<String, Object>> logout(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<Map<String, Object>> logout(
+        @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
         try {
             log.info("로그아웃 요청");
@@ -280,7 +298,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
         } catch (Exception e) {
-            log.error("로그아웃중 에러 발생: "+ e);
+            log.error("로그아웃중 에러 발생: " + e);
             response.put("message", "로그아웃 처리 중 오류 발생");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -294,13 +312,15 @@ public class UserController {
      * @return 삭제 요청 처리 결과
      */
     @PostMapping("/delete")
-    public ResponseEntity<Map<String, Object>> requestDeleteUser(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<Map<String, Object>> requestDeleteUser(
+        @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
         try {
             int userId = jwtUtil.getUserIdFromToken(token);
             usersService.requestDeleteUser(userId);
             jwtUtil.logout(token);  // 회원 탈퇴 시 로그아웃 처리
-            response.put("message", "탈퇴 요청이 성공적으로 처리되었습니다. 7일 후에 계정이 삭제됩니다. 7일 이내에 로그인 시 자동으로 탈퇴가 취소됩니다.");
+            response.put("message",
+                "탈퇴 요청이 성공적으로 처리되었습니다. 7일 후에 계정이 삭제됩니다. 7일 이내에 로그인 시 자동으로 탈퇴가 취소됩니다.");
             response.put("data", new Object[]{});
             return ResponseEntity.ok(response);
         } catch (Exception e) {
