@@ -3,6 +3,7 @@ package com.yoga.backend.teacher.service;
 import com.yoga.backend.teacher.TeacherFilter;
 import com.yoga.backend.teacher.dto.DetailedTeacherDto;
 import com.yoga.backend.teacher.dto.TeacherDto;
+import com.yoga.backend.common.entity.Users;
 
 import java.util.List;
 
@@ -57,7 +58,7 @@ public interface TeacherService {
      * @param keyword 검색 키워드
      * @return 강사 정보 리스트
      */
-    List<TeacherDto> searchTeachers(TeacherFilter filter, int userId, String keyword);
+    List<Users> searchTeachers(TeacherFilter filter, int userId, String keyword);
 
     /**
      * 해시태그로 강사 정보를 조회합니다.
@@ -66,7 +67,7 @@ public interface TeacherService {
      * @param userId  사용자 ID
      * @return 강사 정보 리스트
      */
-    List<TeacherDto> searchTeachersByHashtag(String hashtag, int userId);
+    List<Users> searchTeachersByHashtag(String hashtag, int userId);
 
     List<TeacherDto> getLikeTeachers(int userId);
 }
