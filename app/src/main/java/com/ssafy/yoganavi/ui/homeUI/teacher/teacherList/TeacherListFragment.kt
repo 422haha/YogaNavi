@@ -70,19 +70,34 @@ class TeacherListFragment :
         binding.svSearch.setQuery(viewModel.getSearchKeyword(), false)
         initListener()
         initCollect()
-        if (args.sorting == RECENT) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(RECENT, filter)
-            }
-        } else {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(POPULAR, filter)
+        if (viewModel.teacherList.value.isEmpty()) {
+            when (args.sorting) {
+                RECENT -> {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.setSorting(RECENT, filter)
+                    }
+                }
+                POPULAR -> {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.setSorting(POPULAR, filter)
+                    }
+                }
+                else -> {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.setSorting(viewModel.sorting.value, filter)
+                        if (viewModel.sorting.value == RECENT) {
+                            binding.rbRecent.isChecked = true
+                        } else {
+                            binding.rbPopular.isChecked = true
+                        }
+                    }
+                }
             }
         }
     }
 
-    fun initListener() {
-        binding.lyFilter.setOnClickListener {
+    fun initListener() = with(binding) {
+        lyFilter.setOnClickListener {
             val directions = TeacherListFragmentDirections
                 .actionTeacherListFragmentToFilterFragment(
                     filter,
@@ -91,7 +106,7 @@ class TeacherListFragment :
                 )
             findNavController().navigate(directions)
         }
-        binding.svSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        svSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 viewModel.setSearchKeyword(filter, query)
                 return false
@@ -102,32 +117,29 @@ class TeacherListFragment :
                 return false
             }
         })
-        binding.rbRecent.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(RECENT, filter)
-            }
-        }
+        rgAlign.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                rbRecent.id -> viewLifecycleOwner.lifecycleScope.launch {
+                    if (viewModel.sorting.value != RECENT) {
+                        if (viewModel.teacherList.value.isNotEmpty()) {
+                            viewModel.setSorting(RECENT, filter)
+                        }
+                    }
+                }
 
-        binding.rbPopular.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(POPULAR, filter)
+                rbPopular.id -> viewLifecycleOwner.lifecycleScope.launch {
+                    if (viewModel.sorting.value != POPULAR) {
+                        if (viewModel.teacherList.value.isNotEmpty()) {
+                            viewModel.setSorting(POPULAR, filter)
+                        }
+                    }
+                }
             }
         }
     }
 
     fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            launch {
-                viewModel.sorting.collectLatest { sorting ->
-                    if (sorting == RECENT) {
-                        binding.rbRecent.isChecked = true
-                        binding.rbPopular.isChecked = false
-                    } else {
-                        binding.rbPopular.isChecked = true
-                        binding.rbRecent.isChecked = false
-                    }
-                }
-            }
             launch {
                 viewModel.teacherList.collectLatest { teacherList ->
                     checkEmptyList(teacherList, EMPTY_TEACHER)
