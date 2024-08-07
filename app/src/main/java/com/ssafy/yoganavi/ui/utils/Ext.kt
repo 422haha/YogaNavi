@@ -20,6 +20,7 @@ const val TOKEN_REQUIRED = "Refresh-Token-Request"
 const val PAGE_SIZE = 30
 const val END_TIME = "00:00"
 const val REPEAT_TIME = 5000L
+const val NINE_HOUR = 32_400_000
 
 // 수신부
 const val FORBIDDEN = 403
