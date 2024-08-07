@@ -37,7 +37,7 @@ public interface TeacherRepository extends JpaRepository<Users, Integer> {
      * @param endTime    강의 종료 시간 (Instant)
      * @param days       강의 요일 (쉼표로 구분된 문자열)
      * @param period     필터 기간 (0: 일주일 후, 1: 한 달 후, 2: 세 달 후, 3: 전체 기간)
-     * @param maxLiveNum 최대 수강자 수 (1: 1대1, 1보다 큰 값: 1대다)
+     * @param maxLiveNum 최대 수강자 수 (0: 1대1, 1: 1대다, 2: 전체)
      * @return 필터 조건에 맞는 강사 리스트
      */
     @Query(value = "SELECT DISTINCT u.* FROM users u " +
@@ -71,7 +71,9 @@ public interface TeacherRepository extends JpaRepository<Users, Integer> {
         "  (:period = 3) " +
         ") " +
         "AND (" +
-        "  CASE WHEN :maxLiveNum = 1 THEN l.max_live_num > 0 ELSE l.max_live_num = 1 END" +
+        "  CASE WHEN :maxLiveNum = 0 THEN l.max_live_num = 1 " +
+        "       WHEN :maxLiveNum = 1 THEN l.max_live_num > 1 " +
+        "       ELSE l.max_live_num > 0 END" +
         ")" +
         "AND (" +
         "  (SELECT COUNT(*) FROM my_live_lecture mll WHERE mll.live_id = l.live_id AND mll.end_date > CURRENT_TIMESTAMP) < l.max_live_num "

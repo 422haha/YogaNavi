@@ -41,7 +41,7 @@ public class TeacherController {
         @RequestParam(value = "day", defaultValue = "MON,TUE,WED,THU,FRI,SAT,SUN,") String day,
         // 강의 요일
         @RequestParam(value = "period", defaultValue = "3") int period, // 필터 기간
-        @RequestParam(value = "maxLiveNum", defaultValue = "1") int maxLiveNum, // 최대 수강자 수
+        @RequestParam(value = "maxLiveNum", defaultValue = "2") int maxLiveNum, // 최대 수강자 수
         @RequestParam(value = "searchKeyword", defaultValue = "") String searchKeyword, // 검색 키워드
         @RequestHeader("Authorization") String token) { // 인증 토큰
 
