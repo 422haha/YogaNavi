@@ -1,7 +1,7 @@
 package com.yoga.backend.mypage.livelectures;
 
 import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.home.HomeResponseDto;
+import com.yoga.backend.mypage.livelectures.dto.LectureHistoryDto;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,11 +37,11 @@ public class HistoryController {
     public ResponseEntity<Map<String, Object>> getHomeData(
         @RequestHeader("Authorization") String token) {
         int userId = jwtUtil.getUserIdFromToken(token);
-        List<HomeResponseDto> homeData = hsitoryService.getHistory(userId);
+        List<LectureHistoryDto> history = hsitoryService.getHistory(userId);
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "내 화상 강의 할 일 조회 성공");
-        response.put("data", homeData);
+        response.put("data", history);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
