@@ -135,6 +135,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun setMenuItemAvailable(isAvailable: Boolean){
+        binding.tvMenu.isEnabled = isAvailable
+    }
+
     private fun setBottomNavigationVisible(isVisible: Boolean) {
         if (isVisible) binding.bnv.visibility = View.VISIBLE
         else binding.bnv.visibility = View.GONE

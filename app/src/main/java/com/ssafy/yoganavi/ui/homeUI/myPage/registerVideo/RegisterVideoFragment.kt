@@ -224,11 +224,13 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
     }
 
     private suspend fun loadingView() = withContext(Dispatchers.Main) {
+        setMenuItemAvailable(false)
         binding.vBg.visibility = View.VISIBLE
         binding.lav.visibility = View.VISIBLE
     }
 
     private suspend fun failToUpload(message: String) = withContext(Dispatchers.Main) {
+        setMenuItemAvailable(true)
         binding.vBg.visibility = View.GONE
         binding.lav.visibility = View.GONE
         showSnackBar(message)
