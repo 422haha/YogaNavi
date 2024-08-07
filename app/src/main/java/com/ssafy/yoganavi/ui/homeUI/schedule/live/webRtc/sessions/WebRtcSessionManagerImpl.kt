@@ -205,32 +205,33 @@ class WebRtcSessionManagerImpl(
     }
 
     override fun disconnect() {
-        // dispose audio & video tracks.
-        remoteVideoTrackFlow.replayCache.forEach { videoTrack ->
-            videoTrack.dispose()
+        runCatching {
+            // dispose audio & video tracks.
+            remoteVideoTrackFlow.replayCache.forEach { videoTrack ->
+                videoTrack.dispose()
+            }
+            localVideoTrackFlow.replayCache.forEach { videoTrack ->
+                videoTrack.dispose()
+            }
+            localAudioTrack.dispose()
+            localVideoTrack.dispose()
+
+            // dispose audio handler and video capturer.
+            audioHandler.stop()
+            videoCapturer.stopCapture()
+            videoCapturer.dispose()
+
+            // dispose signaling clients and socket.
+            signalingClient.dispose()
+
+            offer = null
+
+            peerConnection.connection.dispose()
+
+            surfaceTextureHelper.dispose()
+
+            sessionManagerScope.cancel()
         }
-        localVideoTrackFlow.replayCache.forEach { videoTrack ->
-            videoTrack.dispose()
-        }
-        localAudioTrack.dispose()
-        localVideoTrack.dispose()
-
-        // dispose audio handler and video capturer.
-        audioHandler.stop()
-        videoCapturer.stopCapture()
-        videoCapturer.dispose()
-
-        // dispose signaling clients and socket.
-        signalingClient.dispose()
-
-        offer = null
-
-        peerConnection.connection.close()
-        peerConnection.connection.dispose()
-
-        surfaceTextureHelper.dispose()
-
-        sessionManagerScope.cancel()
     }
 
     private fun safeDispose(track: MediaStreamTrack?) {
@@ -244,78 +245,89 @@ class WebRtcSessionManagerImpl(
     }
 
     override fun reconnect() {
-        remoteVideoTrackFlow.replayCache.forEach { videoTrack ->
-            if (videoTrack.state() != MediaStreamTrack.State.ENDED) {
-                videoTrack.dispose()
+        runCatching {
+            remoteVideoTrackFlow.replayCache.forEach { videoTrack ->
+                if (videoTrack.state() != MediaStreamTrack.State.ENDED) {
+                    videoTrack.dispose()
+                }
             }
-        }
-        localVideoTrackFlow.replayCache.forEach { videoTrack ->
-            if (videoTrack.state() != MediaStreamTrack.State.ENDED) {
-                videoTrack.dispose()
+            localVideoTrackFlow.replayCache.forEach { videoTrack ->
+                if (videoTrack.state() != MediaStreamTrack.State.ENDED) {
+                    videoTrack.dispose()
+                }
             }
+
+            safeDispose(localAudioTrack)
+            safeDispose(localVideoTrack)
+
+            // Dispose of audio handler and video capturer
+            audioHandler.stop()
+            videoCapturer.stopCapture()
+            videoCapturer.dispose()
         }
-
-        safeDispose(localAudioTrack)
-        safeDispose(localVideoTrack)
-
-        // Dispose of audio handler and video capturer
-        audioHandler.stop()
-        videoCapturer.stopCapture()
-        videoCapturer.dispose()
-
-        offer = null
     }
 
     private suspend fun sendOffer() {
-        val offer = peerConnection.createOffer().getOrThrow()
-        val result = peerConnection.setLocalDescription(offer)
-        result.onSuccess {
-            signalingClient.sendCommand(SignalingCommand.OFFER, offer.description)
+        runCatching {
+            val offer = peerConnection.createOffer().getOrThrow()
+            val result = peerConnection.setLocalDescription(offer)
+            result.onSuccess {
+                signalingClient.sendCommand(SignalingCommand.OFFER, offer.description)
+            }
+            Timber.d("[SDP] send offer: ${offer.stringify()}")
         }
-        Timber.d("[SDP] send offer: ${offer.stringify()}")
     }
 
     private suspend fun sendAnswer() {
-        peerConnection.setRemoteDescription(
-            SessionDescription(SessionDescription.Type.OFFER, offer)
-        )
-        val answer = peerConnection.createAnswer().getOrThrow()
-        val result = peerConnection.setLocalDescription(answer)
-        result.onSuccess {
-            signalingClient.sendCommand(SignalingCommand.ANSWER, answer.description)
+        runCatching {
+            peerConnection.setRemoteDescription(
+                SessionDescription(SessionDescription.Type.OFFER, offer)
+            )
+            val answer = peerConnection.createAnswer().getOrThrow()
+            val result = peerConnection.setLocalDescription(answer)
+            result.onSuccess {
+                signalingClient.sendCommand(SignalingCommand.ANSWER, answer.description)
+            }
+            Timber.d("[SDP] send answer: ${answer.stringify()}")
         }
-        Timber.d("[SDP] send answer: ${answer.stringify()}")
     }
 
     private fun handleOffer(sdp: String) {
-        Timber.d("[SDP] handle offer: $sdp")
-        offer = sdp
+        runCatching {
+            Timber.d("[SDP] handle offer: $sdp")
+            offer = sdp
 
-        sessionManagerScope.launch {
-            if (offer != null) {
-                sendAnswer()
-            } else {
-                sendOffer()
+            sessionManagerScope.launch {
+                if (offer != null) {
+                    sendAnswer()
+                } else {
+                    sendOffer()
+                }
             }
         }
+
     }
 
     private suspend fun handleAnswer(sdp: String) {
-        Timber.d("[SDP] handle answer: $sdp")
-        peerConnection.setRemoteDescription(
-            SessionDescription(SessionDescription.Type.ANSWER, sdp)
-        )
+        runCatching {
+            Timber.d("[SDP] handle answer: $sdp")
+            peerConnection.setRemoteDescription(
+                SessionDescription(SessionDescription.Type.ANSWER, sdp)
+            )
+        }
     }
 
     private suspend fun handleIce(iceMessage: String) {
-        val iceArray = iceMessage.split(ICE_SEPARATOR)
-        peerConnection.addIceCandidate(
-            IceCandidate(
-                iceArray[0],
-                iceArray[1].toInt(),
-                iceArray[2]
+        runCatching {
+            val iceArray = iceMessage.split(ICE_SEPARATOR)
+            peerConnection.addIceCandidate(
+                IceCandidate(
+                    iceArray[0],
+                    iceArray[1].toInt(),
+                    iceArray[2]
+                )
             )
-        )
+        }
     }
 
     private fun buildCameraCapturer(): VideoCapturer {

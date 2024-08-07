@@ -18,6 +18,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.ssafy.yoganavi.R
@@ -192,11 +193,14 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
                 binding.tvState.text = NO_CONNECT_SERVER
             }
             WebRTCSessionState.Impossible -> {
-//                if(prevState == WebRTCSessionState.Active)
-//                    viewModel.sessionManager.reconnect()
+                if(prevState == WebRTCSessionState.Active && args.isTeacher)
+                    viewModel.sessionManager.reconnect()
+
+                if(!args.isTeacher)
+                    binding.tvState.text = "방송 대기중 입니다 :)"
             }
             WebRTCSessionState.Ready -> {
-                if(args.isTeacher)
+                if (args.isTeacher)
                     viewModel.sessionManager.onSessionScreenReady()
             }
             WebRTCSessionState.Creating -> {
@@ -329,6 +333,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
     private fun popBack() {
         exitFullscreen()
+
+        runCatching { viewModel.sessionManager.disconnect() }
 
         findNavController().popBackStack()
     }
