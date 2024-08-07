@@ -17,6 +17,7 @@ class TeacherDetailAdapter(
     private val goReserve: (Int, String, String, String) -> (Unit),
     private val navigateToLectureDetailFragment: (Long) -> Unit,
     private val sendLikeLecture: (Long) -> Unit,
+    private val loadS3Image: (ImageView, String) -> Unit,
     private val loadS3ImageSequentially: (ImageView, String, String) -> Unit
 ) : ListAdapter<TeacherDetailItem, ViewHolder>(TeacherDetailCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -67,6 +68,6 @@ class TeacherDetailAdapter(
         parent: ViewGroup
     ): TeacherDetailNoticeViewHolder {
         val binding = ListItemNoticeBinding.inflate(inflater, parent, false)
-        return TeacherDetailNoticeViewHolder(binding)
+        return TeacherDetailNoticeViewHolder(binding, loadS3Image, loadS3ImageSequentially)
     }
 }

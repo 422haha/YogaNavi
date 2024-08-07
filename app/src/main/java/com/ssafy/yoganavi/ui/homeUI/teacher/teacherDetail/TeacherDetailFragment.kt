@@ -28,6 +28,7 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
             goReserve = ::goReserve,
             navigateToLectureDetailFragment = ::navigateToLectureDetailFragment,
             sendLikeLecture = ::sendLikeLecture,
+            loadS3Image = ::loadS3Image,
             loadS3ImageSequentially = ::loadS3ImageSequentially
         )
     }
@@ -102,6 +103,8 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
     private fun sendLikeLecture(lectureId: Long) {
         viewModel.likeLecture(lectureId)
     }
+
+    private fun loadS3Image(view: ImageView, key: String) = viewModel.loadS3Image(view, key)
 
     private fun loadS3ImageSequentially(view: ImageView, smallKey: String, largeKey: String) =
         viewModel.loadS3ImageSequentially(view, smallKey, largeKey)
