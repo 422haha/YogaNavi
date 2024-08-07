@@ -21,14 +21,13 @@ class SignalingClient {
   private val client = OkHttpClient()
 
     private val _liveIdFlow = MutableStateFlow(-1)
-    val liveIdFlow: StateFlow<Int> = _liveIdFlow
+    private val liveIdFlow: StateFlow<Int> = _liveIdFlow
 
     init {
         signalingScope.launch {
             liveIdFlow.collect { liveId ->
-                if (liveId != -1) {
+                if (liveId != -1)
                     connectToSignalingServer(liveId)
-                }
             }
         }
     }
@@ -39,8 +38,10 @@ class SignalingClient {
             .addHeader("liveId", liveId.toString())
             .build()
 
-        ws?.cancel()
-        ws = client.newWebSocket(request, SignalingWebSocketListener())
+        runCatching {
+            ws?.cancel()
+            ws = client.newWebSocket(request, SignalingWebSocketListener())
+        }
     }
 
     fun updateLiveId(liveId: Int) {

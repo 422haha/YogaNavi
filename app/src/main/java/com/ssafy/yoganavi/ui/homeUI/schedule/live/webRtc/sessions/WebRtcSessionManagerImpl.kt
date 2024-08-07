@@ -233,25 +233,37 @@ class WebRtcSessionManagerImpl(
         sessionManagerScope.cancel()
     }
 
+    private fun safeDispose(track: MediaStreamTrack?) {
+        try {
+            if (track != null && track.state() != MediaStreamTrack.State.ENDED) {
+                track.dispose()
+            }
+        } catch (e: IllegalStateException) {
+            Timber.e("Error disposing track: ${e.message}")
+        }
+    }
+
     override fun reconnect() {
-        // dispose audio & video tracks.
         remoteVideoTrackFlow.replayCache.forEach { videoTrack ->
-            videoTrack.dispose()
+            if (videoTrack.state() != MediaStreamTrack.State.ENDED) {
+                videoTrack.dispose()
+            }
         }
         localVideoTrackFlow.replayCache.forEach { videoTrack ->
-            videoTrack.dispose()
+            if (videoTrack.state() != MediaStreamTrack.State.ENDED) {
+                videoTrack.dispose()
+            }
         }
-        localAudioTrack.dispose()
-        localVideoTrack.dispose()
 
-        // dispose audio handler and video capturer.
+        safeDispose(localAudioTrack)
+        safeDispose(localVideoTrack)
+
+        // Dispose of audio handler and video capturer
         audioHandler.stop()
         videoCapturer.stopCapture()
         videoCapturer.dispose()
 
         offer = null
-
-        surfaceTextureHelper.dispose()
     }
 
     private suspend fun sendOffer() {
@@ -278,6 +290,14 @@ class WebRtcSessionManagerImpl(
     private fun handleOffer(sdp: String) {
         Timber.d("[SDP] handle offer: $sdp")
         offer = sdp
+
+        sessionManagerScope.launch {
+            if (offer != null) {
+                sendAnswer()
+            } else {
+                sendOffer()
+            }
+        }
     }
 
     private suspend fun handleAnswer(sdp: String) {
