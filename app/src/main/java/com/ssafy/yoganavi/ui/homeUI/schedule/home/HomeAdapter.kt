@@ -37,17 +37,24 @@ class HomeAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: HomeData, preDay: Long) {
             with(binding) {
-                if(!item.teacherSmallProfile.isNullOrBlank()) {
+                if (!item.teacherSmallProfile.isNullOrBlank()) {
                     ivProfile.loadImage(item.teacherSmallProfile)
-                }
-                else {
+                } else {
                     ivProfile.setImageResource(R.drawable.profilenull)
+                }
 
-                if (item.lectureDate != preDay)
+                if (false) onAir.setBackgroundResource(R.color.red) else onAir.setBackgroundResource(
+                    R.color.gray_20
+                )
+
+                if (item.lectureDate != preDay) {
                     dateDivider.isVisible = true
-                else
+                    tvDivider.isVisible = true
+                    tvDivider.text = item.lectureDay
+                } else {
                     dateDivider.isVisible = false
-
+                    tvDivider.isVisible = false
+                }
                 if (false) onAir.setBackgroundResource(R.color.red) else onAir.setBackgroundResource(
                     R.color.gray_20
                 )
