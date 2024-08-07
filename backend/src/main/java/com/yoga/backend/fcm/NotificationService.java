@@ -20,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * fcm 알림 전송 서비스
  * <p>
- * todo 캐시 관리 시간에서 캐시 추가는 23:55, 캐시 삭제는 다음날 자정으로
+ * todo 캐시 관리 시간에서 캐시 추가는 23:49, 캐시 삭제는 다음날 자정으로
+ * todo 강의 추가 시 캐시되나 알림 실행이 안됨
  */
 @Slf4j
 @Service
@@ -140,32 +141,124 @@ public class NotificationService {
 
 
     /**
-     * 매일 23:55에 실행, 내일 할 강의 캐시
+     * 매일 23:49에 실행, 내일 할 강의 캐시
      */
-    @Scheduled(cron = "0 55 23 * * *")
+    @Scheduled(cron = "0 49 23 * * *")
     @Transactional
     public void cacheTomorrowLectures() {
         try {
             LocalDate tomorrowKorea = LocalDate.now(KOREA_ZONE).plusDays(1);
-            String dayAbbreviation = tomorrowKorea.getDayOfWeek().toString().substring(0, 3);
-            Instant startOfTomorrowKorea = tomorrowKorea.atStartOfDay(KOREA_ZONE).toInstant();
-            Instant endOfTomorrowKorea = tomorrowKorea.plusDays(1).atStartOfDay(KOREA_ZONE)
-                .toInstant();
+            String tomorrowDayAbbreviation = tomorrowKorea.getDayOfWeek().toString()
+                .substring(0, 3);
 
-            // 내일 강의 목록
-            List<LiveLectureDto> tomorrowLectures = liveLectureRepository.findLecturesForToday(
-                    startOfTomorrowKorea, endOfTomorrowKorea, dayAbbreviation)
-                .stream()
-                .map(LiveLectureDto::fromEntity)
-                .collect(Collectors.toList());
+            System.out.println("매일 23:49실행 for fcm ");
+            System.out.println("tomorrowDayAbbreviation: " + tomorrowDayAbbreviation);
+            System.out.println("tomorrowkorea: " + tomorrowKorea);
 
-            // Redis에 내일의 강의 목록 저장
-            String redisKey = REDIS_KEY_PREFIX + tomorrowKorea.toString();
-            redisTemplate.opsForValue().set(redisKey, tomorrowLectures);
-            redisTemplate.expireAt(redisKey, Date.from(endOfTomorrowKorea));
-            log.info("내일 강의 목록 Redis 캐시 갱신 완료. 강의 개수: {}", tomorrowLectures.size());
+            List<LiveLectures> tomorrowLectures = liveLectureRepository.findTomorrowLectures(
+                tomorrowKorea, tomorrowDayAbbreviation); // 여기서 에러 발생
+
+            /**
+             *2024-08-07T23:51:00.034+09:00 ERROR 14504 --- [backend] [   scheduling-1] c.yoga.backend.fcm.NotificationService   : 내일 강의 목록 Redis 캐시 갱신 중 에러 발생
+             *
+             * org.springframework.dao.InvalidDataAccessApiUsageException: Argument [2024-08-08] of type [java.time.LocalDate] did not match parameter type [java.time.Instant (n/a)]
+             * 	at org.springframework.orm.jpa.EntityManagerFactoryUtils.convertJpaAccessExceptionIfPossible(EntityManagerFactoryUtils.java:371) ~[spring-orm-6.1.10.jar:6.1.10]
+             * 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:246) ~[spring-orm-6.1.10.jar:6.1.10]
+             * 	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550) ~[spring-orm-6.1.10.jar:6.1.10]
+             * 	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61) ~[spring-tx-6.1.10.jar:6.1.10]
+             * 	at org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:335) ~[spring-tx-6.1.10.jar:6.1.10]
+             * 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:160) ~[spring-tx-6.1.10.jar:6.1.10]
+             * 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:136) ~[spring-data-jpa-3.3.1.jar:3.3.1]
+             * 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:97) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:223) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at jdk.proxy4/jdk.proxy4.$Proxy170.findTomorrowLectures(Unknown Source) ~[na:na]
+             * 	at com.yoga.backend.fcm.NotificationService.cacheTomorrowLectures(NotificationService.java:158) ~[classes/:na]
+             * 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+             * 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+             * 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+             * 	at java.base/java.lang.reflect.Method.invoke(Method.java:568) ~[na:na]
+             * 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:354) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123) ~[spring-tx-6.1.10.jar:6.1.10]
+             * 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:392) ~[spring-tx-6.1.10.jar:6.1.10]
+             * 	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.1.10.jar:6.1.10]
+             * 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at com.yoga.backend.fcm.NotificationService$$SpringCGLIB$$0.cacheTomorrowLectures(<generated>) ~[classes/:na]
+             * 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+             * 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+             * 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+             * 	at java.base/java.lang.reflect.Method.invoke(Method.java:568) ~[na:na]
+             * 	at org.springframework.scheduling.support.ScheduledMethodRunnable.runInternal(ScheduledMethodRunnable.java:130) ~[spring-context-6.1.10.jar:6.1.10]
+             * 	at org.springframework.scheduling.support.ScheduledMethodRunnable.lambda$run$2(ScheduledMethodRunnable.java:124) ~[spring-context-6.1.10.jar:6.1.10]
+             * 	at io.micrometer.observation.Observation.observe(Observation.java:499) ~[micrometer-observation-1.13.1.jar:1.13.1]
+             * 	at org.springframework.scheduling.support.ScheduledMethodRunnable.run(ScheduledMethodRunnable.java:124) ~[spring-context-6.1.10.jar:6.1.10]
+             * 	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54) ~[spring-context-6.1.10.jar:6.1.10]
+             * 	at org.springframework.scheduling.concurrent.ReschedulingRunnable.run(ReschedulingRunnable.java:96) ~[spring-context-6.1.10.jar:6.1.10]
+             * 	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539) ~[na:na]
+             * 	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) ~[na:na]
+             * 	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304) ~[na:na]
+             * 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136) ~[na:na]
+             * 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635) ~[na:na]
+             * 	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+             * Caused by: org.hibernate.query.QueryArgumentException: Argument [2024-08-08] of type [java.time.LocalDate] did not match parameter type [java.time.Instant (n/a)]
+             * 	at org.hibernate.query.spi.QueryParameterBindingValidator.validate(QueryParameterBindingValidator.java:85) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+             * 	at org.hibernate.query.spi.QueryParameterBindingValidator.validate(QueryParameterBindingValidator.java:32) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+             * 	at org.hibernate.query.internal.QueryParameterBindingImpl.validate(QueryParameterBindingImpl.java:362) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+             * 	at org.hibernate.query.internal.QueryParameterBindingImpl.setBindValue(QueryParameterBindingImpl.java:137) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+             * 	at org.hibernate.query.spi.AbstractCommonQueryContract.setParameter(AbstractCommonQueryContract.java:842) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+             * 	at org.hibernate.query.spi.AbstractSelectionQuery.setParameter(AbstractSelectionQuery.java:882) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+             * 	at org.hibernate.query.sqm.internal.QuerySqmImpl.setParameter(QuerySqmImpl.java:1200) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+             * 	at org.hibernate.query.sqm.internal.QuerySqmImpl.setParameter(QuerySqmImpl.java:136) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+             * 	at org.springframework.data.jpa.repository.query.QueryParameterSetter$BindableQuery.setParameter(QueryParameterSetter.java:326) ~[spring-data-jpa-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.jpa.repository.query.QueryParameterSetter$NamedOrIndexedQueryParameterSetter.lambda$4(QueryParameterSetter.java:117) ~[spring-data-jpa-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.jpa.repository.query.QueryParameterSetter$ErrorHandling$1.execute(QueryParameterSetter.java:140) ~[spring-data-jpa-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.jpa.repository.query.QueryParameterSetter$NamedOrIndexedQueryParameterSetter.setParameter(QueryParameterSetter.java:117) ~[spring-data-jpa-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.jpa.repository.query.ParameterBinder.bind(ParameterBinder.java:84) ~[spring-data-jpa-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.jpa.repository.query.ParameterBinder.bind(ParameterBinder.java:76) ~[spring-data-jpa-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.jpa.repository.query.ParameterBinder.bindAndPrepare(ParameterBinder.java:98) ~[spring-data-jpa-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.jpa.repository.query.AbstractStringBasedJpaQuery.doCreateQuery(AbstractStringBasedJpaQuery.java:130) ~[spring-data-jpa-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.createQuery(AbstractJpaQuery.java:243) ~[spring-data-jpa-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.jpa.repository.query.JpaQueryExecution$CollectionExecution.doExecute(JpaQueryExecution.java:129) ~[spring-data-jpa-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.jpa.repository.query.JpaQueryExecution.execute(JpaQueryExecution.java:92) ~[spring-data-jpa-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.doExecute(AbstractJpaQuery.java:152) ~[spring-data-jpa-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.execute(AbstractJpaQuery.java:140) ~[spring-data-jpa-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:170) ~[spring-data-commons-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158) ~[spring-data-commons-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:164) ~[spring-data-commons-3.3.1.jar:3.3.1]
+             * 	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:143) ~[spring-data-commons-3.3.1.jar:3.3.1]
+             * 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:70) ~[spring-data-commons-3.3.1.jar:3.3.1]
+             * 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123) ~[spring-tx-6.1.10.jar:6.1.10]
+             * 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:392) ~[spring-tx-6.1.10.jar:6.1.10]
+             * 	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.1.10.jar:6.1.10]
+             * 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.10.jar:6.1.10]
+             * 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138) ~[spring-tx-6.1.10.jar:6.1.10]
+             * 	... 39 common frames omitted
+             */
+
+            if (!tomorrowLectures.isEmpty()) {
+                String redisKey = REDIS_KEY_PREFIX + tomorrowKorea.toString();
+                List<LiveLectureDto> tomorrowLectureDtos = tomorrowLectures.stream()
+                    .map(LiveLectureDto::fromEntity)
+                    .collect(Collectors.toList());
+
+                redisTemplate.opsForValue().set(redisKey, tomorrowLectureDtos);
+                redisTemplate.expireAt(redisKey,
+                    Date.from(tomorrowKorea.plusDays(1).atStartOfDay(KOREA_ZONE).toInstant()));
+                log.info("내일 강의 목록 Redis 캐시 갱신 완료. 강의 개수: {}", tomorrowLectureDtos.size());
+            } else {
+                log.info("내일 예정된 강의가 없습니다.");
+            }
         } catch (Exception e) {
-            log.error("내일 강의 목록 Redis 캐시 갱신 중 에러 발생: {}", e.getMessage());
+            log.error("내일 강의 목록 Redis 캐시 갱신 중 에러 발생", e);
         }
     }
 
@@ -198,43 +291,42 @@ public class NotificationService {
         try {
             ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE);
             LocalDate todayKorea = nowKorea.toLocalDate();
+            LocalTime nowTimeKorea = nowKorea.toLocalTime();
+            String dayAbbreviation = todayKorea.getDayOfWeek().toString().substring(0, 3);
+
+            System.out.println("1분마다 실행 for fcm");
+            System.out.println("nowkorea: " + nowKorea);
+            System.out.println("todayKorea: " + todayKorea);
+            System.out.println("nowTimeKorea: " + nowTimeKorea);
+
             String redisKey = REDIS_KEY_PREFIX + todayKorea.toString();
             List<LiveLectureDto> todayLectures = getLecturesFromRedis(redisKey);
-            log.debug("오늘의 강의 수: {}", todayLectures.size());
 
-            // 캐시가 비어있으면
             if (todayLectures.isEmpty()) {
                 log.warn("Redis에서 오늘의 강의 목록 조회 불가. DB에서 조회.");
-                String dayAbbreviation = todayKorea.getDayOfWeek().toString().substring(0, 3);
-                Instant startOfDayKorea = todayKorea.atStartOfDay(KOREA_ZONE).toInstant();
-                Instant endOfDayKorea = todayKorea.plusDays(1).atStartOfDay(KOREA_ZONE).toInstant();
-
-                todayLectures = liveLectureRepository.findLecturesForToday(startOfDayKorea,
-                        endOfDayKorea, dayAbbreviation)
+                todayLectures = liveLectureRepository.findLecturesForToday(todayKorea,
+                        dayAbbreviation)
                     .stream()
                     .map(LiveLectureDto::fromEntity)
                     .collect(Collectors.toList());
 
                 redisTemplate.opsForValue().set(redisKey, todayLectures);
-                redisTemplate.expireAt(redisKey, Date.from(endOfDayKorea));
+                redisTemplate.expireAt(redisKey,
+                    Date.from(todayKorea.plusDays(1).atStartOfDay(KOREA_ZONE).toInstant()));
             }
-            log.info("오늘 강의 목록 Redis 캐시 확인 완료. 강의 개수: {}", todayLectures.size());
+
+            log.info("오늘 강의 목록 확인 완료. 강의 개수: {}", todayLectures.size());
 
             // 10분 후에 시작하는 강의 찾기
+            LocalTime tenMinutesLater = nowTimeKorea.plusMinutes(10);
+            System.out.println("tenMinutesLater: " + tenMinutesLater);
             List<LiveLectureDto> upcomingLectures = todayLectures.stream()
                 .filter(lecture -> {
-                    LocalTime lectureTime = extractTimeFromInstant(lecture.getStartTime());
-                    ZonedDateTime lectureDateTime = ZonedDateTime.of(todayKorea, lectureTime,
+                    LocalTime lectureStartTime = LocalTime.ofInstant(lecture.getStartTime(),
                         KOREA_ZONE);
-                    ZonedDateTime notificationTime = lectureDateTime.minusMinutes(10);
-
-                    log.debug("강의 ID: {}, 강의 시작 시간: {}, 알림 시간: {}, 현재 시간: {}",
-                        lecture.getLiveId(), lectureDateTime, notificationTime, nowKorea);
-
-                    return lecture.getAvailableDay()
-                        .contains(todayKorea.getDayOfWeek().toString().substring(0, 3)) &&
-                        nowKorea.isAfter(notificationTime.minusSeconds(30)) &&
-                        nowKorea.isBefore(notificationTime.plusSeconds(30));
+                    return lectureStartTime.isAfter(nowTimeKorea) &&
+                        lectureStartTime.isBefore(tenMinutesLater.plusSeconds(30)) &&
+                        lectureStartTime.isAfter(tenMinutesLater.minusSeconds(30));
                 })
                 .collect(Collectors.toList());
 
@@ -256,6 +348,8 @@ public class NotificationService {
      */
     private void sendNotificationsWithoutDuplication(List<LiveLectureDto> lectures) {
         Map<String, Map<String, String>> notifications = new HashMap<>();
+        LocalDate today = LocalDate.now(KOREA_ZONE);
+        String dayOfWeek = today.getDayOfWeek().toString().substring(0, 3);
 
         for (LiveLectureDto lecture : lectures) {
             String message = String.format("%s 강의가 10분 후에 시작됩니다.", lecture.getLiveTitle());
@@ -269,8 +363,9 @@ public class NotificationService {
                 notifications.put(teacher.getFcmToken(), notificationData);
             }
 
-            List<MyLiveLecture> participants = myLiveLectureRepository.findByLiveLecture_LiveId(
-                lecture.getLiveId());
+            List<MyLiveLecture> participants = myLiveLectureRepository.findParticipantsForTodayLecture(
+                lecture.getLiveId(), today, dayOfWeek);
+
             for (MyLiveLecture participant : participants) {
                 Users student = participant.getUser();
                 if (student != null && student.getFcmToken() != null) {
