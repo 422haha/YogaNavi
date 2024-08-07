@@ -5,7 +5,6 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.dto.mypage.Profile
 import com.ssafy.yoganavi.databinding.FragmentProfileBinding
@@ -13,6 +12,7 @@ import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.profile.dialog.ModifyDialog
 import com.ssafy.yoganavi.ui.utils.MODIFY
 import com.ssafy.yoganavi.ui.utils.MY_PAGE
+import com.ssafy.yoganavi.ui.utils.loadImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -36,11 +36,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
         with(binding) {
             tvName.text = profile.nickname
 
-            if (profile.imageUrlSmall != null) {
-                Glide.with(requireContext())
-                    .load(profile.imageUrlSmall)
-                    .into(ivIcon)
-            }
+            if (profile.imageUrlSmall != null) ivIcon.loadImage(profile.imageUrlSmall)
 
             if (profile.teacher) {
                 isTeacher = true

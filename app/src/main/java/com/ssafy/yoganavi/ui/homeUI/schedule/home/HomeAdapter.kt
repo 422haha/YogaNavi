@@ -6,13 +6,13 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.dto.home.HomeData
 import com.ssafy.yoganavi.databinding.ListItemHomeBinding
 import com.ssafy.yoganavi.ui.utils.convertDaysToHangle
 import com.ssafy.yoganavi.ui.utils.formatDashDate
 import com.ssafy.yoganavi.ui.utils.formatTime
+import com.ssafy.yoganavi.ui.utils.loadImage
 import com.ssafy.yoganavi.ui.utils.startSpaceEnd
 import com.ssafy.yoganavi.ui.utils.startTildeEnd
 
@@ -37,14 +37,11 @@ class HomeAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: HomeData, preDay: Long) {
             with(binding) {
-                if (!item.teacherSmallProfile.isNullOrBlank()) {
-                    Glide.with(binding.root)
-                        .load(item.teacherSmallProfile)
-                        .circleCrop()
-                        .into(ivProfile)
-                } else {
-                    ivProfile.setImageResource(R.drawable.profilenull)
+                if(!item.teacherSmallProfile.isNullOrBlank()) {
+                    ivProfile.loadImage(item.teacherSmallProfile)
                 }
+                else {
+                    ivProfile.setImageResource(R.drawable.profilenull)
 
                 if (item.lectureDate != preDay)
                     dateDivider.isVisible = true

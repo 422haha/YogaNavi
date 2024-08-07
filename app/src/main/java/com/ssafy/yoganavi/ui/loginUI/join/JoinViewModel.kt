@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.response.ListResponse
 import com.ssafy.yoganavi.data.repository.user.UserRepository
 import com.ssafy.yoganavi.data.source.user.UserRequest
+import com.ssafy.yoganavi.ui.utils.ALREADY_USE
 import com.ssafy.yoganavi.ui.utils.END_TIME
 import com.ssafy.yoganavi.ui.utils.HAS_SPACE
 import com.ssafy.yoganavi.ui.utils.IS_BLANK
@@ -134,7 +135,8 @@ class JoinViewModel @Inject constructor(
     private suspend fun emitSuccess(response: ListResponse<Unit>, type: Class<out JoinEvent<*>>) =
         when (type) {
             JoinEvent.RegisterEmailSuccess::class.java -> {
-                _joinEvent.emit(JoinEvent.RegisterEmailSuccess(response.data, response.message))
+                if(response.message == ALREADY_USE) emitError(ALREADY_USE)
+                else _joinEvent.emit(JoinEvent.RegisterEmailSuccess(response.data, response.message))
             }
 
             JoinEvent.CheckEmailSuccess::class.java -> {

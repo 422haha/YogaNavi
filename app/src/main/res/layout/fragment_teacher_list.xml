@@ -38,6 +38,7 @@
             android:id="@+id/rb_popular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="true"
             android:layout_marginEnd="@dimen/padding_medium"
             android:text="@string/popular" />
 
@@ -45,7 +46,6 @@
             android:id="@+id/rb_recent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="true"
             android:text="@string/recent" />
 
     </RadioGroup>

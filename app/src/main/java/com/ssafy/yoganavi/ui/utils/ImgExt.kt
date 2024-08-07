@@ -53,3 +53,8 @@ fun ImageView.loadVideoFrame(uri: String, time: Long, isCircularOn: Boolean = tr
         .placeholder(circularProgressDrawable)
         .into(this)
 }
+
+fun ImageView.loadImage(uri: String) = Glide.with(this)
+    .load(uri)
+    .centerCrop()
+    .into(this)

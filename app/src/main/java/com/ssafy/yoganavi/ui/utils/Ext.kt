@@ -31,6 +31,7 @@ const val PASSWORD_DIFF = "비밀번호가 일치하지 않습니다."
 const val SESSION_END = "세션이 만료되었습니다."
 const val UPLOAD_ERROR = "업로드에 실패했습니다."
 const val BLANK_CHAPTER = "강의 영상 하나 이상을 등록해주세요!"
+const val ALREADY_USE = "이미 존재하는 회원입니다."
 
 // 타이틀
 const val MY_PAGE = "마이 페이지"

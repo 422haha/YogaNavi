@@ -44,7 +44,7 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
             recordedId = data.recordedId,
             recordTitle = data.recordTitle,
             recordContent = data.recordContent,
-            recordThumbnail = data.recordThumbnailPath,
+            recordThumbnail = data.recordThumbnail,
             recordThumbnailSmall = data.recordThumbnailSmall,
             nickname = data.nickname
         )

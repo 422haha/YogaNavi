@@ -2,10 +2,9 @@ package com.ssafy.yoganavi.ui.homeUI.teacher.teacherDetail.teacherDetail.lecture
 
 
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
-import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.databinding.ListItemLectureThumbnail2Binding
+import com.ssafy.yoganavi.ui.utils.loadImage
 import com.ssafy.yoganavi.ui.utils.toK
 
 class TeacherDetailLectureViewHolder(
@@ -20,22 +19,11 @@ class TeacherDetailLectureViewHolder(
         tvCount.text = cnt.toK()
         ivFavorite.isSelected = isSelected
 
+        ivThumbnail.loadImage(data.recordThumbnailSmall)
 
-        val circularProgressDrawable = CircularProgressDrawable(binding.root.context).apply {
-            strokeWidth = 5f
-            centerRadius = 30f
-        }
-        circularProgressDrawable.start()
+        root.setOnClickListener { navigateToLectureDetailFragment(data.recordedId) }
 
-        Glide.with(binding.root)
-            .load(data.recordThumbnailSmall)
-            .placeholder(circularProgressDrawable)
-            .into(ivThumbnail)
-
-        binding.root.setOnClickListener {
-            navigateToLectureDetailFragment(data.recordedId)
-        }
-        binding.ivFavorite.setOnClickListener {
+        ivFavorite.setOnClickListener {
             if (isSelected) cnt -= 1
             else cnt += 1
             tvCount.text = cnt.toK()

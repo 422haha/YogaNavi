@@ -9,7 +9,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.ssafy.yoganavi.R
-import com.ssafy.yoganavi.data.source.teacher.FilterData
+import com.ssafy.yoganavi.data.source.dto.teacher.FilterData
 import com.ssafy.yoganavi.databinding.FragmentFilterBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.utils.END
