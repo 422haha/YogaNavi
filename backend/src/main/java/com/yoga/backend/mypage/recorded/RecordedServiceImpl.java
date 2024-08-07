@@ -89,7 +89,7 @@ public class RecordedServiceImpl implements RecordedService {
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LectureDto> getLikeLectures(int userId) {
         List<LectureDto> lectures = myLikeLectureListRepository.findMyLikedLectures(userId);
-        return applyPresignedUrls(lectures);
+        return applyPresignedUrls(setNickname(lectures));
     }
 
     /**

@@ -194,6 +194,7 @@ public class TeacherServiceImpl implements TeacherService {
                     .recordThumbnailSmall(recordThumbnailSmall)
                     .likeCount((int) lecture.getLikeCount())
                     .myLike(myLike)
+                    .nickname(user.getNickname())
                     .build();
             })
             .sorted(Comparator.comparing(DetailedTeacherDto.LectureDto::getRecordedId).reversed())

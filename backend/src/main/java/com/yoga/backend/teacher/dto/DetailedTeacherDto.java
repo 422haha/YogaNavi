@@ -69,6 +69,7 @@ public class DetailedTeacherDto {
         private String recordThumbnailSmall;
         private Integer likeCount;
         private Boolean myLike;
+        private String nickname;
 
         /**
          * LectureDto 생성자
@@ -79,15 +80,17 @@ public class DetailedTeacherDto {
          * @param recordThumbnailSmall 강의 작은 썸네일 URL
          * @param likeCount            좋아요 수
          * @param myLike               사용자에 의한 좋아요 여부
+         * @param nickname             강사 닉네임
          */
         public LectureDto(String recordedId, String recordTitle, String recordThumbnail,
-            String recordThumbnailSmall, Integer likeCount, Boolean myLike) {
+            String recordThumbnailSmall, Integer likeCount, Boolean myLike, String nickname) {
             this.recordedId = recordedId;
             this.recordTitle = recordTitle;
             this.recordThumbnail = recordThumbnail;
             this.recordThumbnailSmall = recordThumbnailSmall;
             this.likeCount = likeCount;
             this.myLike = myLike;
+            this.nickname = nickname;
         }
     }
 
