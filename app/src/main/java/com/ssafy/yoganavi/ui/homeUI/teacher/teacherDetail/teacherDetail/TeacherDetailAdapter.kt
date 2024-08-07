@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.teacher.teacherDetail.teacherDetail
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ssafy.yoganavi.databinding.ListItemNoticeBinding
@@ -13,9 +14,10 @@ import com.ssafy.yoganavi.ui.utils.ITEM_LECTURE
 import com.ssafy.yoganavi.ui.utils.ITEM_NOTICE
 
 class TeacherDetailAdapter(
-    val goReserve: (Int, String, String, String) -> (Unit),
+    private val goReserve: (Int, String, String, String) -> (Unit),
     private val navigateToLectureDetailFragment: (Long) -> Unit,
-    private val sendLikeLecture: (Long) -> Unit
+    private val sendLikeLecture: (Long) -> Unit,
+    private val loadS3ImageSequentially: (ImageView, String, String) -> Unit
 ) : ListAdapter<TeacherDetailItem, ViewHolder>(TeacherDetailCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -49,7 +51,7 @@ class TeacherDetailAdapter(
         parent: ViewGroup
     ): TeacherDetailHeaderViewHolder {
         val binding = ListItemTeacherHeaderBinding.inflate(inflater, parent, false)
-        return TeacherDetailHeaderViewHolder(binding, goReserve)
+        return TeacherDetailHeaderViewHolder(binding, goReserve, loadS3ImageSequentially)
     }
 
     private fun makeItemLectureViewHolder(

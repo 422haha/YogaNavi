@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.teacher.teacherList
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -26,14 +27,16 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class TeacherListFragment :
-    BaseFragment<FragmentTeacherListBinding>(FragmentTeacherListBinding::inflate) {
+class TeacherListFragment : BaseFragment<FragmentTeacherListBinding>(
+    FragmentTeacherListBinding::inflate
+) {
 
     private val viewModel: TeacherListViewModel by viewModels()
     private val teacherAdapter by lazy {
         TeacherAdapter(
-            ::navigateToTeacherFragment,
-            ::teacherLikeToggle
+            navigateToRegisterTeacherFragment = ::navigateToTeacherFragment,
+            teacherLikeToggle = ::teacherLikeToggle,
+            loadS3Image = ::loadS3Image
         ).apply {
             registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
                 override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
@@ -43,6 +46,7 @@ class TeacherListFragment :
             })
         }
     }
+
     private val args by navArgs<TeacherListFragmentArgs>()
     private var filter = FilterData()
 
@@ -146,4 +150,8 @@ class TeacherListFragment :
     private fun teacherLikeToggle(teacherId: Int = -1) {
         viewModel.teacherLikeToggle(filter, teacherId)
     }
+
+    private fun loadS3Image(imageView: ImageView, key: String) = viewModel.loadS3Image(
+        imageView, key
+    )
 }

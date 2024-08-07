@@ -31,7 +31,6 @@ import com.ssafy.yoganavi.ui.utils.NO_AUTH
 import com.ssafy.yoganavi.ui.utils.PASSWORD_DIFF
 import com.ssafy.yoganavi.ui.utils.UPLOAD_FAIL
 import com.ssafy.yoganavi.ui.utils.getImagePath
-import com.ssafy.yoganavi.ui.utils.loadImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -40,6 +39,7 @@ import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding::inflate) {
+
     private val args by navArgs<ModifyFragmentArgs>()
     private val viewModel: ModifyViewModel by viewModels()
     private val hashTagAdapter by lazy { HashTagAdapter(::deleteHashTag) }
@@ -103,7 +103,8 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
         with(binding) {
             tieNn.setText(data.nickname)
 
-            if (!data.imageUrlSmall.isNullOrBlank()) ivIcon.loadImage(data.imageUrlSmall)
+            if (!data.smallImageKey.isNullOrBlank())
+                viewModel.loadS3Image(ivIcon, data.smallImageKey)
 
             if (data.teacher) {
                 tvHashtag.visibility = View.VISIBLE

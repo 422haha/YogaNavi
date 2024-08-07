@@ -139,7 +139,13 @@ class InfoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun createLive(liveLectureData: LiveLectureData): DetailResponse<Unit> {
-        val response = withContext(ioDispatcher) { infoDataSource.createLive(liveLectureData) }
+        val response = withContext(ioDispatcher) {
+            val newLiveLectureData = liveLectureData.copy(
+                startDate = liveLectureData.startDate + 32_400_000,
+                endDate = liveLectureData.endDate + 32_400_000
+            )
+            infoDataSource.createLive(newLiveLectureData)
+        }
         return response.toDetailResponse()
     }
 

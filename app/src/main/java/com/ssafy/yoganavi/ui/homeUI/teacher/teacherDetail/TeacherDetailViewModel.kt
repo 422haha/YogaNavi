@@ -1,9 +1,12 @@
 package com.ssafy.yoganavi.ui.homeUI.teacher.teacherDetail
 
+import android.widget.ImageView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.amazonaws.services.s3.AmazonS3Client
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
+import com.ssafy.yoganavi.ui.utils.loadS3ImageSequentially
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -11,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TeacherDetailViewModel @Inject constructor(
-    private val infoRepository: InfoRepository
+    private val infoRepository: InfoRepository,
+    private val s3Client: AmazonS3Client
 ) : ViewModel() {
 
     fun getTeacherDetail(
@@ -27,4 +31,10 @@ class TeacherDetailViewModel @Inject constructor(
         runCatching { infoRepository.likeLecture(lectureId) }
             .onFailure { it.printStackTrace() }
     }
+
+    fun loadS3ImageSequentially(
+        view: ImageView,
+        smallKey: String,
+        largeKey: String
+    ) = view.loadS3ImageSequentially(smallKey, largeKey, s3Client)
 }

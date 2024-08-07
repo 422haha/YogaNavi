@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.teacher.teacherDetail
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -19,13 +20,15 @@ import kotlinx.coroutines.withContext
 class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
     FragmentTeacherDetailBinding::inflate
 ) {
+
     private val viewModel: TeacherDetailViewModel by viewModels()
     private val args by navArgs<TeacherDetailFragmentArgs>()
     private val teacherDetailAdapter by lazy {
         TeacherDetailAdapter(
             goReserve = ::goReserve,
             navigateToLectureDetailFragment = ::navigateToLectureDetailFragment,
-            sendLikeLecture = ::sendLikeLecture
+            sendLikeLecture = ::sendLikeLecture,
+            loadS3ImageSequentially = ::loadS3ImageSequentially
         )
     }
 
@@ -43,8 +46,8 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
             teacherName = data.teacherName,
             teacherId = data.teacherId,
             content = data.content ?: "",
-            teacherProfile = data.teacherProfile ?: "",
-            teacherSmallProfile = data.teacherSmallProfile ?: "",
+            profileKey = data.profileKey ?: "",
+            smallProfileKey = data.smallProfileKey ?: "",
             hashtags = data.hashtags,
             liked = data.liked,
             likes = data.likes
@@ -58,8 +61,8 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
                 teacherName = "공지사항",
                 teacherId = -1,
                 content = "",
-                teacherProfile = "",
-                teacherSmallProfile = "",
+                profileKey = "",
+                smallProfileKey = "",
                 hashtags = arrayListOf(),
                 liked = false,
                 likes = 0
@@ -99,4 +102,7 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
     private fun sendLikeLecture(lectureId: Long) {
         viewModel.likeLecture(lectureId)
     }
+
+    private fun loadS3ImageSequentially(view: ImageView, smallKey: String, largeKey: String) =
+        viewModel.loadS3ImageSequentially(view, smallKey, largeKey)
 }

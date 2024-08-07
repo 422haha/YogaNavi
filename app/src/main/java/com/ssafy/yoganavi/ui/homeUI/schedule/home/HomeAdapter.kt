@@ -1,7 +1,8 @@
- package com.ssafy.yoganavi.ui.homeUI.schedule.home
+package com.ssafy.yoganavi.ui.homeUI.schedule.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -11,16 +12,16 @@ import com.ssafy.yoganavi.databinding.ListItemHomeBinding
 import com.ssafy.yoganavi.ui.utils.convertDaysToHangle
 import com.ssafy.yoganavi.ui.utils.formatDashDate
 import com.ssafy.yoganavi.ui.utils.formatTime
-import com.ssafy.yoganavi.ui.utils.loadImage
 import com.ssafy.yoganavi.ui.utils.startSpaceEnd
 import com.ssafy.yoganavi.ui.utils.startTildeEnd
 
 class HomeAdapter(
-    private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit
-): ListAdapter<HomeData, HomeAdapter.ViewHolder>(HomeDiffCallback()) {
+    private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit,
+    private val loadS3Image: (ImageView, String) -> Unit
+) : ListAdapter<HomeData, HomeAdapter.ViewHolder>(HomeDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent, alertLiveDetailDialog)
+        return ViewHolder.from(parent, alertLiveDetailDialog, loadS3Image)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -29,19 +30,25 @@ class HomeAdapter(
 
     class ViewHolder(
         private val binding: ListItemHomeBinding,
-        private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit
-    ): RecyclerView.ViewHolder(binding.root) {
+        private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit,
+        private val loadS3Image: (ImageView, String) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: HomeData) {
             with(binding) {
-                if(!item.teacherSmallProfile.isNullOrBlank()) {
-                    ivProfile.loadImage(item.teacherSmallProfile)
+                if (!item.teacherSmallProfile.isNullOrBlank()) {
+                    loadS3Image(ivProfile, item.teacherSmallProfile)
                 }
 
-                if(false) onAir.setBackgroundResource(R.color.red) else onAir.setBackgroundResource(R.color.gray_20)
+                if (false) onAir.setBackgroundResource(R.color.red) else onAir.setBackgroundResource(
+                    R.color.gray_20
+                )
 
                 tvTeacherNickname.text = item.teacherName
 
-                binding.tvDate.text = startSpaceEnd(formatDashDate(item.lectureDate), convertDaysToHangle(item.lectureDay))
+                binding.tvDate.text = startSpaceEnd(
+                    formatDashDate(item.lectureDate),
+                    convertDaysToHangle(item.lectureDay)
+                )
 
                 tvLectureTitle.text = item.liveTitle
 
@@ -49,22 +56,35 @@ class HomeAdapter(
                 tvLectureTime.text = timeData
 
                 clDetail.setOnClickListener {
-                    alertLiveDetailDialog(item.liveId, item.teacherSmallProfile,item.teacherProfile, item.liveTitle, item.liveContent, item.isMyClass)
+                    alertLiveDetailDialog(
+                        item.liveId,
+                        item.teacherSmallProfile,
+                        item.teacherProfile,
+                        item.liveTitle,
+                        item.liveContent,
+                        item.isMyClass
+                    )
                 }
             }
         }
 
         companion object {
-            fun from(parent: ViewGroup,
-                     alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit): ViewHolder {
-                return ViewHolder(ListItemHomeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                    alertLiveDetailDialog = alertLiveDetailDialog)
+            fun from(
+                parent: ViewGroup,
+                alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit,
+                loadS3Image: (ImageView, String) -> Unit
+            ): ViewHolder {
+                return ViewHolder(
+                    ListItemHomeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                    alertLiveDetailDialog = alertLiveDetailDialog,
+                    loadS3Image = loadS3Image
+                )
             }
         }
     }
 }
 
-class HomeDiffCallback: DiffUtil.ItemCallback<HomeData>() {
+class HomeDiffCallback : DiffUtil.ItemCallback<HomeData>() {
     override fun areItemsTheSame(oldItem: HomeData, newItem: HomeData): Boolean {
         return oldItem.liveId == newItem.liveId
     }
