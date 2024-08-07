@@ -233,6 +233,27 @@ class WebRtcSessionManagerImpl(
         sessionManagerScope.cancel()
     }
 
+    override fun reconnect() {
+        // dispose audio & video tracks.
+        remoteVideoTrackFlow.replayCache.forEach { videoTrack ->
+            videoTrack.dispose()
+        }
+        localVideoTrackFlow.replayCache.forEach { videoTrack ->
+            videoTrack.dispose()
+        }
+        localAudioTrack.dispose()
+        localVideoTrack.dispose()
+
+        // dispose audio handler and video capturer.
+        audioHandler.stop()
+        videoCapturer.stopCapture()
+        videoCapturer.dispose()
+
+        offer = null
+
+        surfaceTextureHelper.dispose()
+    }
+
     private suspend fun sendOffer() {
         val offer = peerConnection.createOffer().getOrThrow()
         val result = peerConnection.setLocalDescription(offer)

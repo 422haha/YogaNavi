@@ -56,8 +56,6 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         super.onCreate(savedInstanceState)
 
         initPermission()
-
-        viewModel.sessionManager.signalingClient.liveId = args.getLiveId
     }
 
     private fun initPermission() {
@@ -78,6 +76,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.sessionManager.signalingClient.updateLiveId(args.getLiveId)
 
         setToolbar(false, "", false)
 
@@ -195,7 +195,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             }
             WebRTCSessionState.Impossible -> {
                 if(prevState == WebRTCSessionState.Active)
-                    viewModel.sessionManager.disconnect()
+                    viewModel.sessionManager.reconnect()
             }
             WebRTCSessionState.Ready -> {
                 if(args.isTeacher)

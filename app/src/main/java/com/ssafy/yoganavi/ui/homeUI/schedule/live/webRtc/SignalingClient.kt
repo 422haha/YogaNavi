@@ -20,31 +20,37 @@ class SignalingClient {
   private val signalingScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
   private val client = OkHttpClient()
 
-    var liveId: Int = 0
-        set(value) {
-            field = value
-            updateRequest(value)
-        }
+    private val _liveIdFlow = MutableStateFlow(-1)
+    val liveIdFlow: StateFlow<Int> = _liveIdFlow
 
-    private fun updateRequest(liveId: Int) {
-        request = Request
-            .Builder()
+    init {
+        signalingScope.launch {
+            liveIdFlow.collect { liveId ->
+                if (liveId != -1) {
+                    connectToSignalingServer(liveId)
+                }
+            }
+        }
+    }
+
+    private fun connectToSignalingServer(liveId: Int) {
+        val request = Request.Builder()
             .url(BuildConfig.SIGNALING_SERVER_IP_ADDRESS + "/rtc")
             .addHeader("liveId", liveId.toString())
             .build()
 
-        ws.cancel()
+        ws?.cancel()
         ws = client.newWebSocket(request, SignalingWebSocketListener())
     }
 
-    private var request = Request
-        .Builder()
-        .url(BuildConfig.SIGNALING_SERVER_IP_ADDRESS + "/rtc")
-        .addHeader("liveId", liveId.toString())
-        .build()
+    fun updateLiveId(liveId: Int) {
+        _liveIdFlow.value = liveId
+    }
+
+    private var ws: WebSocket? = null
 
     // opening web socket with signaling server
-    private var ws = client.newWebSocket(request, SignalingWebSocketListener())
+//    private var ws = client.newWebSocket(request, SignalingWebSocketListener())
 
     // session flow to send information about the session state to the subscribers
     private val _sessionStateFlow = MutableStateFlow(WebRTCSessionState.Offline)
@@ -57,7 +63,7 @@ class SignalingClient {
     fun sendCommand(signalingCommand: SignalingCommand, message: String) {
         Timber.d("[sendCommand] $signalingCommand $message")
 
-        ws.send("$signalingCommand $message")
+        runCatching { ws?.send("$signalingCommand $message") }
     }
 
     private inner class SignalingWebSocketListener : WebSocketListener() {
@@ -96,7 +102,8 @@ class SignalingClient {
     fun dispose() {
         _sessionStateFlow.value = WebRTCSessionState.Offline
         signalingScope.cancel()
-        ws.cancel()
+
+        runCatching { ws?.cancel() }
     }
 }
 
