@@ -132,7 +132,11 @@ class RegisterNoticeFragment : BaseFragment<FragmentRegisterNoticeBinding>(
 
     private suspend fun loadingView() = withContext(Dispatchers.Main) {
         setMenuItemAvailable(false)
-        binding.vBg.visibility = View.VISIBLE
+        binding.vBg.apply {
+            visibility = View.VISIBLE
+            isClickable = true
+            isFocusable = true
+        }
         binding.lav.visibility = View.VISIBLE
     }
 
@@ -144,6 +148,7 @@ class RegisterNoticeFragment : BaseFragment<FragmentRegisterNoticeBinding>(
     }
 
     private suspend fun goBackStack() = withContext(Dispatchers.Main) {
+        setMenuItemAvailable(true)
         findNavController().popBackStack()
     }
 

@@ -211,13 +211,15 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
     }
 
     private suspend fun loadingView() = withContext(Dispatchers.Main) {
-        setMenuItemAvailable(false)
-        binding.vBg.visibility = View.VISIBLE
+        binding.vBg.apply {
+            visibility = View.VISIBLE
+            isClickable = true
+            isFocusable = true
+        }
         binding.lav.visibility = View.VISIBLE
     }
 
     private suspend fun failToUpload() = withContext(Dispatchers.Main) {
-        setMenuItemAvailable(true)
         binding.vBg.visibility = View.GONE
         binding.lav.visibility = View.GONE
         showSnackBar(UPLOAD_FAIL)

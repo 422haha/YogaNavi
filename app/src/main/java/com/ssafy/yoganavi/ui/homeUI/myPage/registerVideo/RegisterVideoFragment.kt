@@ -220,12 +220,18 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
 
 
     private suspend fun successToUpload() = withContext(Dispatchers.Main) {
+        setMenuItemAvailable(true)
         findNavController().popBackStack()
     }
 
     private suspend fun loadingView() = withContext(Dispatchers.Main) {
         setMenuItemAvailable(false)
-        binding.vBg.visibility = View.VISIBLE
+        binding.vBg.apply {
+            visibility = View.VISIBLE
+            isClickable = true
+            isFocusable = true
+        }
+
         binding.lav.visibility = View.VISIBLE
     }
 
