@@ -225,8 +225,13 @@ public class UserController {
 
         boolean result = usersService.checkPwd(userId,
             updateDto.getPassword());
-        response.put("message", result);
-        response.put("data", new Object[]{});
+        if(result){
+            response.put("message", "success");
+            response.put("data", true);
+        }else{
+            response.put("message", "fail");
+            response.put("data", false);
+        }
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

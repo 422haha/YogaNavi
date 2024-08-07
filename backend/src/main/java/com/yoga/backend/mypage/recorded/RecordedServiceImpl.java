@@ -1,6 +1,6 @@
 package com.yoga.backend.mypage.recorded;
 
-import com.yoga.backend.common.awsS3.S3Service;
+import com.yoga.backend.common.service.S3Service;
 import com.yoga.backend.common.entity.RecordedLectures.RecordedLecture;
 import com.yoga.backend.common.entity.RecordedLectures.RecordedLectureChapter;
 import com.yoga.backend.common.entity.RecordedLectures.RecordedLectureLike;
@@ -16,6 +16,7 @@ import com.yoga.backend.mypage.recorded.repository.RecordedLectureListRepository
 import com.yoga.backend.mypage.recorded.repository.RecordedLectureRepository;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 
@@ -36,9 +36,6 @@ import java.util.List;
 @Slf4j
 @Service
 public class RecordedServiceImpl implements RecordedService {
-
-    public static final long URL_EXPIRATION_SECONDS = 86400;
-    private static final String S3_BASE_URL = "https://yoga-navi.s3.ap-northeast-2.amazonaws.com/";
 
     private final S3Service s3Service;
     private final UsersRepository usersRepository;
@@ -74,8 +71,7 @@ public class RecordedServiceImpl implements RecordedService {
      */
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LectureDto> getMyLectures(int userId) {
-        List<LectureDto> lectures = recordedLectureListRepository.findAllLectures(userId);
-        return applyPresignedUrls(lectures);
+        return recordedLectureListRepository.findAllLectures(userId);
     }
 
     /**
@@ -88,7 +84,7 @@ public class RecordedServiceImpl implements RecordedService {
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LectureDto> getLikeLectures(int userId) {
         List<LectureDto> lectures = myLikeLectureListRepository.findMyLikedLectures(userId);
-        return applyPresignedUrls(lectures);
+        return setNickname(lectures);
     }
 
     /**
@@ -109,7 +105,7 @@ public class RecordedServiceImpl implements RecordedService {
         lecture.setThumbnail(lectureDto.getRecordThumbnail());
         lecture.setThumbnailSmall(lectureDto.getRecordThumbnailSmall());
 
-        int chapteurNum = 1;
+        int chapterNum = 1;
         List<RecordedLectureChapter> chapters = new ArrayList<>();
         for (ChapterDto chapterDto : lectureDto.getRecordedLectureChapters()) {
             RecordedLectureChapter chapter = new RecordedLectureChapter();
@@ -117,9 +113,9 @@ public class RecordedServiceImpl implements RecordedService {
             chapter.setDescription(chapterDto.getChapterDescription());
             chapter.setVideoUrl(chapterDto.getRecordVideo());
             chapter.setLecture(lecture);
-            chapter.setChapterNumber(chapteurNum);
+            chapter.setChapterNumber(chapterNum);
             chapters.add(chapter);
-            chapteurNum++;
+            chapterNum++;
         }
         lecture.setChapters(chapters);
         recordedLectureRepository.save(lecture);
@@ -147,8 +143,7 @@ public class RecordedServiceImpl implements RecordedService {
         dto.setLikeCount(lecture.getLikeCount());
         dto.setMyLike(lectureLikeRepository.existsByLectureAndUser(lecture, user));
 
-        // Presigned URL 생성 및 적용
-        return applyPresignedUrls(Collections.singletonList(dto)).get(0);
+        return dto;
     }
 
     /**
@@ -219,7 +214,7 @@ public class RecordedServiceImpl implements RecordedService {
             s3Service.deleteFile(lecture.getThumbnailSmall());
             // 새 저용량 썸네일 설정
             lecture.setThumbnailSmall(lectureDto.getRecordThumbnailSmall());
-            log.info("강의 소형 썸네일 업데이트: {}", lectureDto.getRecordThumbnail());
+            log.info("강의 소형 썸네일 업데이트: {}", lectureDto.getRecordThumbnailSmall());
         }
     }
 
@@ -230,35 +225,34 @@ public class RecordedServiceImpl implements RecordedService {
      * @param chapterDtos 새로운 챕터 정보가 담긴 DTO 리스트
      */
     private void updateChapters(RecordedLecture lecture, List<ChapterDto> chapterDtos) {
-        // 현재 강의의 모든 챕터 ID를 Set으로 저장
-        Set<Long> existingChapterIds = lecture.getChapters().stream()
-            .map(RecordedLectureChapter::getId)
-            .collect(Collectors.toSet());
+        // 현재 강의의 모든 챕터 id set으로
+        Set<Long> existingChapterIds = new HashSet<>();
+        for (RecordedLectureChapter chapter : lecture.getChapters()) {
+            existingChapterIds.add(chapter.getId());
+        }
 
-        // 프론트에서 보낸 챕터 ID를 Set으로 저장
-        Set<Long> receivedChapterIds = chapterDtos.stream()
-            .map(ChapterDto::getId)
-            .filter(id -> id != 0) // 새로 추가된 챕터는 ID가 0이므로 제외
-            .collect(Collectors.toSet());
+        // 프론트에서 보낸 챕터 ID를 set으로 저장
+        Set<Long> receivedChapterIds = new HashSet<>();
+        for (ChapterDto chapterDto : chapterDtos) {
+            if (chapterDto.getId() != 0) { // 새로 추가된 챕터는 ID가 0이므로 제외
+                receivedChapterIds.add(chapterDto.getId());
+            }
+        }
 
-        // 삭제될 챕터 ID (기존 ID 중 받지 않은 ID)
+        // 삭제될 챕터 ID
         Set<Long> chapterIdsToDelete = new HashSet<>(existingChapterIds);
         chapterIdsToDelete.removeAll(receivedChapterIds);
 
         // 챕터 삭제 처리
-        for (Long chapterId : chapterIdsToDelete) {
-            RecordedLectureChapter chapterToDelete = lecture.getChapters().stream()
-                .filter(chapter -> chapter.getId().equals(chapterId))
-                .findFirst()
-                .orElse(null);
-
-            if (chapterToDelete != null) {
-                if (chapterToDelete.getVideoUrl() != null && !chapterToDelete.getVideoUrl()
-                    .isEmpty()) {
-                    s3Service.deleteFile(chapterToDelete.getVideoUrl());
+        Iterator<RecordedLectureChapter> iterator = lecture.getChapters().iterator();
+        while (iterator.hasNext()) {
+            RecordedLectureChapter chapter = iterator.next();
+            if (chapterIdsToDelete.contains(chapter.getId())) {
+                if (chapter.getVideoUrl() != null && !chapter.getVideoUrl().isEmpty()) {
+                    s3Service.deleteFile(chapter.getVideoUrl());
                 }
-                lecture.getChapters().remove(chapterToDelete);
-                log.info("챕터 삭제: {}", chapterId);
+                iterator.remove();
+                log.info("챕터 삭제: {}", chapter.getId());
             }
         }
 
@@ -266,11 +260,13 @@ public class RecordedServiceImpl implements RecordedService {
         for (ChapterDto chapterDto : chapterDtos) {
             if (chapterDto.getId() != 0) {
                 // 기존 챕터 업데이트
-                RecordedLectureChapter chapter = lecture.getChapters().stream()
-                    .filter(c -> c.getId() == chapterDto.getId())
-                    .findFirst()
-                    .orElse(null);
-
+                RecordedLectureChapter chapter = null;
+                for (RecordedLectureChapter c : lecture.getChapters()) {
+                    if (c.getId() == chapterDto.getId()) {
+                        chapter = c;
+                        break;
+                    }
+                }
                 if (chapter != null) {
                     updateChapter(chapter, chapterDto);
                 }
@@ -453,7 +449,7 @@ public class RecordedServiceImpl implements RecordedService {
     public List<LectureDto> getAllLectures(int userId, int page, int size, String sort) {
         List<LectureDto> lectures = allRecordedLecturesRepository.findAllLectures(userId, page,
             size, sort);
-        return applyPresignedUrls(setNickname(lectures));
+        return setNickname(lectures);
     }
 
     @Transactional(readOnly = true)
@@ -461,7 +457,7 @@ public class RecordedServiceImpl implements RecordedService {
         int size, boolean searchTitle, boolean searchContent) {
         List<LectureDto> lectures = recordedLectureListRepository.searchLectures(userId, keyword,
             sort, page, size, searchTitle, searchContent);
-        return applyPresignedUrls(setNickname(lectures));
+        return setNickname(lectures);
     }
 
     private LectureDto convertToDto(RecordedLecture lecture) {
@@ -488,60 +484,6 @@ public class RecordedServiceImpl implements RecordedService {
         dto.setRecordedLectureChapters(chapterDtos);
 
         return dto;
-    }
-
-    private List<LectureDto> applyPresignedUrls(List<LectureDto> lectures) {
-        Map<String, String> presignedUrls = generatePresignedUrls(lectures);
-
-        for (LectureDto lecture : lectures) {
-            lecture.setRecordThumbnail(
-                getPresignedUrl(lecture.getRecordThumbnail(), presignedUrls));
-            lecture.setRecordThumbnailSmall(
-                getPresignedUrl(lecture.getRecordThumbnailSmall(), presignedUrls));
-            if (lecture.getRecordedLectureChapters() != null) {
-                for (ChapterDto chapter : lecture.getRecordedLectureChapters()) {
-                    chapter.setRecordVideo(
-                        getPresignedUrl(chapter.getRecordVideo(), presignedUrls));
-                }
-            }
-        }
-        return lectures;
-    }
-
-    private Map<String, String> generatePresignedUrls(List<LectureDto> lectures) {
-        Set<String> keysToGenerate = new HashSet<>();
-
-        for (LectureDto lecture : lectures) {
-            addKeyIfNeeded(keysToGenerate, lecture.getRecordThumbnail());
-            addKeyIfNeeded(keysToGenerate, lecture.getRecordThumbnailSmall());
-            if (lecture.getRecordedLectureChapters() != null) {
-                for (ChapterDto chapter : lecture.getRecordedLectureChapters()) {
-                    addKeyIfNeeded(keysToGenerate, chapter.getRecordVideo());
-                }
-            }
-        }
-
-        if (keysToGenerate.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        return s3Service.generatePresignedUrls(keysToGenerate, URL_EXPIRATION_SECONDS);
-    }
-
-
-    private void addKeyIfNeeded(Set<String> keysToGenerate, String url) {
-        if (url != null && url.startsWith(S3_BASE_URL)) {
-            String key = url.substring(S3_BASE_URL.length());
-            keysToGenerate.add(key);
-        }
-    }
-
-    private String getPresignedUrl(String url, Map<String, String> presignedUrls) {
-        if (url != null && url.startsWith(S3_BASE_URL)) {
-            String key = url.substring(S3_BASE_URL.length());
-            return presignedUrls.getOrDefault(key, url);
-        }
-        return url;
     }
 
     private String extractS3Key(String url) {

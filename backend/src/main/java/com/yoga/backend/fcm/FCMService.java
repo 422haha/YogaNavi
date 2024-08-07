@@ -7,6 +7,7 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.repository.UsersRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,21 +28,31 @@ public class FCMService {
     }
 
     /**
-     * @param title 메시지 제목
+     * @param title          메시지 제목
      * @param tokenToDataMap 메시지 내용 및
      */
     public void sendBatchMessagesWithData(String title,
         Map<String, Map<String, String>> tokenToDataMap) throws FirebaseMessagingException {
-        List<Message> messages = tokenToDataMap.entrySet().stream()
-            .map(entry -> Message.builder()
-                .setNotification(Notification.builder()
-                    .setTitle(title)
-                    .setBody(entry.getValue().get("body"))
-                    .build())
-                .putData("liveId", entry.getValue().get("liveId"))
-                .setToken(entry.getKey())
-                .build())
-            .collect(Collectors.toList());
+
+        List<Message> messages = new ArrayList<>();
+
+        for (Map.Entry<String, Map<String, String>> map : tokenToDataMap.entrySet()) {
+            String token = map.getKey();
+            Map<String, String> data = map.getValue();
+
+            Notification notification = Notification.builder()
+                .setTitle(title)
+                .setBody(data.get("body"))
+                .build();
+
+            Message message = Message.builder()
+                .setNotification(notification)
+                .putData("liveId", data.get("liveId"))
+                .setToken(token)
+                .build();
+
+            messages.add(message);
+        }
 
         BatchResponse response = FirebaseMessaging.getInstance().sendAll(messages);
         log.info("메시지 전송 성공 {}", response.getSuccessCount());

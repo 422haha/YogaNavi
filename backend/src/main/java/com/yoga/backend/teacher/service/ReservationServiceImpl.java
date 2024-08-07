@@ -3,10 +3,9 @@ package com.yoga.backend.teacher.service;
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
-import com.yoga.backend.home.HomeService;
+import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.livelectures.LiveLectureRepository;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureDto;
-import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.teacher.dto.ReservationRequestDto;
 import com.yoga.backend.mypage.livelectures.MyLiveLectureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Isolation;
 
 import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -27,16 +31,14 @@ public class ReservationServiceImpl implements ReservationService {
     private final MyLiveLectureRepository myLiveLectureRepository;
     private final UsersRepository usersRepository;
     private final LiveLectureRepository liveLectureRepository;
-    private final HomeService homeService;
 
     @Autowired
     public ReservationServiceImpl(MyLiveLectureRepository myLiveLectureRepository,
         UsersRepository usersRepository,
-        LiveLectureRepository liveLectureRepository, HomeService homeService) {
+        LiveLectureRepository liveLectureRepository) {
         this.myLiveLectureRepository = myLiveLectureRepository;
         this.usersRepository = usersRepository;
         this.liveLectureRepository = liveLectureRepository;
-        this.homeService = homeService;
     }
 
     /**
@@ -51,24 +53,66 @@ public class ReservationServiceImpl implements ReservationService {
         Users user = usersRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        LiveLectures liveLecture = liveLectureRepository.findById(
+        LiveLectures newLiveLecture = liveLectureRepository.findById(
                 (long) reservationRequest.getLiveId())
             .orElseThrow(() -> new RuntimeException("실시간 강의를 찾을 수 없습니다."));
 
         // 최대 인원수 체크
         int currentParticipants = myLiveLectureRepository.countByLiveLectureAndEndDateAfter(
-            liveLecture, Instant.now());
-        if (currentParticipants >= liveLecture.getMaxLiveNum()) {
-            throw new RuntimeException("최대 인원을 초과했습니다."); // 최대 인원 초과 체크
+            newLiveLecture, Instant.now());
+        if (currentParticipants >= newLiveLecture.getMaxLiveNum()) {
+            throw new RuntimeException("최대 인원을 초과했습니다.");
+        }
+
+        // 시간 겹침 체크
+        Instant newStartDate = Instant.ofEpochMilli(reservationRequest.getStartDate());
+        Instant newEndDate = Instant.ofEpochMilli(reservationRequest.getEndDate());
+        List<MyLiveLecture> userReservations = myLiveLectureRepository.findByUserId(userId);
+
+        for (MyLiveLecture existingReservation : userReservations) {
+            if (isDateOverlap(newStartDate, newEndDate, existingReservation.getStartDate(),
+                existingReservation.getEndDate()) &&
+                isTimeOverlap(newLiveLecture, existingReservation.getLiveLecture())) {
+                throw new RuntimeException("시간이 겹치는 강의가 이미 존재합니다.");
+            }
         }
 
         MyLiveLecture myLiveLecture = new MyLiveLecture();
         myLiveLecture.setUser(user);
-        myLiveLecture.setLiveLecture(liveLecture);
-        myLiveLecture.setStartDate(Instant.ofEpochMilli(reservationRequest.getStartDate()));
-        myLiveLecture.setEndDate(Instant.ofEpochMilli(reservationRequest.getEndDate()));
+        myLiveLecture.setLiveLecture(newLiveLecture);
+        myLiveLecture.setStartDate(newStartDate);
+        myLiveLecture.setEndDate(newEndDate);
 
         myLiveLectureRepository.save(myLiveLecture);
+    }
+
+    private boolean isDateOverlap(Instant start1, Instant end1, Instant start2, Instant end2) {
+        return (start1.isBefore(end2) && end1.isAfter(start2)) ||
+            start1.equals(start2) || end1.equals(end2);
+    }
+
+    private boolean isTimeOverlap(LiveLectures lecture1, LiveLectures lecture2) {
+        Set<String> days1 = new HashSet<>(Arrays.asList(lecture1.getAvailableDay().split(",")));
+        Set<String> days2 = new HashSet<>(Arrays.asList(lecture2.getAvailableDay().split(",")));
+
+        // 요일이 겹치는지 확인
+        for (String day : days1) {
+            if (days2.contains(day)) {
+                LocalTime start1 = LocalTime.ofInstant(lecture1.getStartTime(),
+                    ZoneId.systemDefault());
+                LocalTime end1 = LocalTime.ofInstant(lecture1.getEndTime(), ZoneId.systemDefault());
+                LocalTime start2 = LocalTime.ofInstant(lecture2.getStartTime(),
+                    ZoneId.systemDefault());
+                LocalTime end2 = LocalTime.ofInstant(lecture2.getEndTime(), ZoneId.systemDefault());
+
+                if ((start1.isBefore(end2) && end1.isAfter(start2)) ||
+                    start1.equals(start2) || end1.equals(end2)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

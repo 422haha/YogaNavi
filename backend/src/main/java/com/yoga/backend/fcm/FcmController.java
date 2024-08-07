@@ -24,15 +24,22 @@ public class FcmController {
 
     @PutMapping("/fcm")
     public ResponseEntity<Map<String, Object>> fcm(@RequestHeader("Authorization") String token,
-        @RequestHeader("FCM-TOKEN") String fcmToken) {
+        @RequestHeader(value = "FCM-TOKEN", required = false) String fcmToken) {
         Map<String, Object> response = new HashMap<>();
         int userId = jwtUtil.getUserIdFromToken(token);
+
         try {
+            if (fcmToken == null || fcmToken.trim().isEmpty()) {
+                response.put("message", "FCM TOKEN이 제공되지 않았습니다.");
+                response.put("data", new Object[]{});
+                return ResponseEntity.badRequest().body(response);
+            }
+
             fcmService.setNewFcm(fcmToken, userId);
             response.put("message", "FCM TOKEN 갱신 완료");
             response.put("data", new Object[]{});
             return ResponseEntity.ok(response);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("fcm error, 서버 에러 : {}", e.getMessage());
             response.put("message", "FCM TOKEN 갱신 불가");
             response.put("data", new Object[]{});
