@@ -29,7 +29,8 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
     private val lectureAdapter by lazy {
         LectureAdapter(
             navigateToRegisterVideoFragment = ::navigateToRegisterVideoFragment,
-            sendLikeLecture = ::sendLikeLecture
+            sendLikeLecture = ::sendLikeLecture,
+            loadS3Image = ::loadS3Image
         )
     }
     private var isDeleteMode = false
@@ -125,6 +126,8 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
     )
 
     private fun sendLikeLecture(recordedId: Long) = viewModel.setLectureLike(recordedId)
+
+    private fun loadS3Image(view: ImageView, key: String) = viewModel.loadS3Image(view, key)
 
     private fun navigateToRegisterVideoFragment(recordedId: Long = -1L) {
         val directions = ManagementVideoFragmentDirections

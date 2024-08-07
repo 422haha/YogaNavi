@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.likeLecture
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -24,7 +25,8 @@ class LikeLectureFragment : BaseFragment<FragmentLikeLectureBinding>(
     private val lectureAdapter: LectureAdapter by lazy {
         LectureAdapter(
             navigateToLectureDetailFragment = ::navigateToLectureDetailFragment,
-            sendLikeLecture = ::sendLikeLecture
+            sendLikeLecture = ::sendLikeLecture,
+            loadS3Image = ::loadS3Image
         )
     }
 
@@ -58,4 +60,6 @@ class LikeLectureFragment : BaseFragment<FragmentLikeLectureBinding>(
     }
 
     private fun sendLikeLecture(recordedId: Long) = viewModel.setLectureLike(recordedId)
+
+    private fun loadS3Image(view: ImageView, key: String) = viewModel.loadS3Image(view, key)
 }

@@ -60,7 +60,12 @@ class TeacherDetailAdapter(
         parent: ViewGroup
     ): TeacherDetailViewHolder {
         val binding = ListItemTeacherLectureRecycleBinding.inflate(inflater, parent, false)
-        return TeacherDetailViewHolder(binding, navigateToLectureDetailFragment, sendLikeLecture)
+        return TeacherDetailViewHolder(
+            binding = binding,
+            navigateToLectureDetailFragment = navigateToLectureDetailFragment,
+            sendLikeLecture = sendLikeLecture,
+            loadS3Image = loadS3Image
+        )
     }
 
     private fun makeItemNoticeViewHolder(

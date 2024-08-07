@@ -68,6 +68,16 @@ fun ImageView.loadVideoFrame(uri: String, time: Long, isCircularOn: Boolean = tr
         .into(this)
 }
 
+fun ImageView.loadS3VideoFrame(
+    key: String,
+    time: Long,
+    isCircularOn: Boolean,
+    s3Client: AmazonS3Client
+) {
+    val url = key.keyToUrl(s3Client)
+    loadVideoFrame(url, time, isCircularOn)
+}
+
 fun ImageView.loadImage(uri: String) = Glide.with(this)
     .load(uri)
     .centerCrop()

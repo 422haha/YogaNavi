@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail.lecture
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ssafy.yoganavi.databinding.ListItemLectureBinding
@@ -10,7 +11,9 @@ import com.ssafy.yoganavi.ui.utils.HEADER
 import com.ssafy.yoganavi.ui.utils.ITEM
 
 class LectureDetailAdapter(
-    private val goChapterVideo: (Int) -> Unit
+    private val goChapterVideo: (Int) -> Unit,
+    private val loadS3ImageSequentially: (ImageView, String, String) -> Unit,
+    private val loadS3VideoFrame: (ImageView, String, Long, Boolean) -> Unit
 ) : ListAdapter<LectureDetailItem, ViewHolder>(LectureDetailItemItemCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -42,7 +45,7 @@ class LectureDetailAdapter(
         parent: ViewGroup
     ): LectureDetailHeaderViewHolder {
         val binding = ListItemLectureHeaderBinding.inflate(inflater, parent, false)
-        return LectureDetailHeaderViewHolder(binding)
+        return LectureDetailHeaderViewHolder(binding, loadS3ImageSequentially)
     }
 
     private fun makeItemViewHolder(
@@ -50,6 +53,6 @@ class LectureDetailAdapter(
         parent: ViewGroup
     ): LectureDetailItemViewHolder {
         val binding = ListItemLectureBinding.inflate(inflater, parent, false)
-        return LectureDetailItemViewHolder(binding, goChapterVideo)
+        return LectureDetailItemViewHolder(binding, goChapterVideo, loadS3VideoFrame)
     }
 }

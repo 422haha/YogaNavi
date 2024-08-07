@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -51,7 +52,10 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
             changeThumbnailTitle = ::changeThumbnailTitle,
             changeThumbnailContent = ::changeThumbnailContent,
             changeVideoTitle = ::changeVideoTitle,
-            changeVideoContent = ::changeVideoContent
+            changeVideoContent = ::changeVideoContent,
+            loadS3ImageSequentially = ::loadS3ImageSequentially,
+            loadS3VideoFrame = ::loadS3VideoFrame,
+            makeUrlFromKey = ::makeUrlFromKey
         )
     }
 
@@ -171,7 +175,7 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
         val prevViewHolder = binding.rvLecture.findViewHolderForAdapterPosition(prevPosition)
                 as? VideoViewHolder ?: return
 
-        prevViewHolder.getFirstFrame()
+        prevViewHolder.removeExoPlayer()
     }
 
     private fun startVideoAboutCurrentCenterItem() {
@@ -195,6 +199,14 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
         content: String,
         position: Int
     ) = viewModel.setVideoContent(content, position)
+
+    private fun loadS3ImageSequentially(view: ImageView, smallKey: String, largeKey: String) =
+        viewModel.loadS3ImageSequentially(view, smallKey, largeKey)
+
+    private fun loadS3VideoFrame(view: ImageView, key: String, time: Long, isCircularOn: Boolean) =
+        viewModel.loadS3VideoFrame(view, key, time, isCircularOn)
+
+    private fun makeUrlFromKey(key: String): String = viewModel.makeUrlFromKey(key)
 
     private fun makeLecture() = viewModel.makeLecture(
         args.recordedId,
