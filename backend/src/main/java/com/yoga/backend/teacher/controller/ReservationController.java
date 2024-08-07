@@ -45,7 +45,7 @@ public class ReservationController {
         Map<String, Object> response = new HashMap<>();
         try {
             reservationService.createReservation(userId, reservationRequest);
-            response.put("message", "성공");
+            response.put("message", "success");
             response.put("data", null);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
@@ -74,7 +74,7 @@ public class ReservationController {
             List<LiveLectureDto> liveLectures = reservationService.getAllLiveLectures(
                 method); // 모든 실시간 강의 조회
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "성공");
+            response.put("message", "success");
             response.put("data",
                 liveLectures.stream().map(this::convertToResponse).collect(Collectors.toList()));
             return ResponseEntity.ok(response);
@@ -101,7 +101,7 @@ public class ReservationController {
             List<LiveLectureDto> liveLectures = reservationService.getLiveLecturesByTeacherAndMethod(
                 teacherId, method); // 강사별 실시간 강의 조회
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "성공");
+            response.put("message", "success");
             response.put("data",
                 liveLectures.stream().map(this::convertToResponse).collect(Collectors.toList()));
             return ResponseEntity.ok(response);
