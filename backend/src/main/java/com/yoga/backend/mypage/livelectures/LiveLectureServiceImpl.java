@@ -4,7 +4,6 @@ import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.fcm.NotificationService;
-import com.yoga.backend.home.HomeService;
 import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateDto;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateResponseDto;
@@ -54,17 +53,6 @@ public class LiveLectureServiceImpl implements LiveLectureService {
         liveLecture.setMaxLiveNum(liveLectureCreateDto.getMaxLiveNum());
         liveLecture.setRegDate(Instant.now());
         liveLecture.setAvailableDay(liveLectureCreateDto.getAvailableDay());
-
-        System.out.println("== "+liveLecture.getLiveTitle());
-        System.out.println("== "+liveLecture.getLiveContent());
-        System.out.println("== "+liveLecture.getStartDate());
-        System.out.println("== "+liveLecture.getEndDate());
-        System.out.println("== "+liveLecture.getStartTime());
-        System.out.println("== "+liveLecture.getEndTime());
-        System.out.println("== "+liveLecture.getMaxLiveNum());
-        System.out.println("== "+liveLecture.getRegDate());
-        System.out.println("== "+liveLecture.getAvailableDay());
-
 
         if (liveLectureCreateDto.getUserId() != 0) {
             Optional<Users> userOptional = usersRepository.findById(

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 
@@ -37,9 +36,6 @@ import java.util.List;
 @Slf4j
 @Service
 public class RecordedServiceImpl implements RecordedService {
-
-    public static final long URL_EXPIRATION_SECONDS = 86400;
-    private static final String S3_BASE_URL = "https://yoga-navi.s3.ap-northeast-2.amazonaws.com/";
 
     private final S3Service s3Service;
     private final UsersRepository usersRepository;
@@ -75,8 +71,7 @@ public class RecordedServiceImpl implements RecordedService {
      */
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LectureDto> getMyLectures(int userId) {
-        List<LectureDto> lectures = recordedLectureListRepository.findAllLectures(userId);
-        return applyPresignedUrls(lectures);
+        return recordedLectureListRepository.findAllLectures(userId);
     }
 
     /**
@@ -89,7 +84,7 @@ public class RecordedServiceImpl implements RecordedService {
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LectureDto> getLikeLectures(int userId) {
         List<LectureDto> lectures = myLikeLectureListRepository.findMyLikedLectures(userId);
-        return applyPresignedUrls(setNickname(lectures));
+        return setNickname(lectures);
     }
 
     /**
@@ -110,7 +105,7 @@ public class RecordedServiceImpl implements RecordedService {
         lecture.setThumbnail(lectureDto.getRecordThumbnail());
         lecture.setThumbnailSmall(lectureDto.getRecordThumbnailSmall());
 
-        int chapteurNum = 1;
+        int chapterNum = 1;
         List<RecordedLectureChapter> chapters = new ArrayList<>();
         for (ChapterDto chapterDto : lectureDto.getRecordedLectureChapters()) {
             RecordedLectureChapter chapter = new RecordedLectureChapter();
@@ -118,9 +113,9 @@ public class RecordedServiceImpl implements RecordedService {
             chapter.setDescription(chapterDto.getChapterDescription());
             chapter.setVideoUrl(chapterDto.getRecordVideo());
             chapter.setLecture(lecture);
-            chapter.setChapterNumber(chapteurNum);
+            chapter.setChapterNumber(chapterNum);
             chapters.add(chapter);
-            chapteurNum++;
+            chapterNum++;
         }
         lecture.setChapters(chapters);
         recordedLectureRepository.save(lecture);
@@ -148,8 +143,7 @@ public class RecordedServiceImpl implements RecordedService {
         dto.setLikeCount(lecture.getLikeCount());
         dto.setMyLike(lectureLikeRepository.existsByLectureAndUser(lecture, user));
 
-        // Presigned URL 생성 및 적용
-        return applyPresignedUrls(Collections.singletonList(dto)).get(0);
+        return dto;
     }
 
     /**
@@ -220,7 +214,7 @@ public class RecordedServiceImpl implements RecordedService {
             s3Service.deleteFile(lecture.getThumbnailSmall());
             // 새 저용량 썸네일 설정
             lecture.setThumbnailSmall(lectureDto.getRecordThumbnailSmall());
-            log.info("강의 소형 썸네일 업데이트: {}", lectureDto.getRecordThumbnail());
+            log.info("강의 소형 썸네일 업데이트: {}", lectureDto.getRecordThumbnailSmall());
         }
     }
 
@@ -455,7 +449,7 @@ public class RecordedServiceImpl implements RecordedService {
     public List<LectureDto> getAllLectures(int userId, int page, int size, String sort) {
         List<LectureDto> lectures = allRecordedLecturesRepository.findAllLectures(userId, page,
             size, sort);
-        return applyPresignedUrls(setNickname(lectures));
+        return setNickname(lectures);
     }
 
     @Transactional(readOnly = true)
@@ -463,7 +457,7 @@ public class RecordedServiceImpl implements RecordedService {
         int size, boolean searchTitle, boolean searchContent) {
         List<LectureDto> lectures = recordedLectureListRepository.searchLectures(userId, keyword,
             sort, page, size, searchTitle, searchContent);
-        return applyPresignedUrls(setNickname(lectures));
+        return setNickname(lectures);
     }
 
     private LectureDto convertToDto(RecordedLecture lecture) {
@@ -490,60 +484,6 @@ public class RecordedServiceImpl implements RecordedService {
         dto.setRecordedLectureChapters(chapterDtos);
 
         return dto;
-    }
-
-    private List<LectureDto> applyPresignedUrls(List<LectureDto> lectures) {
-        Map<String, String> presignedUrls = generatePresignedUrls(lectures);
-
-        for (LectureDto lecture : lectures) {
-            lecture.setRecordThumbnail(
-                getPresignedUrl(lecture.getRecordThumbnail(), presignedUrls));
-            lecture.setRecordThumbnailSmall(
-                getPresignedUrl(lecture.getRecordThumbnailSmall(), presignedUrls));
-            if (lecture.getRecordedLectureChapters() != null) {
-                for (ChapterDto chapter : lecture.getRecordedLectureChapters()) {
-                    chapter.setRecordVideo(
-                        getPresignedUrl(chapter.getRecordVideo(), presignedUrls));
-                }
-            }
-        }
-        return lectures;
-    }
-
-    private Map<String, String> generatePresignedUrls(List<LectureDto> lectures) {
-        Set<String> keysToGenerate = new HashSet<>();
-
-        for (LectureDto lecture : lectures) {
-            addKeyIfNeeded(keysToGenerate, lecture.getRecordThumbnail());
-            addKeyIfNeeded(keysToGenerate, lecture.getRecordThumbnailSmall());
-            if (lecture.getRecordedLectureChapters() != null) {
-                for (ChapterDto chapter : lecture.getRecordedLectureChapters()) {
-                    addKeyIfNeeded(keysToGenerate, chapter.getRecordVideo());
-                }
-            }
-        }
-
-        if (keysToGenerate.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        return s3Service.generatePresignedUrls(keysToGenerate, URL_EXPIRATION_SECONDS);
-    }
-
-
-    private void addKeyIfNeeded(Set<String> keysToGenerate, String url) {
-        if (url != null && url.startsWith(S3_BASE_URL)) {
-            String key = url.substring(S3_BASE_URL.length());
-            keysToGenerate.add(key);
-        }
-    }
-
-    private String getPresignedUrl(String url, Map<String, String> presignedUrls) {
-        if (url != null && url.startsWith(S3_BASE_URL)) {
-            String key = url.substring(S3_BASE_URL.length());
-            return presignedUrls.getOrDefault(key, url);
-        }
-        return url;
     }
 
     private String extractS3Key(String url) {

@@ -3,7 +3,6 @@ package com.yoga.backend.teacher.service;
 import com.yoga.backend.common.entity.Hashtag;
 import com.yoga.backend.common.entity.TeacherLike;
 import com.yoga.backend.common.entity.Users;
-import com.yoga.backend.common.service.S3Service;
 import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.recorded.repository.RecordedLectureLikeRepository;
 import com.yoga.backend.teacher.TeacherFilter;
@@ -27,25 +26,20 @@ import java.util.stream.Collectors;
 @Service
 public class TeacherServiceImpl implements TeacherService {
 
-    private static final long URL_EXPIRATION_SECONDS = 86400; // 24시간
-
     private final TeacherRepository teacherRepository;
     private final TeacherLikeRepository teacherLikeRepository;
     private final RecordedLectureLikeRepository recordedLectureLikeRepository;
     private final UsersRepository usersRepository;
-    private final S3Service s3Service;
 
     @Autowired
     public TeacherServiceImpl(TeacherRepository teacherRepository,
         TeacherLikeRepository teacherLikeRepository,
         RecordedLectureLikeRepository recordedLectureLikeRepository,
-        UsersRepository usersRepository,
-        S3Service s3Service) {
+        UsersRepository usersRepository) {
         this.teacherRepository = teacherRepository;
         this.teacherLikeRepository = teacherLikeRepository;
         this.recordedLectureLikeRepository = recordedLectureLikeRepository;
         this.usersRepository = usersRepository;
-        this.s3Service = s3Service;
     }
 
     /**
@@ -145,53 +139,19 @@ public class TeacherServiceImpl implements TeacherService {
         Users user = teacherRepository.findById(teacherId)
             .orElseThrow(() -> new RuntimeException("강사를 찾을 수 없습니다."));
 
-        String profileImageUrl = null;
-        String profileImageUrlSmall = null;
-        try {
-            if (user.getProfile_image_url() != null && !user.getProfile_image_url().isEmpty()) {
-                profileImageUrl = s3Service.generatePresignedUrl(user.getProfile_image_url(),
-                    URL_EXPIRATION_SECONDS);
-            }
-            if (user.getProfile_image_url_small() != null && !user.getProfile_image_url_small()
-                .isEmpty()) {
-                profileImageUrlSmall = s3Service.generatePresignedUrl(
-                    user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
-            }
-        } catch (Exception e) {
-            System.err.println("Presigned URL 생성 오류: " + e.getMessage());
-        }
-
         boolean likedByUser =
             teacherLikeRepository.findByTeacherAndUser(user, getUserById(userId)) != null;
-
-        final String finalProfileImageUrl = profileImageUrl;
-        final String finalProfileImageUrlSmall = profileImageUrlSmall;
 
         List<DetailedTeacherDto.LectureDto> sortedRecordedLectures = user.getRecordedLectures()
             .stream()
             .map(lecture -> {
-                String recordThumbnail = null;
-                String recordThumbnailSmall = null;
-                try {
-                    if (lecture.getThumbnail() != null && !lecture.getThumbnail().isEmpty()) {
-                        recordThumbnail = s3Service.generatePresignedUrl(lecture.getThumbnail(),
-                            URL_EXPIRATION_SECONDS);
-                    }
-                    if (lecture.getThumbnailSmall() != null && !lecture.getThumbnailSmall()
-                        .isEmpty()) {
-                        recordThumbnailSmall = s3Service.generatePresignedUrl(
-                            lecture.getThumbnailSmall(), URL_EXPIRATION_SECONDS);
-                    }
-                } catch (Exception e) {
-                    System.err.println("Recorded Lecture Presigned URL 생성 오류: " + e.getMessage());
-                }
                 boolean myLike = recordedLectureLikeRepository.existsByLectureAndUser(lecture,
                     getUserById(userId));
                 return DetailedTeacherDto.LectureDto.builder()
                     .recordedId(lecture.getId().toString())
                     .recordTitle(lecture.getTitle())
-                    .recordThumbnail(recordThumbnail)
-                    .recordThumbnailSmall(recordThumbnailSmall)
+                    .recordThumbnail(lecture.getThumbnail())
+                    .recordThumbnailSmall(lecture.getThumbnailSmall())
                     .likeCount((int) lecture.getLikeCount())
                     .myLike(myLike)
                     .nickname(user.getNickname())
@@ -204,41 +164,25 @@ public class TeacherServiceImpl implements TeacherService {
             .id(user.getId())
             .email(user.getEmail())
             .nickname(user.getNickname())
-            .profileImageUrl(profileImageUrl)
-            .profileImageUrlSmall(profileImageUrlSmall)
+            .profileImageUrl(user.getProfile_image_url())
+            .profileImageUrlSmall(user.getProfile_image_url_small())
             .content(user.getContent() != null ? user.getContent()
                 : "안녕하세요! " + user.getNickname() + "입니다.")
             .hashtags(user.getHashtags().stream().map(Hashtag::getName).collect(Collectors.toSet()))
             .recordedLectures(sortedRecordedLectures)
             .notices(user.getArticles().stream().map(article -> {
-                    String imageUrl = article.getImageUrl();
-                    String imageUrlSmall = article.getImageUrlSmall();
-                    try {
-                        if (imageUrl != null && !imageUrl.isEmpty() && !imageUrl.contains(
-                            "X-Amz-Algorithm")) {
-                            imageUrl = s3Service.generatePresignedUrl(article.getImageUrl(),
-                                URL_EXPIRATION_SECONDS);
-                        }
-                        if (imageUrlSmall != null && !imageUrlSmall.isEmpty()
-                            && !imageUrlSmall.contains("X-Amz-Algorithm")) {
-                            imageUrlSmall = s3Service.generatePresignedUrl(article.getImageUrlSmall(),
-                                URL_EXPIRATION_SECONDS);
-                        }
-                    } catch (Exception e) {
-                        System.err.println("공지 Presigned URL 생성 오류: " + e.getMessage());
-                    }
                     return DetailedTeacherDto.NoticeDto.builder()
                         .articleId(article.getArticleId().toString())
                         .content(article.getContent())
-                        .imageUrl(imageUrl)
-                        .imageUrlSmall(imageUrlSmall)
+                        .imageUrl(article.getImageUrl())
+                        .imageUrlSmall(article.getImageUrlSmall())
                         .createdAt(article.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant()
                             .toEpochMilli())
                         .updatedAt(article.getUpdatedAt().atZone(ZoneId.systemDefault()).toInstant()
                             .toEpochMilli())
                         .userName(user.getNickname())
-                        .profileImageUrl(finalProfileImageUrl)
-                        .profileImageSmallUrl(finalProfileImageUrlSmall)
+                        .profileImageUrl(user.getProfile_image_url())
+                        .profileImageSmallUrl(user.getProfile_image_url_small())
                         .build();
                 }).sorted(Comparator.comparing(DetailedTeacherDto.NoticeDto::getArticleId).reversed())
                 .collect(Collectors.toList()))
@@ -347,22 +291,6 @@ public class TeacherServiceImpl implements TeacherService {
      * @return TeacherDto 객체
      */
     private TeacherDto toTeacherDto(Users user, int userId) {
-        String profileImageUrl = null;
-        String profileImageUrlSmall = null;
-        try {
-            if (user.getProfile_image_url() != null && !user.getProfile_image_url().isEmpty()) {
-                profileImageUrl = s3Service.generatePresignedUrl(
-                    user.getProfile_image_url(), URL_EXPIRATION_SECONDS);
-            }
-            if (user.getProfile_image_url_small() != null && !user.getProfile_image_url_small()
-                .isEmpty()) {
-                profileImageUrlSmall = s3Service.generatePresignedUrl(
-                    user.getProfile_image_url_small(), URL_EXPIRATION_SECONDS);
-            }
-        } catch (Exception e) {
-            System.err.println("Presigned URL 생성 오류: " + e.getMessage());
-        }
-
         boolean likedByUser =
             teacherLikeRepository.findByTeacherAndUser(user, getUserById(userId)) != null;
 
@@ -370,8 +298,8 @@ public class TeacherServiceImpl implements TeacherService {
             .id(user.getId())
             .email(user.getEmail())
             .nickname(user.getNickname())
-            .profileImageUrl(profileImageUrl)
-            .profileImageUrlSmall(profileImageUrlSmall)
+            .profileImageUrl(user.getProfile_image_url())
+            .profileImageUrlSmall(user.getProfile_image_url_small())
             .content(user.getContent())
             .hashtags(user.getHashtags().stream().map(Hashtag::getName)
                 .collect(Collectors.toSet()))
