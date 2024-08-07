@@ -9,6 +9,8 @@ import com.ssafy.yoganavi.data.source.dto.teacher.FilterData
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.ui.utils.RECENT
 import com.ssafy.yoganavi.ui.utils.loadS3Image
+import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
+import com.ssafy.yoganavi.ui.utils.POPULAR
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,11 +27,11 @@ class TeacherListViewModel @Inject constructor(
     private val _teacherList = MutableStateFlow<List<TeacherData>>(emptyList())
     val teacherList = _teacherList.asStateFlow()
     private var searchKeyword: String = ""
-    private val _sorting = MutableStateFlow(RECENT)
+    private val _sorting = MutableStateFlow(POPULAR)
     val sorting = _sorting.asStateFlow()
     private var isInit: Boolean = true
 
-    private fun initCheckGetTeacherList(filter: FilterData) {
+    fun initCheckGetTeacherList(filter: FilterData) {
         if (isInit) {
             getAllTeacherList()
         } else {
@@ -59,7 +61,7 @@ class TeacherListViewModel @Inject constructor(
     }
 
     fun setSearchKeyword(filter: FilterData, newString: String?) {
-        searchKeyword = newString ?: ""
+        searchKeyword = newString ?: searchKeyword
         initCheckGetTeacherList(filter)
     }
 

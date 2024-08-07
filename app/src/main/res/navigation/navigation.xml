@@ -47,7 +47,7 @@
             app:argType="boolean" />
         <argument
             android:name="sorting"
-            android:defaultValue="1"
+            android:defaultValue="2"
             app:argType="integer" />
     </fragment>
     <fragment

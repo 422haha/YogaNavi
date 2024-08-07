@@ -3,6 +3,7 @@ package com.ssafy.yoganavi.ui.homeUI.schedule.home
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -25,7 +26,10 @@ class HomeAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(currentList[position])
+        if (position != 0)
+            holder.bind(currentList[position], currentList[position - 1].lectureDate)
+        else
+            holder.bind(currentList[position], currentList[position].lectureDate)
     }
 
     class ViewHolder(
@@ -33,12 +37,26 @@ class HomeAdapter(
         private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit,
         private val loadS3Image: (ImageView, String) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: HomeData) {
+        fun bind(item: HomeData, preDay: Long) {
             with(binding) {
                 if (!item.teacherSmallProfile.isNullOrBlank()) {
                     loadS3Image(ivProfile, item.teacherSmallProfile)
+                }else {
+                    ivProfile.setImageResource(R.drawable.profilenull)
                 }
 
+                if (false) onAir.setBackgroundResource(R.color.red) else onAir.setBackgroundResource(
+                    R.color.gray_20
+                )
+
+                if (item.lectureDate != preDay) {
+                    dateDivider.isVisible = true
+                    tvDivider.isVisible = true
+                    tvDivider.text = item.lectureDay
+                } else {
+                    dateDivider.isVisible = false
+                    tvDivider.isVisible = false
+                }
                 if (false) onAir.setBackgroundResource(R.color.red) else onAir.setBackgroundResource(
                     R.color.gray_20
                 )

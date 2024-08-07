@@ -160,7 +160,7 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
                 check.isEnabled = true
             }
         }
-        tieContent.setOnKeyListener { v, keyCode, event ->
+        tieContent.setOnKeyListener { _, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
                 val currentText = tieContent.text.toString()
                 val length = currentText.length
