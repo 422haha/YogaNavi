@@ -15,6 +15,11 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+/**
+* todo 수강신청 시 수강신청 끝 날짜가 아니라 강의 끝날짜가 나옴
+* */
+
 @Slf4j
 @Service
 public class HomeService {
@@ -43,44 +48,6 @@ public class HomeService {
         result.addAll(getStudentLectures(userId, nowKorea, dayOfWeek));
         return sortHomeData(result);
     }
-    /*@Transactional(readOnly = true)
-    protected List<HomeResponseDto> getStudentLectures(int userId, ZonedDateTime nowKorea,
-        String dayOfWeek) {
-        Instant currentDate = nowKorea.toInstant();
-        List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findCurrentLecturesByUserId(
-            userId, currentDate, dayOfWeek);
-        return myLiveLectures.stream()
-            .flatMap(myLiveLecture -> {
-                LiveLectures lecture = myLiveLecture.getLiveLecture();
-                return convertToHomeResponseDto(lecture, nowKorea, false).stream()
-                    .peek(dto -> {
-                        Users teacher = lecture.getUser(); // 강의의 강사 정보 가져오기
-                        dto.setProfileImageUrl(
-                            generatePresignedUrl(teacher.getProfile_image_url()));
-                        dto.setProfileImageUrlSmall(
-                            generatePresignedUrl(teacher.getProfile_image_url_small()));
-                    });
-            })
-            .collect(Collectors.toList());
-    }
-    @Transactional(readOnly = true)
-    protected List<HomeResponseDto> getUserLectures(int userId, ZonedDateTime nowKorea,
-        String dayOfWeek) {
-        Instant currentDate = nowKorea.toInstant();
-        Instant endDate = nowKorea.plusMonths(1).toInstant();
-        List<LiveLectures> lectures = liveLectureRepository.findLecturesByUserAndDateRange(
-            userId, currentDate, endDate, dayOfWeek);
-        Users user = usersRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
-        return lectures.stream()
-            .flatMap(lecture -> convertToHomeResponseDto(lecture, nowKorea, true).stream())
-            .peek(dto -> {
-                dto.setProfileImageUrl(generatePresignedUrl(user.getProfile_image_url()));
-                dto.setProfileImageUrlSmall(
-                    generatePresignedUrl(user.getProfile_image_url_small()));
-            })
-            .collect(Collectors.toList());
-    }*/
 
     @Transactional(readOnly = true)
     protected List<HomeResponseDto> getStudentLectures(int userId, ZonedDateTime nowKorea,
