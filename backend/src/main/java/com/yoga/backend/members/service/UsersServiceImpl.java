@@ -302,24 +302,7 @@ public class UsersServiceImpl implements UsersService {
         Optional<Users> users = usersRepository.findByIdAndIsDeletedFalse(userId);
 
         if (users.isPresent()) {
-            Users user = users.get();
-            String profileImageUrl = user.getProfile_image_url();
-            String profileImageUrlSmall = user.getProfile_image_url_small();
-            if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
-                String presignedUrl = s3Service.generatePresignedUrl(profileImageUrl,
-                    URL_EXPIRATION_SECONDS);
-                user.setProfile_image_url(presignedUrl);
-            } else {
-                user.setProfile_image_url(null);
-            }
-            if (profileImageUrlSmall != null && !profileImageUrlSmall.isEmpty()) {
-                String presignedUrlSmall = s3Service.generatePresignedUrl(profileImageUrlSmall,
-                    URL_EXPIRATION_SECONDS);
-                user.setProfile_image_url_small(presignedUrlSmall);
-            } else {
-                user.setProfile_image_url_small(null);
-            }
-            return user;
+            return users.get();
         }
         return null;
     }
@@ -353,14 +336,11 @@ public class UsersServiceImpl implements UsersService {
                     try {
                         s3Service.deleteFile(oldImageUrl);
                     } catch (Exception e) {
-                        log.error("사용자 {}의 프로필 이미지 삭제 불가: {}", userId,
-                            oldImageUrl, e);
-
+                        log.error("사용자 {}의 프로필 이미지 삭제 불가: {}", userId, oldImageUrl, e);
                         throw new RuntimeException("이전 프로필 이미지 삭제 불가", e);
                     }
                 }
-                log.debug("사용자 {}의 프로필 이미지를 변경: {}", userId,
-                    updateDto.getImageUrl());
+                log.debug("사용자 {}의 프로필 이미지를 변경: {}", userId, updateDto.getImageUrl());
                 user.setProfile_image_url(updateDto.getImageUrl());
             }
 
@@ -372,14 +352,11 @@ public class UsersServiceImpl implements UsersService {
                     try {
                         s3Service.deleteFile(oldImageUrlSmall);
                     } catch (Exception e) {
-                        log.error("사용자 {}의 소형 프로필 이미지 삭제 불가: {}", userId,
-                            oldImageUrlSmall, e);
-
+                        log.error("사용자 {}의 소형 프로필 이미지 삭제 불가: {}", userId, oldImageUrlSmall, e);
                         throw new RuntimeException("이전 소형 프로필 이미지 삭제 불가", e);
                     }
                 }
-                log.debug("사용자 {}의 소형 프로필 이미지를 변경: {}", userId,
-                    updateDto.getImageUrl());
+                log.debug("사용자 {}의 소형 프로필 이미지를 변경: {}", userId, updateDto.getImageUrlSmall());
                 user.setProfile_image_url_small(updateDto.getImageUrlSmall());
             }
 
@@ -401,7 +378,6 @@ public class UsersServiceImpl implements UsersService {
             Users updatedUser = usersRepository.save(user);
             log.info("사용자 {}의 정보 수정", userId);
             return updatedUser;
-
         }
 
         return null;
@@ -515,5 +491,4 @@ public class UsersServiceImpl implements UsersService {
             return false;
         }
     }
-
 }

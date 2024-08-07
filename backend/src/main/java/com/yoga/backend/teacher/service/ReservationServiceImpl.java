@@ -3,10 +3,9 @@ package com.yoga.backend.teacher.service;
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
-import com.yoga.backend.home.HomeService;
+import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.livelectures.LiveLectureRepository;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureDto;
-import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.teacher.dto.ReservationRequestDto;
 import com.yoga.backend.mypage.livelectures.MyLiveLectureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +31,14 @@ public class ReservationServiceImpl implements ReservationService {
     private final MyLiveLectureRepository myLiveLectureRepository;
     private final UsersRepository usersRepository;
     private final LiveLectureRepository liveLectureRepository;
-    private final HomeService homeService;
 
     @Autowired
     public ReservationServiceImpl(MyLiveLectureRepository myLiveLectureRepository,
         UsersRepository usersRepository,
-        LiveLectureRepository liveLectureRepository,
-        HomeService homeService) {
+        LiveLectureRepository liveLectureRepository) {
         this.myLiveLectureRepository = myLiveLectureRepository;
         this.usersRepository = usersRepository;
         this.liveLectureRepository = liveLectureRepository;
-        this.homeService = homeService;
     }
 
     /**

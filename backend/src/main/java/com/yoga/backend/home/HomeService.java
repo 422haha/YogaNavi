@@ -7,38 +7,38 @@ import com.yoga.backend.common.service.S3Service;
 import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.mypage.livelectures.LiveLectureRepository;
 import com.yoga.backend.mypage.livelectures.MyLiveLectureRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
-* todo 수강신청 시 수강신청 끝 날짜가 아니라 강의 끝날짜가 나옴
-* */
+ * todo 수강신청 시 수강신청 끝 날짜가 아니라 강의 끝날짜가 나옴
+ */
 
 @Slf4j
 @Service
 public class HomeService {
+
     private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
-    private static final long PRESIGNED_URL_EXPIRATION = 3600;
     private final LiveLectureRepository liveLectureRepository;
     private final MyLiveLectureRepository myLiveLectureRepository;
     private final UsersRepository usersRepository;
-    private final S3Service s3Service;
+
     public HomeService(
         LiveLectureRepository liveLectureRepository,
         MyLiveLectureRepository myLiveLectureRepository,
-        UsersRepository usersRepository,
-        S3Service s3Service) {
+        UsersRepository usersRepository) {
         this.liveLectureRepository = liveLectureRepository;
         this.myLiveLectureRepository = myLiveLectureRepository;
         this.usersRepository = usersRepository;
-        this.s3Service = s3Service;
     }
+
     @Transactional(readOnly = true)
     public List<HomeResponseDto> getHomeData(int userId) {
         ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE);
@@ -62,8 +62,8 @@ public class HomeService {
             List<HomeResponseDto> dtos = convertToHomeResponseDto(lecture, nowKorea, false);
             for (HomeResponseDto dto : dtos) {
                 Users teacher = lecture.getUser();
-                dto.setProfileImageUrl(generatePresignedUrl(teacher.getProfile_image_url()));
-                dto.setProfileImageUrlSmall(generatePresignedUrl(teacher.getProfile_image_url_small()));
+                dto.setProfileImageUrl(teacher.getProfile_image_url());
+                dto.setProfileImageUrlSmall(teacher.getProfile_image_url_small());
                 result.add(dto);
             }
         }
@@ -84,20 +84,14 @@ public class HomeService {
         for (LiveLectures lecture : lectures) {
             List<HomeResponseDto> dtos = convertToHomeResponseDto(lecture, nowKorea, true);
             for (HomeResponseDto dto : dtos) {
-                dto.setProfileImageUrl(generatePresignedUrl(user.getProfile_image_url()));
-                dto.setProfileImageUrlSmall(generatePresignedUrl(user.getProfile_image_url_small()));
+                dto.setProfileImageUrl(user.getProfile_image_url());
+                dto.setProfileImageUrlSmall(user.getProfile_image_url_small());
                 result.add(dto);
             }
         }
         return result;
     }
 
-    private String generatePresignedUrl(String url) {
-        if (url != null && !url.isEmpty()) {
-            return s3Service.generatePresignedUrl(url, PRESIGNED_URL_EXPIRATION);
-        }
-        return null;
-    }
     private List<HomeResponseDto> convertToHomeResponseDto(LiveLectures lecture,
         ZonedDateTime nowKorea, boolean isTeacher) {
         List<HomeResponseDto> dtos = new ArrayList<>();
@@ -120,6 +114,7 @@ public class HomeService {
         }
         return dtos;
     }
+
     private HomeResponseDto createHomeResponseDto(LiveLectures lecture, LocalDate date,
         LocalTime startTime, LocalTime endTime, boolean isTeacher) {
         HomeResponseDto dto = new HomeResponseDto();
@@ -150,6 +145,7 @@ public class HomeService {
         dto.setTeacher(isTeacher);
         return dto;
     }
+
     private List<HomeResponseDto> sortHomeData(List<HomeResponseDto> data) {
         return data.stream()
             .sorted(Comparator
