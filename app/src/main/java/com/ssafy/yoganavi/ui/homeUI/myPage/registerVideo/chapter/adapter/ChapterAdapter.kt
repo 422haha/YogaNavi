@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -21,7 +22,10 @@ class ChapterAdapter(
     private val changeThumbnailTitle: (String) -> Unit,
     private val changeThumbnailContent: (String) -> Unit,
     private val changeVideoTitle: (String, Int) -> Unit,
-    private val changeVideoContent: (String, Int) -> Unit
+    private val changeVideoContent: (String, Int) -> Unit,
+    private val loadS3ImageSequentially: (ImageView, String, String) -> Unit,
+    private val loadS3VideoFrame: (ImageView, String, Long, Boolean) -> Unit,
+    private val makeUrlFromKey: (String) -> String
 ) : ListAdapter<ChapterItem, ViewHolder>(ChapterDiffUtil()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -57,7 +61,8 @@ class ChapterAdapter(
             binding = binding,
             addImage = addImage,
             changeThumbnailTitle = changeThumbnailTitle,
-            changeThumbnailContent = changeThumbnailContent
+            changeThumbnailContent = changeThumbnailContent,
+            loadS3ImageSequentially = loadS3ImageSequentially
         )
     }
 
@@ -68,11 +73,13 @@ class ChapterAdapter(
         val binding = CustomChapterViewBinding.inflate(inflater, parent, false)
         return VideoViewHolder(
             binding = binding,
-            exoPlayer= exoPlayer,
+            exoPlayer = exoPlayer,
             addVideoListener = addVideoListener,
             deleteListener = deleteListener,
             changeVideoTitle = changeVideoTitle,
-            changeVideoContent = changeVideoContent
+            changeVideoContent = changeVideoContent,
+            loadS3VideoFrame = loadS3VideoFrame,
+            makeUrlFromKey = makeUrlFromKey
         )
     }
 }

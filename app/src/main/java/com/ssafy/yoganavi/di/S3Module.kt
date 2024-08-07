@@ -42,7 +42,7 @@ object S3Module {
         @ApplicationContext context: Context,
         s3Client: AmazonS3Client
     ): TransferUtility = TransferUtility.builder()
-        .context(context.applicationContext)
+        .context(context)
         .s3Client(s3Client)
         .build()
 

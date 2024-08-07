@@ -118,7 +118,7 @@ fun getCorrectlyOrientedBitmap(filePath: String, bitmap: Bitmap): Bitmap {
 
 suspend fun uploadFile(
     transferUtility: TransferUtility,
-    key: String,
+    key: String?,
     file: File,
     meta: ObjectMetadata? = null
 ): Boolean = suspendCancellableCoroutine { continuation ->

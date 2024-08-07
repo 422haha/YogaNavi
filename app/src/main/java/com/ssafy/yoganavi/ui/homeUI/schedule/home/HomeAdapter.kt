@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.schedule.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -12,16 +13,16 @@ import com.ssafy.yoganavi.databinding.ListItemHomeBinding
 import com.ssafy.yoganavi.ui.utils.convertDaysToHangle
 import com.ssafy.yoganavi.ui.utils.formatDashDate
 import com.ssafy.yoganavi.ui.utils.formatTime
-import com.ssafy.yoganavi.ui.utils.loadImage
 import com.ssafy.yoganavi.ui.utils.startSpaceEnd
 import com.ssafy.yoganavi.ui.utils.startTildeEnd
 
 class HomeAdapter(
-    private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit
+    private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit,
+    private val loadS3Image: (ImageView, String) -> Unit
 ) : ListAdapter<HomeData, HomeAdapter.ViewHolder>(HomeDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent, alertLiveDetailDialog)
+        return ViewHolder.from(parent, alertLiveDetailDialog, loadS3Image)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -33,13 +34,14 @@ class HomeAdapter(
 
     class ViewHolder(
         private val binding: ListItemHomeBinding,
-        private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit
+        private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit,
+        private val loadS3Image: (ImageView, String) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: HomeData, preDay: Long) {
             with(binding) {
                 if (!item.teacherSmallProfile.isNullOrBlank()) {
-                    ivProfile.loadImage(item.teacherSmallProfile)
-                } else {
+                    loadS3Image(ivProfile, item.teacherSmallProfile)
+                }else {
                     ivProfile.setImageResource(R.drawable.profilenull)
                 }
 
@@ -87,11 +89,13 @@ class HomeAdapter(
         companion object {
             fun from(
                 parent: ViewGroup,
-                alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit
+                alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit,
+                loadS3Image: (ImageView, String) -> Unit
             ): ViewHolder {
                 return ViewHolder(
                     ListItemHomeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                    alertLiveDetailDialog = alertLiveDetailDialog
+                    alertLiveDetailDialog = alertLiveDetailDialog,
+                    loadS3Image = loadS3Image
                 )
             }
         }

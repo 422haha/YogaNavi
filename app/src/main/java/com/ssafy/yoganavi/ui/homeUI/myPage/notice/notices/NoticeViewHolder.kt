@@ -1,26 +1,27 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.notice.notices
 
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.databinding.ListItemNoticeBinding
 import com.ssafy.yoganavi.ui.utils.formatDashWeekDate
-import com.ssafy.yoganavi.ui.utils.loadImage
-import com.ssafy.yoganavi.ui.utils.loadImageSequentially
 
 class NoticeViewHolder(
     private val binding: ListItemNoticeBinding,
-    private val navigateToRegisterNoticeFragment: (Int) -> Unit
+    private val navigateToRegisterNoticeFragment: (Int) -> Unit,
+    private val loadS3Image: (ImageView, String) -> Unit,
+    private val loadS3ImageSequentially: (ImageView, String, String) -> Unit
 ) : ViewHolder(binding.root) {
     fun bind(item: NoticeData, noticeDeleteClick: (NoticeData) -> Unit) = with(binding) {
-        if (item.profileImageSmallUrl.isNullOrBlank()) {
-            binding.ivProfile.setImageResource(R.drawable.profilenull)
+        if (item.smallProfileImageKey.isNullOrBlank()) {
+            ivProfile.setImageResource(R.drawable.profilenull)
         } else {
-            ivProfile.loadImage(item.profileImageSmallUrl)
+            loadS3Image(ivProfile, item.smallProfileImageKey)
+        }
 
-            if (item.imageUrl?.isNotBlank() == true && item.imageUrlSmall?.isNotBlank() == true) {
-                ivNotice.loadImageSequentially(item.imageUrlSmall, item.imageUrl)
-            }
+        if (!item.imageKey.isNullOrBlank() && !item.smallImageKey.isNullOrBlank()) {
+            loadS3ImageSequentially(ivNotice, item.smallImageKey, item.imageKey)
         }
 
         tvTeacherNickname.text = item.userName

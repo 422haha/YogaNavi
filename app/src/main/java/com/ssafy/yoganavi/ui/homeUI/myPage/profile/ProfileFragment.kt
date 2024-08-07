@@ -12,13 +12,13 @@ import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.myPage.profile.dialog.ModifyDialog
 import com.ssafy.yoganavi.ui.utils.MODIFY
 import com.ssafy.yoganavi.ui.utils.MY_PAGE
-import com.ssafy.yoganavi.ui.utils.loadImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBinding::inflate) {
+
     private val viewModel: ProfileViewModel by viewModels()
     private var isTeacher: Boolean = false
 
@@ -36,7 +36,8 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
         with(binding) {
             tvName.text = profile.nickname
 
-            if (profile.imageUrlSmall != null) ivIcon.loadImage(profile.imageUrlSmall)
+            if (!profile.smallImageKey.isNullOrBlank())
+                viewModel.loadS3Image(ivIcon, profile.smallImageKey)
 
             if (profile.teacher) {
                 isTeacher = true

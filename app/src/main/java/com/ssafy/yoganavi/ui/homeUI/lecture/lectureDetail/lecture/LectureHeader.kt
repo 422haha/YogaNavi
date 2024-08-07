@@ -5,6 +5,6 @@ data class LectureHeader(
     val recordTitle: String = "",
     val nickname: String = "",
     val recordContent: String = "",
-    val recordThumbnail: String = "",
-    val recordThumbnailSmall: String = "",
+    val imageKey: String = "",
+    val smallImageKey: String = "",
 )

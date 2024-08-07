@@ -1,5 +1,6 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.registerNotice
 
+import android.widget.ImageView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
@@ -8,9 +9,9 @@ import com.amazonaws.services.s3.model.ObjectMetadata
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
 import com.ssafy.yoganavi.data.source.dto.notice.NoticeData
 import com.ssafy.yoganavi.data.source.dto.notice.RegisterNoticeRequest
-import com.ssafy.yoganavi.ui.utils.BUCKET_NAME
 import com.ssafy.yoganavi.ui.utils.MINI
 import com.ssafy.yoganavi.ui.utils.NOTICE
+import com.ssafy.yoganavi.ui.utils.loadS3ImageSequentially
 import com.ssafy.yoganavi.ui.utils.uploadFile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -43,24 +44,20 @@ class RegisterNoticeViewModel @Inject constructor(
 
     fun removeImage() = viewModelScope.launch(Dispatchers.IO) {
         val newNotice = notice.value.copy(
-            imageUrl = "",
+            imageKey = "",
+            smallImageKey = "",
             imageUrlPath = "",
-            imageUrlKey = "",
-            imageUrlSmall = "",
             imageUrlSmallPath = "",
-            imageUrlSmallKey = ""
         )
         _notice.emit(newNotice)
     }
 
     fun addImage(path: String, smallPath: String) = viewModelScope.launch(Dispatchers.IO) {
         val newNotice = notice.value.copy(
-            imageUrl = "",
             imageUrlPath = path,
-            imageUrlKey = "",
-            imageUrlSmall = "",
+            imageKey = "",
             imageUrlSmallPath = smallPath,
-            imageUrlSmallKey = ""
+            smallImageKey = ""
         )
         _notice.emit(newNotice)
     }
@@ -80,8 +77,6 @@ class RegisterNoticeViewModel @Inject constructor(
         val uuid = UUID.randomUUID()
         val imageUrlKey = "$NOTICE/$uuid"
         val imageUrlSmallKey = "$NOTICE/$MINI/$uuid"
-        val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
-        val imageUrlSmall = s3Client.getUrl(BUCKET_NAME, imageUrlSmallKey)
 
         if (notice.value.imageUrlPath.isNotBlank()) {
 
@@ -102,9 +97,10 @@ class RegisterNoticeViewModel @Inject constructor(
 
         var request = RegisterNoticeRequest(
             content = content,
-            imageUrl = imageUrl.toString(),
-            imageUrlSmall = imageUrlSmall.toString()
+            imageUrl = imageUrlKey,
+            imageUrlSmall = imageUrlSmallKey
         )
+
         if (notice.value.imageUrlPath.isBlank()) {
             request = RegisterNoticeRequest(content = content, imageUrl = "")
         }
@@ -125,8 +121,6 @@ class RegisterNoticeViewModel @Inject constructor(
         val uuid = UUID.randomUUID()
         val imageUrlKey = "$NOTICE/$uuid"
         val imageUrlSmallKey = "$NOTICE/$MINI/$uuid"
-        val imageUrl = s3Client.getUrl(BUCKET_NAME, imageUrlKey)
-        val imageUrlSmall = s3Client.getUrl(BUCKET_NAME, imageUrlSmallKey)
 
         if (notice.value.imageUrlPath.isNotBlank()) {
             val noticeFile = File(notice.value.imageUrlPath)
@@ -142,29 +136,24 @@ class RegisterNoticeViewModel @Inject constructor(
                 uploadFail()
                 return@launch
             }
-
-            val newNotice = notice.value.copy(
-                imageUrl = imageUrl.toString(),
-                imageUrlSmall = imageUrlSmall.toString(),
-            )
-            _notice.emit(newNotice)
-
-        } else {
-            val prevUrl = notice.value.imageUrl?.substringBefore("?")
-            val prevUrlSmall = notice.value.imageUrlSmall?.substringBefore("?")
-            val newNotice = notice.value.copy(imageUrl = prevUrl, imageUrlSmall = prevUrlSmall)
-            _notice.emit(newNotice)
         }
 
         val request = RegisterNoticeRequest(
             content = content,
-            imageUrl = notice.value.imageUrl,
-            imageUrlSmall = notice.value.imageUrlSmall
+            imageUrl = notice.value.imageKey,
+            imageUrlSmall = notice.value.smallImageKey
         )
 
         runCatching { infoRepository.updateNotice(request, notice.value.articleId) }
             .onSuccess { goBackStack() }
             .onFailure { uploadFail() }
     }
+
+
+    fun loadS3ImageSequentially(
+        view: ImageView,
+        smallKey: String,
+        largeKey: String
+    ) = view.loadS3ImageSequentially(smallKey, largeKey, s3Client)
 
 }
