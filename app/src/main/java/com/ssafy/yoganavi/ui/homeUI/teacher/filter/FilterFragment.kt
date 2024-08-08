@@ -22,6 +22,7 @@ import com.ssafy.yoganavi.ui.utils.PERIOD_TOTAL
 import com.ssafy.yoganavi.ui.utils.PERIOD_WEEK
 import com.ssafy.yoganavi.ui.utils.RECENT
 import com.ssafy.yoganavi.ui.utils.START
+import com.ssafy.yoganavi.ui.utils.TOTAL
 import com.ssafy.yoganavi.ui.utils.Week
 import com.ssafy.yoganavi.ui.utils.formatZeroDate
 import timber.log.Timber
@@ -48,7 +49,7 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
             binding.ibtnSat.isChecked = true
             binding.ibtnSun.isChecked = true
             binding.rbTotal.isChecked = true
-            binding.rbOneToMulti.isChecked = true
+            binding.rbTotalMethod.isChecked = true
             isInit = true
             val directions = FilterFragmentDirections
                 .actionFilterFragmentToTeacherListFragment(viewModel.filter, isInit, sorting)
@@ -97,10 +98,18 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
             PERIOD_THREE_MONTH -> binding.rbThreeMonth.isChecked = true
             PERIOD_TOTAL -> binding.rbTotal.isChecked = true
         }
-        if (viewModel.filter.maxLiveNum == 0) {
-            binding.rbOneToOne.isChecked = true
-        } else {
-            binding.rbOneToMulti.isChecked = true
+        when (viewModel.filter.maxLiveNum) {
+            ONE_TO_ONE -> {
+                binding.rbOneToOne.isChecked = true
+            }
+
+            ONE_TO_MULTI -> {
+                binding.rbOneToMulti.isChecked = true
+            }
+
+            else -> {
+                binding.rbTotalMethod.isChecked = true
+            }
         }
     }
 
@@ -182,8 +191,10 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
 
         if (binding.rbOneToOne.isChecked) {
             viewModel.filter.maxLiveNum = ONE_TO_ONE
-        } else {
+        } else if (binding.rbOneToMulti.isChecked) {
             viewModel.filter.maxLiveNum = ONE_TO_MULTI
+        } else {
+            viewModel.filter.maxLiveNum = TOTAL
         }
         isInit = false
         val directions = FilterFragmentDirections
