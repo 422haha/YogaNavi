@@ -167,8 +167,16 @@ public class HomeService {
                 boolean isFutureLecture = date.isAfter(today);
 
                 if (isFutureLecture || isLectureToday || isLectureStartedYesterday) {
+
+                    boolean isOnAir = false;
+                    if (isLectureStartedYesterday) { // 어제 시작된 강의가 오늘까지 이어짐
+                        isOnAir = lecture.getIsOnAir();
+                    } else if (isLectureToday) { // 오늘 날짜 강의
+                        isOnAir = lecture.getIsOnAir();
+                    }
+
                     HomeResponseDto dto = createHomeResponseDto(lecture, date, startTime, endTime,
-                        isTeacher);
+                        isTeacher, isOnAir);
                     dtos.add(dto);
                 }
             }
@@ -181,7 +189,7 @@ public class HomeService {
      * HomeResponseDto 생성
      */
     private HomeResponseDto createHomeResponseDto(LiveLectures lecture, LocalDate date,
-        LocalTime startTime, LocalTime endTime, boolean isTeacher) {
+        LocalTime startTime, LocalTime endTime, boolean isTeacher, boolean isOnAir) {
         HomeResponseDto dto = new HomeResponseDto();
 
         dto.setLiveId(lecture.getLiveId());
@@ -213,6 +221,8 @@ public class HomeService {
 
         dto.setTeacher(isTeacher);
         dto.setIsOnAir(lecture.getIsOnAir());
+
+        dto.setIsOnAir(isOnAir);
 
         return dto;
     }

@@ -79,8 +79,6 @@ public class ReservationServiceImpl implements ReservationService {
 
         List<MyLiveLecture> userReservations = myLiveLectureRepository.findByUserId(userId);
 
-        System.out.println("newStartDate ============" + newStartDate);
-        System.out.println("newEndDate ============" + newEndDate);
 
         for (MyLiveLecture existingReservation : userReservations) {
             ZonedDateTime existingStartDateTime = existingReservation.getStartDate().atZone(ZoneId.of("UTC"));
