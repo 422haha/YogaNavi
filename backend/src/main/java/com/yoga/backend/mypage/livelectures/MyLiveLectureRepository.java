@@ -76,7 +76,7 @@ public interface MyLiveLectureRepository extends JpaRepository<MyLiveLecture, Lo
     //학생에게 fcm 전송을 위한 쿼리
     @Query("SELECT ml FROM MyLiveLecture ml JOIN FETCH ml.user JOIN FETCH ml.liveLecture l " +
         "WHERE l.liveId = :liveId " +
-        "AND :currentDate BETWEEN ml.startDate AND ml.endDate " +
+        "AND DATE(:currentDate) BETWEEN DATE(ml.startDate) AND DATE(ml.endDate) " +
         "AND l.availableDay LIKE %:dayOfWeek%")
     List<MyLiveLecture> findParticipantsForTodayLecture(
         @Param("liveId") Long liveId,
