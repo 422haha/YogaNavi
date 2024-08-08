@@ -56,8 +56,6 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         super.onCreate(savedInstanceState)
 
         initPermission()
-
-        viewModel.sessionManager.signalingClient.liveId = args.getLiveId
     }
 
     private fun initPermission() {
@@ -79,6 +77,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.sessionManager.signalingClient.updateLiveId(args.getLiveId)
+
         setToolbar(false, "", false)
 
         initListener()
@@ -91,9 +91,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
         observeCallMediaState()
 
-        localRenderInit()
-
-        remoteRenderInit()
+        renderInit()
     }
 
     private fun initListener() {
@@ -192,13 +190,16 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         when (state) {
             WebRTCSessionState.Offline -> {
                 binding.tvState.text = NO_CONNECT_SERVER
-            }
-            WebRTCSessionState.Impossible -> {
-                if(prevState == WebRTCSessionState.Active)
+
+                if(prevState != WebRTCSessionState.Offline)
                     viewModel.sessionManager.disconnect()
             }
+            WebRTCSessionState.Impossible -> {
+                if(!args.isTeacher)
+                    binding.tvState.text = "방송 대기중 입니다 :)"
+            }
             WebRTCSessionState.Ready -> {
-                if(args.isTeacher)
+                if (args.isTeacher)
                     viewModel.sessionManager.onSessionScreenReady()
             }
             WebRTCSessionState.Creating -> {
@@ -240,8 +241,9 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         binding.ibtnVideo.setImageResource(if (isEnabled) R.drawable.baseline_videocam_24 else R.drawable.baseline_videocam_off_24)
     }
 
-    private fun localRenderInit() {
+    private fun renderInit() {
         localRenderer = binding.localVideoCallScreen
+        remoteRenderer = binding.remoteVideoCallScreen
 
         localRenderer.init(viewModel.sessionManager.peerConnectionFactory.eglBaseContext,
             object: RendererCommon.RendererEvents {
@@ -249,21 +251,6 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
                 override fun onFrameResolutionChanged(width: Int, height: Int, rotation: Int) = Unit
             })
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.sessionManager.localVideoTrackFlow.collectLatest {
-                        cleanLocalTrack(it)
-                        setupLocalVideo(it)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun remoteRenderInit() {
-        remoteRenderer = binding.remoteVideoCallScreen
 
         remoteRenderer.init(viewModel.sessionManager.peerConnectionFactory.eglBaseContext,
             object: RendererCommon.RendererEvents {
@@ -275,9 +262,20 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.sessionManager.remoteVideoTrackFlow.collectLatest {
-                        cleanRemoteTrack(it)
-                        setupRemoteVideo(it)
+                    viewModel.sessionManager.localVideoTrackFlow.collectLatest { videoTrack ->
+                        cleanLocalTrack(videoTrack)
+                        setupLocalVideo(videoTrack)
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.sessionManager.remoteVideoTrackFlow.collectLatest { videoTrack ->
+                        cleanRemoteTrack(videoTrack)
+                        setupRemoteVideo(videoTrack)
                     }
                 }
             }
@@ -334,6 +332,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
     private fun popBack() {
         exitFullscreen()
+
+        runCatching { viewModel.sessionManager.disconnect() }
 
         findNavController().popBackStack()
     }
