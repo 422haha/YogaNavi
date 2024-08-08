@@ -27,6 +27,7 @@ public class HomeResponseDto {
     private String lectureDay;
     private Integer maxLiveNum;
     private Boolean teacher;
+    private Boolean isOnAir;
 
     public boolean isTeacher() {
         return teacher;
