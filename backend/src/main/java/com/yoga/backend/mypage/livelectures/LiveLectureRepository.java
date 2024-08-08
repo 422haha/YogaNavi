@@ -19,17 +19,17 @@ public interface LiveLectureRepository extends JpaRepository<LiveLectures, Long>
 
     // fcm을 위한 쿼리. 전날 밤에 다음날 강의할 강의들을 캐시
     @Query("SELECT l FROM LiveLectures l WHERE " +
-        "l.startDate <= :tomorrow AND l.endDate >= :tomorrow " +
-        "AND l.availableDay LIKE %:dayOfWeek% " +
+        "DATE(l.startDate) <= DATE(:tomorrow) AND " +
+        "DATE(l.endDate) >= DATE(:tomorrow) AND " +
+        "l.availableDay LIKE %:dayOfWeek% " +
         "ORDER BY l.startTime")
     List<LiveLectures> findTomorrowLectures(
         @Param("tomorrow") LocalDate tomorrow,
         @Param("dayOfWeek") String dayOfWeek
     );
-
     //fcm을 위한 쿼리. 캐시가 비어있을 시 실행
     @Query("SELECT l FROM LiveLectures l WHERE " +
-        "l.startDate <= :today AND l.endDate >= :today " +
+        "DATE(l.startDate) <= DATE(:today) AND DATE(l.endDate) >= DATE(:today) " +
         "AND l.availableDay LIKE %:dayOfWeek% " +
         "ORDER BY l.startTime")
     List<LiveLectures> findLecturesForToday(
