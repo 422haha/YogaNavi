@@ -28,6 +28,7 @@ import com.ssafy.yoganavi.ui.homeUI.schedule.live.webRtc.WebRTCSessionState
 import com.ssafy.yoganavi.ui.utils.NO_CONNECT_SERVER
 import com.ssafy.yoganavi.ui.utils.PermissionHandler
 import com.ssafy.yoganavi.ui.utils.PermissionHelper
+import com.ssafy.yoganavi.ui.utils.WAIT_BROADCAST
 import dagger.hilt.android.AndroidEntryPoint
 import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
 import kotlinx.coroutines.flow.collectLatest
@@ -196,7 +197,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             }
             WebRTCSessionState.Impossible -> {
                 if(!args.isTeacher)
-                    binding.tvState.text = "방송 대기중 입니다 :)"
+                    binding.tvState.text = WAIT_BROADCAST
             }
             WebRTCSessionState.Ready -> {
                 if (args.isTeacher)
