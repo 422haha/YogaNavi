@@ -195,6 +195,7 @@ class WebRtcSessionManagerImpl(
     }
 
     override fun enableMicrophone(enabled: Boolean) {
+        localAudioTrack.setEnabled(enabled)
         audioManager?.isMicrophoneMute = !enabled
     }
 
@@ -376,6 +377,15 @@ class WebRtcSessionManagerImpl(
             ),
             MediaConstraints.KeyValuePair(
                 "googTypingNoiseDetection",
+                true.toString()
+            ),
+            // 추가 제약 조건
+            MediaConstraints.KeyValuePair(
+                "googAudioMirroring",
+                false.toString()
+            ),
+            MediaConstraints.KeyValuePair(
+                "googExperimentalEchoCancellation",
                 true.toString()
             )
         )
