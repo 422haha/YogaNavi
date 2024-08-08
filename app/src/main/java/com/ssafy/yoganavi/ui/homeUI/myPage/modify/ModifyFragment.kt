@@ -152,6 +152,9 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
             val text = editText?.toString() ?: ""
             val pwAgain = tiePwAgain.text?.toString() ?: ""
             check.isEnabled = !(text.isNotBlank() && text != pwAgain)
+
+            if(text == pwAgain) tiePwAgain.error = null
+            else tiePwAgain.error = PASSWORD_DIFF
         }
 
         tiePwAgain.addTextChangedListener { text ->
