@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,8 +128,8 @@ public class ReservationController {
         response.put("availableDay", dto.getAvailableDay()); // 실시간 강의 가능한 요일
         response.put("startDate", dto.getStartDate().toEpochMilli()); // 실시간 강의 시작 날짜
         response.put("endDate", dto.getEndDate().toEpochMilli()); // 실시간 강의 종료 날짜
-        response.put("startTime", dto.getStartTime().toEpochMilli()); // 실시간 강의 시작 시간
-        response.put("endTime", dto.getEndTime().toEpochMilli()); // 실시간 강의 종료 시간
+        response.put("startTime", ZonedDateTime.ofInstant(dto.getStartTime(), ZoneId.of("UTC")).toLocalTime().toNanoOfDay() / 1_000_000); // 실시간 강의 시작 시간
+        response.put("endTime", ZonedDateTime.ofInstant(dto.getEndTime(), ZoneId.of("UTC")).toLocalTime().toNanoOfDay() / 1_000_000); // 실시간 강의 종료 시간
         return response;
     }
 }
