@@ -131,17 +131,24 @@ class RegisterNoticeFragment : BaseFragment<FragmentRegisterNoticeBinding>(
     }
 
     private suspend fun loadingView() = withContext(Dispatchers.Main) {
-        binding.vBg.visibility = View.VISIBLE
+        setMenuItemAvailable(false)
+        binding.vBg.apply {
+            visibility = View.VISIBLE
+            isClickable = true
+            isFocusable = true
+        }
         binding.lav.visibility = View.VISIBLE
     }
 
     private suspend fun failToUpload() = withContext(Dispatchers.Main) {
+        setMenuItemAvailable(true)
         binding.vBg.visibility = View.GONE
         binding.lav.visibility = View.GONE
         showSnackBar(UPLOAD_FAIL)
     }
 
     private suspend fun goBackStack() = withContext(Dispatchers.Main) {
+        setMenuItemAvailable(true)
         findNavController().popBackStack()
     }
 

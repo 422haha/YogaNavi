@@ -220,15 +220,23 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
 
 
     private suspend fun successToUpload() = withContext(Dispatchers.Main) {
+        setMenuItemAvailable(true)
         findNavController().popBackStack()
     }
 
     private suspend fun loadingView() = withContext(Dispatchers.Main) {
-        binding.vBg.visibility = View.VISIBLE
+        setMenuItemAvailable(false)
+        binding.vBg.apply {
+            visibility = View.VISIBLE
+            isClickable = true
+            isFocusable = true
+        }
+
         binding.lav.visibility = View.VISIBLE
     }
 
     private suspend fun failToUpload(message: String) = withContext(Dispatchers.Main) {
+        setMenuItemAvailable(true)
         binding.vBg.visibility = View.GONE
         binding.lav.visibility = View.GONE
         showSnackBar(message)

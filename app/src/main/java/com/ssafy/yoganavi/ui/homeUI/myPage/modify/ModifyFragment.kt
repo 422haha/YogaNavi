@@ -211,7 +211,11 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
     }
 
     private suspend fun loadingView() = withContext(Dispatchers.Main) {
-        binding.vBg.visibility = View.VISIBLE
+        binding.vBg.apply {
+            visibility = View.VISIBLE
+            isClickable = true
+            isFocusable = true
+        }
         binding.lav.visibility = View.VISIBLE
     }
 
