@@ -9,5 +9,6 @@ import lombok.ToString;
 @Setter
 @ToString
 public class DeleteDto {
+
     private List<Long> lectureIds;
 }

@@ -27,6 +27,7 @@ public class AllRecordedLecturesRepository {
             .select(Projections.constructor(LectureDto.class,
                 lecture.id,
                 lecture.user.id.as("userId"),
+                lecture.user.nickname.as("nickname"),
                 lecture.title,
                 lecture.content,
                 lecture.thumbnail,
