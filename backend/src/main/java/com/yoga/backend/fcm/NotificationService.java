@@ -19,9 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * fcm 알림 전송 서비스
- * <p>
- * todo 캐시 관리 시간에서 캐시 추가는 23:49, 캐시 삭제는 다음날 자정으로
- * todo 강의 추가 시 캐시되나 알림 실행이 안됨
+ *
+ * todo 학생에게 알림전송 안됨
+ * 수정 삭제 시 학생에게 알림 전송 확인 필요
+ *
  */
 @Slf4j
 @Service
@@ -205,7 +206,6 @@ public class NotificationService {
         try {
             LocalDateTime nowKorea = LocalDateTime.now(KOREA_ZONE);
             LocalDate todayKorea = nowKorea.toLocalDate();
-            LocalTime todayTime = LocalTime.now(KOREA_ZONE);
             String dayAbbreviation = todayKorea.getDayOfWeek().toString().substring(0, 3);
 
             log.info("1분마다 실행 for fcm");
@@ -269,8 +269,10 @@ public class NotificationService {
      */
     private void sendNotificationsWithoutDuplication(List<LiveLectureDto> lectures) {
         Map<String, Map<String, String>> notifications = new HashMap<>();
-        LocalDate today = LocalDate.now(KOREA_ZONE);
-        String dayOfWeek = today.getDayOfWeek().toString().substring(0, 3);
+
+        LocalDateTime nowKorea = LocalDateTime.now(KOREA_ZONE);
+        LocalDate todayKorea = nowKorea.toLocalDate();
+        String dayAbbreviation = todayKorea.getDayOfWeek().toString().substring(0, 3);
 
         for (LiveLectureDto lecture : lectures) {
             String message = String.format("%s 강의가 10분 후에 시작됩니다.", lecture.getLiveTitle());
@@ -285,7 +287,7 @@ public class NotificationService {
             }
 
             List<MyLiveLecture> participants = myLiveLectureRepository.findParticipantsForTodayLecture(
-                lecture.getLiveId(), today, dayOfWeek);
+                lecture.getLiveId(), todayKorea, dayAbbreviation);
 
             for (MyLiveLecture participant : participants) {
                 Users student = participant.getUser();
@@ -424,7 +426,7 @@ public class NotificationService {
             updatedLecture.getLiveId());
 
         Map<String, Map<String, String>> notifications = new HashMap<>();
-        String message = String.format("%s 강의의 일정이 업데이트되었습니다.", updatedLecture.getLiveTitle());
+        String message = String.format("%s 강의의 일정 혹은 내용이 업데이트되었습니다.", updatedLecture.getLiveTitle());
 
         for (MyLiveLecture participant : participants) {
             Users user = participant.getUser();
