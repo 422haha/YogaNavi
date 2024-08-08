@@ -23,7 +23,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.webrtc.AudioTrack
 import org.webrtc.Camera2Capturer
 import org.webrtc.Camera2Enumerator
@@ -170,12 +169,14 @@ class WebRtcSessionManagerImpl(
     }
 
     override fun onSessionScreenReady() {
-        runCatching {
-            setupAudio()
+        runCatching { setupAudio() }
 
+        runCatching {
             peerConnection.connection.addTrack(localVideoTrack)
             peerConnection.connection.addTrack(localAudioTrack)
+        }
 
+        runCatching {
             sessionManagerScope.launch {
                 // sending local video track to show local video from start
                 _localVideoTrackFlow.emit(localVideoTrack)
@@ -214,7 +215,7 @@ class WebRtcSessionManagerImpl(
         }
     }
 
-    override suspend fun disconnect(): Unit = withContext(Dispatchers.IO) {
+    override suspend fun disconnect() {
         runCatching {
             // dispose audio & video tracks.
             remoteVideoTrackFlow.replayCache.forEach { videoTrack ->
@@ -227,27 +228,28 @@ class WebRtcSessionManagerImpl(
             localVideoTrack.dispose()
         }
 
-
         runCatching {
             // dispose audio handler and video capturer.
             audioHandler.stop()
             videoCapturer.stopCapture()
             videoCapturer.dispose()
-
-        }
+        }.onFailure { it.printStackTrace() }
 
         offer = null
 
         runCatching {
             // dispose signaling clients and socket.
             signalingClient.dispose()
+        }.onFailure { it.printStackTrace() }
 
-            peerConnection.connection.dispose()
+        runCatching {
+            peerConnection.connection.close()
+        }.onFailure { it.printStackTrace() }
 
+        runCatching {
             surfaceTextureHelper.dispose()
-
             sessionManagerScope.cancel()
-        }
+        }.onFailure { it.printStackTrace() }
     }
 
     private fun safeDispose(track: MediaStreamTrack?) {
