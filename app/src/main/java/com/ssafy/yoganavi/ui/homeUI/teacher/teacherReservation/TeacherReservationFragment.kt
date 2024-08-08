@@ -24,7 +24,6 @@ import com.ssafy.yoganavi.ui.utils.RESERVATION
 import com.ssafy.yoganavi.ui.utils.RESERVE
 import com.ssafy.yoganavi.ui.utils.SELECT_CLASS
 import com.ssafy.yoganavi.ui.utils.START
-import com.ssafy.yoganavi.ui.utils.loadImage
 import com.ssafy.yoganavi.ui.utils.toCalendarDay
 import com.ssafy.yoganavi.ui.utils.toLong
 import dagger.hilt.android.AndroidEntryPoint
@@ -89,7 +88,7 @@ class TeacherReservationFragment :
         if (args.teacherSmallProfile.isBlank()) {
             ivProfile.setImageResource(R.drawable.profilenull)
         } else {
-            ivProfile.loadImage(args.teacherSmallProfile)
+            viewModel.loadS3Image(ivProfile, args.teacherSmallProfile)
         }
 
         tvTeacherNickname.text = args.teacherName
