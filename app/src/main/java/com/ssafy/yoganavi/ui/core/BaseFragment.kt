@@ -65,17 +65,19 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
         title: String,
         canGoBack: Boolean,
         menuItem: String? = null,
-        menuListener: (() -> Unit)? = null
+        menuListener: (() -> Unit)? = null,
+        isEmptyView: Boolean = false
     ) {
-        if (!(this is LoginFragment || this is FindFragment || this is JoinFragment)) {
-            activityViewModel.setMainEvent(
-                isBottomNavigationVisible,
-                title,
-                canGoBack,
-                menuItem,
-                menuListener
-            )
-        }
+        if (activity == null || requireActivity() !is MainActivity) return
+
+        activityViewModel.setMainEvent(
+            isBottomNavigationVisible = isBottomNavigationVisible,
+            title = title,
+            canGoBack = canGoBack,
+            menuItem = menuItem,
+            menuListener = menuListener
+        )
+        setEmptyView(EmptyData(isEmptyView))
     }
 
     fun setMenuItemAvailable(isAvailable: Boolean) {

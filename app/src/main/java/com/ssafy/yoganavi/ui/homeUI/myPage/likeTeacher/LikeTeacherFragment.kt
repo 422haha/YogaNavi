@@ -33,10 +33,15 @@ class LikeTeacherFragment : BaseFragment<FragmentLikeTeacherBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(false, LIKE_TEACHER, true)
+
         binding.rvTeacher.adapter = teacherAdapter
         viewModel.getList()
         initCollect()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(false, LIKE_TEACHER, true)
     }
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {

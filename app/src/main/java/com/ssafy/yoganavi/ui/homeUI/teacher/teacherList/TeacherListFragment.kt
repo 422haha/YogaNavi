@@ -53,7 +53,6 @@ class TeacherListFragment : BaseFragment<FragmentTeacherListBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setToolbar(true, TEACHER, false)
         filter = args.filter ?: FilterData()
         if (args.isInit) {
             viewModel.setIsInit()
@@ -98,6 +97,11 @@ class TeacherListFragment : BaseFragment<FragmentTeacherListBinding>(
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(true, TEACHER, false)
     }
 
     fun initListener() = with(binding) {

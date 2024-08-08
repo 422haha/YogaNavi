@@ -56,12 +56,17 @@ class RegisterLiveFragment :
 
         if (args.state == UPDATE)
             setModifyInfo()
+    }
 
-        setToolbar(isBottomNavigationVisible = false,
+    override fun onStart() {
+        super.onStart()
+        setToolbar(
+            isBottomNavigationVisible = false,
             title = if (args.liveId == -1) REGISTER_LIVE else MODIFY_LIVE,
             canGoBack = true,
             menuItem = REGISTER,
-            menuListener = { setRegister() })
+            menuListener = { setRegister() }
+        )
     }
 
     private fun initListener(state: String) {

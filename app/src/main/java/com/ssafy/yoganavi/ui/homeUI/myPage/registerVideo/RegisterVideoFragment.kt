@@ -80,6 +80,15 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.rvLecture.adapter = chapterAdapter
+        initCollect()
+        initListener()
+        if (args.recordedId != -1L) viewModel.getLecture(args.recordedId)
+    }
+
+    override fun onStart() {
+        super.onStart()
         setToolbar(
             isBottomNavigationVisible = false,
             title = REGISTER_VIDEO,
@@ -87,11 +96,6 @@ class RegisterVideoFragment : BaseFragment<FragmentRegisterVideoBinding>(
             menuItem = if (args.recordedId != -1L) UPDATE else CREATE,
             menuListener = ::makeLecture
         )
-
-        binding.rvLecture.adapter = chapterAdapter
-        initCollect()
-        initListener()
-        if (args.recordedId != -1L) viewModel.getLecture(args.recordedId)
     }
 
     private fun initListener() = with(binding) {

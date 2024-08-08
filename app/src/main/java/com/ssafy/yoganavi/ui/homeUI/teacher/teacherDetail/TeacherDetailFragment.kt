@@ -35,9 +35,13 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(false, TEACHER_DETAIL, true)
         binding.rvTeacherDetail.adapter = teacherDetailAdapter
         getTeacherDetail()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(false, TEACHER_DETAIL, true)
     }
 
     private fun getTeacherDetail() = viewModel.getTeacherDetail(args.userId, ::bindData)

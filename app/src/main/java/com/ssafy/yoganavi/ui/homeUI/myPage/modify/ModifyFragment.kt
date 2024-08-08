@@ -62,13 +62,17 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(false, MODIFY, true)
 
         checkTeacher()
         initAdapter()
         initListener()
         getProfile()
         initCollect()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(false, MODIFY, true)
     }
 
     private fun checkTeacher() = with(binding) {

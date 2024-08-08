@@ -47,26 +47,36 @@ class TeacherReservationFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(false, RESERVE, true, RESERVATION) {
-            if (!(binding.rbOneToOne.isChecked || binding.rbOneToMulti.isChecked)) {
-                showSnackBar(SELECT_CLASS)
-            } else if (binding.tvNothing.isVisible) {
-                showSnackBar(NOTHING)
-            } else if (saveStartDate == null || saveEndDate == null) {
-                showSnackBar(PICK_DATE)
-            } else {
-                viewModel.registerLive(
-                    liveId,
-                    saveStartDate?.toLong(START),
-                    saveEndDate?.toLong(END),
-                    ::navigateToSchedule
-                )
-            }
-        }
         initView()
         binding.rvAvailableClass.adapter = availableAdapter
         initListener()
         initCollect()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(
+            isBottomNavigationVisible = false,
+            title = RESERVE,
+            canGoBack = true,
+            menuItem = RESERVATION,
+            menuListener = {
+                if (!(binding.rbOneToOne.isChecked || binding.rbOneToMulti.isChecked)) {
+                    showSnackBar(SELECT_CLASS)
+                } else if (binding.tvNothing.isVisible) {
+                    showSnackBar(NOTHING)
+                } else if (saveStartDate == null || saveEndDate == null) {
+                    showSnackBar(PICK_DATE)
+                } else {
+                    viewModel.registerLive(
+                        liveId,
+                        saveStartDate?.toLong(START),
+                        saveEndDate?.toLong(END),
+                        ::navigateToSchedule
+                    )
+                }
+            }
+        )
     }
 
     private fun navigateToSchedule() {
@@ -80,7 +90,7 @@ class TeacherReservationFragment :
         } else {
             ivProfile.loadImage(args.teacherSmallProfile)
         }
-        
+
         tvTeacherNickname.text = args.teacherName
         if (args.hashtags.isNotBlank()) {
             tvHashtag.text = args.hashtags

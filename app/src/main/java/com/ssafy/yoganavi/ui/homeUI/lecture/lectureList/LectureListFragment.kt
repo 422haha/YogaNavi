@@ -39,16 +39,19 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initAdapter()
+        initListener()
+        initCollect()
+        viewModel.updateSortAndKeyword()
+    }
+
+    override fun onStart() {
+        super.onStart()
         setToolbar(
             isBottomNavigationVisible = true,
             title = LECTURE_LIST,
             canGoBack = false
         )
-
-        initAdapter()
-        initListener()
-        initCollect()
-        viewModel.updateSortAndKeyword()
     }
 
     private fun initAdapter() = with(binding.rvLecture) {

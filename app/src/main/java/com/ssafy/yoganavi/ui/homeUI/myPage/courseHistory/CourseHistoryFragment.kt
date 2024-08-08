@@ -27,15 +27,18 @@ class CourseHistoryFragment : BaseFragment<FragmentCourseHistoryBinding>(
 
         binding.rvMyList.adapter = courseHistoryAdapter
 
+        initCollect()
+
+        viewModel.getCourseHistoryList()
+    }
+
+    override fun onStart() {
+        super.onStart()
         setToolbar(
             isBottomNavigationVisible = false,
             title = COURSE_HISTORY,
             canGoBack = true
         )
-
-        initCollect()
-
-        viewModel.getCourseHistoryList()
     }
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {

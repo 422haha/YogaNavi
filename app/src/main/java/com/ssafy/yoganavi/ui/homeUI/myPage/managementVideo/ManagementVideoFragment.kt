@@ -37,6 +37,15 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.rvLecture.adapter = lectureAdapter
+        initListener()
+        initCollect()
+        viewModel.getLectureList()
+    }
+
+    override fun onStart() {
+        super.onStart()
         setToolbar(
             isBottomNavigationVisible = false,
             title = MANAGEMENT_VIDEO,
@@ -44,11 +53,6 @@ class ManagementVideoFragment : BaseFragment<FragmentManagementVideoBinding>(
             menuItem = EDIT,
             menuListener = ::setMode
         )
-
-        binding.rvLecture.adapter = lectureAdapter
-        initListener()
-        initCollect()
-        viewModel.getLectureList()
     }
 
     private fun initListener() {
