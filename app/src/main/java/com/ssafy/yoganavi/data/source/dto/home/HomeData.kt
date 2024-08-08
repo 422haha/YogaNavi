@@ -14,6 +14,7 @@ data class HomeData(
     val teacherProfile: String?,
     @SerializedName("teacher")
     val isMyClass: Boolean = false,
+    val isOnAir: Boolean = false,
     var liveTitle: String = "",
     var liveContent : String = "",
     var lectureDay: String = "",
