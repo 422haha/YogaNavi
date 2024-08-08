@@ -100,6 +100,7 @@ const val EMPTY_COURSE = "아직 수강한 실시간 강의가 없습니다"
 //강의 분류
 const val ONE_TO_ONE = 0
 const val ONE_TO_MULTI = 1
+const val TOTAL = 2
 const val RECENT = 0
 const val POPULAR = 1
 const val PERIOD_WEEK = 0

@@ -7,5 +7,5 @@ data class FilterData(
     var endTime: Long = 86340000L,
     var day: String = "MON,TUE,WED,THU,FRI,SAT,SUN,",
     var period: Int = 3,
-    var maxLiveNum: Int = 1
+    var maxLiveNum: Int = 2
 ) : Serializable

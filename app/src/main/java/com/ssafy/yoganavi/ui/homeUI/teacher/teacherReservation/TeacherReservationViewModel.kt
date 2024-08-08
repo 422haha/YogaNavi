@@ -28,7 +28,8 @@ class TeacherReservationViewModel @Inject constructor(
         liveId: Int,
         startDate: Long?,
         endDate: Long?,
-        navigateToSchedule: () -> (Unit)
+        navigateToSchedule: () -> (Unit),
+        showSnackBar: (String) -> (Unit)
     ) =
         viewModelScope.launch {
             runCatching {
@@ -40,7 +41,13 @@ class TeacherReservationViewModel @Inject constructor(
                     )
                 )
             }
-                .onSuccess { navigateToSchedule() }
+                .onSuccess {
+                    if (it.message == "success")
+                        navigateToSchedule()
+                    else {
+                        showSnackBar(it.message)
+                    }
+                }
                 .onFailure { it.printStackTrace() }
         }
 }

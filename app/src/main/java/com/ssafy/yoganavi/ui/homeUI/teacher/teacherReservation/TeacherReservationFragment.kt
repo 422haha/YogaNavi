@@ -59,7 +59,8 @@ class TeacherReservationFragment :
                     liveId,
                     saveStartDate?.toLong(START),
                     saveEndDate?.toLong(END),
-                    ::navigateToSchedule
+                    ::navigateToSchedule,
+                    ::showSnackBar
                 )
             }
         }
@@ -80,7 +81,7 @@ class TeacherReservationFragment :
         } else {
             ivProfile.loadImage(args.teacherSmallProfile)
         }
-        
+
         tvTeacherNickname.text = args.teacherName
         if (args.hashtags.isNotBlank()) {
             tvHashtag.text = args.hashtags
