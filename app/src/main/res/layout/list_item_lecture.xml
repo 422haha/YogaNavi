@@ -12,7 +12,7 @@
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/padding_medium"
         android:background="@color/gray_20"
-        android:scaleType="fitCenter"
+        android:scaleType="centerCrop"
         app:layout_constraintBottom_toTopOf="@id/dv"
         app:layout_constraintDimensionRatio="4:3"
         app:layout_constraintEnd_toStartOf="@id/tv_video_title"
