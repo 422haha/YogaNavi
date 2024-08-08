@@ -206,20 +206,6 @@ class WebRtcSessionManagerImpl(
     }
 
     override fun enableCamera(enabled: Boolean) {
-        if (enabled) {
-            videoCapturer.startCapture(resolution.width, resolution.height, 30)
-        } else {
-            videoCapturer.stopCapture()
-        }
-    }
-
-    override fun enableMicrophone(enabled: Boolean) {
-        runCatching {
-            audioManager?.isMicrophoneMute = !enabled
-        }
-    }
-
-    override fun enableCamera(enabled: Boolean) {
         runCatching {
             if (enabled) {
                 videoCapturer.startCapture(resolution.width, resolution.height, 30)
