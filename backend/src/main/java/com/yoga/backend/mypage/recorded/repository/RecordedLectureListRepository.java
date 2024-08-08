@@ -10,6 +10,7 @@ import com.yoga.backend.mypage.recorded.dto.LectureDto;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -48,8 +49,11 @@ public class RecordedLectureListRepository {
         QRecordedLecture lecture = QRecordedLecture.recordedLecture;
         QRecordedLectureLike like = QRecordedLectureLike.recordedLectureLike;
 
-        // 키워드 개별 단어로 분리
-        List<String> keywords = Arrays.asList(keyword.split("\\s+"));
+        // 키워드 개별 단어로 분리하고 트림하여 빈 키워드 제거
+        List<String> keywords = Arrays.stream(keyword.split("\\s+"))
+            .map(String::trim)
+            .filter(kw -> !kw.isEmpty())
+            .collect(Collectors.toList());
 
         // 검색 조건 생성
         BooleanExpression keywordCondition = createSearchCondition(lecture, keywords, searchTitle,
@@ -63,6 +67,7 @@ public class RecordedLectureListRepository {
                 lecture.title.as("recordTitle"),
                 lecture.content.as("recordContent"),
                 lecture.thumbnailSmall.as("recordThumbnailSmall"),
+                lecture.thumbnail.as("recordThumbnail"),
                 lecture.likeCount.as("likeCount"),
                 lecture.createdDate,
                 lecture.lastModifiedDate,
@@ -120,4 +125,3 @@ public class RecordedLectureListRepository {
         return null;
     }
 }
-
