@@ -34,12 +34,16 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(false, MANAGEMENT_NOTICE, true)
 
         binding.rvMyList.adapter = noticeAdapter
         initCollect()
         initListener()
         viewModel.getNoticeAll()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(false, MANAGEMENT_NOTICE, true)
     }
 
     private fun initListener() {

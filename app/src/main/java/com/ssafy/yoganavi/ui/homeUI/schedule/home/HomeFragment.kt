@@ -29,17 +29,20 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setToolbar(
-            isBottomNavigationVisible = true,
-            title = HOME,
-            canGoBack = false
-        )
-
         binding.rvMyList.adapter = homeAdapter
 
         initCollect()
 
         viewModel.getHomeList()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(
+            isBottomNavigationVisible = true,
+            title = HOME,
+            canGoBack = false
+        )
     }
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {

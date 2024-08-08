@@ -24,10 +24,13 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        setToolbar(true, MY_PAGE, false)
         initListener()
         getProfileData()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(true, MY_PAGE, false)
     }
 
     private fun getProfileData() = viewModel.getProfileData(::bindData)

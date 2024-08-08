@@ -36,25 +36,7 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(false, FILTER, true, "초기화") {
-            binding.btnStartTime.text = "00:00"
-            viewModel.filter.startTime = 0L
-            binding.btnEndTime.text = "23:59"
-            viewModel.filter.endTime = 86340000L
-            binding.ibtnMon.isChecked = true
-            binding.ibtnTue.isChecked = true
-            binding.ibtnWed.isChecked = true
-            binding.ibtnThu.isChecked = true
-            binding.ibtnFri.isChecked = true
-            binding.ibtnSat.isChecked = true
-            binding.ibtnSun.isChecked = true
-            binding.rbTotal.isChecked = true
-            binding.rbTotalMethod.isChecked = true
-            isInit = true
-            val directions = FilterFragmentDirections
-                .actionFilterFragmentToTeacherListFragment(viewModel.filter, isInit, sorting)
-            findNavController().navigate(directions)
-        }
+
         // CheckBox마다 요일을 바인딩
         weekToggleButtonMap = mapOf(
             Week.MON to binding.ibtnMon,
@@ -67,6 +49,35 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
         )
         initView()
         initListener()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(
+            isBottomNavigationVisible = false,
+            title = FILTER,
+            canGoBack = true,
+            menuItem = "초기화",
+            menuListener = {
+                binding.btnStartTime.text = "00:00"
+                viewModel.filter.startTime = 0L
+                binding.btnEndTime.text = "23:59"
+                viewModel.filter.endTime = 86340000L
+                binding.ibtnMon.isChecked = true
+                binding.ibtnTue.isChecked = true
+                binding.ibtnWed.isChecked = true
+                binding.ibtnThu.isChecked = true
+                binding.ibtnFri.isChecked = true
+                binding.ibtnSat.isChecked = true
+                binding.ibtnSun.isChecked = true
+                binding.rbTotal.isChecked = true
+                binding.rbOneToMulti.isChecked = true
+                isInit = true
+                val directions = FilterFragmentDirections
+                    .actionFilterFragmentToTeacherListFragment(viewModel.filter, isInit, sorting)
+                findNavController().navigate(directions)
+            }
+        )
     }
 
     private fun initView() {

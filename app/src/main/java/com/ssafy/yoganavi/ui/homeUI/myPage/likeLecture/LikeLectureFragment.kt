@@ -32,15 +32,19 @@ class LikeLectureFragment : BaseFragment<FragmentLikeLectureBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.rvLecture.adapter = lectureAdapter
+        initCollect()
+        viewModel.getLectureList()
+    }
+
+    override fun onStart() {
+        super.onStart()
         setToolbar(
             isBottomNavigationVisible = false,
             title = LIKE_LECTURE,
             canGoBack = true
         )
-
-        binding.rvLecture.adapter = lectureAdapter
-        initCollect()
-        viewModel.getLectureList()
     }
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {

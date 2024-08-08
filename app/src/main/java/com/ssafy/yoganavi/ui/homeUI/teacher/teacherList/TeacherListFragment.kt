@@ -40,7 +40,8 @@ class TeacherListFragment : BaseFragment<FragmentTeacherListBinding>(
         ).apply {
             registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
                 override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-                    binding.rvTeacherList.scrollToPosition(0)
+                    if (args.sorting == RECENT) return
+                    binding.rvTeacherList.scrollToPosition(positionStart)
                     super.onItemRangeChanged(positionStart, itemCount)
                 }
             })
@@ -53,7 +54,6 @@ class TeacherListFragment : BaseFragment<FragmentTeacherListBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setToolbar(true, TEACHER, false)
         filter = args.filter ?: FilterData()
         if (args.isInit) {
             viewModel.setIsInit()
@@ -81,11 +81,13 @@ class TeacherListFragment : BaseFragment<FragmentTeacherListBinding>(
                         viewModel.setSorting(RECENT, filter)
                     }
                 }
+
                 POPULAR -> {
                     viewLifecycleOwner.lifecycleScope.launch {
                         viewModel.setSorting(POPULAR, filter)
                     }
                 }
+
                 else -> {
                     viewLifecycleOwner.lifecycleScope.launch {
                         viewModel.setSorting(viewModel.sorting.value, filter)
@@ -98,6 +100,11 @@ class TeacherListFragment : BaseFragment<FragmentTeacherListBinding>(
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(true, TEACHER, false)
     }
 
     fun initListener() = with(binding) {
