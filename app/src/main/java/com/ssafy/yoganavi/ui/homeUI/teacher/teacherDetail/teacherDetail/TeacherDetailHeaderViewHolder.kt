@@ -1,28 +1,29 @@
 package com.ssafy.yoganavi.ui.homeUI.teacher.teacherDetail.teacherDetail
 
+import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.databinding.ListItemTeacherHeaderBinding
-import com.ssafy.yoganavi.ui.utils.loadImageSequentially
 
 class TeacherDetailHeaderViewHolder(
     private val binding: ListItemTeacherHeaderBinding,
-    private val goReserve: (Int, String, String, String) -> (Unit)
+    private val goReserve: (Int, String, String, String) -> (Unit),
+    private val loadS3ImageSequentially: (ImageView, String, String) -> Unit
 ) : ViewHolder(binding.root) {
     fun bind(teacherDetailHeader: TeacherData) = with(binding) {
         ivProfile.isVisible = true
-        if (!teacherDetailHeader.teacherProfile.isNullOrBlank() && !teacherDetailHeader.teacherSmallProfile.isNullOrBlank()) {
-            ivProfile.loadImageSequentially(
-                teacherDetailHeader.teacherSmallProfile,
-                teacherDetailHeader.teacherProfile
+
+        if (!teacherDetailHeader.profileKey.isNullOrBlank() && !teacherDetailHeader.smallProfileKey.isNullOrBlank()) {
+            loadS3ImageSequentially(
+                ivProfile,
+                teacherDetailHeader.smallProfileKey,
+                teacherDetailHeader.profileKey
             )
-        }
-        else if(teacherDetailHeader.teacherId==-1){
+        } else if (teacherDetailHeader.teacherId == -1) {
             ivProfile.isVisible = false
-        }
-        else {
+        } else {
             ivProfile.setImageResource(R.drawable.profilenull)
         }
         tvNickname.text = teacherDetailHeader.teacherName
@@ -49,7 +50,7 @@ class TeacherDetailHeaderViewHolder(
                 teacherDetailHeader.teacherId,
                 teacherDetailHeader.teacherName,
                 hashtagString,
-                teacherDetailHeader.teacherSmallProfile ?: ""
+                teacherDetailHeader.smallProfileKey ?: ""
             )
         }
     }

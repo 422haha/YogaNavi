@@ -39,7 +39,7 @@
         <argument
             android:name="filter"
             android:defaultValue="@null"
-            app:argType="com.ssafy.yoganavi.data.source.teacher.FilterData"
+            app:argType="com.ssafy.yoganavi.data.source.dto.teacher.FilterData"
             app:nullable="true" />
         <argument
             android:name="isInit"
@@ -47,7 +47,7 @@
             app:argType="boolean" />
         <argument
             android:name="sorting"
-            android:defaultValue="0"
+            android:defaultValue="2"
             app:argType="integer" />
     </fragment>
     <fragment
@@ -135,7 +135,7 @@
         <argument
             android:name="filter"
             android:defaultValue="@null"
-            app:argType="com.ssafy.yoganavi.data.source.teacher.FilterData"
+            app:argType="com.ssafy.yoganavi.data.source.dto.teacher.FilterData"
             app:nullable="true" />
         <argument
             android:name="isInit"

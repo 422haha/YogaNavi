@@ -74,7 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/padding_medium"
             android:layout_marginTop="@dimen/padding_small"
-            android:text="@string/password"
+            android:text="@string/change_password"
             app:layout_constraintStart_toStartOf="@id/til_pw"
             app:layout_constraintTop_toBottomOf="@id/til_nn" />
 

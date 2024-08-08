@@ -15,7 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.bumptech.glide.Glide
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -40,6 +39,7 @@ import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding::inflate) {
+
     private val args by navArgs<ModifyFragmentArgs>()
     private val viewModel: ModifyViewModel by viewModels()
     private val hashTagAdapter by lazy { HashTagAdapter(::deleteHashTag) }
@@ -103,11 +103,8 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
         with(binding) {
             tieNn.setText(data.nickname)
 
-            if (data.imageUrlSmall?.isNotBlank() == true) {
-                Glide.with(requireContext())
-                    .load(data.imageUrlSmall)
-                    .into(ivIcon)
-            }
+            if (!data.smallImageKey.isNullOrBlank())
+                viewModel.loadS3Image(ivIcon, data.smallImageKey)
 
             if (data.teacher) {
                 tvHashtag.visibility = View.VISIBLE
@@ -163,7 +160,7 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
                 check.isEnabled = true
             }
         }
-        tieContent.setOnKeyListener { v, keyCode, event ->
+        tieContent.setOnKeyListener { _, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
                 val currentText = tieContent.text.toString()
                 val length = currentText.length
@@ -214,7 +211,11 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
     }
 
     private suspend fun loadingView() = withContext(Dispatchers.Main) {
-        binding.vBg.visibility = View.VISIBLE
+        binding.vBg.apply {
+            visibility = View.VISIBLE
+            isClickable = true
+            isFocusable = true
+        }
         binding.lav.visibility = View.VISIBLE
     }
 

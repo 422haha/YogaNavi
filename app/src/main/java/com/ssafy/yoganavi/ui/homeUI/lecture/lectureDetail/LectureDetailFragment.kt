@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -22,7 +23,13 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
 ) {
     private val viewModel: LectureDetailViewModel by viewModels()
     private val args by navArgs<LectureDetailFragmentArgs>()
-    private val lectureDetailAdapter by lazy { LectureDetailAdapter(::moveToVideo) }
+    private val lectureDetailAdapter by lazy {
+        LectureDetailAdapter(
+            goChapterVideo = ::moveToVideo,
+            loadS3ImageSequentially = ::loadS3ImageSequentially,
+            loadS3VideoFrame = ::loadS3VideoFrame
+        )
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,8 +51,8 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
             recordedId = data.recordedId,
             recordTitle = data.recordTitle,
             recordContent = data.recordContent,
-            recordThumbnail = data.recordThumbnailPath,
-            recordThumbnailSmall = data.recordThumbnailSmall,
+            imageKey = data.imageKey,
+            smallImageKey = data.smallImageKey,
             nickname = data.nickname
         )
         itemList.add(LectureDetailItem.Header(header))
@@ -57,12 +64,19 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
         lectureDetailAdapter.submitList(itemList)
     }
 
+    private fun loadS3ImageSequentially(view: ImageView, smallKey: String, largeKey: String) =
+        viewModel.loadS3Image(view, smallKey, largeKey)
+
+    private fun loadS3VideoFrame(view: ImageView, key: String, time: Long, isCircularOn: Boolean) =
+        viewModel.loadS3VideoFrame(view, key, time, isCircularOn)
+
     private fun moveToVideo(start: Int) {
         val uriList = lectureDetailAdapter.currentList
             .asSequence()
             .drop(start)
             .map { it as LectureDetailItem.Item }
-            .map { it.chapterData.recordVideo }
+            .map { it.chapterData.recordKey }
+            .map { keyToUri(it) }
             .toList()
             .toTypedArray()
 
@@ -73,7 +87,9 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
     }
 
     private fun String.toTitle(): String {
-        val name = if (length > 10) substring(0, 10) else this
+        val name = if (length > 7) "${substring(0, 7)}..." else this
         return "${name}님의 $LECTURE"
     }
+
+    private fun keyToUri(key: String): String = viewModel.keyToUri(key)
 }

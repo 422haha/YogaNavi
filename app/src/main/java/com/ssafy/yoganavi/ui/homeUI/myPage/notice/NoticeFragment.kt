@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.notice
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -22,7 +23,14 @@ import kotlinx.coroutines.launch
 class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding::inflate) {
 
     private val viewModel: NoticeViewModel by viewModels()
-    private val noticeAdapter by lazy { NoticeAdapter(::navigateToNoticeFragment, ::noticeDelete) }
+    private val noticeAdapter by lazy {
+        NoticeAdapter(
+            navigateToRegisterNoticeFragment = ::navigateToNoticeFragment,
+            noticeDeleteClick = ::noticeDelete,
+            loadS3Image = ::loadS3Image,
+            loadS3ImageSequentially = ::loadS3ImageSequentially
+        )
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -45,7 +53,7 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.noticeList.collectLatest {
-                checkEmptyList(it,EMPTY_NOTICE)
+                checkEmptyList(it, EMPTY_NOTICE)
                 noticeAdapter.submitList(it)
             }
         }
@@ -60,4 +68,12 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(FragmentNoticeBinding
     private fun noticeDelete(noticeData: NoticeData) {
         viewModel.deleteNotice(noticeData.articleId)
     }
+
+    private fun loadS3Image(view: ImageView, key: String) = viewModel.loadS3Image(view, key)
+
+    private fun loadS3ImageSequentially(
+        view: ImageView,
+        smallKey: String,
+        largeKey: String
+    ) = viewModel.loadS3ImageSequentially(view, smallKey, largeKey)
 }

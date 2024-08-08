@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.likeTeacher
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -20,11 +21,13 @@ import kotlinx.coroutines.launch
 class LikeTeacherFragment : BaseFragment<FragmentLikeTeacherBinding>(
     FragmentLikeTeacherBinding::inflate
 ) {
-    val viewModel: LikeTeacherViewModel by viewModels()
+
+    private val viewModel: LikeTeacherViewModel by viewModels()
     private val teacherAdapter: TeacherAdapter by lazy {
         TeacherAdapter(
-            ::navigateToTeacherFragment,
-            ::teacherLikeToggle
+            navigateToRegisterTeacherFragment = ::navigateToTeacherFragment,
+            teacherLikeToggle = ::teacherLikeToggle,
+            loadS3Image = ::loadS3Image
         )
     }
 
@@ -54,4 +57,8 @@ class LikeTeacherFragment : BaseFragment<FragmentLikeTeacherBinding>(
     private fun teacherLikeToggle(teacherId: Int = -1) {
         viewModel.teacherLikeToggle(teacherId)
     }
+
+    private fun loadS3Image(imageView: ImageView, key: String) = viewModel.loadS3Image(
+        imageView, key
+    )
 }

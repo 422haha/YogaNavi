@@ -20,6 +20,7 @@ const val TOKEN_REQUIRED = "Refresh-Token-Request"
 const val PAGE_SIZE = 30
 const val END_TIME = "00:00"
 const val REPEAT_TIME = 5000L
+const val NINE_HOUR = 32_400_000
 
 // 수신부
 const val FORBIDDEN = 403
@@ -31,6 +32,7 @@ const val PASSWORD_DIFF = "비밀번호가 일치하지 않습니다."
 const val SESSION_END = "세션이 만료되었습니다."
 const val UPLOAD_ERROR = "업로드에 실패했습니다."
 const val BLANK_CHAPTER = "강의 영상 하나 이상을 등록해주세요!"
+const val ALREADY_USE = "이미 존재하는 회원입니다."
 
 // 타이틀
 const val MY_PAGE = "마이 페이지"
@@ -79,6 +81,7 @@ const val NOTHING = "수강가능한 수업이 없습니다."
 const val PICK_DATE = "날짜를 선택하세요."
 const val UPLOAD_FAIL = "업로드에 실패했습니다."
 const val NO_BROADCAST = "방송 중이 아닙니다."
+const val WAIT_BROADCAST = "방송 대기중 입니다 :)"
 const val NO_CONNECT_SERVER = "서버와의 연결되지 않았습니다."
 const val CLOSE_LIVE = "해당 화상강의가 종료되었습니다."
 

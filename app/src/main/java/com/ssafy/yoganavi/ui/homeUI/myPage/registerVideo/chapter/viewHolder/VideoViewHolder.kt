@@ -1,6 +1,7 @@
 package com.ssafy.yoganavi.ui.homeUI.myPage.registerVideo.chapter.viewHolder
 
 import android.view.View
+import android.widget.ImageView
 import androidx.core.widget.addTextChangedListener
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -17,10 +18,13 @@ class VideoViewHolder(
     private val addVideoListener: (Int) -> Unit,
     private val deleteListener: (Int) -> Unit,
     private val changeVideoTitle: (String, Int) -> Unit,
-    private val changeVideoContent: (String, Int) -> Unit
+    private val changeVideoContent: (String, Int) -> Unit,
+    private val loadS3VideoFrame: (ImageView, String, Long, Boolean) -> Unit,
+    private val makeUrlFromKey: (String) -> String
 ) : ViewHolder(binding.root) {
 
     private var uri: String = ""
+    private var isPath: Boolean = false
 
     fun bind(data: VideoData) = with(binding) {
         initListener()
@@ -31,8 +35,16 @@ class VideoViewHolder(
         tvDeleteBtn.setOnClickListener { deleteListener(layoutPosition) }
 
         uri = when {
-            data.recordPath.isNotBlank() -> data.recordPath
-            data.recordVideo.isNotBlank() -> data.recordVideo
+            data.recordPath.isNotBlank() -> {
+                isPath = true
+                data.recordPath
+            }
+
+            data.recordKey.isNotBlank() -> {
+                isPath = false
+                data.recordKey
+            }
+
             else -> ""
         }
 
@@ -40,18 +52,25 @@ class VideoViewHolder(
         else cleanVideo()
     }
 
-    fun getFirstFrame() = with(binding) {
+    private fun getFirstFrame() = with(binding) {
         if (uri.isBlank()) return@with
 
         removeExoPlayer()
-        ivVideo.loadVideoFrame(uri, 0)
+        if (isPath) ivVideo.loadVideoFrame(uri, 0)
+        else loadS3VideoFrame(ivVideo, uri, 0, true)
+
         tvAddVideo.visibility = View.GONE
         pvVideo.visibility = View.GONE
     }
 
     fun getVideo() = with(binding) {
         if (uri.isBlank()) return@with
-        val mediaItem = MediaItem.fromUri(uri)
+
+        val mediaItem = if (isPath) {
+            MediaItem.fromUri(uri)
+        } else {
+            MediaItem.fromUri(makeUrlFromKey(uri))
+        }
 
         pvVideo.player = exoPlayer.apply {
             setMediaItem(mediaItem)
@@ -76,7 +95,7 @@ class VideoViewHolder(
         tvAddVideo.visibility = View.VISIBLE
     }
 
-    private fun removeExoPlayer() = with(binding) {
+    fun removeExoPlayer() = with(binding) {
         exoPlayer.stop()
         exoPlayer.clearMediaItems()
         exoPlayer.clearVideoSurface()

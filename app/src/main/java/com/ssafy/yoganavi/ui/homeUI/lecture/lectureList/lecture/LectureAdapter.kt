@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.lecture.lectureList.lecture
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.paging.PagingDataAdapter
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.databinding.ListItemLectureThumbnailBinding
@@ -10,7 +11,8 @@ import com.ssafy.yoganavi.ui.homeUI.myPage.managementVideo.lecture.LectureViewHo
 
 class LectureAdapter(
     private val navigateToLectureDetailFragment: ((Long, String) -> Unit)? = null,
-    private val sendLikeLecture: (Long) -> Unit
+    private val sendLikeLecture: (Long) -> Unit,
+    private val loadS3Image: (ImageView, String) -> Unit
 ) : PagingDataAdapter<LectureData, LectureViewHolder>(LectureItemCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LectureViewHolder {
@@ -20,7 +22,8 @@ class LectureAdapter(
         return LectureViewHolder(
             binding = binding,
             navigateToLectureDetailFragment = navigateToLectureDetailFragment,
-            sendLikeLecture = sendLikeLecture
+            sendLikeLecture = sendLikeLecture,
+            loadS3Image = loadS3Image
         )
     }
 

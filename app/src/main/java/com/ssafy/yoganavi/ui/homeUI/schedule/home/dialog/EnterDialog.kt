@@ -6,9 +6,9 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.TypedValue
 import android.view.ViewGroup
+import android.widget.ImageView
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.databinding.DialogEnterBinding
-import com.ssafy.yoganavi.ui.utils.loadImageSequentially
 
 class EnterDialog(
     context: Context,
@@ -17,6 +17,7 @@ class EnterDialog(
     private val title: String,
     private val content: String,
     private val okCallback: () -> Unit,
+    private val loadS3ImageSequentially: (ImageView, String, String) -> Unit
 ) : AlertDialog(context) {
 
     private lateinit var binding: DialogEnterBinding
@@ -43,7 +44,7 @@ class EnterDialog(
 
         with(binding) {
             if (!imageUri.isNullOrBlank() && !smallImageUri.isNullOrBlank()) {
-                ivProfile.loadImageSequentially(smallImageUri, imageUri)
+                loadS3ImageSequentially(ivProfile, smallImageUri, imageUri)
             }
 
             tvTitle.text = title

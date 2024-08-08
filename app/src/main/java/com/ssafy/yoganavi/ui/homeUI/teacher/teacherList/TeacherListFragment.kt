@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.teacher.teacherList
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -12,7 +13,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.ssafy.yoganavi.data.source.teacher.FilterData
+import androidx.recyclerview.widget.RecyclerView
+import com.ssafy.yoganavi.data.source.dto.teacher.FilterData
 import com.ssafy.yoganavi.databinding.FragmentTeacherListBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.teacher.teacherList.teacher.TeacherAdapter
@@ -25,16 +27,26 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class TeacherListFragment :
-    BaseFragment<FragmentTeacherListBinding>(FragmentTeacherListBinding::inflate) {
+class TeacherListFragment : BaseFragment<FragmentTeacherListBinding>(
+    FragmentTeacherListBinding::inflate
+) {
 
     private val viewModel: TeacherListViewModel by viewModels()
     private val teacherAdapter by lazy {
         TeacherAdapter(
-            ::navigateToTeacherFragment,
-            ::teacherLikeToggle
-        )
+            navigateToRegisterTeacherFragment = ::navigateToTeacherFragment,
+            teacherLikeToggle = ::teacherLikeToggle,
+            loadS3Image = ::loadS3Image
+        ).apply {
+            registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                    binding.rvTeacherList.scrollToPosition(0)
+                    super.onItemRangeChanged(positionStart, itemCount)
+                }
+            })
+        }
     }
+
     private val args by navArgs<TeacherListFragmentArgs>()
     private var filter = FilterData()
 
@@ -62,19 +74,34 @@ class TeacherListFragment :
         binding.svSearch.setQuery(viewModel.getSearchKeyword(), false)
         initListener()
         initCollect()
-        if (args.sorting == RECENT) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(RECENT, filter)
-            }
-        } else {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(POPULAR, filter)
+        if (viewModel.teacherList.value.isEmpty()) {
+            when (args.sorting) {
+                RECENT -> {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.setSorting(RECENT, filter)
+                    }
+                }
+                POPULAR -> {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.setSorting(POPULAR, filter)
+                    }
+                }
+                else -> {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.setSorting(viewModel.sorting.value, filter)
+                        if (viewModel.sorting.value == RECENT) {
+                            binding.rbRecent.isChecked = true
+                        } else {
+                            binding.rbPopular.isChecked = true
+                        }
+                    }
+                }
             }
         }
     }
 
-    fun initListener() {
-        binding.lyFilter.setOnClickListener {
+    fun initListener() = with(binding) {
+        lyFilter.setOnClickListener {
             val directions = TeacherListFragmentDirections
                 .actionTeacherListFragmentToFilterFragment(
                     filter,
@@ -83,7 +110,7 @@ class TeacherListFragment :
                 )
             findNavController().navigate(directions)
         }
-        binding.svSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        svSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 viewModel.setSearchKeyword(filter, query)
                 return false
@@ -94,32 +121,29 @@ class TeacherListFragment :
                 return false
             }
         })
-        binding.rbRecent.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(RECENT, filter)
-            }
-        }
+        rgAlign.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                rbRecent.id -> viewLifecycleOwner.lifecycleScope.launch {
+                    if (viewModel.sorting.value != RECENT) {
+                        if (viewModel.teacherList.value.isNotEmpty()) {
+                            viewModel.setSorting(RECENT, filter)
+                        }
+                    }
+                }
 
-        binding.rbPopular.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.setSorting(POPULAR, filter)
+                rbPopular.id -> viewLifecycleOwner.lifecycleScope.launch {
+                    if (viewModel.sorting.value != POPULAR) {
+                        if (viewModel.teacherList.value.isNotEmpty()) {
+                            viewModel.setSorting(POPULAR, filter)
+                        }
+                    }
+                }
             }
         }
     }
 
     fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            launch {
-                viewModel.sorting.collectLatest { sorting ->
-                    if (sorting == RECENT) {
-                        binding.rbRecent.isChecked = true
-                        binding.rbPopular.isChecked = false
-                    } else {
-                        binding.rbPopular.isChecked = true
-                        binding.rbRecent.isChecked = false
-                    }
-                }
-            }
             launch {
                 viewModel.teacherList.collectLatest { teacherList ->
                     checkEmptyList(teacherList, EMPTY_TEACHER)
@@ -138,4 +162,8 @@ class TeacherListFragment :
     private fun teacherLikeToggle(teacherId: Int = -1) {
         viewModel.teacherLikeToggle(filter, teacherId)
     }
+
+    private fun loadS3Image(imageView: ImageView, key: String) = viewModel.loadS3Image(
+        imageView, key
+    )
 }

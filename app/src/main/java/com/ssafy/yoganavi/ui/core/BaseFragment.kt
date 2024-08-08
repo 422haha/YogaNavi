@@ -78,6 +78,11 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
         }
     }
 
+    fun setMenuItemAvailable(isAvailable: Boolean) {
+        if (activity == null || requireActivity() !is MainActivity) return
+        (requireActivity() as MainActivity).setMenuItemAvailable(isAvailable)
+    }
+
     fun logout() {
         if (this is LoginFragment || this is FindFragment || this is JoinFragment) return
 

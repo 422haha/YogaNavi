@@ -12,7 +12,7 @@ import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
 import com.ssafy.yoganavi.data.source.response.YogaDetailResponse
 import com.ssafy.yoganavi.data.source.response.YogaResponse
-import com.ssafy.yoganavi.data.source.teacher.FilterData
+import com.ssafy.yoganavi.data.source.dto.teacher.FilterData
 import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -1,8 +1,8 @@
 package com.ssafy.yoganavi.ui.homeUI.teacher.teacherList.teacher
 
+import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.bumptech.glide.Glide
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.databinding.ListItemTeacherBinding
@@ -10,8 +10,10 @@ import com.ssafy.yoganavi.ui.utils.toK
 
 class TeacherViewHolder(
     private val binding: ListItemTeacherBinding,
-    private val navigateToTeacherDetailFragment: (Int) -> Unit
+    private val navigateToTeacherDetailFragment: (Int) -> Unit,
+    private val loadS3Image: (ImageView, String) -> Unit
 ) : ViewHolder(binding.root) {
+
     fun bind(item: TeacherData, teacherLikeToggle: (Int) -> Unit) = with(binding) {
         tvTeacherNickname.text = item.teacherName
         tvCount.text = item.likes.toK()
@@ -23,12 +25,10 @@ class TeacherViewHolder(
             tvHashtag.isVisible = false
         }
 
-        if (item.teacherSmallProfile.isNullOrBlank()) {
-            binding.ivProfile.setImageResource(R.drawable.profilenull)
+        if (item.smallProfileKey.isNullOrBlank()) {
+            ivProfile.setImageResource(R.drawable.profilenull)
         } else {
-            Glide.with(binding.root)
-                .load(item.teacherSmallProfile)
-                .into(binding.ivProfile)
+            loadS3Image(ivProfile, item.smallProfileKey)
         }
 
         if (item.liked) {

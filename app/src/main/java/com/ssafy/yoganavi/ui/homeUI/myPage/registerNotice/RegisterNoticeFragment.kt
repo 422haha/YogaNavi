@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewTreeObserver
+import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
@@ -21,7 +22,6 @@ import com.ssafy.yoganavi.ui.utils.MANAGEMENT_UPDATE
 import com.ssafy.yoganavi.ui.utils.REGISTER
 import com.ssafy.yoganavi.ui.utils.UPLOAD_FAIL
 import com.ssafy.yoganavi.ui.utils.getImagePath
-import com.ssafy.yoganavi.ui.utils.loadImageSequentially
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -90,8 +90,8 @@ class RegisterNoticeFragment : BaseFragment<FragmentRegisterNoticeBinding>(
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.notice.collectLatest { notice ->
                 binding.etNotice.setText(notice.content)
-                if (notice.imageUrl?.isNotBlank() == true && notice.imageUrlSmall?.isNotBlank() == true) {
-                    binding.ivPhoto.loadImageSequentially(notice.imageUrlSmall, notice.imageUrl)
+                if (!notice.imageKey.isNullOrBlank() && !notice.smallImageKey.isNullOrBlank()) {
+                    loadS3ImageSequentially(binding.ivPhoto, notice.smallImageKey, notice.imageKey)
                     binding.ivPhoto.visibility = View.VISIBLE
                     binding.btnDeletePhoto.visibility = View.VISIBLE
                     binding.btnAddPhoto.visibility = View.GONE
@@ -131,17 +131,30 @@ class RegisterNoticeFragment : BaseFragment<FragmentRegisterNoticeBinding>(
     }
 
     private suspend fun loadingView() = withContext(Dispatchers.Main) {
-        binding.vBg.visibility = View.VISIBLE
+        setMenuItemAvailable(false)
+        binding.vBg.apply {
+            visibility = View.VISIBLE
+            isClickable = true
+            isFocusable = true
+        }
         binding.lav.visibility = View.VISIBLE
     }
 
     private suspend fun failToUpload() = withContext(Dispatchers.Main) {
+        setMenuItemAvailable(true)
         binding.vBg.visibility = View.GONE
         binding.lav.visibility = View.GONE
         showSnackBar(UPLOAD_FAIL)
     }
 
     private suspend fun goBackStack() = withContext(Dispatchers.Main) {
+        setMenuItemAvailable(true)
         findNavController().popBackStack()
     }
+
+    private fun loadS3ImageSequentially(
+        view: ImageView,
+        smallKey: String,
+        largeKey: String
+    ) = viewModel.loadS3ImageSequentially(view, smallKey, largeKey)
 }

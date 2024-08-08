@@ -1,13 +1,17 @@
 package com.ssafy.yoganavi.ui.homeUI.lecture.lectureList
 
+import android.widget.ImageView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.amazonaws.services.s3.AmazonS3Client
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
 import com.ssafy.yoganavi.data.repository.lecture.LectureRepository
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.ui.homeUI.lecture.lectureList.lecture.SortAndKeyword
+import com.ssafy.yoganavi.ui.utils.FAME
+import com.ssafy.yoganavi.ui.utils.loadS3Image
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,6 +25,7 @@ import javax.inject.Inject
 class LectureListViewModel @Inject constructor(
     private val lectureRepository: LectureRepository,
     private val infoRepository: InfoRepository,
+    private val s3Client: AmazonS3Client
 ) : ViewModel() {
 
     private val _sortAndKeyword = MutableStateFlow(SortAndKeyword())
@@ -38,7 +43,7 @@ class LectureListViewModel @Inject constructor(
 
     fun setLectureLike(recordedId: Long) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.likeLecture(recordedId) }
-            .onSuccess { updateSortAndKeyword(likeChange = true) }
+            .onSuccess { if (_sortAndKeyword.value.sort == FAME) updateSortAndKeyword(likeChange = true) }
             .onFailure { it.printStackTrace() }
     }
 
@@ -54,4 +59,6 @@ class LectureListViewModel @Inject constructor(
         val newValue = SortAndKeyword(sort, keyword, searchInTitle, searchInContent, newLike)
         _sortAndKeyword.value = newValue
     }
+
+    fun loadS3Image(view: ImageView, key: String) = view.loadS3Image(key, s3Client)
 }

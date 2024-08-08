@@ -1,11 +1,14 @@
 package com.ssafy.yoganavi.ui.homeUI.teacher.teacherList
 
+import android.widget.ImageView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.amazonaws.services.s3.AmazonS3Client
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
+import com.ssafy.yoganavi.data.source.dto.teacher.FilterData
+import com.ssafy.yoganavi.ui.utils.loadS3Image
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
-import com.ssafy.yoganavi.data.source.teacher.FilterData
-import com.ssafy.yoganavi.ui.utils.RECENT
+import com.ssafy.yoganavi.ui.utils.POPULAR
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,17 +18,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TeacherListViewModel @Inject constructor(
-    private val infoRepository: InfoRepository
+    private val infoRepository: InfoRepository,
+    private val s3Client: AmazonS3Client
 ) : ViewModel() {
 
     private val _teacherList = MutableStateFlow<List<TeacherData>>(emptyList())
     val teacherList = _teacherList.asStateFlow()
     private var searchKeyword: String = ""
-    private val _sorting = MutableStateFlow(RECENT)
+    private val _sorting = MutableStateFlow(POPULAR)
     val sorting = _sorting.asStateFlow()
     private var isInit: Boolean = true
 
-    private fun initCheckGetTeacherList(filter: FilterData) {
+    fun initCheckGetTeacherList(filter: FilterData) {
         if (isInit) {
             getAllTeacherList()
         } else {
@@ -55,7 +59,7 @@ class TeacherListViewModel @Inject constructor(
     }
 
     fun setSearchKeyword(filter: FilterData, newString: String?) {
-        searchKeyword = newString ?: ""
+        searchKeyword = newString ?: searchKeyword
         initCheckGetTeacherList(filter)
     }
 
@@ -79,4 +83,7 @@ class TeacherListViewModel @Inject constructor(
     fun getIsInit(): Boolean {
         return isInit
     }
+
+    fun loadS3Image(view: ImageView, key: String) = view.loadS3Image(key, s3Client)
+
 }

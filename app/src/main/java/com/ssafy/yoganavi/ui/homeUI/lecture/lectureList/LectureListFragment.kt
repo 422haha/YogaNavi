@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.lecture.lectureList
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -31,7 +32,8 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
     private val lectureAdapter by lazy {
         LectureAdapter(
             navigateToLectureDetailFragment = ::navigateToLectureDetailFragment,
-            sendLikeLecture = ::sendLikeLecture
+            sendLikeLecture = ::sendLikeLecture,
+            loadS3Image = ::loadS3Image
         )
     }
 
@@ -122,6 +124,6 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
         findNavController().navigate(directions)
     }
 
-    private fun sendLikeLecture(recordedId: Long) =
-        viewModel.setLectureLike(recordedId)
+    private fun sendLikeLecture(recordedId: Long) = viewModel.setLectureLike(recordedId)
+    private fun loadS3Image(view: ImageView, key: String) = viewModel.loadS3Image(view, key)
 }

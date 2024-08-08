@@ -15,8 +15,9 @@ import com.ssafy.yoganavi.data.source.dto.teacher.LiveReserveRequest
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherData
 import com.ssafy.yoganavi.data.source.dto.teacher.TeacherDetailData
 import com.ssafy.yoganavi.data.source.info.InfoDataSource
-import com.ssafy.yoganavi.data.source.teacher.FilterData
+import com.ssafy.yoganavi.data.source.dto.teacher.FilterData
 import com.ssafy.yoganavi.di.IoDispatcher
+import com.ssafy.yoganavi.ui.utils.NINE_HOUR
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -139,7 +140,13 @@ class InfoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun createLive(liveLectureData: LiveLectureData): DetailResponse<Unit> {
-        val response = withContext(ioDispatcher) { infoDataSource.createLive(liveLectureData) }
+        val response = withContext(ioDispatcher) {
+            val newLiveLectureData = liveLectureData.copy(
+                startDate = liveLectureData.startDate + NINE_HOUR,
+                endDate = liveLectureData.endDate + NINE_HOUR
+            )
+            infoDataSource.createLive(newLiveLectureData)
+        }
         return response.toDetailResponse()
     }
 
