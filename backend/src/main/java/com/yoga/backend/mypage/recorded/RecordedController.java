@@ -280,7 +280,8 @@ public class RecordedController {
     ) {
         Map<String, Object> response = new HashMap<>();
         int userId = jwtUtil.getUserIdFromToken(token);
-        List<LectureDto> lectureList = recordedService.searchLectures(userId, keyword, sort, page, size, title, content);
+        List<LectureDto> lectureList = recordedService.searchLectures(userId, keyword, sort, page,
+            size, title, content);
 
         if (!lectureList.isEmpty()) {
             response.put("message", "강의 검색 성공");
