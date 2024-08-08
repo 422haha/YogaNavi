@@ -84,6 +84,7 @@ const val NO_BROADCAST = "방송 중이 아닙니다."
 const val WAIT_BROADCAST = "방송 대기중 입니다 :)"
 const val NO_CONNECT_SERVER = "서버와의 연결되지 않았습니다."
 const val CLOSE_LIVE = "해당 화상강의가 종료되었습니다."
+const val SUCCESS = "success"
 
 // empty 관리
 const val EMPTY_LIVE = "예정된 실시간 강의가 없습니다"
