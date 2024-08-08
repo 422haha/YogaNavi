@@ -11,6 +11,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -210,4 +212,33 @@ public class LiveLectureServiceImpl implements LiveLectureService {
             throw new RuntimeException("강의 삭제 실패", e);
         }
     }
+
+    // 비동기 처리 코드
+    //    @Async
+//    @Override
+//    public CompletableFuture<Void> updateIsOnAir(Long liveId, boolean isOnAir) {
+//        LiveLectures lecture = liveLecturesRepository.findById(liveId)
+//            .orElseThrow(() -> new IllegalArgumentException("Invalid liveId: " + liveId));
+//        lecture.setIsOnAir(isOnAir);
+//        liveLecturesRepository.save(lecture);
+//        return CompletableFuture.completedFuture(null);
+//    }
+
+    /**
+     * 실시간 강의의 OnAir 상태를 업데이트합니다.
+     *
+     * @param liveId 업데이트할 강의의 ID
+     * @param isOnAir 강의가 OnAir 상태인지 여부
+     */
+    @Override
+    public void updateIsOnAir(Long liveId, boolean isOnAir) {
+        // liveId로 강의를 검색하고, 존재하지 않으면 예외를 발생
+        LiveLectures lecture = liveLecturesRepository.findById(liveId)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid liveId: " + liveId));
+
+        // OnAir 상태 설절하고 저장
+        lecture.setIsOnAir(isOnAir);
+        liveLecturesRepository.save(lecture);
+    }
 }
+
