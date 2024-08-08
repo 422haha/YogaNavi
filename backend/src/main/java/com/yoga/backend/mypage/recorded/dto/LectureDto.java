@@ -29,19 +29,20 @@ public class LectureDto {
     private LocalDateTime lastModifiedDate;
 
     // QueryDSL용 생성자 수정
-    //
-    public LectureDto(Long recordedId, String recordTitle, String recordContent,
-        String recordThumbnailSmall, Long likeCount,
-        LocalDateTime createdDate, LocalDateTime lastModifiedDate,
-        Boolean myLike) {
+    public LectureDto(Long recordedId, Integer userId, String nickname, String recordTitle, String recordContent,
+        String recordThumbnail, String recordThumbnailSmall, Long likeCount,
+        LocalDateTime createdDate, LocalDateTime lastModifiedDate, Boolean myLike) {
         this.recordedId = recordedId;
+        this.userId = userId;
+        this.nickname = nickname;
         this.recordTitle = recordTitle;
         this.recordContent = recordContent;
+        this.recordThumbnail = recordThumbnail;
         this.recordThumbnailSmall = recordThumbnailSmall;
         this.likeCount = likeCount;
         this.createdDate = createdDate;
         this.lastModifiedDate = lastModifiedDate;
-        this.myLike = myLike != null && myLike;
+        this.myLike = myLike;
     }
 
     // findAllLectures, findMyLikedLectures

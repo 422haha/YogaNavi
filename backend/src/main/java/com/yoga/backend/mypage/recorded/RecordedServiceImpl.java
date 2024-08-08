@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 
@@ -83,8 +84,7 @@ public class RecordedServiceImpl implements RecordedService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public List<LectureDto> getLikeLectures(int userId) {
-        List<LectureDto> lectures = myLikeLectureListRepository.findMyLikedLectures(userId);
-        return setNickname(lectures);
+        return myLikeLectureListRepository.findMyLikedLectures(userId);
     }
 
     /**
@@ -131,15 +131,22 @@ public class RecordedServiceImpl implements RecordedService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public LectureDto getLectureDetails(Long recordedId, int userId) {
+        // 강의 정보 가져오기
         RecordedLecture lecture = recordedLectureRepository.findById(recordedId)
             .orElseThrow(() -> new RuntimeException("강의 찾을 수 없음"));
 
+        // 강의를 업로드한 사용자 정보 가져오기
+        Users uploader = usersRepository.findById(lecture.getUser().getId())
+            .orElseThrow(() -> new RuntimeException("업로더 사용자 찾을 수 없음"));
+
+        // 요청한 사용자 정보 가져오기
         Users user = usersRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자 찾을 수 없음"));
 
-        String nickname = user.getNickname();
+        // DTO로 변환
         LectureDto dto = convertToDto(lecture);
-        dto.setNickname(nickname);
+        dto.setUserId(uploader.getId()); // 업로더의 userId 설정
+        dto.setNickname(uploader.getNickname()); // 업로더의 nickname 설정
         dto.setLikeCount(lecture.getLikeCount());
         dto.setMyLike(lectureLikeRepository.existsByLectureAndUser(lecture, user));
 
@@ -214,7 +221,7 @@ public class RecordedServiceImpl implements RecordedService {
             s3Service.deleteFile(lecture.getThumbnailSmall());
             // 새 저용량 썸네일 설정
             lecture.setThumbnailSmall(lectureDto.getRecordThumbnailSmall());
-            log.info("강의 소형 썸네일 업데이트: {}", lectureDto.getRecordThumbnailSmall());
+            log.info("강의 소형 썸네일 업데이트: {}", lectureDto.getRecordThumbnail());
         }
     }
 
@@ -308,7 +315,7 @@ public class RecordedServiceImpl implements RecordedService {
         String existingUrl = chapter.getVideoUrl();
         String newUrl = chapterDto.getRecordVideo();
 
-        if (!Objects.equals(extractS3Key(existingUrl), extractS3Key(newUrl))) {
+        if (!Objects.equals(existingUrl, newUrl)) {
             if (newUrl != null && !newUrl.isEmpty()) {
                 // 새 비디오 URL이 제공된 경우
                 if (existingUrl != null && !existingUrl.isEmpty()) {
@@ -334,7 +341,6 @@ public class RecordedServiceImpl implements RecordedService {
         chapter.setLecture(lecture);
         return chapter;
     }
-
 
     /**
      * 강의를 삭제
@@ -447,23 +453,20 @@ public class RecordedServiceImpl implements RecordedService {
 
     @Override
     public List<LectureDto> getAllLectures(int userId, int page, int size, String sort) {
-        List<LectureDto> lectures = allRecordedLecturesRepository.findAllLectures(userId, page,
-            size, sort);
-        return setNickname(lectures);
+        return allRecordedLecturesRepository.findAllLectures(userId, page, size, sort);
     }
 
     @Transactional(readOnly = true)
     public List<LectureDto> searchLectures(int userId, String keyword, String sort, int page,
         int size, boolean searchTitle, boolean searchContent) {
-        List<LectureDto> lectures = recordedLectureListRepository.searchLectures(userId, keyword,
-            sort, page, size, searchTitle, searchContent);
-        return setNickname(lectures);
+        return recordedLectureListRepository.searchLectures(userId, keyword, sort, page, size,
+            searchTitle, searchContent);
     }
 
     private LectureDto convertToDto(RecordedLecture lecture) {
         LectureDto dto = new LectureDto();
         dto.setRecordedId(lecture.getId());
-        dto.setUserId(lecture.getUser().getId());
+        dto.setUserId(lecture.getUser().getId()); // 업로더의 userId 설정
         dto.setRecordTitle(lecture.getTitle());
         dto.setRecordContent(lecture.getContent());
         dto.setRecordThumbnail(lecture.getThumbnail());
@@ -484,14 +487,6 @@ public class RecordedServiceImpl implements RecordedService {
         dto.setRecordedLectureChapters(chapterDtos);
 
         return dto;
-    }
-
-    private String extractS3Key(String url) {
-        if (url.startsWith("https://")) {
-            String[] parts = url.split("/", 4);
-            return parts.length > 3 ? parts[3] : "";
-        }
-        return url;
     }
 
     private List<LectureDto> setNickname(List<LectureDto> lectures) {
