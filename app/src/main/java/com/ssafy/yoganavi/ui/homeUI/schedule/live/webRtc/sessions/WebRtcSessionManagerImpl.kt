@@ -170,9 +170,9 @@ class WebRtcSessionManagerImpl(
     }
 
     override fun onSessionScreenReady() {
-        runCatching {
-            setupAudio()
+        runCatching { setupAudio() }
 
+        runCatching {
             peerConnection.connection.addTrack(localVideoTrack)
             peerConnection.connection.addTrack(localAudioTrack)
         }
@@ -181,18 +181,23 @@ class WebRtcSessionManagerImpl(
             sessionManagerScope.launch {
                 // sending local video track to show local video from start
                 _localVideoTrackFlow.emit(localVideoTrack)
+            }
+        }
 
-                if (offer != null) {
+        runCatching {
+            sessionManagerScope.launch {
+                if (offer != null)
                     sendAnswer()
-                } else {
+                else
                     sendOffer()
-                }
             }
         }
     }
 
     override fun flipCamera() {
-        (videoCapturer as? Camera2Capturer)?.switchCamera(null)
+        runCatching {
+            (videoCapturer as? Camera2Capturer)?.switchCamera(null)
+        }
     }
 
     override fun enableMicrophone(enabled: Boolean) {
@@ -208,7 +213,23 @@ class WebRtcSessionManagerImpl(
         }
     }
 
-    override fun disconnect() {
+    override fun enableMicrophone(enabled: Boolean) {
+        runCatching {
+            audioManager?.isMicrophoneMute = !enabled
+        }
+    }
+
+    override fun enableCamera(enabled: Boolean) {
+        runCatching {
+            if (enabled) {
+                videoCapturer.startCapture(resolution.width, resolution.height, 30)
+            } else {
+                videoCapturer.stopCapture()
+            }
+        }
+    }
+
+    override suspend fun disconnect() {
         runCatching {
             // dispose audio & video tracks.
             remoteVideoTrackFlow.replayCache.forEach { videoTrack ->
@@ -219,23 +240,30 @@ class WebRtcSessionManagerImpl(
             }
             localAudioTrack.dispose()
             localVideoTrack.dispose()
+        }
 
+        runCatching {
             // dispose audio handler and video capturer.
             audioHandler.stop()
             videoCapturer.stopCapture()
             videoCapturer.dispose()
+        }.onFailure { it.printStackTrace() }
 
+        offer = null
+
+        runCatching {
             // dispose signaling clients and socket.
             signalingClient.dispose()
+        }.onFailure { it.printStackTrace() }
 
-            offer = null
+        runCatching {
+            peerConnection.connection.close()
+        }.onFailure { it.printStackTrace() }
 
-            peerConnection.connection.dispose()
-
+        runCatching {
             surfaceTextureHelper.dispose()
-
             sessionManagerScope.cancel()
-        }
+        }.onFailure { it.printStackTrace() }
     }
 
     private fun safeDispose(track: MediaStreamTrack?) {
@@ -245,27 +273,6 @@ class WebRtcSessionManagerImpl(
             }
         } catch (e: IllegalStateException) {
             Timber.e("Error disposing track: ${e.message}")
-        }
-    }
-
-    override fun reconnect() {
-        runCatching {
-            remoteVideoTrackFlow.replayCache.forEach { videoTrack ->
-                if (videoTrack.state() != MediaStreamTrack.State.ENDED) {
-                    videoTrack.dispose()
-                }
-            }
-            localVideoTrackFlow.replayCache.forEach { videoTrack ->
-                if (videoTrack.state() != MediaStreamTrack.State.ENDED) {
-                    videoTrack.dispose()
-                }
-            }
-
-            safeDispose(localAudioTrack)
-            safeDispose(localVideoTrack)
-
-            // Dispose of audio handler and video capturer
-            audioHandler.stop()
         }
     }
 

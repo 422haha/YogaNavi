@@ -45,10 +45,6 @@ class HomeAdapter(
                     ivProfile.setImageResource(R.drawable.profilenull)
                 }
 
-                if (false) onAir.setBackgroundResource(R.color.red) else onAir.setBackgroundResource(
-                    R.color.gray_20
-                )
-
                 if (item.lectureDate != preDay) {
                     dateDivider.isVisible = true
                     tvDivider.isVisible = true
@@ -58,9 +54,7 @@ class HomeAdapter(
                     tvDivider.isVisible = false
                 }
 
-                if (false) onAir.setBackgroundResource(R.color.red) else onAir.setBackgroundResource(
-                    R.color.gray_20
-                )
+                if (item.isOnAir) onAir.setBackgroundResource(R.color.red) else onAir.setBackgroundResource(R.color.gray_20)
 
                 tvTeacherNickname.text = item.teacherName
 

@@ -199,10 +199,14 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             WebRTCSessionState.Offline -> {
                 binding.tvState.text = NO_CONNECT_SERVER
 
-                if (prevState != WebRTCSessionState.Offline)
-                    viewModel.sessionManager.disconnect()
+                if (prevState != WebRTCSessionState.Offline) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        runCatching {
+                            viewModel.sessionManager.disconnect()
+                        }
+                    }
+                }
             }
-
             WebRTCSessionState.Impossible -> {
                 if (!args.isTeacher)
                     binding.tvState.text = WAIT_BROADCAST
@@ -210,18 +214,15 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
                     viewModel.sessionManager.onSessionScreenReady()
                 }
             }
-
             WebRTCSessionState.Ready -> {
                 if (args.isTeacher)
                     viewModel.sessionManager.onSessionScreenReady()
             }
-
             WebRTCSessionState.Creating -> {
                 if (!args.isTeacher)
                     viewModel.sessionManager.onSessionScreenReady()
             }
-
-            WebRTCSessionState.Active -> {}
+            WebRTCSessionState.Active -> {  }
         }
 
         prevState = state
@@ -347,7 +348,11 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     private fun popBack() {
         exitFullscreen()
 
-        runCatching { viewModel.sessionManager.disconnect() }
+        viewLifecycleOwner.lifecycleScope.launch {
+            runCatching {
+                viewModel.sessionManager.disconnect()
+            }
+        }
 
         findNavController().popBackStack()
     }
