@@ -18,7 +18,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.ssafy.yoganavi.R
@@ -191,11 +190,11 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         when (state) {
             WebRTCSessionState.Offline -> {
                 binding.tvState.text = NO_CONNECT_SERVER
+
+                if(prevState != WebRTCSessionState.Offline)
+                    viewModel.sessionManager.disconnect()
             }
             WebRTCSessionState.Impossible -> {
-                if(prevState == WebRTCSessionState.Active && args.isTeacher)
-                    viewModel.sessionManager.reconnect()
-
                 if(!args.isTeacher)
                     binding.tvState.text = "방송 대기중 입니다 :)"
             }

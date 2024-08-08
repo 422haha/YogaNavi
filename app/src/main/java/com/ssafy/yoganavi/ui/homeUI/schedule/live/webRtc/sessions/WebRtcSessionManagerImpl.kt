@@ -169,12 +169,14 @@ class WebRtcSessionManagerImpl(
     }
 
     override fun onSessionScreenReady() {
-        setupAudio()
-
         runCatching {
+            setupAudio()
+
             peerConnection.connection.addTrack(localVideoTrack)
             peerConnection.connection.addTrack(localAudioTrack)
+        }
 
+        runCatching {
             sessionManagerScope.launch {
                 // sending local video track to show local video from start
                 _localVideoTrackFlow.emit(localVideoTrack)
@@ -262,8 +264,6 @@ class WebRtcSessionManagerImpl(
 
             // Dispose of audio handler and video capturer
             audioHandler.stop()
-            videoCapturer.stopCapture()
-            videoCapturer.dispose()
         }
     }
 
