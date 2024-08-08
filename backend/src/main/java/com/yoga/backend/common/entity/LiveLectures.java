@@ -57,4 +57,8 @@ public class LiveLectures {
 
     @Column(length = 100, nullable = false)
     private String availableDay; // 가능한 강의 요일
+
+    @Column(nullable = false)
+    private Boolean isOnAir = false; // 강의 오픈 여부
+
 }

@@ -228,6 +228,7 @@ public class HomeService {
         dto.setProfileImageUrlSmall(lecture.getUser().getProfile_image_url_small());
 
         dto.setTeacher(isTeacher);
+        dto.setIsOnAir(lecture.getIsOnAir());
 
         return dto;
     }
