@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 수강 내역
- * todo 자정 넘어가는거 고려
  */
 @Service
 public class HistoryService {
@@ -86,15 +85,6 @@ public class HistoryService {
             }
         }
 
-        // 디버깅
-//        System.out.println("학생");
-//        System.out.println("currentDate: " + currentDate);
-//        for (LectureHistoryDto historyDto : result) {
-//            System.out.println("historyDto.getLiveTitle = " + historyDto.getLiveTitle());
-//            System.out.println("historyDto.getLectureDay" + historyDto.getLectureDay());
-//            System.out.println("historyDto.getEndTime" + historyDto.getEndTime());
-//        }
-
         return result;
     }
 
@@ -127,15 +117,6 @@ public class HistoryService {
             }
         }
 
-        // 디버깅
-//        System.out.println("선생");
-//        System.out.println("currentDate: " + currentDate);
-//        for (LectureHistoryDto historyDto : result) {
-//            System.out.println("historyDto.getLiveTitle = " + historyDto.getLiveTitle());
-//            System.out.println("historyDto.getLectureDay" + historyDto.getLectureDay());
-//            System.out.println("historyDto.getEndTime" + historyDto.getEndTime());
-//        }
-
         return result;
     }
 
@@ -161,28 +142,32 @@ public class HistoryService {
                 .withZoneSameInstant(KOREA_ZONE).toLocalDate();
         }
 
-//        LocalTime startTime = LocalTime.ofInstant(lecture.getStartTime(), KOREA_ZONE);
-//        LocalTime endTime = LocalTime.ofInstant(lecture.getEndTime(), KOREA_ZONE);\
-
         LocalTime startTime = ZonedDateTime.ofInstant(lecture.getStartTime(), ZoneId.of("UTC"))
             .toLocalTime();
         LocalTime endTime = ZonedDateTime.ofInstant(lecture.getEndTime(), ZoneId.of("UTC"))
             .toLocalTime();
 
-//        System.out.println("startdate: " + startDate);
-//        System.out.println("enddate: " + endDate);
-//        System.out.println("startTime: " + startTime);
-//        System.out.println("endTime: " + endTime);
-
         LocalDate today = nowKorea.toLocalDate();
         LocalTime nowTime = nowKorea.toLocalTime();
 
-//        System.out.println("nowtime: " + nowTime);
+        boolean tillYesterday = endTime.isBefore(startTime);
 
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
             if (lecture.getAvailableDay()
                 .contains(date.getDayOfWeek().toString().substring(0, 3))) {
-                if (date.isBefore(today) || (date.isEqual(today) && endTime.isBefore(nowTime))) {
+
+                // 오늘 강의, 종료 시간이 지난 강의
+                boolean isLectureToday =
+                    date.isEqual(today) && endTime.isBefore(nowTime) && !tillYesterday;
+
+                // 어제 시작된 강의가 오늘까지 이어짐, 이미 종료
+                boolean isLectureYesterday =
+                    date.equals(today.minusDays(1)) && tillYesterday && endTime.isBefore(nowTime);
+
+                // 과거의 강의
+                boolean isPastLecture = date.isBefore(today);
+
+                if (isPastLecture || isLectureToday || isLectureYesterday) {
                     LectureHistoryDto dto = createLectureHistoryDto(lecture, date, startTime,
                         endTime, isTeacher);
                     dtos.add(dto);
