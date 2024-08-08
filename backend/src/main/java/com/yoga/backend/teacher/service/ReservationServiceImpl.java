@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 
 /**
  * 예약 서비스 구현 클래스 예약 생성 및 조회 등의 비즈니스 로직을 구현
+ * <p>
+ * todo 오늘~오늘 + 강의 시작시간 10분전인 경우 신청 불가
  */
 @Service
 public class ReservationServiceImpl implements ReservationService {
@@ -76,6 +78,9 @@ public class ReservationServiceImpl implements ReservationService {
         ZonedDateTime newEndDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(reservationRequest.getEndDate()), ZoneId.of("UTC"));
 
         List<MyLiveLecture> userReservations = myLiveLectureRepository.findByUserId(userId);
+
+        System.out.println("newStartDate ============" + newStartDate);
+        System.out.println("newEndDate ============" + newEndDate);
 
         for (MyLiveLecture existingReservation : userReservations) {
             ZonedDateTime existingStartDateTime = existingReservation.getStartDate().atZone(ZoneId.of("UTC"));

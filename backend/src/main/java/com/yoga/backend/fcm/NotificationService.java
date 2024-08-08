@@ -19,10 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * fcm 알림 전송 서비스
- *
- * todo 학생에게 알림전송 안됨
- * 수정 삭제 시 학생에게 알림 전송 확인 필요
- *
  */
 @Slf4j
 @Service
@@ -237,7 +233,7 @@ public class NotificationService {
                 .filter(lecture -> {
                     LocalDate lectureDate = lecture.getStartDate().atZone(ZoneOffset.UTC)
                         .withZoneSameInstant(ZoneId.of("UTC")).toLocalDate();
-                    LocalTime lectureStartTime =lecture.getStartTime().atZone(ZoneOffset.UTC)
+                    LocalTime lectureStartTime = lecture.getStartTime().atZone(ZoneOffset.UTC)
                         .withZoneSameInstant(ZoneId.of("UTC")).toLocalTime();
                     LocalDateTime lectureStartDateTime = LocalDateTime.of(lectureDate,
                         lectureStartTime);
@@ -426,7 +422,8 @@ public class NotificationService {
             updatedLecture.getLiveId());
 
         Map<String, Map<String, String>> notifications = new HashMap<>();
-        String message = String.format("%s 강의의 일정 혹은 내용이 업데이트되었습니다.", updatedLecture.getLiveTitle());
+        String message = String.format("%s 강의의 일정 혹은 내용이 업데이트되었습니다.",
+            updatedLecture.getLiveTitle());
 
         for (MyLiveLecture participant : participants) {
             Users user = participant.getUser();

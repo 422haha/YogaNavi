@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 내가 듣거나 진행할 강의들
- * todo 자정 넘어가는거 고려
  */
 @Service
 public class HomeService {
@@ -66,7 +65,6 @@ public class HomeService {
     protected List<HomeResponseDto> getPastStudentLectures(int userId, ZonedDateTime nowKorea,
         String dayOfWeek) {
         LocalDate currentDate = nowKorea.toLocalDate();
-//        System.out.println("home current date " + currentDate);
 
         List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findCurrentLecturesByUserId(
             userId, currentDate, dayOfWeek);
@@ -86,15 +84,6 @@ public class HomeService {
                 result.add(dto);
             }
         }
-
-        // 디버깅
-//        System.out.println("학생");
-//        System.out.println("currentDate: " + currentDate);
-//        for (HomeResponseDto historyDto : result) {
-//            System.out.println("HomeResponseDto.getLiveTitle = " + historyDto.getLiveTitle());
-//            System.out.println("HomeResponseDto.getLectureDay" + historyDto.getLectureDay());
-//            System.out.println("HomeResponseDto.getEndTime" + historyDto.getEndTime());
-//        }
 
         return result;
     }
@@ -128,15 +117,6 @@ public class HomeService {
             }
         }
 
-        // 디버깅
-//        System.out.println("선생");
-//        System.out.println("currentDate: " + currentDate);
-//        for (HomeResponseDto historyDto : result) {
-//            System.out.println("HomeResponseDto.getLiveTitle = " + historyDto.getLiveTitle());
-//            System.out.println("HomeResponseDto.getLectureDay" + historyDto.getLectureDay());
-//            System.out.println("HomeResponseDto.getEndTime" + historyDto.getEndTime());
-//        }
-
         return result;
     }
 
@@ -161,30 +141,34 @@ public class HomeService {
                 .withZoneSameInstant(KOREA_ZONE).toLocalDate();
         }
 
-//        LocalTime startTime = LocalTime.ofInstant(lecture.getStartTime(), KOREA_ZONE);
-//        LocalTime endTime = LocalTime.ofInstant(lecture.getEndTime(), KOREA_ZONE);
-
         LocalTime startTime = ZonedDateTime.ofInstant(lecture.getStartTime(), ZoneId.of("UTC"))
             .toLocalTime();
         LocalTime endTime = ZonedDateTime.ofInstant(lecture.getEndTime(), ZoneId.of("UTC"))
             .toLocalTime();
 
-//        System.out.println("convert to home ============= ");
-//        System.out.println("startdate: " + startDate);
-//        System.out.println("enddate: " + endDate);
-//        System.out.println("startTime: " + startTime);
-//        System.out.println("endTime: " + endTime);
-
         LocalDate today = nowKorea.toLocalDate();
         LocalTime nowTime = nowKorea.toLocalTime();
 
-//        System.out.println("nowtime: " + nowTime);
+        boolean overNight = endTime.isBefore(startTime);
 
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            if (lecture.getAvailableDay().contains(date.getDayOfWeek().toString().substring(0, 3))) {
-                if (date.isAfter(today) || (date.isEqual(today) && endTime.isAfter(nowTime))) {
-                    HomeResponseDto dto = createHomeResponseDto(lecture, date, startTime,
-                        endTime, isTeacher);
+            if (lecture.getAvailableDay()
+                .contains(date.getDayOfWeek().toString().substring(0, 3))) {
+
+                // 오늘 날짜 강의 && 종료 시간이 현재 시간 이후 || 자정을 넘음
+                boolean isLectureToday =
+                    date.isEqual(today) && (endTime.isAfter(nowTime) || overNight);
+
+                // 어제 시작된 강의가 오늘까지 이어짐 (자정을 넘고, 현재 시간이 종료 시간 이전)
+                boolean isLectureStartedYesterday =
+                    date.equals(today.minusDays(1)) && overNight && endTime.isAfter(nowTime);
+
+                // 미래 강의
+                boolean isFutureLecture = date.isAfter(today);
+
+                if (isFutureLecture || isLectureToday || isLectureStartedYesterday) {
+                    HomeResponseDto dto = createHomeResponseDto(lecture, date, startTime, endTime,
+                        isTeacher);
                     dtos.add(dto);
                 }
             }
