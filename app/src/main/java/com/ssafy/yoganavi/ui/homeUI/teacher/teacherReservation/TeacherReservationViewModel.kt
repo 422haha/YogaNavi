@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.yoganavi.data.repository.info.InfoRepository
 import com.ssafy.yoganavi.data.source.dto.live.LiveLectureData
 import com.ssafy.yoganavi.data.source.dto.teacher.LiveReserveRequest
+import com.ssafy.yoganavi.ui.utils.SUCCESS
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +29,8 @@ class TeacherReservationViewModel @Inject constructor(
         liveId: Int,
         startDate: Long?,
         endDate: Long?,
-        navigateToSchedule: () -> (Unit)
+        navigateToSchedule: () -> (Unit),
+        showSnackBar: (String) -> (Unit)
     ) =
         viewModelScope.launch {
             runCatching {
@@ -40,7 +42,13 @@ class TeacherReservationViewModel @Inject constructor(
                     )
                 )
             }
-                .onSuccess { navigateToSchedule() }
+                .onSuccess {
+                    if (it.message == SUCCESS)
+                        navigateToSchedule()
+                    else {
+                        showSnackBar(it.message)
+                    }
+                }
                 .onFailure { it.printStackTrace() }
         }
 }

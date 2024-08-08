@@ -15,7 +15,7 @@ import com.ssafy.yoganavi.ui.utils.ITEM_NOTICE
 
 class TeacherDetailAdapter(
     private val goReserve: (Int, String, String, String) -> (Unit),
-    private val navigateToLectureDetailFragment: (Long) -> Unit,
+    private val navigateToLectureDetailFragment: (Long, String) -> Unit,
     private val sendLikeLecture: (Long) -> Unit,
     private val loadS3Image: (ImageView, String) -> Unit,
     private val loadS3ImageSequentially: (ImageView, String, String) -> Unit

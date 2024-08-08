@@ -72,7 +72,8 @@ class TeacherReservationFragment :
                         liveId,
                         saveStartDate?.toLong(START),
                         saveEndDate?.toLong(END),
-                        ::navigateToSchedule
+                        ::navigateToSchedule,
+                        ::showSnackBar
                     )
                 }
             }

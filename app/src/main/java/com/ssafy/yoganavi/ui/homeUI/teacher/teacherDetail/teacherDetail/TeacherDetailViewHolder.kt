@@ -8,7 +8,7 @@ import com.ssafy.yoganavi.ui.homeUI.teacher.teacherDetail.teacherDetail.lecture.
 
 class TeacherDetailViewHolder(
     private val binding: ListItemTeacherLectureRecycleBinding,
-    navigateToLectureDetailFragment: (Long) -> Unit,
+    navigateToLectureDetailFragment: (Long, String) -> Unit,
     sendLikeLecture: (Long) -> Unit,
     loadS3Image: (ImageView, String) -> Unit
 ) : ViewHolder(binding.root) {

@@ -57,7 +57,6 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
             recordContent = data.recordContent,
             imageKey = data.imageKey,
             smallImageKey = data.smallImageKey,
-            nickname = data.nickname
         )
         itemList.add(LectureDetailItem.Header(header))
 

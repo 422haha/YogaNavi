@@ -35,10 +35,4 @@ class LiveViewModel @Inject constructor(
     fun toggleCameraState(isEnabled: Boolean) {
         _callMediaState.value = _callMediaState.value.copy(isCameraEnabled = isEnabled)
     }
-
-    override fun onCleared() {
-        super.onCleared()
-
-        runCatching { sessionManager.disconnect() }
-    }
 }

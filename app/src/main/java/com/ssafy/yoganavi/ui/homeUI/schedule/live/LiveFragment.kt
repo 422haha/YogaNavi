@@ -28,8 +28,10 @@ import com.ssafy.yoganavi.ui.homeUI.schedule.live.webRtc.WebRTCSessionState
 import com.ssafy.yoganavi.ui.utils.NO_CONNECT_SERVER
 import com.ssafy.yoganavi.ui.utils.PermissionHandler
 import com.ssafy.yoganavi.ui.utils.PermissionHelper
+import com.ssafy.yoganavi.ui.utils.WAIT_BROADCAST
 import dagger.hilt.android.AndroidEntryPoint
 import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.webrtc.RendererCommon
@@ -56,8 +58,6 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         super.onCreate(savedInstanceState)
 
         initPermission()
-
-        viewModel.sessionManager.signalingClient.liveId = args.getLiveId
     }
 
     private fun initPermission() {
@@ -71,13 +71,16 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             requestPermissionLauncher
         )
 
-        permissionHelper = PermissionHelper(this, arrayOf(Manifest.permission.CAMERA), ::popBack).apply {
-            launchPermission()
-        }
+        permissionHelper =
+            PermissionHelper(this, arrayOf(Manifest.permission.CAMERA), ::popBack).apply {
+                launchPermission()
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.sessionManager.signalingClient.updateLiveId(args.getLiveId)
 
         setToolbar(false, "", false)
 
@@ -87,13 +90,12 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
         initInMoveLocalView()
 
+        renderInit()
+
         observeSessionState()
 
         observeCallMediaState()
 
-        localRenderInit()
-
-        remoteRenderInit()
     }
 
     private fun initListener() {
@@ -114,7 +116,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             }
 
             ibtnCamSwitch.setOnClickListener {
-                if(viewModel.sessionManager.signalingClient.sessionStateFlow.value == WebRTCSessionState.Active)
+                if (viewModel.sessionManager.signalingClient.sessionStateFlow.value == WebRTCSessionState.Active)
                     viewModel.sessionManager.flipCamera()
             }
 
@@ -131,6 +133,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
                     viewModel.updateOffset(view.x - event.rawX, view.y - event.rawY)
                     true
                 }
+
                 MotionEvent.ACTION_MOVE -> {
                     view.animate()
                         .x(event.rawX + viewModel.offsetX.value)
@@ -139,6 +142,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
                         .start()
                     true
                 }
+
                 else -> false
             }
         }
@@ -157,6 +161,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
                     viewModel.updateOffset(view.x - event.rawX, view.y - event.rawY)
                     true
                 }
+
                 MotionEvent.ACTION_MOVE -> {
                     val newX = event.rawX + viewModel.offsetX.value
                     val newY = event.rawY + viewModel.offsetY.value
@@ -171,6 +176,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
                         .start()
                     true
                 }
+
                 else -> false
             }
         }
@@ -192,20 +198,27 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         when (state) {
             WebRTCSessionState.Offline -> {
                 binding.tvState.text = NO_CONNECT_SERVER
-            }
-            WebRTCSessionState.Impossible -> {
-                if(prevState == WebRTCSessionState.Active)
+
+                if (prevState != WebRTCSessionState.Offline)
                     viewModel.sessionManager.disconnect()
             }
-            WebRTCSessionState.Ready -> {
-                if(args.isTeacher)
-                    viewModel.sessionManager.onSessionScreenReady()
-            }
-            WebRTCSessionState.Creating -> {
+
+            WebRTCSessionState.Impossible -> {
                 if(!args.isTeacher)
+                    binding.tvState.text = WAIT_BROADCAST
+            }
+
+            WebRTCSessionState.Ready -> {
+                if (args.isTeacher)
                     viewModel.sessionManager.onSessionScreenReady()
             }
-            WebRTCSessionState.Active -> { }
+
+            WebRTCSessionState.Creating -> {
+                if (!args.isTeacher)
+                    viewModel.sessionManager.onSessionScreenReady()
+            }
+
+            WebRTCSessionState.Active -> {}
         }
 
         prevState = state
@@ -215,36 +228,44 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.callMediaState.collectLatest { state ->
-                        handleMicrophoneState(state.isMicrophoneEnabled)
-                        handleCameraState(state.isCameraEnabled)
+                    handleMicrophoneState(state.isMicrophoneEnabled)
+                    handleCameraState(state.isCameraEnabled)
                 }
             }
         }
     }
 
     private fun handleMicrophoneState(isEnabled: Boolean) {
-        if(isEnabled) permissionHandler.branchPermission(Manifest.permission.RECORD_AUDIO, "오디오")
+        if (isEnabled) permissionHandler.branchPermission(Manifest.permission.RECORD_AUDIO, "오디오")
 
-        if(viewModel.sessionManager.signalingClient.sessionStateFlow.value == WebRTCSessionState.Active)
+        if (viewModel.sessionManager.signalingClient.sessionStateFlow.value == WebRTCSessionState.Active)
             viewModel.sessionManager.enableMicrophone(isEnabled)
 
         binding.ibtnMic.setImageResource(if (isEnabled) R.drawable.baseline_mic_24 else R.drawable.baseline_mic_off_24)
     }
 
     private fun handleCameraState(isEnabled: Boolean) {
-        if(isEnabled) permissionHelper.launchPermission()
+        if (isEnabled) permissionHelper.launchPermission()
 
-        if(viewModel.sessionManager.signalingClient.sessionStateFlow.value == WebRTCSessionState.Active)
+        if (viewModel.sessionManager.signalingClient.sessionStateFlow.value == WebRTCSessionState.Active)
             viewModel.sessionManager.enableCamera(isEnabled)
 
         binding.ibtnVideo.setImageResource(if (isEnabled) R.drawable.baseline_videocam_24 else R.drawable.baseline_videocam_off_24)
     }
 
-    private fun localRenderInit() {
+    private fun renderInit() {
         localRenderer = binding.localVideoCallScreen
+        remoteRenderer = binding.remoteVideoCallScreen
 
         localRenderer.init(viewModel.sessionManager.peerConnectionFactory.eglBaseContext,
-            object: RendererCommon.RendererEvents {
+            object : RendererCommon.RendererEvents {
+                override fun onFirstFrameRendered() = Unit
+
+                override fun onFrameResolutionChanged(width: Int, height: Int, rotation: Int) = Unit
+            })
+
+        remoteRenderer.init(viewModel.sessionManager.peerConnectionFactory.eglBaseContext,
+            object : RendererCommon.RendererEvents {
                 override fun onFirstFrameRendered() = Unit
 
                 override fun onFrameResolutionChanged(width: Int, height: Int, rotation: Int) = Unit
@@ -252,35 +273,23 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.sessionManager.localVideoTrackFlow.collectLatest {
-                        cleanLocalTrack(it)
-                        setupLocalVideo(it)
-                    }
-                }
+                collectLocalVideoTrack()
+                collectRemoteVideoTrack()
             }
         }
     }
 
-    private fun remoteRenderInit() {
-        remoteRenderer = binding.remoteVideoCallScreen
+    private fun CoroutineScope.collectLocalVideoTrack() = launch {
+        viewModel.sessionManager.localVideoTrackFlow.collectLatest { videoTrack ->
+            cleanLocalTrack(videoTrack)
+            setupLocalVideo(videoTrack)
+        }
+    }
 
-        remoteRenderer.init(viewModel.sessionManager.peerConnectionFactory.eglBaseContext,
-            object: RendererCommon.RendererEvents {
-                override fun onFirstFrameRendered() = Unit
-
-                override fun onFrameResolutionChanged(width: Int, height: Int, rotation: Int) = Unit
-            })
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.sessionManager.remoteVideoTrackFlow.collectLatest {
-                        cleanRemoteTrack(it)
-                        setupRemoteVideo(it)
-                    }
-                }
-            }
+    private fun CoroutineScope.collectRemoteVideoTrack() = launch {
+        viewModel.sessionManager.remoteVideoTrackFlow.collectLatest { videoTrack ->
+            cleanRemoteTrack(videoTrack)
+            setupRemoteVideo(videoTrack)
         }
     }
 
@@ -334,6 +343,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
     private fun popBack() {
         exitFullscreen()
+
+        runCatching { viewModel.sessionManager.disconnect() }
 
         findNavController().popBackStack()
     }
