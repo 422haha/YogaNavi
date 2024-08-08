@@ -62,13 +62,17 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(false, MODIFY, true)
 
         checkTeacher()
         initAdapter()
         initListener()
         getProfile()
         initCollect()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(false, MODIFY, true)
     }
 
     private fun checkTeacher() = with(binding) {
@@ -148,6 +152,9 @@ class ModifyFragment : BaseFragment<FragmentModifyBinding>(FragmentModifyBinding
             val text = editText?.toString() ?: ""
             val pwAgain = tiePwAgain.text?.toString() ?: ""
             check.isEnabled = !(text.isNotBlank() && text != pwAgain)
+
+            if(text == pwAgain) tiePwAgain.error = null
+            else tiePwAgain.error = PASSWORD_DIFF
         }
 
         tiePwAgain.addTextChangedListener { text ->

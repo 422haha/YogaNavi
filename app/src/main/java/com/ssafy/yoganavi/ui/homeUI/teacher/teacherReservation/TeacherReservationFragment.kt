@@ -24,7 +24,6 @@ import com.ssafy.yoganavi.ui.utils.RESERVATION
 import com.ssafy.yoganavi.ui.utils.RESERVE
 import com.ssafy.yoganavi.ui.utils.SELECT_CLASS
 import com.ssafy.yoganavi.ui.utils.START
-import com.ssafy.yoganavi.ui.utils.loadImage
 import com.ssafy.yoganavi.ui.utils.toCalendarDay
 import com.ssafy.yoganavi.ui.utils.toLong
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,26 +46,37 @@ class TeacherReservationFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(false, RESERVE, true, RESERVATION) {
-            if (!(binding.rbOneToOne.isChecked || binding.rbOneToMulti.isChecked)) {
-                showSnackBar(SELECT_CLASS)
-            } else if (binding.tvNothing.isVisible) {
-                showSnackBar(NOTHING)
-            } else if (saveStartDate == null || saveEndDate == null) {
-                showSnackBar(PICK_DATE)
-            } else {
-                viewModel.registerLive(
-                    liveId,
-                    saveStartDate?.toLong(START),
-                    saveEndDate?.toLong(END),
-                    ::navigateToSchedule
-                )
-            }
-        }
         initView()
         binding.rvAvailableClass.adapter = availableAdapter
         initListener()
         initCollect()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(
+            isBottomNavigationVisible = false,
+            title = RESERVE,
+            canGoBack = true,
+            menuItem = RESERVATION,
+            menuListener = {
+                if (!(binding.rbOneToOne.isChecked || binding.rbOneToMulti.isChecked)) {
+                    showSnackBar(SELECT_CLASS)
+                } else if (binding.tvNothing.isVisible) {
+                    showSnackBar(NOTHING)
+                } else if (saveStartDate == null || saveEndDate == null) {
+                    showSnackBar(PICK_DATE)
+                } else {
+                    viewModel.registerLive(
+                        liveId,
+                        saveStartDate?.toLong(START),
+                        saveEndDate?.toLong(END),
+                        ::navigateToSchedule,
+                        ::showSnackBar
+                    )
+                }
+            }
+        )
     }
 
     private fun navigateToSchedule() {
@@ -78,9 +88,9 @@ class TeacherReservationFragment :
         if (args.teacherSmallProfile.isBlank()) {
             ivProfile.setImageResource(R.drawable.profilenull)
         } else {
-            ivProfile.loadImage(args.teacherSmallProfile)
+            viewModel.loadS3Image(ivProfile, args.teacherSmallProfile)
         }
-        
+
         tvTeacherNickname.text = args.teacherName
         if (args.hashtags.isNotBlank()) {
             tvHashtag.text = args.hashtags

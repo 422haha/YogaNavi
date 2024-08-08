@@ -56,12 +56,17 @@ class RegisterLiveFragment :
 
         if (args.state == UPDATE)
             setModifyInfo()
+    }
 
-        setToolbar(isBottomNavigationVisible = false,
+    override fun onStart() {
+        super.onStart()
+        setToolbar(
+            isBottomNavigationVisible = false,
             title = if (args.liveId == -1) REGISTER_LIVE else MODIFY_LIVE,
             canGoBack = true,
             menuItem = REGISTER,
-            menuListener = { setRegister() })
+            menuListener = { setRegister() }
+        )
     }
 
     private fun initListener(state: String) {
@@ -153,10 +158,9 @@ class RegisterLiveFragment :
                 }
             }
 
-            if (args.state == CREATE)
-                viewModel.createLive(::popBackStack)
-            else
-                viewModel.updateLive(::popBackStack)
+            if (args.state == CREATE) viewModel.createLive(::popBackStack)
+            else viewModel.updateLive(::popBackStack)
+
         } else {
             showSnackBar(IS_BLANK)
         }
@@ -194,6 +198,11 @@ class RegisterLiveFragment :
                 { _, sYear, sMonth, sDay ->
                     calendar.set(sYear, sMonth, sDay, 0, 0, 0)
 
+                    if (calendar.timeInMillis.checkSameDate(viewModel.liveLectureData.startDate)) {
+                        showSnackBar("최소 이틀 이상 선택해주세요!")
+                        return@DatePickerDialog
+                    }
+
                     binding.tieEnd.setText(intToDate(sYear, sMonth, sDay))
                     viewModel.liveLectureData.endDate = calendar.timeInMillis
                 }, year, month, day
@@ -206,6 +215,13 @@ class RegisterLiveFragment :
                 show()
             }
         }
+    }
+
+    private fun Long.checkSameDate(time: Long): Boolean {
+        val millisecondsPerDay = 24 * 60 * 60 * 1000L
+        val startDate = (this / millisecondsPerDay) * millisecondsPerDay
+        val endDate = (time / millisecondsPerDay) * millisecondsPerDay
+        return startDate == endDate
     }
 
     private fun showTimePicker(state: Int) {

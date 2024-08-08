@@ -36,12 +36,6 @@ class ManagementLiveFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setToolbar(
-            isBottomNavigationVisible = false,
-            title = MANAGEMENT_LIVE,
-            canGoBack = true,
-        )
-
         initListener()
 
         binding.rvLiveList.adapter = liveAdapter
@@ -49,6 +43,15 @@ class ManagementLiveFragment :
         initCollect()
 
         viewModel.getLiveList()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(
+            isBottomNavigationVisible = false,
+            title = MANAGEMENT_LIVE,
+            canGoBack = true,
+        )
     }
 
     private fun initListener() {

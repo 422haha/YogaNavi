@@ -41,7 +41,7 @@ class HomeAdapter(
             with(binding) {
                 if (!item.teacherSmallProfile.isNullOrBlank()) {
                     loadS3Image(ivProfile, item.teacherSmallProfile)
-                }else {
+                } else {
                     ivProfile.setImageResource(R.drawable.profilenull)
                 }
 
@@ -64,9 +64,7 @@ class HomeAdapter(
                 )
 
                 tvLectureTitle.text = item.liveTitle
-
-                val timeData = startTildeEnd(formatTime(item.startTime), formatTime(item.endTime))
-                tvLectureTime.text = timeData
+                tvLectureTime.text = item.startTime.makeNextDay(item.endTime)
 
                 clDetail.setOnClickListener {
                     alertLiveDetailDialog(
@@ -79,6 +77,14 @@ class HomeAdapter(
                     )
                 }
             }
+        }
+
+        private fun Long.makeNextDay(endTime: Long): String {
+            val start = formatTime(this)
+            var end = formatTime(endTime)
+
+            if(this > endTime) end = "익일 $end"
+            return startTildeEnd(start, end)
         }
 
         companion object {

@@ -51,24 +51,48 @@ class RegisterNoticeFragment : BaseFragment<FragmentRegisterNoticeBinding>(
         binding.btnDeletePhoto.visibility = View.GONE
         binding.btnAddPhoto.visibility = View.VISIBLE
 
-        if (args.articleId != -1) {
-            viewModel.getNotice(args.articleId)
-            setToolbar(false, MANAGEMENT_UPDATE, true, REGISTER) {
-                val notice = binding.etNotice.text.toString()
+        if (args.articleId != -1) viewModel.getNotice(args.articleId)
 
-                if (notice.isBlank()) showSnackBar(R.string.notice_info)
-                else viewModel.updateNotice(notice, ::loadingView, ::goBackStack, ::failToUpload)
-            }
-        } else {
-            setToolbar(false, MANAGEMENT_INSERT, true, REGISTER) {
-                val notice = binding.etNotice.text.toString()
-
-                if (notice.isBlank()) showSnackBar(R.string.notice_info)
-                else viewModel.insertNotice(notice, ::loadingView, ::goBackStack, ::failToUpload)
-            }
-        }
         initCollect()
         initListener()
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        if (args.articleId != -1) setToolbar(
+            isBottomNavigationVisible = false,
+            title = MANAGEMENT_UPDATE,
+            canGoBack = true,
+            menuItem = REGISTER,
+            menuListener = {
+                val notice = binding.etNotice.text.toString()
+                if (notice.isBlank()) showSnackBar(R.string.notice_info)
+                else viewModel.updateNotice(
+                    notice,
+                    ::loadingView,
+                    ::goBackStack,
+                    ::failToUpload
+                )
+            }
+        )
+        else setToolbar(
+            isBottomNavigationVisible = false,
+            title = MANAGEMENT_INSERT,
+            canGoBack = true,
+            menuItem = REGISTER,
+            menuListener = {
+                val notice = binding.etNotice.text.toString()
+
+                if (notice.isBlank()) showSnackBar(R.string.notice_info)
+                else viewModel.insertNotice(
+                    notice,
+                    ::loadingView,
+                    ::goBackStack,
+                    ::failToUpload
+                )
+            }
+        )
     }
 
     private fun initListener() {

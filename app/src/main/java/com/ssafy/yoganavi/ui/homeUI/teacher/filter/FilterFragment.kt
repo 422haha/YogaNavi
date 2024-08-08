@@ -22,6 +22,7 @@ import com.ssafy.yoganavi.ui.utils.PERIOD_TOTAL
 import com.ssafy.yoganavi.ui.utils.PERIOD_WEEK
 import com.ssafy.yoganavi.ui.utils.RECENT
 import com.ssafy.yoganavi.ui.utils.START
+import com.ssafy.yoganavi.ui.utils.TOTAL
 import com.ssafy.yoganavi.ui.utils.Week
 import com.ssafy.yoganavi.ui.utils.formatZeroDate
 import timber.log.Timber
@@ -35,25 +36,7 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(false, FILTER, true, "초기화") {
-            binding.btnStartTime.text = "00:00"
-            viewModel.filter.startTime = 0L
-            binding.btnEndTime.text = "23:59"
-            viewModel.filter.endTime = 86340000L
-            binding.ibtnMon.isChecked = true
-            binding.ibtnTue.isChecked = true
-            binding.ibtnWed.isChecked = true
-            binding.ibtnThu.isChecked = true
-            binding.ibtnFri.isChecked = true
-            binding.ibtnSat.isChecked = true
-            binding.ibtnSun.isChecked = true
-            binding.rbTotal.isChecked = true
-            binding.rbOneToMulti.isChecked = true
-            isInit = true
-            val directions = FilterFragmentDirections
-                .actionFilterFragmentToTeacherListFragment(viewModel.filter, isInit, sorting)
-            findNavController().navigate(directions)
-        }
+
         // CheckBox마다 요일을 바인딩
         weekToggleButtonMap = mapOf(
             Week.MON to binding.ibtnMon,
@@ -66,6 +49,35 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
         )
         initView()
         initListener()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(
+            isBottomNavigationVisible = false,
+            title = FILTER,
+            canGoBack = true,
+            menuItem = "초기화",
+            menuListener = {
+                binding.btnStartTime.text = "00:00"
+                viewModel.filter.startTime = 0L
+                binding.btnEndTime.text = "23:59"
+                viewModel.filter.endTime = 86340000L
+                binding.ibtnMon.isChecked = true
+                binding.ibtnTue.isChecked = true
+                binding.ibtnWed.isChecked = true
+                binding.ibtnThu.isChecked = true
+                binding.ibtnFri.isChecked = true
+                binding.ibtnSat.isChecked = true
+                binding.ibtnSun.isChecked = true
+                binding.rbTotal.isChecked = true
+                binding.rbOneToMulti.isChecked = true
+                isInit = true
+                val directions = FilterFragmentDirections
+                    .actionFilterFragmentToTeacherListFragment(viewModel.filter, isInit, sorting)
+                findNavController().navigate(directions)
+            }
+        )
     }
 
     private fun initView() {
@@ -97,10 +109,18 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
             PERIOD_THREE_MONTH -> binding.rbThreeMonth.isChecked = true
             PERIOD_TOTAL -> binding.rbTotal.isChecked = true
         }
-        if (viewModel.filter.maxLiveNum == 0) {
-            binding.rbOneToOne.isChecked = true
-        } else {
-            binding.rbOneToMulti.isChecked = true
+        when (viewModel.filter.maxLiveNum) {
+            ONE_TO_ONE -> {
+                binding.rbOneToOne.isChecked = true
+            }
+
+            ONE_TO_MULTI -> {
+                binding.rbOneToMulti.isChecked = true
+            }
+
+            else -> {
+                binding.rbTotalMethod.isChecked = true
+            }
         }
     }
 
@@ -182,8 +202,10 @@ class FilterFragment : BaseFragment<FragmentFilterBinding>(FragmentFilterBinding
 
         if (binding.rbOneToOne.isChecked) {
             viewModel.filter.maxLiveNum = ONE_TO_ONE
-        } else {
+        } else if (binding.rbOneToMulti.isChecked) {
             viewModel.filter.maxLiveNum = ONE_TO_MULTI
+        } else {
+            viewModel.filter.maxLiveNum = TOTAL
         }
         isInit = false
         val directions = FilterFragmentDirections

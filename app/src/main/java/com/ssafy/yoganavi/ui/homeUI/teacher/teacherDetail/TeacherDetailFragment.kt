@@ -35,9 +35,13 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setToolbar(false, TEACHER_DETAIL, true)
         binding.rvTeacherDetail.adapter = teacherDetailAdapter
         getTeacherDetail()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setToolbar(false, TEACHER_DETAIL, true)
     }
 
     private fun getTeacherDetail() = viewModel.getTeacherDetail(args.userId, ::bindData)
@@ -92,10 +96,11 @@ class TeacherDetailFragment : BaseFragment<FragmentTeacherDetailBinding>(
         findNavController().navigate(directions)
     }
 
-    private fun navigateToLectureDetailFragment(recordedId: Long = -1) {
+    private fun navigateToLectureDetailFragment(recordedId: Long = -1, teacherName: String) {
         val directions =
             TeacherDetailFragmentDirections.actionTeacherDetailFragmentToLectureDetailFragment(
-                recordedId
+                recordedId = recordedId,
+                teacher = teacherName
             )
         findNavController().navigate(directions)
     }

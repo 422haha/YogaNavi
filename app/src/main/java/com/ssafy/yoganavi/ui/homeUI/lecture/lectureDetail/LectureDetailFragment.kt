@@ -33,14 +33,18 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.recyclerView.adapter = lectureDetailAdapter
+        getLectureDetail()
+    }
+
+    override fun onStart() {
+        super.onStart()
         setToolbar(
             isBottomNavigationVisible = false,
             title = args.teacher.toTitle(),
             canGoBack = true
         )
-
-        binding.recyclerView.adapter = lectureDetailAdapter
-        getLectureDetail()
     }
 
     private fun getLectureDetail() = viewModel.getLecture(args.recordedId, ::bindData)
@@ -53,7 +57,6 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
             recordContent = data.recordContent,
             imageKey = data.imageKey,
             smallImageKey = data.smallImageKey,
-            nickname = data.nickname
         )
         itemList.add(LectureDetailItem.Header(header))
 
