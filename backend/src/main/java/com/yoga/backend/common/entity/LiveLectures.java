@@ -1,6 +1,8 @@
 package com.yoga.backend.common.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.yoga.backend.common.converter.InstantToSqlDateConverter;
+import com.yoga.backend.common.converter.InstantToSqlTimeConverter;
 import jakarta.persistence.*;
 import java.time.Instant;
 import lombok.Getter;
@@ -25,27 +27,28 @@ public class LiveLectures {
     @Column(length = 300)
     private String liveContent; // 강의 내용
 
-    @Column(nullable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "UTC")
+    @Column(nullable = false, columnDefinition = "DATE")
+    @Convert(converter = InstantToSqlDateConverter.class)
     private Instant startDate; // 시작 날짜
 
-    @Column(nullable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "UTC")
+    @Column(nullable = false, columnDefinition = "DATE")
+    @Convert(converter = InstantToSqlDateConverter.class)
     private Instant endDate; // 종료 날짜
 
-    @Column(nullable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "UTC")
+    @Column(nullable = false, columnDefinition = "TIME")
+    @Convert(converter = InstantToSqlTimeConverter.class)
     private Instant startTime; // 강의 시작 시간
 
-    @Column(nullable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "UTC")
+    @Column(nullable = false, columnDefinition = "TIME")
+    @Convert(converter = InstantToSqlTimeConverter.class)
     private Instant endTime; // 강의 종료 시간
 
     @Column(nullable = false)
     private Integer maxLiveNum; // 최대 수강자 수
 
     @Column(nullable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "UTC") // 안되면 이걸 제거
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "UTC")
+    // 안되면 이걸 제거
     private Instant regDate; // 강의 등록 시간
 
     @ManyToOne(fetch = FetchType.LAZY)
