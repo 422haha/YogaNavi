@@ -6,6 +6,7 @@ import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CameraMetadata
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
+import android.media.audiofx.BassBoost
 import android.os.Build
 import androidx.core.content.getSystemService
 import com.ssafy.yoganavi.ui.homeUI.schedule.live.webRtc.SignalingClient
@@ -200,6 +201,19 @@ class WebRtcSessionManagerImpl(
     }
 
     override fun enableMicrophone(enabled: Boolean) {
+        localAudioTrack.setEnabled(enabled)
+        audioManager?.isMicrophoneMute = !enabled
+    }
+
+    override fun enableCamera(enabled: Boolean) {
+        if (enabled) {
+            videoCapturer.startCapture(resolution.width, resolution.height, 30)
+        } else {
+            videoCapturer.stopCapture()
+        }
+    }
+
+    override fun enableMicrophone(enabled: Boolean) {
         runCatching {
             audioManager?.isMicrophoneMute = !enabled
         }
@@ -358,8 +372,12 @@ class WebRtcSessionManagerImpl(
                 true.toString()
             ),
             MediaConstraints.KeyValuePair(
-                "googAutoGainControl",
+                "googEchoCancellation2",
                 true.toString()
+            ),
+            MediaConstraints.KeyValuePair(
+                "googAutoGainControl",
+                false.toString()
             ),
             MediaConstraints.KeyValuePair(
                 "googHighpassFilter",
@@ -370,7 +388,20 @@ class WebRtcSessionManagerImpl(
                 true.toString()
             ),
             MediaConstraints.KeyValuePair(
+                "NoiseSuppression",
+                true.toString()
+            ),
+            MediaConstraints.KeyValuePair(
                 "googTypingNoiseDetection",
+                true.toString()
+            ),
+            // 추가 제약 조건
+            MediaConstraints.KeyValuePair(
+                "googAudioMirroring",
+                false.toString()
+            ),
+            MediaConstraints.KeyValuePair(
+                "googExperimentalEchoCancellation",
                 true.toString()
             )
         )
@@ -388,6 +419,8 @@ class WebRtcSessionManagerImpl(
         audioHandler.start()
         audioManager?.mode = AudioManager.MODE_IN_COMMUNICATION
 
+        setupAudioEffects(audioManager?.generateAudioSessionId() ?: 0)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val devices = audioManager?.availableCommunicationDevices ?: return
             val deviceType = AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
@@ -397,5 +430,12 @@ class WebRtcSessionManagerImpl(
             val isCommunicationDeviceSet = audioManager?.setCommunicationDevice(device)
             Timber.d("[setupAudio] #sfu; isCommunicationDeviceSet: $isCommunicationDeviceSet")
         }
+    }
+
+    fun setupAudioEffects(audioSessionId: Int) {
+        // BassBoost 설정
+        val bassBoost = BassBoost(0, audioSessionId)
+        bassBoost.enabled = true
+        bassBoost.setStrength(1000.toShort())
     }
 }

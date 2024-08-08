@@ -208,8 +208,11 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
                 }
             }
             WebRTCSessionState.Impossible -> {
-                if(!args.isTeacher)
+                if (!args.isTeacher)
                     binding.tvState.text = WAIT_BROADCAST
+                else {
+                    viewModel.sessionManager.onSessionScreenReady()
+                }
             }
             WebRTCSessionState.Ready -> {
                 if (args.isTeacher)
