@@ -15,7 +15,9 @@ import org.springframework.transaction.annotation.Isolation;
 
 import java.time.Instant;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -57,6 +59,11 @@ public class ReservationServiceImpl implements ReservationService {
                 (long) reservationRequest.getLiveId())
             .orElseThrow(() -> new RuntimeException("실시간 강의를 찾을 수 없습니다."));
 
+        // 사용자가 자신의 강의를 예약하는 것을 막음
+        if (newLiveLecture.getUser().getId() == userId) {
+            throw new RuntimeException("자신의 강의는 예약할 수 없습니다.");
+        }
+
         // 최대 인원수 체크
         int currentParticipants = myLiveLectureRepository.countByLiveLectureAndEndDateAfter(
             newLiveLecture, Instant.now());
@@ -65,13 +72,16 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         // 시간 겹침 체크
-        Instant newStartDate = Instant.ofEpochMilli(reservationRequest.getStartDate());
-        Instant newEndDate = Instant.ofEpochMilli(reservationRequest.getEndDate());
+        ZonedDateTime newStartDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(reservationRequest.getStartDate()), ZoneId.of("UTC"));
+        ZonedDateTime newEndDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(reservationRequest.getEndDate()), ZoneId.of("UTC"));
+
         List<MyLiveLecture> userReservations = myLiveLectureRepository.findByUserId(userId);
 
         for (MyLiveLecture existingReservation : userReservations) {
-            if (isDateOverlap(newStartDate, newEndDate, existingReservation.getStartDate(),
-                existingReservation.getEndDate()) &&
+            ZonedDateTime existingStartDateTime = existingReservation.getStartDate().atZone(ZoneId.of("UTC"));
+            ZonedDateTime existingEndDateTime = existingReservation.getEndDate().atZone(ZoneId.of("UTC"));
+
+            if (isDateOverlap(newStartDateTime, newEndDateTime, existingStartDateTime, existingEndDateTime) &&
                 isTimeOverlap(newLiveLecture, existingReservation.getLiveLecture())) {
                 throw new RuntimeException("시간이 겹치는 강의가 이미 존재합니다.");
             }
@@ -80,17 +90,33 @@ public class ReservationServiceImpl implements ReservationService {
         MyLiveLecture myLiveLecture = new MyLiveLecture();
         myLiveLecture.setUser(user);
         myLiveLecture.setLiveLecture(newLiveLecture);
-        myLiveLecture.setStartDate(newStartDate);
-        myLiveLecture.setEndDate(newEndDate);
+        myLiveLecture.setStartDate(newStartDateTime.toInstant());
+        myLiveLecture.setEndDate(newEndDateTime.toInstant());
 
         myLiveLectureRepository.save(myLiveLecture);
     }
 
-    private boolean isDateOverlap(Instant start1, Instant end1, Instant start2, Instant end2) {
+    /**
+     * 날짜가 겹치는지 확인하는 메서드
+     *
+     * @param start1 첫 번째 기간의 시작 시간
+     * @param end1   첫 번째 기간의 종료 시간
+     * @param start2 두 번째 기간의 시작 시간
+     * @param end2   두 번째 기간의 종료 시간
+     * @return 날짜가 겹치는지 여부
+     */
+    private boolean isDateOverlap(ZonedDateTime start1, ZonedDateTime end1, ZonedDateTime start2, ZonedDateTime end2) {
         return (start1.isBefore(end2) && end1.isAfter(start2)) ||
             start1.equals(start2) || end1.equals(end2);
     }
 
+    /**
+     * 시간이 겹치는지 확인하는 메서드
+     *
+     * @param lecture1 첫 번째 강의
+     * @param lecture2 두 번째 강의
+     * @return 시간이 겹치는지 여부
+     */
     private boolean isTimeOverlap(LiveLectures lecture1, LiveLectures lecture2) {
         Set<String> days1 = new HashSet<>(Arrays.asList(lecture1.getAvailableDay().split(",")));
         Set<String> days2 = new HashSet<>(Arrays.asList(lecture2.getAvailableDay().split(",")));
@@ -98,11 +124,9 @@ public class ReservationServiceImpl implements ReservationService {
         // 요일이 겹치는지 확인
         for (String day : days1) {
             if (days2.contains(day)) {
-                LocalTime start1 = LocalTime.ofInstant(lecture1.getStartTime(),
-                    ZoneId.systemDefault());
+                LocalTime start1 = LocalTime.ofInstant(lecture1.getStartTime(), ZoneId.systemDefault());
                 LocalTime end1 = LocalTime.ofInstant(lecture1.getEndTime(), ZoneId.systemDefault());
-                LocalTime start2 = LocalTime.ofInstant(lecture2.getStartTime(),
-                    ZoneId.systemDefault());
+                LocalTime start2 = LocalTime.ofInstant(lecture2.getStartTime(), ZoneId.systemDefault());
                 LocalTime end2 = LocalTime.ofInstant(lecture2.getEndTime(), ZoneId.systemDefault());
 
                 if ((start1.isBefore(end2) && end1.isAfter(start2)) ||
