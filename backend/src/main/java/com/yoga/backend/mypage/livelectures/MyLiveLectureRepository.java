@@ -3,6 +3,8 @@ package com.yoga.backend.mypage.livelectures;
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -71,28 +73,41 @@ public interface MyLiveLectureRepository extends JpaRepository<MyLiveLecture, Lo
     int countByLiveLectureAndEndDateAfter(@Param("liveLecture") LiveLectures liveLecture,
         @Param("currentDate") Instant currentDate);
 
-    @Query("SELECT ml FROM MyLiveLecture ml JOIN FETCH ml.liveLecture l " +
-        "WHERE ml.user.id = :userId " +
-        "AND ml.startDate <= :currentDate " +
-        "AND ml.endDate >= :currentDate " +
+    //학생에게 fcm 전송을 위한 쿼리
+    @Query("SELECT ml FROM MyLiveLecture ml JOIN FETCH ml.user JOIN FETCH ml.liveLecture l " +
+        "WHERE l.liveId = :liveId " +
+        "AND :currentDate BETWEEN ml.startDate AND ml.endDate " +
         "AND l.availableDay LIKE %:dayOfWeek%")
-    List<MyLiveLecture> findCurrentLecturesByUserId(
-        @Param("userId") int userId,
-        @Param("currentDate") Instant currentDate,
+    List<MyLiveLecture> findParticipantsForTodayLecture(
+        @Param("liveId") Long liveId,
+        @Param("currentDate") LocalDate currentDate,
         @Param("dayOfWeek") String dayOfWeek
     );
 
+
+    // home을 위한 쿼리
     @Query("SELECT ml FROM MyLiveLecture ml JOIN FETCH ml.liveLecture l " +
         "WHERE ml.user.id = :userId " +
-        "AND ((ml.startDate <= :endDate AND ml.endDate >= :startDate) " +
-        "     OR (DATE(ml.startDate) = DATE(:currentDate) AND FUNCTION('TIME', l.endTime) > FUNCTION('TIME', :currentDate)) " +
-        "     OR DATE(ml.endDate) < DATE(:endDate)) " +
+        "AND (DATE(ml.startDate) <= DATE(:currentDate) " +
+        "     AND DATE(ml.endDate) >= DATE(:currentDate) " +
+        "     OR DATE(ml.endDate) > DATE(:currentDate)) " +
+        "AND l.availableDay LIKE %:dayOfWeek%")
+    List<MyLiveLecture> findCurrentLecturesByUserId(
+        @Param("userId") int userId,
+        @Param("currentDate") LocalDate currentDate,
+        @Param("dayOfWeek") String dayOfWeek
+    );
+
+    // history를 위한 쿼리
+    @Query("SELECT ml FROM MyLiveLecture ml JOIN FETCH ml.liveLecture l " +
+        "WHERE ml.user.id = :userId " +
+        "AND (DATE(ml.startDate) <= DATE(:currentDate) " +
+        "     AND DATE(ml.endDate) >= DATE(:currentDate) " +
+        "     OR DATE(ml.endDate) < DATE(:currentDate)) " +
         "AND l.availableDay LIKE %:dayOfWeek%")
     List<MyLiveLecture> findPastAndOngoingLecturesByUserId(
         @Param("userId") int userId,
-        @Param("startDate") Instant startDate,
-        @Param("currentDate") Instant currentDate,
-        @Param("endDate") Instant endDate,
+        @Param("currentDate") LocalDate currentDate,
         @Param("dayOfWeek") String dayOfWeek
     );
 }
