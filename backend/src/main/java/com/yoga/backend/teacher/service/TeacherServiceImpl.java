@@ -4,7 +4,7 @@ import com.yoga.backend.common.entity.Hashtag;
 import com.yoga.backend.common.entity.TeacherLike;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.repository.UsersRepository;
-import com.yoga.backend.mypage.recorded.repository.RecordedLectureLikeRepository;
+import com.yoga.backend.recorded.repository.RecordedLectureLikeRepository;
 import com.yoga.backend.teacher.TeacherFilter;
 import com.yoga.backend.teacher.dto.DetailedTeacherDto;
 import com.yoga.backend.teacher.dto.TeacherDto;

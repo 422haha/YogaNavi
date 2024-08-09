@@ -1,7 +1,7 @@
 package com.yoga.backend.teacher.service;
 
 import com.yoga.backend.common.entity.MyLiveLecture;
-import com.yoga.backend.mypage.livelectures.dto.LiveLectureDto;
+import com.yoga.backend.livelectures.dto.LiveLectureDto;
 import com.yoga.backend.teacher.dto.ReservationRequestDto;
 
 import java.util.List;

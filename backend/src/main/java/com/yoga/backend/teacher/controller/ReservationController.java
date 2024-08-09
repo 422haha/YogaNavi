@@ -1,6 +1,6 @@
 package com.yoga.backend.teacher.controller;
 
-import com.yoga.backend.mypage.livelectures.dto.LiveLectureDto;
+import com.yoga.backend.livelectures.dto.LiveLectureDto;
 import com.yoga.backend.teacher.dto.ReservationRequestDto;
 import com.yoga.backend.teacher.service.ReservationService;
 import com.yoga.backend.common.util.JwtUtil;
