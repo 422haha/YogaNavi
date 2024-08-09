@@ -1,6 +1,5 @@
 package com.yoga.backend.members.dto;
 
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +14,6 @@ public class RegisterDto {
     private Integer authnumber;
     private String imageUrl;
 
-
     public boolean isTeacher() {
         return teacher;
     }
@@ -23,6 +21,4 @@ public class RegisterDto {
     public void setTeacher(boolean teacher) {
         this.teacher = teacher;
     }
-
-
 }

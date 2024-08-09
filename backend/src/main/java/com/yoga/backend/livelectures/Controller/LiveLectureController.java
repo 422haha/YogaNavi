@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,18 +28,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 실시간 강의 컨트롤러 클래스. 실시간 강의 생성 및 조회에 대한 API 엔드포인트를 제공.
+ * 실시간 강의 컨트롤러.
  */
 @RestController
 @RequestMapping("/mypage/live-lecture-manage")
 public class LiveLectureController {
 
-    @Autowired
-    private LiveLectureService liveLectureService;
-    @Autowired
-    private JwtUtil jwtUtil;
-    @Autowired
-    private UsersRepository usersRepository;
+    private final LiveLectureService liveLectureService;
+    private final JwtUtil jwtUtil;
+    private final UsersRepository usersRepository;
+
+    public LiveLectureController(LiveLectureService liveLectureService, JwtUtil jwtUtil,
+        UsersRepository usersRepository) {
+        this.liveLectureService = liveLectureService;
+        this.jwtUtil = jwtUtil;
+        this.usersRepository = usersRepository;
+    }
 
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> createLiveLecture(

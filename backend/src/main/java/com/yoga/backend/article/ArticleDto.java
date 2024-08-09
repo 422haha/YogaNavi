@@ -3,7 +3,7 @@ package com.yoga.backend.article;
 import lombok.Data;
 
 /**
- * 게시글(공지사항) DTO 클래스
+ * 게시글(공지사항) DTO
  */
 @Data
 public class ArticleDto {

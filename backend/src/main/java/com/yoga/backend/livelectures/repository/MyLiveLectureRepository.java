@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 /**
- * 나의 실시간 강의 리포지토리 인터페이스 데이터베이스와의 상호작용을 정의
+ * 나의 실시간 강의 리포지토리 인터페이스
  */
 public interface MyLiveLectureRepository extends JpaRepository<MyLiveLecture, Long> {
 
@@ -49,17 +49,6 @@ public interface MyLiveLectureRepository extends JpaRepository<MyLiveLecture, Lo
      */
     @Query("SELECT mll FROM MyLiveLecture mll JOIN FETCH mll.user WHERE mll.liveLecture.liveId = :liveId")
     List<MyLiveLecture> findByLiveLectureIdWithUser(@Param("liveId") Long liveId);
-
-    /**
-     * 특정 기간 내의 사용자 예약 목록 조회
-     *
-     * @param userId 사용자 ID
-     * @param start  시작 시간 (Instant)
-     * @param end    종료 시간 (Instant)
-     * @return 기간 내의 사용자 예약 목록
-     */
-    List<MyLiveLecture> findByUserIdAndStartDateBetween(@Param("userId") int userId,
-        @Param("start") Instant start, @Param("end") Instant end);
 
     /**
      * 특정 강의의 현재 참여자 수 조회

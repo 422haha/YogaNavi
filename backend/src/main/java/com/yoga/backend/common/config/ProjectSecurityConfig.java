@@ -27,11 +27,13 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @Configuration
 public class ProjectSecurityConfig {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
+    private final UsersRepository userRepository;
 
-    @Autowired
-    private UsersRepository userRepository;
+    public ProjectSecurityConfig(JwtUtil jwtUtil, UsersRepository userRepository) {
+        this.jwtUtil = jwtUtil;
+        this.userRepository = userRepository;
+    }
 
 
     @Bean

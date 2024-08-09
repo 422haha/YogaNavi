@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 화상 강의 응답을 위한 DTO 클래스 화상 강의의 세부 정보를 포함
+ * 화상 강의 응답 위한 DTO.
  */
 @Setter
 @Getter

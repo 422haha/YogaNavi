@@ -80,29 +80,6 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     }
 
     /**
-     * 모든 실시간 강의 조회
-     *
-     * @return 모든 실시간 강의 리스트
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public List<LiveLectures> getAllLiveLectures() {
-        return liveLecturesRepository.findAll();
-    }
-
-    /**
-     * 특정 사용자 ID에 대한 나의 실시간 강의 목록을 조회
-     *
-     * @param userId 사용자 ID
-     * @return 나의 실시간 강의 리스트
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public List<MyLiveLecture> getMyLiveLecturesByUserId(int userId) {
-        return myLiveLectureRepository.findByUserId(userId);
-    }
-
-    /**
      * 사용자 ID로 화상 강의를 조회
      *
      * @param userId 사용자 ID
@@ -118,11 +95,10 @@ public class LiveLectureServiceImpl implements LiveLectureService {
      * 화상 강의를 수정
      *
      * @param liveLectureCreateDto 수정할 화상 강의 DTO
-     * @return 수정된 화상 강의 엔티티
      */
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public LiveLectures updateLiveLecture(LiveLectureCreateDto liveLectureCreateDto) {
+    public void updateLiveLecture(LiveLectureCreateDto liveLectureCreateDto) {
 
         LiveLectures liveLecture = liveLecturesRepository.findById(liveLectureCreateDto.getLiveId())
             .orElseThrow(() -> new IllegalArgumentException("Invalid lecture ID"));
@@ -157,7 +133,6 @@ public class LiveLectureServiceImpl implements LiveLectureService {
 
         notificationService.sendLectureUpdateNotification(updatedLecture);
 
-        return updatedLecture;
     }
 
     /**
@@ -212,17 +187,6 @@ public class LiveLectureServiceImpl implements LiveLectureService {
             throw new RuntimeException("강의 삭제 실패", e);
         }
     }
-
-    // 비동기 처리 코드
-    //    @Async
-//    @Override
-//    public CompletableFuture<Void> updateIsOnAir(Long liveId, boolean isOnAir) {
-//        LiveLectures lecture = liveLecturesRepository.findById(liveId)
-//            .orElseThrow(() -> new IllegalArgumentException("Invalid liveId: " + liveId));
-//        lecture.setIsOnAir(isOnAir);
-//        liveLecturesRepository.save(lecture);
-//        return CompletableFuture.completedFuture(null);
-//    }
 
     /**
      * 실시간 강의의 OnAir 상태를 업데이트합니다.
