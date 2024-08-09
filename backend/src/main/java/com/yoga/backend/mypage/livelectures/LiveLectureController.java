@@ -188,9 +188,12 @@ public class LiveLectureController {
         dto.setLiveContent(lecture.getLiveContent());
         dto.setAvailableDay(lecture.getAvailableDay());
         dto.setStartDate(lecture.getStartDate().toEpochMilli());
-        dto.setStartTime(ZonedDateTime.ofInstant(lecture.getStartTime(), ZoneId.of("UTC")).toLocalTime().toNanoOfDay() / 1_000_000);
+        dto.setStartTime(
+            ZonedDateTime.ofInstant(lecture.getStartTime(), ZoneId.of("UTC")).toLocalTime()
+                .toNanoOfDay() / 1_000_000);
         dto.setEndDate(lecture.getEndDate().toEpochMilli());
-        dto.setEndTime(ZonedDateTime.ofInstant(lecture.getEndTime(), ZoneId.of("UTC")).toLocalTime().toNanoOfDay() / 1_000_000);
+        dto.setEndTime(ZonedDateTime.ofInstant(lecture.getEndTime(), ZoneId.of("UTC")).toLocalTime()
+            .toNanoOfDay() / 1_000_000);
         dto.setMaxLiveNum(lecture.getMaxLiveNum());
         return dto;
     }
