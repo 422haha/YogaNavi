@@ -426,10 +426,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
     private fun popBack() {
         runCatching {
-            onBuffering(true)
             viewModel.sessionManager.disconnect()
         }.also {
-            onBuffering(false)
             setSpeakerphoneOn(false)
             exitFullscreen()
             findNavController().popBackStack()
