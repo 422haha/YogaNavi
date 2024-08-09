@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.math.ceil
 
 @HiltViewModel
 class LectureVideoViewModel @Inject constructor(
@@ -57,24 +58,21 @@ class LectureVideoViewModel @Inject constructor(
 
             isVideoInfer = true
 
-            val videoTime = withContext(Dispatchers.Main) {
+            val (uri, position, fps) = withContext(Dispatchers.Main) {
                 val position = player.currentPosition
-                val duration = player.duration
                 val uri = player.currentMediaItem?.localConfiguration?.uri?.toString()
+                val fps = player.videoFormat?.frameRate ?: 30f
 
-                val fps = uri?.let { getVideoFrameRate() } ?: 30
-                val totalFrames = getTotalFrameCount(duration, fps)
-
-                return@withContext VideoTime(position, totalFrames, duration, uri)
+                return@withContext Triple(uri, position, fps)
             }
 
-            if (videoTime.position == 0L || videoTime.uri.isNullOrBlank()) {
+            if (position == 0L || uri.isNullOrBlank()) {
                 isVideoInfer = false
                 return@launch
             }
 
-            retriever.setDataSource(videoTime.uri)
-            val bitmap = getBitmap(videoTime.position, videoTime.totalFrames, videoTime.duration)
+            retriever.setDataSource(uri)
+            val bitmap = getBitmap(position, fps)
 
             bitmap?.let {
                 val results = poseRepository.infer(bitmap, bitmap.width, bitmap.height)
@@ -97,28 +95,16 @@ class LectureVideoViewModel @Inject constructor(
         }
     }
 
-
-    private fun getVideoFrameRate(): Int {
-        val frameRate = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CAPTURE_FRAMERATE)?.toFloatOrNull()
-        retriever.release()
-        return frameRate?.toInt() ?: 30
-    }
-
-    fun getTotalFrameCount(duration: Long, fps: Int): Int {
-        return (duration / 1000 * fps).toInt()
-    }
-
-    private fun getBitmap(position: Long, totalFrames: Int, duration: Long): Bitmap? {
+    private fun getBitmap(position: Long, fps: Float): Bitmap? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            retriever.getFrameAtIndex(estimateFrameCount(position, totalFrames, duration))
+            retriever.getFrameAtIndex(estimateFrameCount(position, fps))
         } else {
             retriever.getFrameAtTime(position * 1000L)
         }
     }
 
-    private fun estimateFrameCount(position: Long, totalFrames: Int, duration: Long): Int {
-        val fraction = position.toDouble() / duration.toDouble()
-        return (fraction * totalFrames).toInt()
+    private fun estimateFrameCount(position: Long, fps: Float): Int {
+        return ceil(position / 1000f * fps).toInt()
     }
 
     override fun onCleared() {
