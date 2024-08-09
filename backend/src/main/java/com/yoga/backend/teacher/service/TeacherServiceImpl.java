@@ -160,6 +160,7 @@ public class TeacherServiceImpl implements TeacherService {
 
         return DetailedTeacherDto.builder()
             .id(user.getId())
+            .email(user.getEmail())
             .nickname(user.getNickname())
             .profileImageUrl(user.getProfile_image_url())
             .profileImageUrlSmall(user.getProfile_image_url_small())
