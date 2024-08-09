@@ -20,7 +20,6 @@ import com.ssafy.yoganavi.ui.homeUI.schedule.live.webRtc.utils.stringify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
@@ -31,6 +30,7 @@ import org.webrtc.CameraEnumerationAndroid
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
 import org.webrtc.MediaStreamTrack
+import org.webrtc.PeerConnection
 import org.webrtc.SessionDescription
 import org.webrtc.SurfaceTextureHelper
 import org.webrtc.VideoCapturer
@@ -215,41 +215,30 @@ class WebRtcSessionManagerImpl(
         }
     }
 
-    override suspend fun disconnect() {
-        runCatching {
-            // dispose audio & video tracks.
-            remoteVideoTrackFlow.replayCache.forEach { videoTrack ->
-                videoTrack.dispose()
-            }
-            localVideoTrackFlow.replayCache.forEach { videoTrack ->
-                videoTrack.dispose()
-            }
-            localAudioTrack.dispose()
-            localVideoTrack.dispose()
+    override fun disconnect() {
+        // dispose audio & video tracks.
+        remoteVideoTrackFlow.replayCache.forEach { videoTrack ->
+            safeDispose(videoTrack)
+        }
+        localVideoTrackFlow.replayCache.forEach { videoTrack ->
+            safeDispose(videoTrack)
         }
 
-        runCatching {
-            // dispose audio handler and video capturer.
-            audioHandler.stop()
-            videoCapturer.stopCapture()
-            videoCapturer.dispose()
-        }.onFailure { it.printStackTrace() }
+        safeDispose(localAudioTrack)
+        safeDispose(localVideoTrack)
+
+        // dispose audio handler and video capturer.
+        audioHandler.stop()
+        videoCapturer.stopCapture()
+        videoCapturer.dispose()
+
+        // dispose signaling clients and socket.
+        signalingClient.dispose()
 
         offer = null
 
-        runCatching {
-            // dispose signaling clients and socket.
-            signalingClient.dispose()
-        }.onFailure { it.printStackTrace() }
-
-        runCatching {
+        if(peerConnection.connection.connectionState() != PeerConnection.PeerConnectionState.CLOSED)
             peerConnection.connection.close()
-        }.onFailure { it.printStackTrace() }
-
-        runCatching {
-            surfaceTextureHelper.dispose()
-            sessionManagerScope.cancel()
-        }.onFailure { it.printStackTrace() }
     }
 
     private fun safeDispose(track: MediaStreamTrack?) {
