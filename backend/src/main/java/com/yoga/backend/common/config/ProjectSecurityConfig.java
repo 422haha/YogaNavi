@@ -95,7 +95,6 @@ public class ProjectSecurityConfig {
 //            .requestMatchers("/myAccount").hasRole("TEACHER")
 //            .requestMatchers("/myBalance").authenticated()
 //                .requestMatchers("/members/**").permitAll()
-                .requestMatchers("/test").authenticated()
 
         );
 
