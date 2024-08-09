@@ -10,8 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RecordedLectureRepository extends JpaRepository<RecordedLecture, Long> {
 
-    List<RecordedLecture> findByUserId(int userId);
-
     @Query("SELECT r FROM RecordedLecture r WHERE r.id IN :ids")
     List<RecordedLecture> findAllByIdCustom(@Param("ids") List<Long> ids);
 }

@@ -6,11 +6,9 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
-
 /**
- * 실시간 강의 DTO(Data Transfer Object) 클래스. 강의 생성 및 관리를 위한 데이터 전송 객체
+ * 실시간 강의 DTO.
  */
-
 @Setter
 @Getter
 public class LiveLectureCreateDto {

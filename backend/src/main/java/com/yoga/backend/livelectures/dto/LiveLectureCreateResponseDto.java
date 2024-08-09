@@ -2,9 +2,10 @@ package com.yoga.backend.livelectures.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+
 /**
- * 화상 강의 생성 후 메시지와 데이터를 응답하기 위한 DTO 클래스
- * 이 클래스는 화상 강의 생성 성공 메시지와 함께 추가 데이터를 포함할 수 있습니다.
+ * 화상 강의 생성 후 응답 DTO
+ *
  */
 @Setter
 @Getter

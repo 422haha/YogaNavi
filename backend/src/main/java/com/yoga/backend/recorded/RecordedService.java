@@ -1,6 +1,5 @@
 package com.yoga.backend.recorded;
 
-
 import com.yoga.backend.recorded.dto.DeleteDto;
 import com.yoga.backend.recorded.dto.LectureDto;
 import java.util.List;

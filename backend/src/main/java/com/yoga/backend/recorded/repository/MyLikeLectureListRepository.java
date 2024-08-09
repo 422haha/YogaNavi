@@ -10,7 +10,6 @@ import com.querydsl.core.types.ExpressionUtils;
 import com.yoga.backend.common.entity.RecordedLectures.QRecordedLecture;
 import com.yoga.backend.common.entity.RecordedLectures.QRecordedLectureLike;
 import com.yoga.backend.recorded.dto.LectureDto;
-
 import java.util.List;
 import org.springframework.stereotype.Repository;
 

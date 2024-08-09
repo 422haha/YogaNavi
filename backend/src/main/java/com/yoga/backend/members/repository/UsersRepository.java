@@ -3,7 +3,6 @@ package com.yoga.backend.members.repository;
 import jakarta.persistence.LockModeType;
 import java.time.Instant;
 import java.util.List;
-
 import com.yoga.backend.common.entity.Users;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Lock;

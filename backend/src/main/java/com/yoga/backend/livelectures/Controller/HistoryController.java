@@ -27,12 +27,11 @@ public class HistoryController {
 
     }
 
-
     /**
      * 수강 내역 처리
      *
      * @param token JWT 토큰
-     * @return 수강 내역 페이지에 대한 응답 DTO를 포함한 ResponseEntity 객체
+     * @return 수강 내역 페이지에 대한 응답 포함한 ResponseEntity
      */
     @GetMapping
     public ResponseEntity<Map<String, Object>> getHomeData(

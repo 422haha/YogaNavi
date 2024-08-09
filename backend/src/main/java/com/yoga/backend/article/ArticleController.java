@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * 게시글(공지사항) 관련 요청을 처리하는 컨트롤러 클래스
+ * 게시글(공지사항) 관련 요청을 처리하는 컨트롤러
  */
 @RestController
 @RequestMapping("/mypage/notification")
@@ -25,14 +25,6 @@ public class ArticleController {
     private final UsersRepository usersRepository;
     private final JwtUtil jwtUtil;
 
-    /**
-     * ArticleController 생성자
-     *
-     * @param articleService  ArticleService 객체
-     * @param usersRepository UsersRepository 객체
-     * @param jwtUtil         JwtUtil 객체
-     */
-    @Autowired
     public ArticleController(ArticleService articleService, UsersRepository usersRepository,
         JwtUtil jwtUtil) {
         this.articleService = articleService;
@@ -41,11 +33,11 @@ public class ArticleController {
     }
 
     /**
-     * 새로운 게시글을 작성합니다.
+     * 새로운 게시글 작성
      *
      * @param token      JWT 토큰
      * @param articleDto 게시글 DTO
-     * @return 작성 결과 메시지와 데이터
+     * @return 작성 결과 메시지, 데이터
      */
     @PostMapping("/write")
     public ResponseEntity<Map<String, Object>> createArticle(
@@ -83,7 +75,7 @@ public class ArticleController {
     }
 
     /**
-     * 특정 사용자가 작성한 모든 게시글을 조회합니다.
+     * 특정 사용자가 작성한 모든 게시글 조회
      *
      * @param token JWT 토큰
      * @return 게시글 목록
@@ -120,7 +112,7 @@ public class ArticleController {
         }
     }
     /**
-     * 특정 게시글을 조회합니다.
+     * 특정 게시글 조회
      *
      * @param id 게시글 ID
      * @return 게시글 정보
@@ -130,7 +122,7 @@ public class ArticleController {
         @PathVariable("article_id") Long id) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // 게시글 ID로 특정 게시글을 가져옵니다.
+            // 게시글 ID로 특정 게시글 조회
             Optional<Article> article = articleService.getArticleById(id);
             if (article.isPresent()) {
                 response.put("message", "success");
@@ -149,7 +141,7 @@ public class ArticleController {
     }
 
     /**
-     * 특정 게시글을 업데이트합니다.
+     * 특정 게시글 업데이트
      *
      * @param token      JWT 토큰
      * @param id         게시글 ID
@@ -200,11 +192,11 @@ public class ArticleController {
 
 
     /**
-     * 특정 게시글을 삭제합니다.
+     * 특정 게시글 삭제
      *
      * @param token JWT 토큰
      * @param id    게시글 ID
-     * @return 삭제 결과 메시지와 데이터
+     * @return 삭제 결과 메시지, 데이터
      */
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Map<String, Object>> deleteArticle(
@@ -230,7 +222,6 @@ public class ArticleController {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
                 }
 
-                // 게시글을 삭제합니다.
                 articleService.deleteArticle(id);
 
                 response.put("message", "게시글 삭제 성공");
@@ -249,7 +240,7 @@ public class ArticleController {
     }
 
     /**
-     * Article 객체를 Map으로 변환합니다.
+     * Article 객체를 Map으로 변환
      *
      * @param article 게시글 객체
      * @return 변환된 Map 객체

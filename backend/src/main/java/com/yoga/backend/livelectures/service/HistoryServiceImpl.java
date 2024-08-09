@@ -67,7 +67,6 @@ public class HistoryServiceImpl implements HistoryService {
     public List<LectureHistoryDto> getPastStudentLectures(int userId, ZonedDateTime nowKorea,
         String dayOfWeek) {
         LocalDate currentDate = nowKorea.toLocalDate();
-//        System.out.println("history current date " + currentDate);
 
         List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findPastAndOngoingLecturesByUserId(
             userId, currentDate, dayOfWeek);

@@ -3,9 +3,8 @@ package com.yoga.backend.livelectures.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-
 /**
- * 홈 페이지 응답 DTO 클래스. 홈 페이지에 대한 데이터 담고있음.
+ * 홈 페이지 응답 DTO
  */
 @Getter
 @Setter

@@ -25,7 +25,7 @@ public class LectureDto {
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
 
-    // QueryDSL용 생성자 수정
+    // QueryDSL용 생성자
     public LectureDto(Long recordedId, Integer userId, String nickname, String recordTitle,
         String recordContent,
         String recordThumbnail, String recordThumbnailSmall, Long likeCount,

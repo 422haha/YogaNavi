@@ -11,10 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 /*
@@ -25,13 +23,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/")
 public class UserController {
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
     private final JwtUtil jwtUtil;
     private final UsersService usersService;
 
-    public UserController(UsersService usersService, JwtUtil jwtUtil) {
+    public UserController(UsersService usersService,
+        JwtUtil jwtUtil) {
         this.usersService = usersService;
         this.jwtUtil = jwtUtil;
     }
@@ -228,10 +224,10 @@ public class UserController {
 
         boolean result = usersService.checkPwd(userId,
             updateDto.getPassword());
-        if(result){
+        if (result) {
             response.put("message", "success");
             response.put("data", true);
-        }else{
+        } else {
             response.put("message", "fail");
             response.put("data", false);
         }
