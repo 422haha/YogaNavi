@@ -1,4 +1,4 @@
-package com.yoga.backend.mypage.livelectures.dto;
+package com.yoga.backend.livelectures.dto;
 
 import com.yoga.backend.common.entity.LiveLectures;
 import java.io.Serializable;

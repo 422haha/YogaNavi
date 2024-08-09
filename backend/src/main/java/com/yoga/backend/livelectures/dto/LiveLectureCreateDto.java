@@ -1,4 +1,4 @@
-package com.yoga.backend.mypage.livelectures.dto;
+package com.yoga.backend.livelectures.dto;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

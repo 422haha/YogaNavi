@@ -1,11 +1,11 @@
-package com.yoga.backend.mypage.livelectures;
+package com.yoga.backend.livelectures;
 
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.util.JwtUtil;
 import com.yoga.backend.members.repository.UsersRepository;
-import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateDto;
-import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateResponseDto;
-import com.yoga.backend.mypage.livelectures.dto.LiveLectureResponseDto;
+import com.yoga.backend.livelectures.dto.LiveLectureCreateDto;
+import com.yoga.backend.livelectures.dto.LiveLectureCreateResponseDto;
+import com.yoga.backend.livelectures.dto.LiveLectureResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.ZoneId;

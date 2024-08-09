@@ -1,10 +1,10 @@
-package com.yoga.backend.mypage.livelectures;
+package com.yoga.backend.livelectures;
 
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.repository.UsersRepository;
-import com.yoga.backend.mypage.livelectures.dto.LectureHistoryDto;
+import com.yoga.backend.livelectures.dto.LectureHistoryDto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -26,7 +26,7 @@ public class HistoryService {
     private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
     private final LiveLectureRepository liveLectureRepository;
-    private final MyLiveLectureRepository myLiveLectureRepository;
+    private final com.yoga.backend.livelectures.MyLiveLectureRepository myLiveLectureRepository;
     private final UsersRepository usersRepository;
 
     public HistoryService(

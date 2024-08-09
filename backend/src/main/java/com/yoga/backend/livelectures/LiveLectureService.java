@@ -1,11 +1,10 @@
-package com.yoga.backend.mypage.livelectures;
+package com.yoga.backend.livelectures;
 
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
-import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateDto;
-import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateResponseDto;
+import com.yoga.backend.livelectures.dto.LiveLectureCreateDto;
+import com.yoga.backend.livelectures.dto.LiveLectureCreateResponseDto;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * 실시간 강의 서비스 인터페이스

@@ -1,18 +1,16 @@
-package com.yoga.backend.mypage.livelectures;
+package com.yoga.backend.livelectures;
 
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.fcm.NotificationService;
 import com.yoga.backend.members.repository.UsersRepository;
-import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateDto;
-import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateResponseDto;
+import com.yoga.backend.livelectures.dto.LiveLectureCreateDto;
+import com.yoga.backend.livelectures.dto.LiveLectureCreateResponseDto;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
