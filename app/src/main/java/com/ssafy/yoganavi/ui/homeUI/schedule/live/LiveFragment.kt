@@ -1,6 +1,8 @@
 package com.ssafy.yoganavi.ui.homeUI.schedule.live
 
 import android.Manifest
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context.AUDIO_SERVICE
 import android.content.pm.ActivityInfo
@@ -44,7 +46,7 @@ import org.webrtc.VideoTrack
 class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::inflate) {
     private val args: LiveFragmentArgs by navArgs()
 
-    private val viewModel: LiveViewModel by viewModels()
+    private val viewModel: LiveViewModel by viewModels<LiveViewModel>()
 
     private lateinit var localRenderer: VideoTextureViewRenderer
     private lateinit var remoteRenderer: VideoTextureViewRenderer
@@ -212,7 +214,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
                 if (prevState != WebRTCSessionState.Offline) {
                     viewLifecycleOwner.lifecycleScope.launch {
-                        runCatching {
+                        runCatching  {
                             viewModel.sessionManager.disconnect()
                         }
                     }
@@ -220,27 +222,87 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             }
 
             WebRTCSessionState.Impossible -> {
+                if(prevState != WebRTCSessionState.Offline)
+                    renderInitWhenImpossible()
+
                 if (!args.isTeacher)
                     binding.tvState.text = WAIT_BROADCAST
-                else {
-                    viewModel.sessionManager.onSessionScreenReady()
-                }
             }
 
             WebRTCSessionState.Ready -> {
                 if (args.isTeacher)
-                    viewModel.sessionManager.onSessionScreenReady()
+                    viewModel.sessionManager.onSessionReady()
             }
 
             WebRTCSessionState.Creating -> {
                 if (!args.isTeacher)
-                    viewModel.sessionManager.onSessionScreenReady()
+                    viewModel.sessionManager.onSessionReady()
             }
 
-            WebRTCSessionState.Active -> {}
+            WebRTCSessionState.Active -> { backSize() }
         }
 
         prevState = state
+    }
+
+    private fun renderInitWhenImpossible() {
+        val layoutParams = binding.draggableContainer.layoutParams
+
+        val startWidth = layoutParams.width
+        val startHeight = layoutParams.height
+
+        val parentWidth = (binding.draggableContainer.parent as View).width
+        val parentHeight = (binding.draggableContainer.parent as View).height
+
+        val widthAnimator = ValueAnimator.ofInt(startWidth, parentWidth).apply {
+            addUpdateListener { animator ->
+                layoutParams.width = animator.animatedValue as Int
+                binding.draggableContainer.layoutParams = layoutParams
+            }
+        }
+
+        val heightAnimator = ValueAnimator.ofInt(startHeight, parentHeight).apply {
+            addUpdateListener { animator ->
+                layoutParams.height = animator.animatedValue as Int
+                binding.draggableContainer.layoutParams = layoutParams
+            }
+        }
+
+        val animatorSet = AnimatorSet().apply {
+            playTogether(widthAnimator, heightAnimator)
+        }
+
+        animatorSet.start()
+    }
+
+    private fun backSize() {
+        val layoutParams = binding.draggableContainer.layoutParams
+
+        val startWidth = binding.root.width
+        val startHeight = binding.root.height
+        val endWidth = 525
+        val endHeight = 394
+
+        val widthAnimator = ValueAnimator.ofInt(startWidth, endWidth).apply {
+            addUpdateListener { animator ->
+                layoutParams.width = animator.animatedValue as Int
+                binding.draggableContainer.layoutParams = layoutParams
+            }
+        }
+
+        val heightAnimator = ValueAnimator.ofInt(startHeight, endHeight).apply {
+            addUpdateListener { animator ->
+                layoutParams.height = animator.animatedValue as Int
+                binding.draggableContainer.layoutParams = layoutParams
+            }
+        }
+
+        val animatorSet = AnimatorSet().apply {
+            duration = 300
+            playTogether(widthAnimator, heightAnimator)
+        }
+
+        animatorSet.start()
     }
 
     private fun observeCallMediaState() {
@@ -273,6 +335,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     }
 
     private fun renderInit() {
+        viewModel.sessionManager.onLocalScreen()
+
         localRenderer = binding.localVideoCallScreen
         remoteRenderer = binding.remoteVideoCallScreen
 
@@ -300,15 +364,19 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
     private fun CoroutineScope.collectLocalVideoTrack() = launch {
         viewModel.sessionManager.localVideoTrackFlow.collectLatest { videoTrack ->
-            cleanLocalTrack(videoTrack)
-            setupLocalVideo(videoTrack)
+            runCatching {
+                cleanLocalTrack(videoTrack)
+                setupLocalVideo(videoTrack)
+            }
         }
     }
 
     private fun CoroutineScope.collectRemoteVideoTrack() = launch {
         viewModel.sessionManager.remoteVideoTrackFlow.collectLatest { videoTrack ->
-            cleanRemoteTrack(videoTrack)
-            setupRemoteVideo(videoTrack)
+            runCatching {
+                cleanRemoteTrack(videoTrack)
+                setupRemoteVideo(videoTrack)
+            }
         }
     }
 
@@ -378,7 +446,6 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             audioManager.isSpeakerphoneOn = on
         }
     }
-
 
     private fun popBack() {
         runCatching {
