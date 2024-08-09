@@ -46,6 +46,8 @@ interface InfoRepository {
 
     suspend fun getLecture(recordId: Long): DetailResponse<LectureDetailData>
 
+    suspend fun getMypageLecture(recordId: Long): DetailResponse<LectureDetailData>
+
     suspend fun updateLecture(lecture: LectureDetailData): DetailResponse<Boolean>
 
     suspend fun deleteLectures(recordIdList: List<Long>): DetailResponse<Boolean>

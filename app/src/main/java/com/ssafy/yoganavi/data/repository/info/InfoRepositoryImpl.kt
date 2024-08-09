@@ -112,6 +112,10 @@ class InfoRepositoryImpl @Inject constructor(
         return response.toDetailResponse()
     }
 
+    override suspend fun getMypageLecture(recordId: Long): DetailResponse<LectureDetailData> {
+        val response = withContext(ioDispatcher) { infoDataSource.getMypageLecture(recordId) }
+        return response.toDetailResponse()
+    }
 
     override suspend fun updateLecture(lecture: LectureDetailData): DetailResponse<Boolean> {
         val response = withContext(ioDispatcher) { infoDataSource.updateLecture(lecture) }

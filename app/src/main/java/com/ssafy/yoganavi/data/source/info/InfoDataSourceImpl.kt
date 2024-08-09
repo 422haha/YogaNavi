@@ -75,6 +75,9 @@ class InfoDataSourceImpl @Inject constructor(private val infoAPI: InfoAPI) : Inf
     override suspend fun getLecture(recordedId: Long): Response<YogaDetailResponse<LectureDetailData>> =
         infoAPI.getLecture(recordedId)
 
+    override suspend fun getMypageLecture(recordedId: Long): Response<YogaDetailResponse<LectureDetailData>> =
+        infoAPI.getMypageLecture(recordedId)
+
     override suspend fun updateLecture(lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>> =
         infoAPI.updateLecture(id = lecture.recordedId, lecture = lecture)
 
