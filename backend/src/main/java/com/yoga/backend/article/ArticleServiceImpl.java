@@ -2,7 +2,6 @@ package com.yoga.backend.article;
 
 import com.yoga.backend.common.entity.Article;
 import com.yoga.backend.common.service.S3Service;
-import com.yoga.backend.common.entity.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;

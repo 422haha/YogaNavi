@@ -1,11 +1,12 @@
-package com.yoga.backend.home;
+package com.yoga.backend.livelectures.service;
 
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
+import com.yoga.backend.livelectures.dto.HomeResponseDto;
+import com.yoga.backend.livelectures.repository.LiveLectureRepository;
+import com.yoga.backend.livelectures.repository.MyLiveLectureRepository;
 import com.yoga.backend.members.repository.UsersRepository;
-import com.yoga.backend.livelectures.LiveLectureRepository;
-import com.yoga.backend.livelectures.MyLiveLectureRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -22,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
  * 내가 듣거나 진행할 강의들
  */
 @Service
-public class HomeService {
+public class HomeServiceImpl implements HomeService {
 
     private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
@@ -30,7 +31,7 @@ public class HomeService {
     private final MyLiveLectureRepository myLiveLectureRepository;
     private final UsersRepository usersRepository;
 
-    public HomeService(
+    public HomeServiceImpl(
         LiveLectureRepository liveLectureRepository,
         MyLiveLectureRepository myLiveLectureRepository,
         UsersRepository usersRepository) {
@@ -45,6 +46,7 @@ public class HomeService {
      * @param userId 사용자 ID
      * @return 강의 이력 DTO 리스트
      */
+    @Override
     @Transactional(readOnly = true)
     public List<HomeResponseDto> getHomeData(int userId) {
         ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE);
@@ -62,7 +64,7 @@ public class HomeService {
      * 학생의 수강할 강의들
      */
     @Transactional(readOnly = true)
-    protected List<HomeResponseDto> getPastStudentLectures(int userId, ZonedDateTime nowKorea,
+    public List<HomeResponseDto> getPastStudentLectures(int userId, ZonedDateTime nowKorea,
         String dayOfWeek) {
         LocalDate currentDate = nowKorea.toLocalDate();
 
@@ -92,7 +94,7 @@ public class HomeService {
      * 강사의 강의 이력
      */
     @Transactional(readOnly = true)
-    protected List<HomeResponseDto> getPastUserLectures(int userId, ZonedDateTime nowKorea,
+    public List<HomeResponseDto> getPastUserLectures(int userId, ZonedDateTime nowKorea,
         String dayOfWeek) {
         LocalDate currentDate = nowKorea.toLocalDate();
 
@@ -123,7 +125,7 @@ public class HomeService {
     /**
      * LiveLectures Entity -> HomeResponseDto
      */
-    private List<HomeResponseDto> convertToHomeResponseDto(LiveLectures lecture,
+    public List<HomeResponseDto> convertToHomeResponseDto(LiveLectures lecture,
         MyLiveLecture myLiveLecture, ZonedDateTime nowKorea, boolean isTeacher) {
         List<HomeResponseDto> dtos = new ArrayList<>();
 
@@ -188,7 +190,7 @@ public class HomeService {
     /**
      * HomeResponseDto 생성
      */
-    private HomeResponseDto createHomeResponseDto(LiveLectures lecture, LocalDate date,
+    public HomeResponseDto createHomeResponseDto(LiveLectures lecture, LocalDate date,
         LocalTime startTime, LocalTime endTime, boolean isTeacher, boolean isOnAir) {
         HomeResponseDto dto = new HomeResponseDto();
 
@@ -230,7 +232,7 @@ public class HomeService {
     /**
      * 오름차순 정렬
      */
-    private List<HomeResponseDto> sortHomeData(List<HomeResponseDto> data) {
+    public List<HomeResponseDto> sortHomeData(List<HomeResponseDto> data) {
         return data.stream()
             .sorted(Comparator
                 .comparingLong(HomeResponseDto::getLectureDate)

@@ -1,4 +1,4 @@
-package com.yoga.backend.livelectures;
+package com.yoga.backend.livelectures.service;
 
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;

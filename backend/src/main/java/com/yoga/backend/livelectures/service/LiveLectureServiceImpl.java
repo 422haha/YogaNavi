@@ -1,9 +1,11 @@
-package com.yoga.backend.livelectures;
+package com.yoga.backend.livelectures.service;
 
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.fcm.NotificationService;
+import com.yoga.backend.livelectures.repository.LiveLectureRepository;
+import com.yoga.backend.livelectures.repository.MyLiveLectureRepository;
 import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.livelectures.dto.LiveLectureCreateDto;
 import com.yoga.backend.livelectures.dto.LiveLectureCreateResponseDto;

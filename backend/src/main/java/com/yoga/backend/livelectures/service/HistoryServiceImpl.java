@@ -1,8 +1,10 @@
-package com.yoga.backend.livelectures;
+package com.yoga.backend.livelectures.service;
 
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.entity.MyLiveLecture;
 import com.yoga.backend.common.entity.Users;
+import com.yoga.backend.livelectures.repository.LiveLectureRepository;
+import com.yoga.backend.livelectures.repository.MyLiveLectureRepository;
 import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.livelectures.dto.LectureHistoryDto;
 import java.time.LocalDate;
@@ -21,15 +23,15 @@ import org.springframework.transaction.annotation.Transactional;
  * 수강 내역
  */
 @Service
-public class HistoryService {
+public class HistoryServiceImpl implements HistoryService {
 
     private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
     private final LiveLectureRepository liveLectureRepository;
-    private final com.yoga.backend.livelectures.MyLiveLectureRepository myLiveLectureRepository;
+    private final MyLiveLectureRepository myLiveLectureRepository;
     private final UsersRepository usersRepository;
 
-    public HistoryService(
+    public HistoryServiceImpl(
         LiveLectureRepository liveLectureRepository,
         MyLiveLectureRepository myLiveLectureRepository,
         UsersRepository usersRepository) {
@@ -44,6 +46,7 @@ public class HistoryService {
      * @param userId 사용자 ID
      * @return 강의 이력 DTO 리스트
      */
+    @Override
     @Transactional(readOnly = true)
     public List<LectureHistoryDto> getHistory(int userId) {
         ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE);
@@ -61,7 +64,7 @@ public class HistoryService {
      * 학생의 과거 수강 이력
      */
     @Transactional(readOnly = true)
-    protected List<LectureHistoryDto> getPastStudentLectures(int userId, ZonedDateTime nowKorea,
+    public List<LectureHistoryDto> getPastStudentLectures(int userId, ZonedDateTime nowKorea,
         String dayOfWeek) {
         LocalDate currentDate = nowKorea.toLocalDate();
 //        System.out.println("history current date " + currentDate);
@@ -92,7 +95,7 @@ public class HistoryService {
      * 강사의 강의 이력
      */
     @Transactional(readOnly = true)
-    protected List<LectureHistoryDto> getPastUserLectures(int userId, ZonedDateTime nowKorea,
+    public List<LectureHistoryDto> getPastUserLectures(int userId, ZonedDateTime nowKorea,
         String dayOfWeek) {
         LocalDate currentDate = nowKorea.toLocalDate();
 
@@ -124,7 +127,7 @@ public class HistoryService {
     /**
      * LiveLectures Entity -> LectureHistoryDto
      */
-    private List<LectureHistoryDto> convertToLectureHistoryDto(LiveLectures lecture,
+    public List<LectureHistoryDto> convertToLectureHistoryDto(LiveLectures lecture,
         MyLiveLecture myLiveLecture, ZonedDateTime nowKorea, boolean isTeacher) {
         List<LectureHistoryDto> dtos = new ArrayList<>();
 
@@ -181,7 +184,7 @@ public class HistoryService {
     /**
      * LectureHistoryDto 생성
      */
-    private LectureHistoryDto createLectureHistoryDto(LiveLectures lecture, LocalDate date,
+    public LectureHistoryDto createLectureHistoryDto(LiveLectures lecture, LocalDate date,
         LocalTime startTime, LocalTime endTime, boolean isTeacher) {
         LectureHistoryDto dto = new LectureHistoryDto();
 
@@ -220,7 +223,7 @@ public class HistoryService {
     /**
      * 내림차순 정렬
      */
-    private List<LectureHistoryDto> sortHistoryData(List<LectureHistoryDto> data) {
+    public List<LectureHistoryDto> sortHistoryData(List<LectureHistoryDto> data) {
         return data.stream()
             .sorted(Comparator
                 .comparingLong(LectureHistoryDto::getLectureDate)

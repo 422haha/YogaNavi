@@ -1,5 +1,6 @@
 package com.yoga.backend.livelectures;
 
+import com.yoga.backend.livelectures.service.LiveLectureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
