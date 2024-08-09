@@ -1,4 +1,4 @@
-package com.yoga.backend.mypage.recorded.dto;
+package com.yoga.backend.recorded.dto;
 
 import java.util.List;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.yoga.backend.mypage.recorded;
+package com.yoga.backend.recorded;
 
 import com.yoga.backend.common.service.S3Service;
 import com.yoga.backend.common.entity.RecordedLectures.RecordedLecture;
@@ -6,25 +6,22 @@ import com.yoga.backend.common.entity.RecordedLectures.RecordedLectureChapter;
 import com.yoga.backend.common.entity.RecordedLectures.RecordedLectureLike;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.repository.UsersRepository;
-import com.yoga.backend.mypage.recorded.dto.ChapterDto;
-import com.yoga.backend.mypage.recorded.dto.DeleteDto;
-import com.yoga.backend.mypage.recorded.dto.LectureDto;
-import com.yoga.backend.mypage.recorded.repository.AllRecordedLecturesRepository;
-import com.yoga.backend.mypage.recorded.repository.MyLikeLectureListRepository;
-import com.yoga.backend.mypage.recorded.repository.RecordedLectureLikeRepository;
-import com.yoga.backend.mypage.recorded.repository.RecordedLectureListRepository;
-import com.yoga.backend.mypage.recorded.repository.RecordedLectureRepository;
-import java.util.Collections;
+import com.yoga.backend.recorded.dto.ChapterDto;
+import com.yoga.backend.recorded.dto.DeleteDto;
+import com.yoga.backend.recorded.dto.LectureDto;
+import com.yoga.backend.recorded.repository.AllRecordedLecturesRepository;
+import com.yoga.backend.recorded.repository.MyLikeLectureListRepository;
+import com.yoga.backend.recorded.repository.RecordedLectureLikeRepository;
+import com.yoga.backend.recorded.repository.RecordedLectureListRepository;
+import com.yoga.backend.recorded.repository.RecordedLectureRepository;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +29,8 @@ import java.util.List;
 
 
 /**
- * 녹화 강의 관련 비즈니스 로직을 처리하는 서비스 구현 클래스. 강의 목록 조회, 강의 생성, 수정, 삭제 및 좋아요 기능 제공.
+ *  녹화 강의
+ *  강의 목록 조회, 강의 생성, 수정, 삭제 및 좋아요
  */
 @Slf4j
 @Service

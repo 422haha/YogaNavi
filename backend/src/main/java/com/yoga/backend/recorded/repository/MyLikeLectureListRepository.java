@@ -1,4 +1,4 @@
-package com.yoga.backend.mypage.recorded.repository;
+package com.yoga.backend.recorded.repository;
 
 import static com.querydsl.core.types.Projections.constructor;
 
@@ -9,7 +9,7 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.ExpressionUtils;
 import com.yoga.backend.common.entity.RecordedLectures.QRecordedLecture;
 import com.yoga.backend.common.entity.RecordedLectures.QRecordedLectureLike;
-import com.yoga.backend.mypage.recorded.dto.LectureDto;
+import com.yoga.backend.recorded.dto.LectureDto;
 
 import java.util.List;
 import org.springframework.stereotype.Repository;

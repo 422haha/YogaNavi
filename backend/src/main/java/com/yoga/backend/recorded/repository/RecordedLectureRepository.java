@@ -1,4 +1,4 @@
-package com.yoga.backend.mypage.recorded.repository;
+package com.yoga.backend.recorded.repository;
 
 import com.yoga.backend.common.entity.RecordedLectures.RecordedLecture;
 import java.util.List;

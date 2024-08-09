@@ -1,13 +1,10 @@
-package com.yoga.backend.mypage.recorded.dto;
+package com.yoga.backend.recorded.dto;
 
-import jakarta.persistence.Column;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.LastModifiedDate;
 
 @Getter
 @Setter
