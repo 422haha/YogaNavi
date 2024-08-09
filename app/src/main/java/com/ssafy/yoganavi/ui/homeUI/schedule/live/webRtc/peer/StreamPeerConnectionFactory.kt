@@ -1,7 +1,7 @@
 package com.ssafy.yoganavi.ui.homeUI.schedule.live.webRtc.peer
 
 import android.content.Context
-import android.os.Build
+import android.media.MediaRecorder
 import kotlinx.coroutines.CoroutineScope
 import org.webrtc.AudioSource
 import org.webrtc.AudioTrack
@@ -88,74 +88,24 @@ class StreamPeerConnectionFactory constructor(
         .createInitializationOptions()
     )
 
-    PeerConnectionFactory.builder()
-      .setVideoDecoderFactory(videoDecoderFactory)
-      .setVideoEncoderFactory(videoEncoderFactory)
-      .setAudioDeviceModule(
-        JavaAudioDeviceModule
-          .builder(context)
-          .setUseHardwareAcousticEchoCanceler(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-          .setUseHardwareNoiseSuppressor(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-          .setAudioRecordErrorCallback(object :
-              JavaAudioDeviceModule.AudioRecordErrorCallback {
-              override fun onWebRtcAudioRecordInitError(p0: String?) {
-                  Timber.d("[onWebRtcAudioRecordInitError] $p0")
-              }
-
-              override fun onWebRtcAudioRecordStartError(
-                p0: JavaAudioDeviceModule.AudioRecordStartErrorCode?,
-                p1: String?
-              ) {
-                  Timber.d("[onWebRtcAudioRecordInitError] $p1")
-              }
-
-              override fun onWebRtcAudioRecordError(p0: String?) {
-                  Timber.d("[onWebRtcAudioRecordError] $p0")
-              }
-            })
-          .setAudioTrackErrorCallback(object :
-              JavaAudioDeviceModule.AudioTrackErrorCallback {
-              override fun onWebRtcAudioTrackInitError(p0: String?) {
-                  Timber.d( "[onWebRtcAudioTrackInitError] $p0")
-              }
-
-              override fun onWebRtcAudioTrackStartError(
-                p0: JavaAudioDeviceModule.AudioTrackStartErrorCode?,
-                p1: String?
-              ) {
-                  Timber.d("[onWebRtcAudioTrackStartError] $p0")
-              }
-
-              override fun onWebRtcAudioTrackError(p0: String?) {
-                  Timber.d("[onWebRtcAudioTrackError] $p0")
-              }
-            })
-          .setAudioRecordStateCallback(object :
-              JavaAudioDeviceModule.AudioRecordStateCallback {
-              override fun onWebRtcAudioRecordStart() {
-                  Timber.d("[onWebRtcAudioRecordStart] no args" )
-              }
-
-              override fun onWebRtcAudioRecordStop() {
-                  Timber.d("[onWebRtcAudioRecordStop] no args")
-              }
-            })
-          .setAudioTrackStateCallback(object :
-              JavaAudioDeviceModule.AudioTrackStateCallback {
-              override fun onWebRtcAudioTrackStart() {
-                  Timber.d("[onWebRtcAudioTrackStart] no args")
-              }
-
-              override fun onWebRtcAudioTrackStop() {
-                  Timber.d("[onWebRtcAudioTrackStop] no args")
-              }
-            })
-          .createAudioDeviceModule().also {
-            it.setMicrophoneMute(false)
-            it.setSpeakerMute(false)
-          }
-      )
-      .createPeerConnectionFactory()
+      PeerConnectionFactory.builder()
+          .setVideoDecoderFactory(videoDecoderFactory)
+          .setVideoEncoderFactory(videoEncoderFactory)
+          .setAudioDeviceModule(
+              JavaAudioDeviceModule
+                  .builder(context)
+                  .setSampleRate(16000)  // 8000Hz에서 16000Hz로 증가
+                  .setUseHardwareAcousticEchoCanceler(true)  // 하드웨어 AEC 활성화
+                  .setUseHardwareNoiseSuppressor(true)  // 하드웨어 노이즈 서프레서 활성화
+                  .setUseStereoInput(false)  // 모노 입력 사용
+                  .setUseStereoOutput(false)  // 모노 출력 사용
+                  .setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)  // 음성 통신에 최적화된 오디오 소스 사용
+                  .createAudioDeviceModule().also {
+                      it.setMicrophoneMute(false)
+                      it.setSpeakerMute(false)
+                  },
+          )
+          .createPeerConnectionFactory()
   }
 
   /**
