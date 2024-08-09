@@ -196,10 +196,10 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     }
 
     private fun handleSessionState(state: WebRTCSessionState) {
-        if(state == WebRTCSessionState.Offline || state == WebRTCSessionState.Impossible || state == WebRTCSessionState.Active)
-            binding.lav.isVisible = false
         if(state == WebRTCSessionState.Ready || state == WebRTCSessionState.Creating)
-            binding.lav.isVisible = true
+            onBuffering(true)
+        else if(state == WebRTCSessionState.Offline || state == WebRTCSessionState.Impossible || state == WebRTCSessionState.Active)
+            onBuffering(false)
 
         when (state) {
             WebRTCSessionState.Offline -> {
@@ -288,6 +288,16 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         }
 
         animatorSet.start()
+    }
+
+    private fun onBuffering(isEnabled: Boolean) {
+        if(isEnabled) {
+            binding.lav.playAnimation()
+            binding.lav.isVisible = true
+        } else {
+            binding.lav.pauseAnimation()
+            binding.lav.isVisible = false
+        }
     }
 
     private fun observeCallMediaState() {
@@ -416,10 +426,10 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
     private fun popBack() {
         runCatching {
-            binding.lav.isVisible = true
+            onBuffering(true)
             viewModel.sessionManager.disconnect()
         }.also {
-            binding.lav.isVisible = false
+            onBuffering(false)
             setSpeakerphoneOn(false)
             exitFullscreen()
             findNavController().popBackStack()
