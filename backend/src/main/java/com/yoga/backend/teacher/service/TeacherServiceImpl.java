@@ -74,7 +74,6 @@ public class TeacherServiceImpl implements TeacherService {
         return users.stream()
             .filter(user -> searchKeyword == null || searchKeyword.isEmpty() ||
                 user.getNickname().replace(" ", "").contains(searchKeyword) ||
-                user.getEmail().replace(" ", "").contains(searchKeyword) ||
                 user.getHashtags().stream()
                     .anyMatch(
                         hashtag -> hashtag.getName().replace(" ", "").contains(searchKeyword)))
@@ -111,7 +110,6 @@ public class TeacherServiceImpl implements TeacherService {
         return users.stream()
             .filter(user -> searchKeyword == null || searchKeyword.isEmpty() ||
                 user.getNickname().replace(" ", "").contains(searchKeyword) ||
-                user.getEmail().replace(" ", "").contains(searchKeyword) ||
                 user.getHashtags().stream()
                     .anyMatch(
                         hashtag -> hashtag.getName().replace(" ", "").contains(searchKeyword)))
@@ -237,7 +235,6 @@ public class TeacherServiceImpl implements TeacherService {
 
         return users.stream()
             .filter(user -> user.getNickname().replace(" ", "").contains(searchKeyword) ||
-                user.getEmail().replace(" ", "").contains(searchKeyword) ||
                 user.getHashtags().stream()
                     .anyMatch(
                         hashtag -> hashtag.getName().replace(" ", "").contains(searchKeyword)))
