@@ -74,7 +74,6 @@ public class TeacherServiceImpl implements TeacherService {
         return users.stream()
             .filter(user -> searchKeyword == null || searchKeyword.isEmpty() ||
                 user.getNickname().replace(" ", "").contains(searchKeyword) ||
-                user.getEmail().replace(" ", "").contains(searchKeyword) ||
                 user.getHashtags().stream()
                     .anyMatch(
                         hashtag -> hashtag.getName().replace(" ", "").contains(searchKeyword)))
@@ -111,7 +110,6 @@ public class TeacherServiceImpl implements TeacherService {
         return users.stream()
             .filter(user -> searchKeyword == null || searchKeyword.isEmpty() ||
                 user.getNickname().replace(" ", "").contains(searchKeyword) ||
-                user.getEmail().replace(" ", "").contains(searchKeyword) ||
                 user.getHashtags().stream()
                     .anyMatch(
                         hashtag -> hashtag.getName().replace(" ", "").contains(searchKeyword)))
@@ -162,7 +160,6 @@ public class TeacherServiceImpl implements TeacherService {
 
         return DetailedTeacherDto.builder()
             .id(user.getId())
-            .email(user.getEmail())
             .nickname(user.getNickname())
             .profileImageUrl(user.getProfile_image_url())
             .profileImageUrlSmall(user.getProfile_image_url_small())
@@ -237,7 +234,6 @@ public class TeacherServiceImpl implements TeacherService {
 
         return users.stream()
             .filter(user -> user.getNickname().replace(" ", "").contains(searchKeyword) ||
-                user.getEmail().replace(" ", "").contains(searchKeyword) ||
                 user.getHashtags().stream()
                     .anyMatch(
                         hashtag -> hashtag.getName().replace(" ", "").contains(searchKeyword)))
