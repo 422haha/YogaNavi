@@ -10,7 +10,6 @@ import com.ssafy.yoganavi.data.repository.info.InfoRepository
 import com.ssafy.yoganavi.data.repository.lecture.LectureRepository
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureData
 import com.ssafy.yoganavi.ui.homeUI.lecture.lectureList.lecture.SortAndKeyword
-import com.ssafy.yoganavi.ui.utils.FAME
 import com.ssafy.yoganavi.ui.utils.loadS3Image
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +42,7 @@ class LectureListViewModel @Inject constructor(
 
     fun setLectureLike(recordedId: Long) = viewModelScope.launch(Dispatchers.IO) {
         runCatching { infoRepository.likeLecture(recordedId) }
-            .onSuccess { if (_sortAndKeyword.value.sort == FAME) updateSortAndKeyword(likeChange = true) }
+            .onSuccess { updateSortAndKeyword(likeChange = true) }
             .onFailure { it.printStackTrace() }
     }
 
