@@ -16,6 +16,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,6 +30,7 @@ class LectureListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _sortAndKeyword = MutableStateFlow(SortAndKeyword())
+    val sortAndKeyword: StateFlow<SortAndKeyword> = _sortAndKeyword.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val lectureList: Flow<PagingData<LectureData>> = _sortAndKeyword
