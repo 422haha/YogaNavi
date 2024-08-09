@@ -53,6 +53,8 @@ interface InfoDataSource {
 
     suspend fun getLecture(recordedId: Long): Response<YogaDetailResponse<LectureDetailData>>
 
+    suspend fun getMypageLecture(recordedId: Long): Response<YogaDetailResponse<LectureDetailData>>
+
     suspend fun updateLecture(lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>>
 
     suspend fun deleteLectures(recordIdList: List<Long>): Response<YogaDetailResponse<Boolean>>

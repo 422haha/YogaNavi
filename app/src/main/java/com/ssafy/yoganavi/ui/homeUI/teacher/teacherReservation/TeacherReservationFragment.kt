@@ -17,12 +17,10 @@ import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.teacher.teacherReservation.availableList.AvailableAdapter
 import com.ssafy.yoganavi.ui.utils.END
 import com.ssafy.yoganavi.ui.utils.NOTHING
-import com.ssafy.yoganavi.ui.utils.ONE_TO_MULTI
 import com.ssafy.yoganavi.ui.utils.ONE_TO_ONE
 import com.ssafy.yoganavi.ui.utils.PICK_DATE
 import com.ssafy.yoganavi.ui.utils.RESERVATION
 import com.ssafy.yoganavi.ui.utils.RESERVE
-import com.ssafy.yoganavi.ui.utils.SELECT_CLASS
 import com.ssafy.yoganavi.ui.utils.START
 import com.ssafy.yoganavi.ui.utils.toCalendarDay
 import com.ssafy.yoganavi.ui.utils.toLong
@@ -48,7 +46,6 @@ class TeacherReservationFragment :
         super.onViewCreated(view, savedInstanceState)
         initView()
         binding.rvAvailableClass.adapter = availableAdapter
-        initListener()
         initCollect()
     }
 
@@ -60,9 +57,7 @@ class TeacherReservationFragment :
             canGoBack = true,
             menuItem = RESERVATION,
             menuListener = {
-                if (!(binding.rbOneToOne.isChecked || binding.rbOneToMulti.isChecked)) {
-                    showSnackBar(SELECT_CLASS)
-                } else if (binding.tvNothing.isVisible) {
+                if (binding.tvNothing.isVisible) {
                     showSnackBar(NOTHING)
                 } else if (saveStartDate == null || saveEndDate == null) {
                     showSnackBar(PICK_DATE)
@@ -98,39 +93,12 @@ class TeacherReservationFragment :
         } else tvHashtag.isVisible = false
 
         preAnimation()
-        showRbMethod()
+        clickMethod()
     }
 
-    private fun showRbMethod() = with(binding) {
-        lifecycleScope.launch {
-            delay(300)
-            tvSelectClassMethod.isVisible = true
-            tvSelectClassMethod.startAnimation(
-                AnimationUtils.loadAnimation(
-                    context,
-                    R.anim.slide_up
-                )
-            )
-            delay(500)
-            rgClass.isVisible = true
-            rbOneToMulti.startAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_up))
-            rbOneToOne.startAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_up))
-        }
-
-    }
-
-    private fun initListener() = with(binding) {
-        rbOneToOne.setOnClickListener {
-            clickMethod(ONE_TO_ONE)
-        }
-        rbOneToMulti.setOnClickListener {
-            clickMethod(ONE_TO_MULTI)
-        }
-    }
-
-    private fun clickMethod(method: Int) {
+    private fun clickMethod() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.getAvailableClass(args.teacherId, method)
+            viewModel.getAvailableClass(args.teacherId, ONE_TO_ONE)
             availableAdapter.selectedPosition = -1
         }
         visibleAvailableClass()
@@ -152,8 +120,6 @@ class TeacherReservationFragment :
     }
 
     private fun preAnimation() = with(binding) {
-        tvSelectClassMethod.isVisible = false
-        rgClass.isVisible = false
         tvAvailableClass.isVisible = false
         lyRvAvailableClass.isVisible = false
         tvSelectTerm.isVisible = false

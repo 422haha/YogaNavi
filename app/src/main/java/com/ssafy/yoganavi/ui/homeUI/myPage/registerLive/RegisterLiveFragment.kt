@@ -128,8 +128,6 @@ class RegisterLiveFragment :
         binding.cbEndDateUnlimited.isEnabled = false
         binding.btnStart.isEnabled = false
         binding.btnEnd.isEnabled = false
-        binding.spMaxNum.isEnabled = false
-
     }
 
     private fun setRegister() {
@@ -154,7 +152,7 @@ class RegisterLiveFragment :
 
                     availableDay = viewModel.dayStatusMap.filter { it.value }.keys.joinToString(",")
 
-                    maxLiveNum = spMaxNum.selectedItemPosition + 1
+                    maxLiveNum = 1
                 }
             }
 
@@ -291,9 +289,6 @@ class RegisterLiveFragment :
             binding.btnStart.text = formatTime(viewModel.liveLectureData.startTime)
             binding.btnEnd.text = formatTime(viewModel.liveLectureData.endTime)
 
-            val size = resources.getStringArray(R.array.maxnum_array).size
-            if (viewModel.liveLectureData.maxLiveNum in 1..size)
-                binding.spMaxNum.setSelection(viewModel.liveLectureData.maxLiveNum - 1)
         }
     }
 

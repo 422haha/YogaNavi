@@ -67,28 +67,32 @@ interface InfoAPI {
     suspend fun getLikeTeacherList(): Response<YogaResponse<TeacherData>>
 
     // LECTURE
-    @GET("recorded-lecture/mypage/list")
+    @GET("mypage/recorded-lecture/list")
     suspend fun getLectureList(): Response<YogaResponse<LectureData>>
 
-    @POST("recorded-lecture/mypage/create")
+    @POST("mypage/recorded-lecture/create")
     suspend fun createLecture(@Body lecture: LectureDetailData): Response<YogaDetailResponse<Boolean>>
 
-    @GET("recorded-lecture/mypage/detail/{recorded_id}")
+    @GET("mypage/recorded-lecture/detail/{recorded_id}")
+    suspend fun getMypageLecture(@Path("recorded_id") id: Long): Response<YogaDetailResponse<LectureDetailData>>
+
+    @GET("recorded-lecture/detail/{recorded_id}")
     suspend fun getLecture(@Path("recorded_id") id: Long): Response<YogaDetailResponse<LectureDetailData>>
 
-    @PUT("recorded-lecture/mypage/update/{recorded_id}")
+
+    @PUT("mypage/recorded-lecture/update/{recordedId}")
     suspend fun updateLecture(
         @Path("recorded_id") id: Long,
         @Body lecture: LectureDetailData
     ): Response<YogaDetailResponse<Boolean>>
 
-    @POST("recorded-lecture/mypage/delete")
+    @POST("mypage/recorded-lecture/delete")
     suspend fun deleteLectures(@Body body: HashMap<String, List<Long>>): Response<YogaDetailResponse<Boolean>>
 
     @POST("recorded-lecture/like/{recorded_id}")
     suspend fun likeLecture(@Path("recorded_id") id: Long): Response<YogaDetailResponse<Boolean>>
 
-    @GET("recorded-lecture/mypage/likelist")
+    @GET("mypage/recorded-lecture/likelist")
     suspend fun getLikeLectureList(): Response<YogaResponse<LectureData>>
 
     // Live
