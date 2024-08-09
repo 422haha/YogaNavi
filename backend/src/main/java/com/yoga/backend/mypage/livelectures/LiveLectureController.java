@@ -8,6 +8,8 @@ import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateResponseDto;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -186,9 +188,12 @@ public class LiveLectureController {
         dto.setLiveContent(lecture.getLiveContent());
         dto.setAvailableDay(lecture.getAvailableDay());
         dto.setStartDate(lecture.getStartDate().toEpochMilli());
-        dto.setStartTime(lecture.getStartTime().toEpochMilli() / 1_000_000);
+        dto.setStartTime(
+            ZonedDateTime.ofInstant(lecture.getStartTime(), ZoneId.of("UTC")).toLocalTime()
+                .toNanoOfDay() / 1_000_000);
         dto.setEndDate(lecture.getEndDate().toEpochMilli());
-        dto.setEndTime(lecture.getEndTime().toEpochMilli() / 1_000_000);
+        dto.setEndTime(ZonedDateTime.ofInstant(lecture.getEndTime(), ZoneId.of("UTC")).toLocalTime()
+            .toNanoOfDay() / 1_000_000);
         dto.setMaxLiveNum(lecture.getMaxLiveNum());
         return dto;
     }
