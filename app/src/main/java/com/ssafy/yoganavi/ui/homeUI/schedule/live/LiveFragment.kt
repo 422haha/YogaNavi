@@ -2,7 +2,10 @@ package com.ssafy.yoganavi.ui.homeUI.schedule.live
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context.AUDIO_SERVICE
 import android.content.pm.ActivityInfo
+import android.media.AudioDeviceInfo
+import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.view.MotionEvent
@@ -84,6 +87,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         viewModel.sessionManager.signalingClient.updateLiveId(args.getLiveId)
 
         setToolbar(false, "", false)
+
+        setSpeakerphoneOn(true)
 
         initListener()
 
@@ -355,10 +360,31 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         supportActionBar?.show()
     }
 
+    private fun setSpeakerphoneOn(on: Boolean) {
+        val audioManager =  requireActivity().getSystemService(AUDIO_SERVICE) as AudioManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val devices = audioManager.availableCommunicationDevices
+            val speakerDevice = devices.find { it.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER }
+
+            if (on && speakerDevice != null) {
+                audioManager.setCommunicationDevice(speakerDevice)
+            } else {
+                audioManager.clearCommunicationDevice()
+            }
+        } else {
+            audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+            @Suppress("DEPRECATION")
+            audioManager.isSpeakerphoneOn = on
+        }
+    }
+
+
     private fun popBack() {
         runCatching {
             viewModel.sessionManager.disconnect()
         }.also {
+            setSpeakerphoneOn(false)
             exitFullscreen()
             findNavController().popBackStack()
         }
