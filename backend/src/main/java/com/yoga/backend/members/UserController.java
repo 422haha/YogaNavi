@@ -216,6 +216,13 @@ public class UserController {
         }
     }
 
+    /**
+     * 사용자 정보 수정 전에 비밀번호 확인
+     *
+     * @param token     사용자 인증 토큰
+     * @param updateDto 비밀번호 담은 DTO
+     * @return 비밀번호 일치 응답
+     */
     @PostMapping("/mypage/check")
     public ResponseEntity<Map<String, Object>> checkBeforeUpdate(
         @RequestHeader("Authorization") String token, @RequestBody UpdateDto updateDto) {

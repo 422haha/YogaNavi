@@ -114,7 +114,7 @@ public class RecordedController {
      * @param recorded_id 강의 id
      * @return 강의 상세 정보
      */
-    @GetMapping("/mypage/detail/{recorded_id}")
+    @GetMapping({"/mypage/detail/{recorded_id}", "/recorded-lecture/detail/{recorded_id}"})
     public ResponseEntity<Map<String, Object>> getLectureDetails(
         @RequestHeader("Authorization") String token, @PathVariable long recorded_id) {
         Map<String, Object> response = new HashMap<>();

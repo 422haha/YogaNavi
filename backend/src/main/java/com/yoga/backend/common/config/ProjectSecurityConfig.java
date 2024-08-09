@@ -1,5 +1,7 @@
 package com.yoga.backend.common.config;
 
+import com.yoga.backend.common.constants.FcmConstants;
+import com.yoga.backend.common.constants.SecurityConstants;
 import com.yoga.backend.common.handler.CustomAuthenticationSuccessHandler;
 import com.yoga.backend.common.filter.JWTTokenValidatorFilter;
 import com.yoga.backend.common.handler.CustomLoginFailureHandler;
@@ -42,10 +44,6 @@ public class ProjectSecurityConfig {
         return new JWTTokenValidatorFilter(jwtUtil, userRepository);
     }
 
-//    @Bean FcmFilter fcmFilter() {
-//        return new FcmFilter(jwtUtil, userRepository);
-//    }
-
     /**
      * 기본 보안 필터 체인을 구성
      *
@@ -67,14 +65,23 @@ public class ProjectSecurityConfig {
                 public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOrigins(Collections.singletonList("*")); // 모든 출처 허용
-                    config.setAllowedMethods(Collections.singletonList("*")); // 모든 HTTP 메서드 허용
-                    config.setAllowCredentials(true); // 자격 증명 포함 요청 허용
-                    config.setAllowedHeaders(Collections.singletonList("*")); // 모든 헤더 허용
-                    config.setExposedHeaders(Arrays.asList("Authorization")); // Authorization 헤더 노출
-                    config.setMaxAge(3600L); // 캐싱 시간 설정 (1시간)
+                    config.setAllowedMethods(
+                        Arrays.asList("GET", "POST", "PUT", "DELETE")); // HTTP 메서드 허용
+                    config.setAllowCredentials(false); // Retrofit에서는  보통 필요 없음
+                    config.setAllowedHeaders(Arrays.asList(
+                        SecurityConstants.JWT_HEADER,
+                        SecurityConstants.REFRESH_TOKEN_HEADER,
+                        FcmConstants.FCM_HEADER,
+                        "Content-Type"
+                    ));
+                    config.setExposedHeaders(Arrays.asList(
+                        SecurityConstants.JWT_HEADER,
+                        SecurityConstants.REFRESH_TOKEN_HEADER
+                    ));
                     return config;
                 }
-            }));
+            })
+        );
 
         // CSRF 보호 비활성화
         http.csrf(csrf -> csrf.disable());
@@ -85,22 +92,17 @@ public class ProjectSecurityConfig {
         // URL 기반 권한 부여 설정
         http.authorizeHttpRequests((requests) -> requests
                 .anyRequest().permitAll()
-//            .requestMatchers("/myAccount").hasRole("USER")
-//            .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
-//            .requestMatchers("/test").authenticated()
-//            .requestMatchers("/mypage/recorded-lecture/").hasRole("TEACHER")
-//            .requestMatchers("/user").authenticated()
+//            .requestMatchers("/myAccount").hasRole("TEACHER")
+//            .requestMatchers("/myBalance").authenticated()
 //                .requestMatchers("/members/**").permitAll()
-//                .requestMatchers("/test").authenticated()
+                .requestMatchers("/test").authenticated()
 
-        ); // /members/register/** 엔드포인트에 대한 인증 제거
+        );
 
         // 인증 성공 시 JWT 발급
         http.formLogin(form -> form
-                .successHandler(customAuthenticationSuccessHandler())
-                .failureHandler(new CustomLoginFailureHandler())
-//            .loginPage("/login")
-//            .failureUrl("/login-fail")
+            .successHandler(customAuthenticationSuccessHandler())
+            .failureHandler(new CustomLoginFailureHandler())
         );
 
         // HTTP 기본 인증 구성

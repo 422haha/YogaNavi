@@ -148,10 +148,6 @@ public class NotificationService {
             String tomorrowDayAbbreviation = tomorrowKorea.getDayOfWeek().toString()
                 .substring(0, 3);
 
-            System.out.println("매일 23:49실행 for fcm ");
-            System.out.println("tomorrowDayAbbreviation: " + tomorrowDayAbbreviation);
-            System.out.println("tomorrowkorea: " + tomorrowKorea);
-
             List<LiveLectures> tomorrowLectures = liveLectureRepository.findTomorrowLectures(
                 tomorrowKorea, tomorrowDayAbbreviation); // 여기서 에러 발생
 
@@ -203,10 +199,6 @@ public class NotificationService {
             LocalDateTime nowKorea = LocalDateTime.now(KOREA_ZONE);
             LocalDate todayKorea = nowKorea.toLocalDate();
             String dayAbbreviation = todayKorea.getDayOfWeek().toString().substring(0, 3);
-
-            log.info("1분마다 실행 for fcm");
-            log.info("nowKorea: " + nowKorea);
-            log.info("todayKorea: " + todayKorea);
 
             String redisKey = REDIS_KEY_PREFIX + todayKorea.toString();
             List<LiveLectureDto> todayLectures = getLecturesFromRedis(redisKey);
@@ -277,7 +269,7 @@ public class NotificationService {
             notificationData.put("body", message);
             notificationData.put("liveId", lecture.getLiveId().toString());
 
-            Users teacher = usersRepository.findById(lecture.getUserId()).orElse(null);
+            Users teacher = usersRepository.findByIdAndIsDeletedFalse(lecture.getUserId()).orElse(null);
             if (teacher != null && teacher.getFcmToken() != null) {
                 notifications.put(teacher.getFcmToken(), notificationData);
             }
