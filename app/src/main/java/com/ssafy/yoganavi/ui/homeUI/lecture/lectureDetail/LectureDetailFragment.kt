@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
@@ -12,10 +13,16 @@ import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail.lecture.LectureDetailAdapter
 import com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail.lecture.LectureDetailItem
 import com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail.lecture.LectureHeader
+import com.ssafy.yoganavi.ui.utils.DOWNLOAD
+import com.ssafy.yoganavi.ui.utils.DOWNLOAD_VIDEO
+import com.ssafy.yoganavi.ui.utils.FAIL_DOWNLOAD
 import com.ssafy.yoganavi.ui.utils.LECTURE
+import com.ssafy.yoganavi.ui.utils.getYogaDirectory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 @AndroidEntryPoint
 class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
@@ -74,19 +81,74 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
         viewModel.loadS3VideoFrame(view, key, time, isCircularOn)
 
     private fun moveToVideo(start: Int) {
-        val uriList = lectureDetailAdapter.currentList
+        val keyArray = lectureDetailAdapter.currentList
             .asSequence()
             .drop(start)
             .map { it as LectureDetailItem.Item }
             .map { it.chapterData.recordKey }
-            .map { keyToUri(it) }
             .toList()
             .toTypedArray()
 
+        downloadView()
+        val keyAndFileArray = makeFile(keyArray)
+        downloadVideo(keyAndFileArray)
+    }
+
+    private fun makeFile(keyArray: Array<String>): Array<Pair<String, File>> {
+        val yogaDir = getYogaDirectory(requireContext())
+        if (!yogaDir.exists()) yogaDir.mkdirs()
+
+        val downloadDir = File(yogaDir, DOWNLOAD)
+        if (!downloadDir.exists()) downloadDir.mkdirs()
+
+        return keyArray.map { key ->
+            val fileName = key.substringAfterLast(delimiter = "/")
+            val newFile = File(downloadDir, fileName)
+            if (!newFile.exists()) newFile.createNewFile()
+            Pair(key, newFile)
+        }.toTypedArray()
+    }
+
+    private fun downloadVideo(keyAndFileArray: Array<Pair<String, File>>) =
+        viewLifecycleOwner.lifecycleScope.launch {
+            val result = viewModel.downloadVideo(keyAndFileArray).await()
+
+            if (!result) {
+                failToDownload()
+                return@launch
+            }
+
+            val urlArray = keyAndFileArray.map { it.second.absolutePath }.toTypedArray()
+            moveToLectureVideoFragment(urlArray)
+        }
+
+    private fun moveToLectureVideoFragment(urlArray: Array<String>) {
         val directions = LectureDetailFragmentDirections
-            .actionLectureDetailFragmentToLectureVideoFragment(uriList = uriList)
+            .actionLectureDetailFragmentToLectureVideoFragment(urlArray)
 
         findNavController().navigate(directions)
+    }
+
+    private fun downloadView() = with(binding) {
+        vBg.apply {
+            visibility = View.VISIBLE
+            isClickable = true
+            isFocusable = true
+        }
+
+        tvDownload.apply {
+            text = DOWNLOAD_VIDEO
+            visibility = View.VISIBLE
+        }
+
+        lav.visibility = View.VISIBLE
+    }
+
+    private fun failToDownload() = with(binding) {
+        vBg.visibility = View.GONE
+        lav.visibility = View.GONE
+        tvDownload.visibility = View.GONE
+        showSnackBar(FAIL_DOWNLOAD)
     }
 
     private fun String.toTitle(): String {
@@ -94,5 +156,4 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
         return "${name}님의 $LECTURE"
     }
 
-    private fun keyToUri(key: String): String = viewModel.keyToUri(key)
 }

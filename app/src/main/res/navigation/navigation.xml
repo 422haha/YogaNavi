@@ -220,7 +220,7 @@
         android:label="fragment_lecture_video"
         tools:layout="@layout/fragment_lecture_video">
         <argument
-            android:name="uriList"
+            android:name="urlArray"
             app:argType="string[]" />
     </fragment>
     <fragment

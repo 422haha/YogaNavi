@@ -1,13 +1,9 @@
 package com.ssafy.yoganavi.ui.homeUI.lecture.lectureVideo
 
-import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
-import android.os.Build
-import androidx.annotation.OptIn
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.ssafy.yoganavi.data.repository.ai.PoseRepository
 import com.ssafy.yoganavi.data.source.ai.KeyPoint
@@ -19,7 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.math.ceil
 
 @HiltViewModel
 class LectureVideoViewModel @Inject constructor(
@@ -28,6 +23,7 @@ class LectureVideoViewModel @Inject constructor(
 
     private val retriever = MediaMetadataRetriever()
     private var isVideoInfer: Boolean = false
+    private var averageInferTime: Float = 0f
 
     private val _userKeyPoints: MutableStateFlow<List<KeyPoint>> =
         MutableStateFlow(emptyList())
@@ -47,7 +43,6 @@ class LectureVideoViewModel @Inject constructor(
         image.close()
     }
 
-    @OptIn(UnstableApi::class)
     fun inferVideo(
         player: ExoPlayer,
         width: Int,
@@ -57,13 +52,10 @@ class LectureVideoViewModel @Inject constructor(
             if (isVideoInfer) return@launch
 
             isVideoInfer = true
-
-            val (uri, position, fps) = withContext(Dispatchers.Main) {
+            val (position, uri) = withContext(Dispatchers.Main) {
                 val position = player.currentPosition
                 val uri = player.currentMediaItem?.localConfiguration?.uri?.toString()
-                val fps = player.videoFormat?.frameRate ?: 30f
-
-                return@withContext Triple(uri, position, fps)
+                return@withContext Pair(position, uri)
             }
 
             if (position == 0L || uri.isNullOrBlank()) {
@@ -71,8 +63,14 @@ class LectureVideoViewModel @Inject constructor(
                 return@launch
             }
 
+            val startTime = System.currentTimeMillis()
             retriever.setDataSource(uri)
-            val bitmap = getBitmap(position, fps)
+            val bitmap = retriever.getFrameAtTime(
+                (position + averageInferTime.toLong()) * 1000,
+                MediaMetadataRetriever.OPTION_CLOSEST_SYNC
+            )
+            val endTime = System.currentTimeMillis()
+            averageInferTime = ((endTime - startTime) + averageInferTime) / 2f
 
             bitmap?.let {
                 val results = poseRepository.infer(bitmap, bitmap.width, bitmap.height)
@@ -95,17 +93,6 @@ class LectureVideoViewModel @Inject constructor(
         }
     }
 
-    private fun getBitmap(position: Long, fps: Float): Bitmap? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            retriever.getFrameAtIndex(estimateFrameCount(position, fps))
-        } else {
-            retriever.getFrameAtTime(position * 1000L)
-        }
-    }
-
-    private fun estimateFrameCount(position: Long, fps: Float): Int {
-        return ceil(position / 1000f * fps).toInt()
-    }
 
     override fun onCleared() {
         super.onCleared()

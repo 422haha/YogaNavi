@@ -140,7 +140,28 @@ suspend fun uploadFile(
     })
 }
 
-private fun getYogaDirectory(context: Context): File {
+suspend fun downloadFile(
+    transferUtility: TransferUtility,
+    key: String,
+    file: File
+): Boolean = suspendCancellableCoroutine { continuation ->
+    val observer = transferUtility.download(BUCKET_NAME, key, file)
+
+    observer.setTransferListener(object : TransferListener {
+        override fun onStateChanged(id: Int, state: TransferState?) {
+            if (state == TransferState.COMPLETED) continuation.resume(true)
+        }
+
+        override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
+        }
+
+        override fun onError(id: Int, ex: java.lang.Exception?) {
+            continuation.resume(false)
+        }
+    })
+}
+
+fun getYogaDirectory(context: Context): File {
     val yogaDir = File(context.cacheDir, YOGA)
     if (!yogaDir.exists()) yogaDir.mkdirs()
     return yogaDir
