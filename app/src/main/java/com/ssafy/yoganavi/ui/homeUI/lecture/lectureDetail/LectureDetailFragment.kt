@@ -7,7 +7,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.ssafy.yoganavi.data.source.ai.KeyPoint
 import com.ssafy.yoganavi.data.source.dto.lecture.LectureDetailData
 import com.ssafy.yoganavi.databinding.FragmentLectureDetailBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
@@ -17,7 +16,6 @@ import com.ssafy.yoganavi.ui.homeUI.lecture.lectureDetail.lecture.LectureHeader
 import com.ssafy.yoganavi.ui.utils.DOWNLOAD
 import com.ssafy.yoganavi.ui.utils.DOWNLOAD_VIDEO
 import com.ssafy.yoganavi.ui.utils.FAIL_DOWNLOAD
-import com.ssafy.yoganavi.ui.utils.INFER
 import com.ssafy.yoganavi.ui.utils.LECTURE
 import com.ssafy.yoganavi.ui.utils.getYogaDirectory
 import dagger.hilt.android.AndroidEntryPoint
@@ -93,7 +91,7 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
 
         downloadView()
         val keyAndFileArray = makeFile(keyArray)
-        downloadAndInfer(keyAndFileArray)
+        downloadVideo(keyAndFileArray)
     }
 
     private fun makeFile(keyArray: Array<String>): Array<Pair<String, File>> {
@@ -111,27 +109,25 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
         }.toTypedArray()
     }
 
-    private fun downloadAndInfer(keyAndFileArray: Array<Pair<String, File>>) =
+    private fun downloadVideo(keyAndFileArray: Array<Pair<String, File>>) =
         viewLifecycleOwner.lifecycleScope.launch {
-            val poseList: Array<List<List<KeyPoint>>> = viewModel.downloadAndInfer(
-                keyAndFileArray = keyAndFileArray,
-                startInference = ::startInference,
-                failToDownload = ::failToDownload
-            ).await()
+            val result = viewModel.downloadVideo(keyAndFileArray).await()
 
-            // TODO pose List도 전달
+            if (!result) {
+                failToDownload()
+                return@launch
+            }
 
             val urlArray = keyAndFileArray.map { it.second.absolutePath }.toTypedArray()
-            if (poseList.isNotEmpty()) moveToLectureVideoFragment(urlArray)
+            moveToLectureVideoFragment(urlArray)
         }
 
-    private suspend fun moveToLectureVideoFragment(urlArray: Array<String>) =
-        withContext(Dispatchers.Main) {
-            val directions = LectureDetailFragmentDirections
-                .actionLectureDetailFragmentToLectureVideoFragment(urlArray)
+    private fun moveToLectureVideoFragment(urlArray: Array<String>) {
+        val directions = LectureDetailFragmentDirections
+            .actionLectureDetailFragmentToLectureVideoFragment(urlArray)
 
-            findNavController().navigate(directions)
-        }
+        findNavController().navigate(directions)
+    }
 
     private fun downloadView() = with(binding) {
         vBg.apply {
@@ -148,21 +144,16 @@ class LectureDetailFragment : BaseFragment<FragmentLectureDetailBinding>(
         lav.visibility = View.VISIBLE
     }
 
-    private suspend fun startInference() = withContext(Dispatchers.Main) {
-        binding.tvDownload.text = INFER
-    }
-
-    private suspend fun failToDownload() = withContext(Dispatchers.Main) {
-        with(binding) {
-            vBg.visibility = View.GONE
-            lav.visibility = View.GONE
-            tvDownload.visibility = View.GONE
-            showSnackBar(FAIL_DOWNLOAD)
-        }
+    private fun failToDownload() = with(binding) {
+        vBg.visibility = View.GONE
+        lav.visibility = View.GONE
+        tvDownload.visibility = View.GONE
+        showSnackBar(FAIL_DOWNLOAD)
     }
 
     private fun String.toTitle(): String {
         val name = if (length > 7) "${substring(0, 7)}..." else this
         return "${name}님의 $LECTURE"
     }
+
 }
