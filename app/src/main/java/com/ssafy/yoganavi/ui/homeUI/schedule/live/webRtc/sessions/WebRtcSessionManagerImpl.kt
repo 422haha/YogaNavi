@@ -178,8 +178,11 @@ class WebRtcSessionManagerImpl(
     override fun onSessionReady() {
         runCatching {
             setupAudio()
-            peerConnection.connection.addTrack(localVideoTrack)
             peerConnection.connection.addTrack(localAudioTrack)
+        }
+
+        runCatching {
+            peerConnection.connection.addTrack(localVideoTrack)
         }
 
         runCatching {
