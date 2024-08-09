@@ -95,7 +95,6 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         observeSessionState()
 
         observeCallMediaState()
-
     }
 
     private fun initListener() {
@@ -346,14 +345,11 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     }
 
     private fun popBack() {
-        exitFullscreen()
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            runCatching {
-                viewModel.sessionManager.disconnect()
-            }
+        runCatching {
+            viewModel.sessionManager.disconnect()
+        }.also {
+            exitFullscreen()
+            findNavController().popBackStack()
         }
-
-        findNavController().popBackStack()
     }
 }
