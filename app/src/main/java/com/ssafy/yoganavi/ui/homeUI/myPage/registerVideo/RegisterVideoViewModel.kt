@@ -47,7 +47,7 @@ class RegisterVideoViewModel @Inject constructor(
     val chapterList: StateFlow<List<ChapterItem>> = _chapterList.asStateFlow()
 
     fun getLecture(recordId: Long) = viewModelScope.launch(Dispatchers.IO) {
-        runCatching { infoRepository.getLecture(recordId) }
+        runCatching { infoRepository.getMypageLecture(recordId) }
             .onSuccess { it.data?.let { data -> _chapterList.emit(data.toChapterItem()) } }
             .onFailure { it.printStackTrace() }
     }

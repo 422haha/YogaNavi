@@ -11,8 +11,11 @@
         android:id="@+id/cv_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/padding_extra_small"
-        app:cardCornerRadius="10dp"
+        app:cardCornerRadius="0dp"
+        android:layout_margin="1dp"
+        app:cardElevation="0dp"
+        app:strokeColor="@android:color/transparent"
+        app:strokeWidth="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="3:4"
         app:layout_constraintEnd_toEndOf="parent"
@@ -70,11 +73,11 @@
         android:layout_margin="@dimen/padding_small"
         android:ellipsize="end"
         android:gravity="center"
-        android:maxLines="1"
-        android:singleLine="true"
+        android:maxLines="3"
+        android:singleLine="false"
         app:layout_constraintBottom_toBottomOf="@id/cv_content"
         app:layout_constraintEnd_toEndOf="@id/cv_content"
         app:layout_constraintStart_toStartOf="@id/cv_content"
-        tools:text="SO EZ 요가" />
+        tools:text="SO EZ 요가 SO EZ 요가 SO EZ 요가 SO EZ 요가" /> />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
