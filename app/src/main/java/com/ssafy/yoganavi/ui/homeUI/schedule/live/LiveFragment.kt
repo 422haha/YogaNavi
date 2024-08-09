@@ -53,6 +53,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     private lateinit var draggableContainer: FrameLayout
 
     private var prevState: WebRTCSessionState = WebRTCSessionState.Offline
+    private var isMirrorMode = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,8 +116,12 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             }
 
             ibtnCamSwitch.setOnClickListener {
-                if (viewModel.sessionManager.signalingClient.sessionStateFlow.value == WebRTCSessionState.Active)
+                if (viewModel.sessionManager.signalingClient.sessionStateFlow.value == WebRTCSessionState.Active) {
+                    isMirrorMode = !isMirrorMode
+                    localVideoCallScreen.setMirror(isMirrorMode)
+
                     viewModel.sessionManager.flipCamera()
+                }
             }
 
             ibtnCancel.setOnClickListener { popBack() }
@@ -149,6 +154,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initInMoveLocalView() {
+        binding.localVideoCallScreen.setMirror(isMirrorMode)
+
         draggableContainer = binding.draggableContainer
         draggableContainer.setOnTouchListener { view, event ->
             val parent = view.parent as View
@@ -206,6 +213,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
                     }
                 }
             }
+
             WebRTCSessionState.Impossible -> {
                 if (!args.isTeacher)
                     binding.tvState.text = WAIT_BROADCAST
@@ -213,15 +221,18 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
                     viewModel.sessionManager.onSessionScreenReady()
                 }
             }
+
             WebRTCSessionState.Ready -> {
                 if (args.isTeacher)
                     viewModel.sessionManager.onSessionScreenReady()
             }
+
             WebRTCSessionState.Creating -> {
                 if (!args.isTeacher)
                     viewModel.sessionManager.onSessionScreenReady()
             }
-            WebRTCSessionState.Active -> {  }
+
+            WebRTCSessionState.Active -> {}
         }
 
         prevState = state
