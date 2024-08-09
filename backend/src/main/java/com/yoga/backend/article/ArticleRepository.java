@@ -1,4 +1,4 @@
-package com.yoga.backend.mypage.article;
+package com.yoga.backend.article;
 
 import com.yoga.backend.common.entity.Article;
 import java.util.Optional;

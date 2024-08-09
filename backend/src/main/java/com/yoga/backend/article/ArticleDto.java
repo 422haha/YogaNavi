@@ -1,4 +1,4 @@
-package com.yoga.backend.mypage.article;
+package com.yoga.backend.article;
 
 import lombok.Data;
 
