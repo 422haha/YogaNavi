@@ -85,6 +85,7 @@ const val WAIT_BROADCAST = "방송 대기중 입니다 :)"
 const val NO_CONNECT_SERVER = "서버와의 연결되지 않았습니다."
 const val CLOSE_LIVE = "해당 화상강의가 종료되었습니다."
 const val SUCCESS = "success"
+const val DOWNLOAD = "download"
 
 // empty 관리
 const val EMPTY_LIVE = "예정된 실시간 강의가 없습니다"
@@ -144,3 +145,8 @@ const val IS_NOT_EMAIL = "유효하지 않은 이메일 형식입니다."
 const val NOT_USER = "존재하지 않는 회원입니다."
 const val HAS_SPACE = "비밀번호에 공백이 있습니다."
 const val WRONG_PASSWORD = "비밀번호가 틀렸습니다."
+const val FAIL_DOWNLOAD = "영상 다운로드에 실패했습니다."
+
+// 요가 다운로드
+const val DOWNLOAD_VIDEO = "요가 영상을 다운로드하고 있어요!"
+const val INFER = "요가 영상을 추론하고 있어요!"

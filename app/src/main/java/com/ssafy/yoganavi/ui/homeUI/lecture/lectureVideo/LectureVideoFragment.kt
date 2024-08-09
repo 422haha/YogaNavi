@@ -83,7 +83,7 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
 
     private fun setVideo() = with(binding) {
         player = ExoPlayer.Builder(requireContext()).build()
-        val mediaItems = args.uriList.map { url ->
+        val mediaItems = args.urlArray.map { url ->
             MediaItem.fromUri(url)
         }
 
