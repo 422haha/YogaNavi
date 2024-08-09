@@ -169,19 +169,17 @@ class WebRtcSessionManagerImpl(
         }
     }
 
-    override fun onSessionScreenReady() {
-        runCatching { setupAudio() }
+    override fun onLocalScreen() {
+        sessionManagerScope.launch {
+            _localVideoTrackFlow.emit(localVideoTrack)
+        }
+    }
 
+    override fun onSessionReady() {
         runCatching {
+            setupAudio()
             peerConnection.connection.addTrack(localVideoTrack)
             peerConnection.connection.addTrack(localAudioTrack)
-        }
-
-        runCatching {
-            sessionManagerScope.launch {
-                // sending local video track to show local video from start
-                _localVideoTrackFlow.emit(localVideoTrack)
-            }
         }
 
         runCatching {
@@ -195,9 +193,7 @@ class WebRtcSessionManagerImpl(
     }
 
     override fun flipCamera() {
-        runCatching {
-            (videoCapturer as? Camera2Capturer)?.switchCamera(null)
-        }
+        (videoCapturer as? Camera2Capturer)?.switchCamera(null)
     }
 
     override fun enableMicrophone(enabled: Boolean) {
@@ -206,12 +202,10 @@ class WebRtcSessionManagerImpl(
     }
 
     override fun enableCamera(enabled: Boolean) {
-        runCatching {
-            if (enabled) {
-                videoCapturer.startCapture(resolution.width, resolution.height, 30)
-            } else {
-                videoCapturer.stopCapture()
-            }
+        if (enabled) {
+            videoCapturer.startCapture(resolution.width, resolution.height, 30)
+        } else {
+            videoCapturer.stopCapture()
         }
     }
 

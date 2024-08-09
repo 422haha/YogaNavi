@@ -14,7 +14,8 @@ import androidx.fragment.app.Fragment
 class PermissionHelper(
     private val fragment: Fragment,
     private val permissions: Array<String>,
-    private val popBack: () -> Unit
+    private val popBack: () -> Unit,
+    private val isPermission: (() -> Unit)? = null
 ) {
     private val requestPermissionLauncher =
         fragment.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -30,6 +31,7 @@ class PermissionHelper(
 
     private fun checkResult(result: Map<String, Boolean>) {
         if (result.containsValue(false)) makeDialog()
+        else isPermission?.invoke()
     }
 
     private fun makeDialog() {
