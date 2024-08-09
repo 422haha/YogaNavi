@@ -54,7 +54,7 @@ class HomeAdapter(
                     tvDivider.isVisible = false
                 }
 
-                if (item.isOnAir) onAir.setBackgroundResource(R.color.red) else onAir.setBackgroundResource(R.color.gray_20)
+                if (item.isOnAir) onAir.setBackgroundResource(R.color.green) else onAir.setBackgroundResource(R.color.gray_20)
 
                 tvTeacherNickname.text = item.teacherName
 
