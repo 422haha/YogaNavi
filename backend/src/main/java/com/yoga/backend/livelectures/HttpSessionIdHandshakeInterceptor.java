@@ -1,4 +1,4 @@
-package com.yoga.backend.mypage.livelectures;
+package com.yoga.backend.livelectures;
 
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;

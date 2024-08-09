@@ -1,4 +1,4 @@
-package com.yoga.backend.mypage.livelectures;
+package com.yoga.backend.livelectures;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;

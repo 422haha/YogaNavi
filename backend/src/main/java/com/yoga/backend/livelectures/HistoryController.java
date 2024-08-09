@@ -1,7 +1,7 @@
-package com.yoga.backend.mypage.livelectures;
+package com.yoga.backend.livelectures;
 
 import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.mypage.livelectures.dto.LectureHistoryDto;
+import com.yoga.backend.livelectures.dto.LectureHistoryDto;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
