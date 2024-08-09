@@ -25,10 +25,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/")
 public class UserController {
 
-
-    // 인증번호 저장용 변수
-    static int rNum;
-
     @Autowired
     PasswordEncoder passwordEncoder;
 

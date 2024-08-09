@@ -1,7 +1,8 @@
-package com.yoga.backend.livelectures;
+package com.yoga.backend.livelectures.Controller;
 
 import com.yoga.backend.common.entity.LiveLectures;
 import com.yoga.backend.common.util.JwtUtil;
+import com.yoga.backend.livelectures.service.LiveLectureService;
 import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.livelectures.dto.LiveLectureCreateDto;
 import com.yoga.backend.livelectures.dto.LiveLectureCreateResponseDto;

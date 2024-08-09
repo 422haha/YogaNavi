@@ -1,4 +1,4 @@
-package com.yoga.backend.livelectures;
+package com.yoga.backend.livelectures.repository;
 
 import com.yoga.backend.common.entity.LiveLectures;
 import java.time.Instant;
