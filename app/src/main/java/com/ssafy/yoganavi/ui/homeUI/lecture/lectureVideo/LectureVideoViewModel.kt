@@ -1,9 +1,13 @@
 package com.ssafy.yoganavi.ui.homeUI.lecture.lectureVideo
 
+import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
+import android.os.Build
+import androidx.annotation.OptIn
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.ssafy.yoganavi.data.repository.ai.PoseRepository
 import com.ssafy.yoganavi.data.source.ai.KeyPoint
@@ -42,6 +46,7 @@ class LectureVideoViewModel @Inject constructor(
         image.close()
     }
 
+    @OptIn(UnstableApi::class)
     fun inferVideo(
         player: ExoPlayer,
         width: Int,
@@ -51,22 +56,25 @@ class LectureVideoViewModel @Inject constructor(
             if (isVideoInfer) return@launch
 
             isVideoInfer = true
-            val (position, uri) = withContext(Dispatchers.Main) {
+
+            val videoTime = withContext(Dispatchers.Main) {
                 val position = player.currentPosition
+                val duration = player.duration
                 val uri = player.currentMediaItem?.localConfiguration?.uri?.toString()
-                return@withContext Pair(position, uri)
+
+                val fps = uri?.let { getVideoFrameRate() } ?: 30
+                val totalFrames = getTotalFrameCount(duration, fps)
+
+                return@withContext VideoTime(position, totalFrames, duration, uri)
             }
 
-            if (position == 0L || uri.isNullOrBlank()) {
+            if (videoTime.position == 0L || videoTime.uri.isNullOrBlank()) {
                 isVideoInfer = false
                 return@launch
             }
 
-            retriever.setDataSource(uri)
-            val bitmap = retriever.getFrameAtTime(
-                position * 1000,
-                MediaMetadataRetriever.OPTION_CLOSEST_SYNC
-            )
+            retriever.setDataSource(videoTime.uri)
+            val bitmap = getBitmap(videoTime.position, videoTime.totalFrames, videoTime.duration)
 
             bitmap?.let {
                 val results = poseRepository.infer(bitmap, bitmap.width, bitmap.height)
@@ -89,6 +97,29 @@ class LectureVideoViewModel @Inject constructor(
         }
     }
 
+
+    private fun getVideoFrameRate(): Int {
+        val frameRate = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CAPTURE_FRAMERATE)?.toFloatOrNull()
+        retriever.release()
+        return frameRate?.toInt() ?: 30
+    }
+
+    fun getTotalFrameCount(duration: Long, fps: Int): Int {
+        return (duration / 1000 * fps).toInt()
+    }
+
+    private fun getBitmap(position: Long, totalFrames: Int, duration: Long): Bitmap? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            retriever.getFrameAtIndex(estimateFrameCount(position, totalFrames, duration))
+        } else {
+            retriever.getFrameAtTime(position * 1000L)
+        }
+    }
+
+    private fun estimateFrameCount(position: Long, totalFrames: Int, duration: Long): Int {
+        val fraction = position.toDouble() / duration.toDouble()
+        return (fraction * totalFrames).toInt()
+    }
 
     override fun onCleared() {
         super.onCleared()
