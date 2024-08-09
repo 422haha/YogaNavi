@@ -2,6 +2,7 @@ package com.ssafy.yoganavi.ui.homeUI.myPage.courseHistory
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -20,7 +21,7 @@ class CourseHistoryFragment : BaseFragment<FragmentCourseHistoryBinding>(
 ) {
     private val viewModel: CourseHistoryViewModel by viewModels()
 
-    private val courseHistoryAdapter by lazy { CourseHistoryAdapter() }
+    private val courseHistoryAdapter by lazy { CourseHistoryAdapter(::loadS3Image) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,4 +50,6 @@ class CourseHistoryFragment : BaseFragment<FragmentCourseHistoryBinding>(
             }
         }
     }
+
+    private fun loadS3Image(view: ImageView, key: String) = viewModel.loadS3Image(view, key)
 }
