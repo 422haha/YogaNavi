@@ -34,8 +34,6 @@ public class UsersServiceImpl implements UsersService {
     private static final Duration TOKEN_VALIDITY_DURATION = Duration.ofMinutes(5);
     private static final ZoneId KOREA_ZONE_ID = ZoneId.of("Asia/Seoul");
     private static final Duration DELETE_DELAY = Duration.ofDays(7);
-    //    private static final Duration DELETE_DELAY = Duration.ofMinutes(2); // 시험용
-    public static final long URL_EXPIRATION_SECONDS = 86400; // 1 hour
 
     private final S3Service s3Service;
     private final UserDeletionService userDeletionService;
@@ -133,7 +131,16 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public boolean checkUser(String email) {
-        return !usersRepository.findByEmail(email).isPresent();
+        // db에 이메일 존재 하는지
+        if (usersRepository.findByEmail(email).isPresent()) {
+            return false;
+        }
+        // 이메일이 삭제된 사용자의 패턴과 일치?
+        if (email.matches("deleted_\\d+@yoganavi\\.com")) {
+            return false;
+        }
+        // 해당하지 않으면 사용 가능
+        return true;
     }
 
     /**
@@ -201,9 +208,9 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public String sendPasswordResetToken(String email) {
-        Optional<Users> userOpt = usersRepository.findByEmailWithLock(email);
-        if (userOpt.isPresent()) {
-            Users user = userOpt.get();
+        Optional<Users> Users = usersRepository.findByEmailWithLock(email);
+        if (Users.isPresent()) {
+            Users user = Users.get();
             String token = generateToken();
             user.setAuthToken(token);
             user.setAuthTokenExpirationTime(Instant.now().plus(TOKEN_VALIDITY_DURATION));
@@ -232,9 +239,9 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public boolean validatePasswordAuthToken(String email, String token) {
-        Optional<Users> userOpt = usersRepository.findByEmailWithLock(email);
-        if (userOpt.isPresent()) {
-            Users user = userOpt.get();
+        Optional<Users> Users = usersRepository.findByEmailWithLock(email);
+        if (Users.isPresent()) {
+            Users user = Users.get();
             return token.equals(user.getAuthToken()) &&
                 Instant.now().isBefore(user.getAuthTokenExpirationTime());
         }
@@ -251,9 +258,9 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public boolean validateEmailAuthToken(String email, String token) {
-        Optional<TempAuthInfo> tempAuthInfoOpt = tempAuthInfoRepository.findByEmail(email);
-        if (tempAuthInfoOpt.isPresent()) {
-            TempAuthInfo tempAuthInfo = tempAuthInfoOpt.get();
+        Optional<TempAuthInfo> tempAuthInfos = tempAuthInfoRepository.findByEmail(email);
+        if (tempAuthInfos.isPresent()) {
+            TempAuthInfo tempAuthInfo = tempAuthInfos.get();
             boolean isValid = token.equals(tempAuthInfo.getAuthToken()) &&
                 Instant.now().isBefore(tempAuthInfo.getExpirationTime());
             if (isValid) {
@@ -274,9 +281,9 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public String resetPassword(String email, String newPassword) {
-        Optional<Users> userOpt = usersRepository.findByEmailWithLock(email);
-        if (userOpt.isPresent()) {
-            Users user = userOpt.get();
+        Optional<Users> Users = usersRepository.findByEmailWithLock(email);
+        if (Users.isPresent()) {
+            Users user = Users.get();
             if (Instant.now().isAfter(user.getAuthTokenExpirationTime())) {
                 return "인증 시간이 만료되었습니다. 다시 인증해주세요.";
             }
@@ -478,10 +485,10 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(readOnly = true)
     public boolean checkPwd(int userId, String password) {
-        Optional<Users> userOpt = usersRepository.findById(userId);
+        Optional<Users> users = usersRepository.findById(userId);
         try {
-            if (userOpt.isPresent()) {
-                Users user = userOpt.get();
+            if (users.isPresent()) {
+                Users user = users.get();
                 return passwordEncoder.matches(password, user.getPwd());
             } else {
                 return false;
