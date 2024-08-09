@@ -1,7 +1,6 @@
 package com.yoga.backend.recorded;
 
 import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.recorded.dto.ChapterDto;
 import com.yoga.backend.recorded.dto.DeleteDto;
 import com.yoga.backend.recorded.dto.LectureDto;
 import java.util.HashMap;
@@ -15,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/recorded-lecture")
+@RequestMapping("/")
 public class RecordedController {
 
     private final RecordedService recordedService;
@@ -27,14 +26,13 @@ public class RecordedController {
         this.jwtUtil = jwtUtil;
     }
 
-
     /**
      * 사용자가 업로드한 강의 목록을 조회
      *
      * @param token jwt
      * @return 사용자가 업로드한 강의 목록과 관련된 정보가 포함된 ResponseEntity 객체
      */
-    @GetMapping("/mypage/list")
+    @GetMapping("/mypage/recorded-lecture/list")
     public ResponseEntity<Map<String, Object>> getMyLectures(
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
@@ -53,14 +51,13 @@ public class RecordedController {
         }
     }
 
-
     /**
      * 사용자가 좋아요한 강의 목록을 조회
      *
      * @param token jwt
      * @return 사용자가 업로드한 강의 목록과 관련된 정보가 포함된 ResponseEntity 객체
      */
-    @GetMapping("/mypage/likelist")
+    @GetMapping("/mypage/recorded-lecture/likelist")
     public ResponseEntity<Map<String, Object>> getLikeLectures(
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
@@ -86,7 +83,7 @@ public class RecordedController {
      * @param lectureDto 강의 정보
      * @return sessionId
      */
-    @PostMapping("/mypage/create")
+    @PostMapping("/mypage/recorded-lecture/create")
     public ResponseEntity<Map<String, Object>> createLecture(
         @RequestHeader("Authorization") String token,
         @RequestBody LectureDto lectureDto) {
@@ -112,7 +109,8 @@ public class RecordedController {
      * @param recorded_id 강의 id
      * @return 강의 상세 정보
      */
-    @GetMapping({"/mypage/detail/{recorded_id}", "/recorded-lecture/detail/{recorded_id}"})
+    @GetMapping({"/mypage/recorded-lecture/detail/{recorded_id}",
+        "/recorded-lecture/detail/{recorded_id}"})
     public ResponseEntity<Map<String, Object>> getLectureDetails(
         @RequestHeader("Authorization") String token, @PathVariable long recorded_id) {
         Map<String, Object> response = new HashMap<>();
@@ -136,17 +134,13 @@ public class RecordedController {
      * @param lectureDto 수정된 강의 dto
      * @return 강의 수정 성공/실패 응답
      */
-    @PutMapping("/mypage/update/{recordedId}")
+    @PutMapping("/mypage/recorded-lecture/update/{recordedId}")
     public ResponseEntity<Map<String, Object>> updateLecture(
         @RequestHeader("Authorization") String token,
         @PathVariable Long recordedId,
         @RequestBody LectureDto lectureDto) {
         Map<String, Object> response = new HashMap<>();
         lectureDto.setRecordedId(recordedId);
-
-        for (ChapterDto ctr : lectureDto.getRecordedLectureChapters()) {
-            System.out.println(ctr.getId() + "      =======        " + ctr.getRecordVideo());
-        }
 
         log.info("강의 수정 ID: {}", recordedId);
         log.debug("LectureDto: {}", lectureDto);
@@ -182,7 +176,7 @@ public class RecordedController {
      * @param deleteDto 삭제할 강의 ID 리스트를 포함한 DTO
      * @return 강의 삭제 성공/실패 응답
      */
-    @PostMapping("/mypage/delete")
+    @PostMapping("/mypage/recorded-lecture/delete")
     public ResponseEntity<Map<String, Object>> deleteLectures(
         @RequestHeader("Authorization") String token,
         @RequestBody DeleteDto deleteDto) {
@@ -223,7 +217,7 @@ public class RecordedController {
      * @param recordedId 강의 id
      * @return 좋아요/취소 성공/실패 응답
      */
-    @PostMapping("/like/{recordedId}")
+    @PostMapping("/recorded-lecture/like/{recordedId}")
     public ResponseEntity<Map<String, Object>> like(@RequestHeader("Authorization") String token,
         @PathVariable Long recordedId) {
         Map<String, Object> response = new HashMap<>();
@@ -243,7 +237,7 @@ public class RecordedController {
         }
     }
 
-    @GetMapping("/sort/{sort}")
+    @GetMapping("/recorded-lecture/sort/{sort}")
     public ResponseEntity<Map<String, Object>> getAllLectures(
         @RequestHeader("Authorization") String token,
         @PathVariable String sort,
@@ -266,7 +260,7 @@ public class RecordedController {
         }
     }
 
-    @GetMapping("/search/{keyword}/sort/{sort}")
+    @GetMapping("/recorded-lecture/search/{keyword}/sort/{sort}")
     public ResponseEntity<Map<String, Object>> searchLectures(
         @RequestHeader("Authorization") String token,
         @PathVariable String keyword,

@@ -4,7 +4,6 @@ import com.yoga.backend.common.entity.Article;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.repository.UsersRepository;
 import com.yoga.backend.common.util.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

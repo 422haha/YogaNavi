@@ -93,11 +93,40 @@ public class ProjectSecurityConfig {
 
         // URL 기반 권한 부여 설정
         http.authorizeHttpRequests((requests) -> requests
-                .anyRequest().permitAll()
-//            .requestMatchers("/myAccount").hasRole("TEACHER")
-//            .requestMatchers("/myBalance").authenticated()
-//                .requestMatchers("/members/**").permitAll()
+            // 선생만 접근 가능
+            .requestMatchers("/mypage/notification/write",
+                "/mypage/notification/update/**",
+                "/mypage/notification/delete/**",
+                "/mypage/live-lecture-manage/**",
+                "/mypage/recorded-lecture/list",
+                "/mypage/recorded-lecture/create",
+                "/mypage/recorded-lecture/detail/**",
+                "/mypage/recorded-lecture/update/**",
+                "/mypage/recorded-lecture/delete").hasRole("TEACHER")
 
+            // 모든 인증된 사용자
+            .requestMatchers("/mypage/notification/list",
+                "/fcm",
+                "/mypage/course-history",
+                "/home",
+                "/mypage/info",
+                "/mypage/check",
+                "/mypage/update",
+                "/mylogout",
+                "/delete",
+                "/mypage/recorded-lecture/likelist",
+                "/recorded-lecture/detail/**",
+                "/recorded-lecture/like/**",
+                "/recorded-lecture/sort/**",
+                "/recorded-lecture/search/**",
+                "/teacher/**").authenticated()
+
+            // 모두에게 열려있다!
+            .requestMatchers("/members/**",
+                "/is-on").permitAll()
+
+            // 그 외의 경우
+            .anyRequest().authenticated()
         );
 
         // 인증 성공 시 JWT 발급
@@ -113,7 +142,7 @@ public class ProjectSecurityConfig {
     }
 
     /**
-     * BCryptPasswordEncoder 를 반환
+     * BCryptPasswordEncoder 반환
      *
      * @return PasswordEncoder
      */
