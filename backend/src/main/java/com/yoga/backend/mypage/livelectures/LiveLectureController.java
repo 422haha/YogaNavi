@@ -8,7 +8,6 @@ import com.yoga.backend.mypage.livelectures.dto.LiveLectureCreateResponseDto;
 import com.yoga.backend.mypage.livelectures.dto.LiveLectureResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
