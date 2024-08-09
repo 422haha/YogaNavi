@@ -17,6 +17,7 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -195,12 +196,13 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     }
 
     private fun handleSessionState(state: WebRTCSessionState) {
-        binding.tvState.text = state.name
+        if(state == WebRTCSessionState.Offline || state == WebRTCSessionState.Impossible || state == WebRTCSessionState.Active)
+            binding.lav.isVisible = false
+        if(state == WebRTCSessionState.Ready || state == WebRTCSessionState.Creating)
+            binding.lav.isVisible = true
 
         when (state) {
             WebRTCSessionState.Offline -> {
-                binding.tvState.text = NO_CONNECT_SERVER
-
                 if (prevState != WebRTCSessionState.Offline) {
                     runCatching  { viewModel.sessionManager.disconnect() }
                         .onFailure { it.printStackTrace() }
@@ -210,9 +212,6 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             WebRTCSessionState.Impossible -> {
                 if(prevState == WebRTCSessionState.Active)
                     renderInitWhenImpossible()
-
-                if (!args.isTeacher)
-                    binding.tvState.text = WAIT_BROADCAST
             }
 
             WebRTCSessionState.Ready -> {
@@ -417,8 +416,10 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
     private fun popBack() {
         runCatching {
+            binding.lav.isVisible = true
             viewModel.sessionManager.disconnect()
         }.also {
+            binding.lav.isVisible = false
             setSpeakerphoneOn(false)
             exitFullscreen()
             findNavController().popBackStack()
