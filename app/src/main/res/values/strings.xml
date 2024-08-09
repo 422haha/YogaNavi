@@ -79,15 +79,11 @@
     <string name="three_months">세 달</string>
     <string name="year">일 년</string>
     <string name="total">전체</string>
-    <string name="one_to_one">1:1</string>
-    <string name="one_to_multiple">1:多</string>
-    <string name="class_method">수업 방식 선택</string>
     <string name="send">전송</string>
     <string name="notice">공지사항</string>
     <string name="available_class">수강 가능한 수업</string>
     <string name="proceeding_live">진행중인 강의</string>
     <string name="emptyMessage">리스트가 비어있습니다 :)</string>
-    <string name="max_num">최대 수강인원</string>
     <string name="live_delete_msg">화상강의 일정이 삭제되었습니다.</string>
     <string name="end_unlimit">종료일을 시작일로부터 1년으로 하시겠습니까?</string>
     <!-- 필터 끝 -->
