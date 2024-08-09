@@ -43,7 +43,7 @@ import org.webrtc.VideoTrack
 class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::inflate) {
     private val args: LiveFragmentArgs by navArgs()
 
-    private val viewModel: LiveViewModel by viewModels<LiveViewModel>()
+    private val viewModel: LiveViewModel by viewModels()
 
     private lateinit var localRenderer: VideoTextureViewRenderer
     private lateinit var remoteRenderer: VideoTextureViewRenderer
