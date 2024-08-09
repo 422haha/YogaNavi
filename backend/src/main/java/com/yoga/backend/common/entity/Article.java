@@ -2,7 +2,6 @@ package com.yoga.backend.common.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

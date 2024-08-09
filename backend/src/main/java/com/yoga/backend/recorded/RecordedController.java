@@ -1,9 +1,9 @@
-package com.yoga.backend.mypage.recorded;
+package com.yoga.backend.recorded;
 
 import com.yoga.backend.common.util.JwtUtil;
-import com.yoga.backend.mypage.recorded.dto.ChapterDto;
-import com.yoga.backend.mypage.recorded.dto.DeleteDto;
-import com.yoga.backend.mypage.recorded.dto.LectureDto;
+import com.yoga.backend.recorded.dto.ChapterDto;
+import com.yoga.backend.recorded.dto.DeleteDto;
+import com.yoga.backend.recorded.dto.LectureDto;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.yoga.backend.mypage.recorded.repository;
+package com.yoga.backend.recorded.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
@@ -6,7 +6,7 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yoga.backend.common.entity.RecordedLectures.QRecordedLecture;
 import com.yoga.backend.common.entity.RecordedLectures.QRecordedLectureLike;
-import com.yoga.backend.mypage.recorded.dto.LectureDto;
+import com.yoga.backend.recorded.dto.LectureDto;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 

@@ -2,13 +2,11 @@ package com.yoga.backend.members.repository;
 
 import jakarta.persistence.LockModeType;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.yoga.backend.common.entity.Users;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
