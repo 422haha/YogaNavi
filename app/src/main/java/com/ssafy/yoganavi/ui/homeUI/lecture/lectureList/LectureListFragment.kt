@@ -58,7 +58,9 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
         adapter = lectureAdapter.apply {
             registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
                 override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-                    scrollToPosition(0)
+                    if(viewModel.sortAndKeyword.value.sort == DATE) return
+
+                    scrollToPosition(positionStart)
                     super.onItemRangeChanged(positionStart, itemCount)
                 }
             })
