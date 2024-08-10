@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.dto.mypage.Profile
@@ -14,6 +15,8 @@ import com.ssafy.yoganavi.ui.utils.MODIFY
 import com.ssafy.yoganavi.ui.utils.MY_PAGE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
@@ -25,7 +28,8 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initListener()
-        getProfileData()
+        initCollect()
+        viewModel.getProfileData()
     }
 
     override fun onStart() {
@@ -33,7 +37,13 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
         setToolbar(true, MY_PAGE, false)
     }
 
-    private fun getProfileData() = viewModel.getProfileData(::bindData)
+    private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
+        viewModel.getProfileData().collectLatest {
+            if (it != null) {
+                bindData(it)
+            }
+        }
+    }
 
     private suspend fun bindData(profile: Profile) = withContext(Dispatchers.Main) {
         with(binding) {
