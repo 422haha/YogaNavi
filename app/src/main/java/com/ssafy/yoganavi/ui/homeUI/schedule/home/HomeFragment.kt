@@ -31,6 +31,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
         binding.rvMyList.adapter = homeAdapter
 
+        binding.srl.setOnRefreshListener {
+            viewModel.getHomeList()
+            binding.srl.isRefreshing = false
+        }
+
         initCollect()
 
         viewModel.getHomeList()
@@ -47,22 +52,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            collectAdapterList()
-            repeatCollect()
-        }
-    }
-
-    private fun CoroutineScope.collectAdapterList() = launch {
-        viewModel.homeList.collectLatest { list ->
-            checkEmptyList(list, EMPTY_LIVE)
-            homeAdapter.submitList(list)
-        }
-    }
-
-    private fun CoroutineScope.repeatCollect() = launch {
-        while (true) {
-            delay(REPEAT_TIME)
-            viewModel.getHomeList()
+            viewModel.homeList.collectLatest { list ->
+                checkEmptyList(list, EMPTY_LIVE)
+                homeAdapter.submitList(list)
+            }
         }
     }
 
