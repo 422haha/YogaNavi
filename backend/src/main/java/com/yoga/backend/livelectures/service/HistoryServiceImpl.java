@@ -50,12 +50,11 @@ public class HistoryServiceImpl implements HistoryService {
     @Transactional(readOnly = true)
     public List<LectureHistoryDto> getHistory(int userId) {
         ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE);
-        String dayOfWeek = nowKorea.getDayOfWeek().toString().substring(0, 3);
 
         List<LectureHistoryDto> result = new ArrayList<>();
 
-        result.addAll(getPastUserLectures(userId, nowKorea, dayOfWeek));
-        result.addAll(getPastStudentLectures(userId, nowKorea, dayOfWeek));
+        result.addAll(getPastUserLectures(userId, nowKorea));
+        result.addAll(getPastStudentLectures(userId, nowKorea));
 
         return sortHistoryData(result);
     }
@@ -64,17 +63,17 @@ public class HistoryServiceImpl implements HistoryService {
      * 학생의 과거 수강 이력
      */
     @Transactional(readOnly = true)
-    public List<LectureHistoryDto> getPastStudentLectures(int userId, ZonedDateTime nowKorea,
-        String dayOfWeek) {
+    public List<LectureHistoryDto> getPastStudentLectures(int userId, ZonedDateTime nowKorea) {
         LocalDate currentDate = nowKorea.toLocalDate();
 
         List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findPastAndOngoingLecturesByUserId(
-            userId, currentDate, dayOfWeek);
+            userId, currentDate);
 
         List<LectureHistoryDto> result = new ArrayList<>();
 
         for (MyLiveLecture myLiveLecture : myLiveLectures) {
             LiveLectures lecture = myLiveLecture.getLiveLecture();
+
             List<LectureHistoryDto> dtos = convertToLectureHistoryDto(lecture, myLiveLecture,
                 nowKorea, false);
 
@@ -94,12 +93,11 @@ public class HistoryServiceImpl implements HistoryService {
      * 강사의 강의 이력
      */
     @Transactional(readOnly = true)
-    public List<LectureHistoryDto> getPastUserLectures(int userId, ZonedDateTime nowKorea,
-        String dayOfWeek) {
+    public List<LectureHistoryDto> getPastUserLectures(int userId, ZonedDateTime nowKorea) {
         LocalDate currentDate = nowKorea.toLocalDate();
 
         List<LiveLectures> lectures = liveLectureRepository.findPastAndOngoingLecturesByUser(userId,
-            currentDate, dayOfWeek);
+            currentDate);
 
         Users user = usersRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
@@ -155,6 +153,11 @@ public class HistoryServiceImpl implements HistoryService {
         boolean tillYesterday = endTime.isBefore(startTime);
 
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+
+            if (date.isAfter(today)) {
+                break;
+            }
+
             if (lecture.getAvailableDay()
                 .contains(date.getDayOfWeek().toString().substring(0, 3))) {
 

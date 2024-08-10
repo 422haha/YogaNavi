@@ -10,7 +10,6 @@ import com.yoga.backend.members.repository.UsersRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collections;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -119,14 +118,14 @@ public class ProjectSecurityConfig {
                 "/recorded-lecture/like/**",
                 "/recorded-lecture/sort/**",
                 "/recorded-lecture/search/**",
-                "/teacher/**").authenticated()
+                "/teacher/**").hasAnyRole("TEACHER", "STUDENT")
 
             // 모두에게 열려있다!
             .requestMatchers("/members/**",
                 "/is-on").permitAll()
 
             // 그 외의 경우
-            .anyRequest().authenticated()
+            .anyRequest().hasAnyRole("TEACHER", "STUDENT")
         );
 
         // 인증 성공 시 JWT 발급

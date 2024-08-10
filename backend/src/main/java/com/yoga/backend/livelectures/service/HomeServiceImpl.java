@@ -16,12 +16,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 내가 듣거나 진행할 강의들
  */
+@Slf4j
 @Service
 public class HomeServiceImpl implements HomeService {
 
@@ -46,17 +48,14 @@ public class HomeServiceImpl implements HomeService {
      * @param userId 사용자 ID
      * @return 강의 이력 DTO 리스트
      */
-    @Override
     @Transactional(readOnly = true)
     public List<HomeResponseDto> getHomeData(int userId) {
-        ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE);
-        String dayOfWeek = nowKorea.getDayOfWeek().toString().substring(0, 3);
 
+        ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE);
         List<HomeResponseDto> result = new ArrayList<>();
 
-        result.addAll(getPastUserLectures(userId, nowKorea, dayOfWeek));
-        result.addAll(getPastStudentLectures(userId, nowKorea, dayOfWeek));
-
+        result.addAll(getUserLectures(userId, nowKorea));
+        result.addAll(getStudentLectures(userId, nowKorea));
         return sortHomeData(result);
     }
 
@@ -64,53 +63,42 @@ public class HomeServiceImpl implements HomeService {
      * 학생의 수강할 강의들
      */
     @Transactional(readOnly = true)
-    public List<HomeResponseDto> getPastStudentLectures(int userId, ZonedDateTime nowKorea,
-        String dayOfWeek) {
+    protected List<HomeResponseDto> getStudentLectures(int userId, ZonedDateTime nowKorea) {
         LocalDate currentDate = nowKorea.toLocalDate();
 
-        List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findCurrentLecturesByUserId(
-            userId, currentDate, dayOfWeek);
+        List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findCurrentMyLectures(
+            userId, currentDate);
 
         List<HomeResponseDto> result = new ArrayList<>();
-
         for (MyLiveLecture myLiveLecture : myLiveLectures) {
             LiveLectures lecture = myLiveLecture.getLiveLecture();
             List<HomeResponseDto> dtos = convertToHomeResponseDto(lecture, myLiveLecture,
                 nowKorea, false);
-
             for (HomeResponseDto dto : dtos) {
                 Users teacher = lecture.getUser();
-
                 dto.setProfileImageUrl(teacher.getProfile_image_url());
                 dto.setProfileImageUrlSmall(teacher.getProfile_image_url_small());
                 result.add(dto);
             }
         }
-
         return result;
     }
 
     /**
-     * 강사의 강의 이력
+     * 강사가 강의 할 것들
      */
     @Transactional(readOnly = true)
-    public List<HomeResponseDto> getPastUserLectures(int userId, ZonedDateTime nowKorea,
-        String dayOfWeek) {
+    protected List<HomeResponseDto> getUserLectures(int userId, ZonedDateTime nowKorea) {
         LocalDate currentDate = nowKorea.toLocalDate();
-
         List<LiveLectures> lectures = liveLectureRepository.findLecturesByUserAndDateRange(userId,
-            currentDate, dayOfWeek);
+            currentDate);
 
         Users user = usersRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
-
         List<HomeResponseDto> result = new ArrayList<>();
-
         for (LiveLectures lecture : lectures) {
-
             List<HomeResponseDto> dtos = convertToHomeResponseDto(lecture, null, nowKorea,
                 true);
-
             for (HomeResponseDto dto : dtos) {
                 // 강사의 프로필 이미지 URL 설정
                 dto.setProfileImageUrl(user.getProfile_image_url());
@@ -118,17 +106,16 @@ public class HomeServiceImpl implements HomeService {
                 result.add(dto);
             }
         }
-
         return result;
     }
 
     /**
      * LiveLectures Entity -> HomeResponseDto
      */
-    public List<HomeResponseDto> convertToHomeResponseDto(LiveLectures lecture,
+    private List<HomeResponseDto> convertToHomeResponseDto(LiveLectures lecture,
         MyLiveLecture myLiveLecture, ZonedDateTime nowKorea, boolean isTeacher) {
-        List<HomeResponseDto> dtos = new ArrayList<>();
 
+        List<HomeResponseDto> dtos = new ArrayList<>();
         LocalDate startDate;
         LocalDate endDate;
         if (myLiveLecture != null) {
@@ -142,68 +129,54 @@ public class HomeServiceImpl implements HomeService {
             endDate = lecture.getEndDate().atZone(ZoneOffset.UTC)
                 .withZoneSameInstant(KOREA_ZONE).toLocalDate();
         }
-
         LocalTime startTime = ZonedDateTime.ofInstant(lecture.getStartTime(), ZoneId.of("UTC"))
             .toLocalTime();
         LocalTime endTime = ZonedDateTime.ofInstant(lecture.getEndTime(), ZoneId.of("UTC"))
             .toLocalTime();
-
         LocalDate today = nowKorea.toLocalDate();
         LocalTime nowTime = nowKorea.toLocalTime();
-
         boolean overNight = endTime.isBefore(startTime);
-
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
             if (lecture.getAvailableDay()
                 .contains(date.getDayOfWeek().toString().substring(0, 3))) {
-
                 // 오늘 날짜 강의 && 종료 시간이 현재 시간 이후 || 자정을 넘음
                 boolean isLectureToday =
                     date.isEqual(today) && (endTime.isAfter(nowTime) || overNight);
-
                 // 어제 시작된 강의가 오늘까지 이어짐 (자정을 넘고, 현재 시간이 종료 시간 이전)
                 boolean isLectureStartedYesterday =
                     date.equals(today.minusDays(1)) && overNight && endTime.isAfter(nowTime);
-
                 // 미래 강의
                 boolean isFutureLecture = date.isAfter(today);
-
                 if (isFutureLecture || isLectureToday || isLectureStartedYesterday) {
-
                     boolean isOnAir = false;
                     if (isLectureStartedYesterday) { // 어제 시작된 강의가 오늘까지 이어짐
                         isOnAir = lecture.getIsOnAir();
                     } else if (isLectureToday) { // 오늘 날짜 강의
                         isOnAir = lecture.getIsOnAir();
                     }
-
                     HomeResponseDto dto = createHomeResponseDto(lecture, date, startTime, endTime,
                         isTeacher, isOnAir);
                     dtos.add(dto);
                 }
             }
         }
-
         return dtos;
     }
 
     /**
      * HomeResponseDto 생성
      */
-    public HomeResponseDto createHomeResponseDto(LiveLectures lecture, LocalDate date,
+    private HomeResponseDto createHomeResponseDto(LiveLectures lecture, LocalDate date,
         LocalTime startTime, LocalTime endTime, boolean isTeacher, boolean isOnAir) {
         HomeResponseDto dto = new HomeResponseDto();
-
         dto.setLiveId(lecture.getLiveId());
         dto.setUserId(lecture.getUser().getId());
         dto.setNickname(lecture.getUser().getNickname());
         dto.setLiveTitle(lecture.getLiveTitle());
         dto.setLiveContent(lecture.getLiveContent());
-
         ZonedDateTime lectureDateTime = date.atStartOfDay(KOREA_ZONE);
         ZonedDateTime gmtLectureDateTime = lectureDateTime.withZoneSameInstant(ZoneOffset.UTC);
         dto.setLectureDate(gmtLectureDateTime.toInstant().toEpochMilli());
-
         ZonedDateTime startDateTime = date.atTime(startTime).atZone(ZoneId.of("UTC"));
         ZonedDateTime endDateTime = date.atTime(endTime).atZone(ZoneId.of("UTC"));
         dto.setStartTime(
@@ -211,28 +184,23 @@ public class HomeServiceImpl implements HomeService {
                 / 1_000_000);
         dto.setEndTime(endDateTime.withZoneSameInstant(ZoneOffset.UTC).toLocalTime().toNanoOfDay()
             / 1_000_000);
-
         dto.setRegDate(
             lecture.getRegDate().atZone(ZoneOffset.UTC).withZoneSameInstant(KOREA_ZONE).toInstant()
                 .toEpochMilli());
         dto.setLectureDay(date.getDayOfWeek().toString().substring(0, 3));
         dto.setMaxLiveNum(lecture.getMaxLiveNum());
-
         dto.setProfileImageUrl(lecture.getUser().getProfile_image_url());
         dto.setProfileImageUrlSmall(lecture.getUser().getProfile_image_url_small());
-
         dto.setTeacher(isTeacher);
         dto.setIsOnAir(lecture.getIsOnAir());
-
         dto.setIsOnAir(isOnAir);
-
         return dto;
     }
 
     /**
      * 오름차순 정렬
      */
-    public List<HomeResponseDto> sortHomeData(List<HomeResponseDto> data) {
+    private List<HomeResponseDto> sortHomeData(List<HomeResponseDto> data) {
         return data.stream()
             .sorted(Comparator
                 .comparingLong(HomeResponseDto::getLectureDate)

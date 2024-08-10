@@ -33,7 +33,8 @@ public class UsersServiceImpl implements UsersService {
 
     private static final Duration TOKEN_VALIDITY_DURATION = Duration.ofMinutes(5);
     private static final ZoneId KOREA_ZONE_ID = ZoneId.of("Asia/Seoul");
-    private static final Duration DELETE_DELAY = Duration.ofDays(7);
+    //    private static final Duration DELETE_DELAY = Duration.ofDays(7);
+    private static final Duration DELETE_DELAY = Duration.ofMinutes(1); // 테스트용. 1분 뒤에 삭제
 
     private final S3Service s3Service;
     private final UserDeletionService userDeletionService;
@@ -458,21 +459,22 @@ public class UsersServiceImpl implements UsersService {
         Users user = usersRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
-        ZonedDateTime nowSeoul = ZonedDateTime.now(KOREA_ZONE_ID);
-        ZonedDateTime deletionTimeSeoul = nowSeoul.plus(DELETE_DELAY);
-        user.setDeletedAt(deletionTimeSeoul.toInstant());
+        ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE_ID);
+        ZonedDateTime deletionTimeKorea = nowKorea.plus(DELETE_DELAY);
+        System.out.println("deletionTimeSeoul : "+deletionTimeKorea.toInstant());
+        user.setDeletedAt(deletionTimeKorea.toInstant());
         usersRepository.save(user);
-        log.info("사용자 {} 삭제 예정: {}", userId, deletionTimeSeoul);
+        log.info("사용자 {} 삭제 예정: {}", userId, deletionTimeKorea);
     }
 
     @Override
     @Transactional
     public void processDeletedUsers() {
-        ZonedDateTime nowSeoul = ZonedDateTime.now(KOREA_ZONE_ID);
-        Instant expirationTime = nowSeoul.toInstant();
+        ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE_ID);
+        System.out.println("nowKorea : "+nowKorea.toInstant());
 
         List<Users> usersToDelete = usersRepository.findByDeletedAtBeforeAndIsDeletedFalse(
-            expirationTime);
+            nowKorea.toInstant());
         for (Users user : usersToDelete) {
             try {
                 userDeletionService.processDeletedUser(user);

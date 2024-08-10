@@ -51,7 +51,7 @@ public class ReservationServiceImpl implements ReservationService {
      * @param reservationRequest 예약 요청 DTO
      */
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void createReservation(int userId, ReservationRequestDto reservationRequest) {
         Users user = usersRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
