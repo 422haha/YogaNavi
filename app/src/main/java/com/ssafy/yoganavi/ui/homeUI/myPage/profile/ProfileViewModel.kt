@@ -13,9 +13,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,17 +24,12 @@ class ProfileViewModel @Inject constructor(
     private val s3Client: AmazonS3Client
 ) : ViewModel() {
 
-    private val _profile = MutableStateFlow<Profile?>(null)
-    val profile = _profile.asStateFlow()
-
-    fun getProfileData(): StateFlow<Profile?> {
+    fun getProfileData(bindData: suspend (Profile) -> Unit) =
         viewModelScope.launch(Dispatchers.IO) {
             runCatching { infoRepository.getProfile() }
-                .onSuccess { _profile.value = it.data }
+                .onSuccess { it.data?.let { data -> bindData(data) } }
                 .onFailure { it.printStackTrace() }
         }
-        return _profile
-    }
 
     fun clearUserData(moveLogin: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
         runCatching {
