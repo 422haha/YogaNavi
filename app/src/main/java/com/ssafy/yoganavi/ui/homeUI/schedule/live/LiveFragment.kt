@@ -124,30 +124,6 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun initOutMoveLocalView() {
-        draggableContainer = binding.draggableContainer
-        draggableContainer.setOnTouchListener { view, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    viewModel.updateOffset(view.x - event.rawX, view.y - event.rawY)
-                    true
-                }
-
-                MotionEvent.ACTION_MOVE -> {
-                    view.animate()
-                        .x(event.rawX + viewModel.offsetX.value)
-                        .y(event.rawY + viewModel.offsetY.value)
-                        .setDuration(0)
-                        .start()
-                    true
-                }
-
-                else -> false
-            }
-        }
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
     private fun initInMoveLocalView() {
         binding.localVideoCallScreen.setMirror(isMirrorMode)
 
