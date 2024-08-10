@@ -13,10 +13,7 @@ import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.schedule.home.dialog.EnterDialog
 import com.ssafy.yoganavi.ui.utils.EMPTY_LIVE
 import com.ssafy.yoganavi.ui.utils.HOME
-import com.ssafy.yoganavi.ui.utils.REPEAT_TIME
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
