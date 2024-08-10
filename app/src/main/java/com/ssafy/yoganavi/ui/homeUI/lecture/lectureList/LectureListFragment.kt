@@ -42,7 +42,7 @@ class LectureListFragment : BaseFragment<FragmentLectureListBinding>(
         initAdapter()
         initListener()
         initCollect()
-        viewModel.updateSortAndKeyword()
+        viewModel.updateSortAndKeyword(mustRefresh = true)
     }
 
     override fun onStart() {

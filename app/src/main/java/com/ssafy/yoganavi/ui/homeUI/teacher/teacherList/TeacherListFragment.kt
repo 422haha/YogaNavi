@@ -74,28 +74,26 @@ class TeacherListFragment : BaseFragment<FragmentTeacherListBinding>(
         binding.svSearch.setQuery(viewModel.getSearchKeyword(), false)
         initListener()
         initCollect()
-        if (viewModel.teacherList.value.isEmpty()) {
-            when (args.sorting) {
-                RECENT -> {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        viewModel.setSorting(RECENT, filter)
-                    }
+        when (args.sorting) {
+            RECENT -> {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.setSorting(RECENT, filter)
                 }
+            }
 
-                POPULAR -> {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        viewModel.setSorting(POPULAR, filter)
-                    }
+            POPULAR -> {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.setSorting(POPULAR, filter)
                 }
+            }
 
-                else -> {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        viewModel.setSorting(viewModel.sorting.value, filter)
-                        if (viewModel.sorting.value == RECENT) {
-                            binding.rbRecent.isChecked = true
-                        } else {
-                            binding.rbPopular.isChecked = true
-                        }
+            else -> {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.setSorting(viewModel.sorting.value, filter)
+                    if (viewModel.sorting.value == RECENT) {
+                        binding.rbRecent.isChecked = true
+                    } else {
+                        binding.rbPopular.isChecked = true
                     }
                 }
             }
