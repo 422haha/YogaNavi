@@ -5,7 +5,6 @@ import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
@@ -93,28 +92,6 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
 
         pvVideo.player = player
         pvVideo.setBackgroundColor(Color.BLACK)
-
-        pvVideo.useController = false
-
-        binding.tvCountdown.visibility = View.VISIBLE
-        binding.tvCountdownInst.visibility = View.VISIBLE
-
-        object : CountDownTimer(5000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                if (isAdded && isVisible) {
-                    binding.tvCountdown.text = (millisUntilFinished / 1000).toString()
-                }
-            }
-
-            override fun onFinish() {
-                if (isAdded && isVisible) {
-                    binding.tvCountdown.visibility = View.GONE
-                    binding.tvCountdownInst.visibility = View.GONE
-                    pvVideo.useController = true
-                    player.play()
-                }
-            }
-        }.start()
     }
 
     private fun closeVideo() = with(binding) {
