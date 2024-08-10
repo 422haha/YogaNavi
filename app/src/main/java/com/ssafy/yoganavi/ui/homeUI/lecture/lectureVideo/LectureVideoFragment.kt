@@ -96,20 +96,20 @@ class LectureVideoFragment : BaseFragment<FragmentLectureVideoBinding>(
 
         pvVideo.useController = false
 
-        binding.tvCountdown.visibility = View.VISIBLE
-        binding.tvCountdownInst.visibility = View.VISIBLE
+        tvCountdown.visibility = View.VISIBLE
+        tvCountdownInst.visibility = View.VISIBLE
 
         object : CountDownTimer(5000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 if (isAdded && isVisible) {
-                    binding.tvCountdown.text = (millisUntilFinished / 1000).toString()
+                    tvCountdown.text = (millisUntilFinished / 1000).toString()
                 }
             }
 
             override fun onFinish() {
                 if (isAdded && isVisible) {
-                    binding.tvCountdown.visibility = View.GONE
-                    binding.tvCountdownInst.visibility = View.GONE
+                    tvCountdown.visibility = View.GONE
+                    tvCountdownInst.visibility = View.GONE
                     pvVideo.useController = true
                     player.play()
                 }
