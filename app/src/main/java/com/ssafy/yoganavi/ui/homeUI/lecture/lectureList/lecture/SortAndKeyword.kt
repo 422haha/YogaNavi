@@ -7,5 +7,6 @@ data class SortAndKeyword(
     val keyword: String? = null,
     val searchInTitle: Boolean = true,
     val searchInContent: Boolean = true,
-    val likeChange: Boolean = false
+    val likeChange: Boolean = false,
+    val mustRefresh: Boolean = false,
 )
