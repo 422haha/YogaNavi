@@ -26,6 +26,7 @@ public interface LiveLectureRepository extends JpaRepository<LiveLectures, Long>
         @Param("tomorrow") LocalDate tomorrow,
         @Param("dayOfWeek") String dayOfWeek
     );
+
     //fcm을 위한 쿼리. 캐시가 비어있을 시 실행
     @Query("SELECT l FROM LiveLectures l WHERE " +
         "DATE(l.startDate) <= DATE(:today) AND DATE(l.endDate) >= DATE(:today) " +
@@ -53,28 +54,25 @@ public interface LiveLectureRepository extends JpaRepository<LiveLectures, Long>
         @Param("userId") int userId,
         @Param("maxLiveNum") int maxLiveNum, @Param("now") Instant now);
 
+
     //home을 위한 쿼리
     @Query("SELECT l FROM LiveLectures l WHERE l.user.id = :userId " +
         "AND (DATE(l.startDate) <= DATE(:currentDate) " +
         "     AND DATE(l.endDate) >= DATE(:currentDate) " +
-        "     OR DATE(l.endDate) > DATE(:currentDate)) " +
-        "AND l.availableDay LIKE %:dayOfWeek%")
+        "     OR DATE(l.endDate) > DATE(:currentDate)) ")
     List<LiveLectures> findLecturesByUserAndDateRange(
         @Param("userId") int userId,
-        @Param("currentDate") LocalDate currentDate,
-        @Param("dayOfWeek") String dayOfWeek
+        @Param("currentDate") LocalDate currentDate
     );
 
     // history를 위한 쿼리
     @Query("SELECT l FROM LiveLectures l WHERE l.user.id = :userId " +
         "AND (DATE(l.startDate) <= DATE(:currentDate) " +
         "     AND DATE(l.endDate) >= DATE(:currentDate) " +
-        "     OR DATE(l.endDate) < DATE(:currentDate)) " +
-        "AND l.availableDay LIKE %:dayOfWeek%")
+        "     OR DATE(l.endDate) < DATE(:currentDate))")
     List<LiveLectures> findPastAndOngoingLecturesByUser(
         @Param("userId") int userId,
-        @Param("currentDate") LocalDate currentDate,
-        @Param("dayOfWeek") String dayOfWeek
+        @Param("currentDate") LocalDate currentDate
     );
 
 }

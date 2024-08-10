@@ -72,30 +72,26 @@ public interface MyLiveLectureRepository extends JpaRepository<MyLiveLecture, Lo
         @Param("dayOfWeek") String dayOfWeek
     );
 
-
-    // home을 위한 쿼리
+    // home 학생을 위한 쿼리
     @Query("SELECT ml FROM MyLiveLecture ml JOIN FETCH ml.liveLecture l " +
         "WHERE ml.user.id = :userId " +
         "AND (DATE(ml.startDate) <= DATE(:currentDate) " +
         "     AND DATE(ml.endDate) >= DATE(:currentDate) " +
-        "     OR DATE(ml.endDate) > DATE(:currentDate)) " +
-        "AND l.availableDay LIKE %:dayOfWeek%")
-    List<MyLiveLecture> findCurrentLecturesByUserId(
+        "     OR DATE(ml.endDate) > DATE(:currentDate))")
+    List<MyLiveLecture> findCurrentMyLectures(
         @Param("userId") int userId,
-        @Param("currentDate") LocalDate currentDate,
-        @Param("dayOfWeek") String dayOfWeek
+        @Param("currentDate") LocalDate currentDate
     );
 
-    // history를 위한 쿼리
+
+    // history 학생을 위한 쿼리
     @Query("SELECT ml FROM MyLiveLecture ml JOIN FETCH ml.liveLecture l " +
         "WHERE ml.user.id = :userId " +
         "AND (DATE(ml.startDate) <= DATE(:currentDate) " +
         "     AND DATE(ml.endDate) >= DATE(:currentDate) " +
-        "     OR DATE(ml.endDate) < DATE(:currentDate)) " +
-        "AND l.availableDay LIKE %:dayOfWeek%")
+        "     OR DATE(ml.endDate) < DATE(:currentDate))")
     List<MyLiveLecture> findPastAndOngoingLecturesByUserId(
         @Param("userId") int userId,
-        @Param("currentDate") LocalDate currentDate,
-        @Param("dayOfWeek") String dayOfWeek
+        @Param("currentDate") LocalDate currentDate
     );
 }
