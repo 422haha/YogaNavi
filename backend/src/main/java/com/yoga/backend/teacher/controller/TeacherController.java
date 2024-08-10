@@ -16,20 +16,22 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 강사 컨트롤러 클래스
+ * 강사 컨트롤러
  */
 @RestController
 @RequestMapping("")
 public class TeacherController {
 
-    @Autowired
-    private TeacherService teacherService; // 강사 서비스
+    private final TeacherService teacherService;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private JwtUtil jwtUtil; // JWT 유틸리티
+    public TeacherController(TeacherService teacherService, JwtUtil jwtUtil) {
+        this.teacherService = teacherService;
+        this.jwtUtil = jwtUtil;
+    }
 
     /**
-     * 모든 강사 목록을 가져옵니다.
+     * 모든 강사 목록 조회
      *
      * @return 강사 목록
      */
@@ -75,7 +77,7 @@ public class TeacherController {
     }
 
     /**
-     * 정렬된 강사 목록을 가져옵니다.
+     * 정렬된 강사 목록 조회
      *
      * @param sorting 정렬 방식 (0: 최신순, 1: 인기순)
      * @param token   인증 토큰
@@ -108,7 +110,7 @@ public class TeacherController {
     }
 
     /**
-     * 강사 상세 정보를 가져옵니다.
+     * 강사 상세 정보 조회
      *
      * @param teacherId 강사 ID
      * @param token     인증 토큰

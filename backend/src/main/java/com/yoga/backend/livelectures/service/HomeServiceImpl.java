@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -50,7 +51,6 @@ public class HomeServiceImpl implements HomeService {
      */
     @Transactional(readOnly = true)
     public List<HomeResponseDto> getHomeData(int userId) {
-
         ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE);
         List<HomeResponseDto> result = new ArrayList<>();
 
@@ -206,5 +206,24 @@ public class HomeServiceImpl implements HomeService {
                 .comparingLong(HomeResponseDto::getLectureDate)
                 .thenComparingLong(HomeResponseDto::getStartTime))
             .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public boolean updateLiveState(Long liveId, Boolean isOnAir) {
+
+        if (liveId == null) {
+            throw new IllegalArgumentException("liveId가 null입니다.");
+        }
+        try {
+            LiveLectures liveLectures = liveLectureRepository.findById(liveId)
+                .orElseThrow(() -> new NullPointerException("강의를 찾을 수 없습니다: " + liveId));
+            liveLectures.setIsOnAir(isOnAir);
+            liveLectureRepository.save(liveLectures);
+            return true;
+        } catch (Exception e) {
+            log.error("라이브 상태 업데이트 중 에러 발생. liveId : {}", liveId, e);
+            throw new RuntimeException("라이브 상태 업데이트 중 오류가 발생했습니다.", e);
+        }
     }
 }

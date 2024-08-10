@@ -48,7 +48,6 @@ public class LiveLectures {
 
     @Column(nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "UTC")
-    // 안되면 이걸 제거
     private Instant regDate; // 강의 등록 시간
 
     @ManyToOne(fetch = FetchType.LAZY)

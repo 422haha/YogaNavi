@@ -23,8 +23,12 @@ public class SessionManager extends TextWebSocketHandler {
     private final Map<String, WebRTCSessionState> roomStates = new ConcurrentHashMap<>();
     private final Map<UUID, ClientState> clientStates = new ConcurrentHashMap<>();
 
-    @Autowired
-    private LiveLectureService liveLectureService;
+
+    private final LiveLectureService liveLectureService;
+
+    public SessionManager(LiveLectureService liveLectureService) {
+        this.liveLectureService = liveLectureService;
+    }
 
     /**
      * WebSocket 연결이 설정된 후 호출됨
@@ -63,12 +67,14 @@ public class SessionManager extends TextWebSocketHandler {
      * @throws Exception 예외 발생 시
      */
     @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+    protected void handleTextMessage(WebSocketSession session, TextMessage message)
+        throws Exception {
         String liveId = getLiveIdFromHeaders(session);
         String payload = message.getPayload();
         UUID sessionId = getSessionId(session, liveId);
 
-        System.out.println("메시지 수신 - 세션 ID: " + sessionId + ", 라이브 ID: " + liveId + ", 메시지: " + payload);
+        System.out.println(
+            "메시지 수신 - 세션 ID: " + sessionId + ", 라이브 ID: " + liveId + ", 메시지: " + payload);
 
         if (payload.startsWith(MessageType.STATE.toString())) {
             handleState(sessionId, liveId);
@@ -85,11 +91,12 @@ public class SessionManager extends TextWebSocketHandler {
      * WebSocket 연결이 종료된 후 호출됨
      *
      * @param session WebSocket 세션
-     * @param status 연결 종료 상태
+     * @param status  연결 종료 상태
      * @throws Exception 예외 발생 시
      */
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status)
+        throws Exception {
         String liveId = getLiveIdFromHeaders(session);
         UUID sessionId = getSessionId(session, liveId);
 
@@ -104,7 +111,7 @@ public class SessionManager extends TextWebSocketHandler {
                 roomStates.remove(liveId);
                 System.out.println("라이브 ID: " + liveId + "에 대한 모든 클라이언트 연결이 종료됨");
             } else {
-                updateRoomState(liveId);
+//                updateRoomState(liveId);
             }
         }
     }
@@ -127,7 +134,7 @@ public class SessionManager extends TextWebSocketHandler {
      * WebSocket 세션에서 sessionId를 가져옴
      *
      * @param session WebSocket 세션
-     * @param liveId 라이브 ID
+     * @param liveId  라이브 ID
      * @return sessionId
      */
     private UUID getSessionId(WebSocketSession session, String liveId) {
@@ -144,7 +151,7 @@ public class SessionManager extends TextWebSocketHandler {
      * 상태 메시지를 처리
      *
      * @param sessionId 세션 ID
-     * @param liveId 라이브 ID
+     * @param liveId    라이브 ID
      * @throws IOException 예외 발생 시
      */
     private void handleState(UUID sessionId, String liveId) throws IOException {
@@ -159,8 +166,8 @@ public class SessionManager extends TextWebSocketHandler {
      * 오퍼 메시지를 처리
      *
      * @param sessionId 세션 ID
-     * @param message 수신된 메시지
-     * @param liveId 라이브 ID
+     * @param message   수신된 메시지
+     * @param liveId    라이브 ID
      * @throws IOException 예외 발생 시
      */
     private void handleOffer(UUID sessionId, String message, String liveId) throws IOException {
@@ -176,7 +183,8 @@ public class SessionManager extends TextWebSocketHandler {
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("다른 클라이언트를 찾을 수 없습니다."));
 
-        System.out.println("제안 처리 - 세션 ID: " + sessionId + ", 라이브 ID: " + liveId + ", 메시지: " + message);
+        System.out.println(
+            "제안 처리 - 세션 ID: " + sessionId + ", 라이브 ID: " + liveId + ", 메시지: " + message);
         clientToSendOffer.sendMessage(new TextMessage(message));
         clientStates.put(sessionId, ClientState.OFFER_SENT);
 
@@ -200,8 +208,8 @@ public class SessionManager extends TextWebSocketHandler {
      * 응답 메시지를 처리
      *
      * @param sessionId 세션 ID
-     * @param message 수신된 메시지
-     * @param liveId 라이브 ID
+     * @param message   수신된 메시지
+     * @param liveId    라이브 ID
      * @throws IOException 예외 발생 시
      */
     private void handleAnswer(UUID sessionId, String message, String liveId) throws IOException {
@@ -215,7 +223,8 @@ public class SessionManager extends TextWebSocketHandler {
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("다른 클라이언트를 못 찾았습니다."));
 
-        System.out.println("응답 처리 - 세션 ID: " + sessionId + ", 라이브 ID: " + liveId + ", 메시지: " + message);
+        System.out.println(
+            "응답 처리 - 세션 ID: " + sessionId + ", 라이브 ID: " + liveId + ", 메시지: " + message);
         clientToSendAnswer.sendMessage(new TextMessage(message));
         roomStates.put(liveId, WebRTCSessionState.Active);
         clientStates.put(sessionId, ClientState.CONNECTED);
@@ -226,8 +235,8 @@ public class SessionManager extends TextWebSocketHandler {
      * ICE 후보 메시지를 처리합니다.
      *
      * @param sessionId 세션 ID
-     * @param message 수신된 메시지
-     * @param liveId 라이브 ID
+     * @param message   수신된 메시지
+     * @param liveId    라이브 ID
      * @throws IOException 예외 발생 시
      */
     private void handleIce(UUID sessionId, String message, String liveId) throws IOException {
@@ -237,7 +246,8 @@ public class SessionManager extends TextWebSocketHandler {
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("O다른 클라이언트를 못 찾았습니다."));
 
-        System.out.println("ICE 후보 처리 - 세션 ID: " + sessionId + ", 라이브 ID: " + liveId + ", 메시지: " + message);
+        System.out.println(
+            "ICE 후보 처리 - 세션 ID: " + sessionId + ", 라이브 ID: " + liveId + ", 메시지: " + message);
         clientToSendIce.sendMessage(new TextMessage(message));
     }
 
@@ -261,13 +271,14 @@ public class SessionManager extends TextWebSocketHandler {
      * @param liveId 라이브 ID
      * @throws IOException 예외 발생 시
      */
-private void updateRoomState(String liveId) throws IOException {
-    int roomSize = liveLectureSessions.get(liveId).size();
-    roomStates.put(liveId, roomSize == 2 ? WebRTCSessionState.Ready : WebRTCSessionState.Impossible);
-    System.out.println("방 상태 업데이트 - 라이브 ID: " + liveId + ", 상태: " + roomStates.get(liveId));
-    liveLectureService.updateIsOnAir(Long.valueOf(liveId), roomSize > 0);
-    notifyAboutStateUpdate(liveId);
-}
+    private void updateRoomState(String liveId) throws IOException {
+        int roomSize = liveLectureSessions.get(liveId).size();
+        roomStates.put(liveId,
+            roomSize == 2 ? WebRTCSessionState.Ready : WebRTCSessionState.Impossible);
+        System.out.println("방 상태 업데이트 - 라이브 ID: " + liveId + ", 상태: " + roomStates.get(liveId));
+//    liveLectureService.updateIsOnAir(Long.valueOf(liveId), roomSize > 0);
+        notifyAboutStateUpdate(liveId);
+    }
 
     /**
      * 방을 초기화
@@ -313,3 +324,4 @@ private void updateRoomState(String liveId) throws IOException {
         STATE, OFFER, ANSWER, ICE
     }
 }
+

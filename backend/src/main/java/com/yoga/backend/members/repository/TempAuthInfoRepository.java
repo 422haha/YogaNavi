@@ -7,6 +7,8 @@ import java.util.Optional;
 
 @Repository
 public interface TempAuthInfoRepository extends JpaRepository<TempAuthInfo, Long> {
+
     Optional<TempAuthInfo> findByEmail(String email);
+
     void deleteByEmail(String email);
 }

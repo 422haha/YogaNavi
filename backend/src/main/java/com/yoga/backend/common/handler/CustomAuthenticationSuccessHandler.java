@@ -55,8 +55,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         String accessToken = jwtUtil.generateAccessToken(email, role);
         String refreshToken = jwtUtil.generateRefreshToken(email);
 
-        log.info("CustomAuthenticationSuccessHandler accessToken={}", accessToken);
-        log.info("CustomAuthenticationSuccessHandler refreshToken={}", refreshToken);
+//        log.info("CustomAuthenticationSuccessHandler accessToken={}", accessToken);
+//        log.info("CustomAuthenticationSuccessHandler refreshToken={}", refreshToken);
 
         response.setHeader(SecurityConstants.JWT_HEADER, accessToken);
         response.setHeader(SecurityConstants.REFRESH_TOKEN_HEADER, refreshToken);

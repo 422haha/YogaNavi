@@ -49,7 +49,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 특정 사용자의 모든 게시글을 조회합니다.
+     * 특정 사용자의 모든 게시글을 조회
      *
      * @param userId 사용자 ID
      * @return 게시글 리스트
@@ -61,7 +61,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 특정 게시글을 ID로 조회합니다.
+     * 특정 게시글을 ID로 조회
      *
      * @param id 게시글 ID
      * @return 게시글 Optional 객체
@@ -73,7 +73,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 게시글을 업데이트합니다.
+     * 게시글 업데이트
      *
      * @param articleId     게시글 ID
      * @param newContent    새로운 내용
@@ -82,7 +82,7 @@ public class ArticleServiceImpl implements ArticleService {
      * @return 업데이트된 게시글 객체
      */
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public Article updateArticle(Long articleId, String newContent, String newImage,
         String newImageSmall) {
         try {
@@ -117,12 +117,12 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 게시글을 삭제합니다.
+     * 게시글 삭제
      *
      * @param id 삭제할 게시글 ID
      */
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void deleteArticle(Long id) {
         try {
             Optional<Article> articleOpt = articleRepository.findById(id);
@@ -140,7 +140,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 특정 내용이 포함된 게시글을 조회합니다.
+     * 특정 내용이 포함된 게시글 조회
      *
      * @param content 검색할 내용
      * @return 게시글 리스트

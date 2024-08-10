@@ -189,7 +189,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     }
 
     /**
-     * 실시간 강의의 OnAir 상태를 업데이트합니다.
+     * 실시간 강의의 OnAir 상태를 업데이트
      *
      * @param liveId 업데이트할 강의의 ID
      * @param isOnAir 강의가 OnAir 상태인지 여부
