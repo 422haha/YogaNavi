@@ -36,19 +36,21 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
     private fun getProfileData() = viewModel.getProfileData(::bindData)
 
     private suspend fun bindData(profile: Profile) = withContext(Dispatchers.Main) {
-        with(binding) {
-            tvName.text = profile.nickname
+        runCatching {
+            with(binding) {
+                tvName.text = profile.nickname
 
-            if (!profile.smallImageKey.isNullOrBlank())
-                viewModel.loadS3Image(ivIcon, profile.smallImageKey)
+                if (!profile.smallImageKey.isNullOrBlank())
+                    viewModel.loadS3Image(ivIcon, profile.smallImageKey)
 
-            if (profile.teacher) {
-                isTeacher = true
-                tvManagementVideo.visibility = View.VISIBLE
-                tvManagementLive.visibility = View.VISIBLE
-                tvRegisterNotice.visibility = View.VISIBLE
+                if (profile.teacher) {
+                    isTeacher = true
+                    tvManagementVideo.visibility = View.VISIBLE
+                    tvManagementLive.visibility = View.VISIBLE
+                    tvRegisterNotice.visibility = View.VISIBLE
+                }
             }
-        }
+        }.onFailure { it.printStackTrace() }
     }
 
     private fun initListener() {
