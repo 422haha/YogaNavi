@@ -17,6 +17,7 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -34,6 +35,7 @@ import com.ssafy.yoganavi.ui.utils.WAIT_BROADCAST
 import dagger.hilt.android.AndroidEntryPoint
 import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.webrtc.RendererCommon
@@ -194,12 +196,13 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
     }
 
     private fun handleSessionState(state: WebRTCSessionState) {
-        binding.tvState.text = state.name
+        if(state == WebRTCSessionState.Ready || state == WebRTCSessionState.Creating)
+            onBuffering(true)
+        else if(state == WebRTCSessionState.Offline || state == WebRTCSessionState.Impossible || state == WebRTCSessionState.Active)
+            onBuffering(false)
 
         when (state) {
             WebRTCSessionState.Offline -> {
-                binding.tvState.text = NO_CONNECT_SERVER
-
                 if (prevState != WebRTCSessionState.Offline) {
                     runCatching  { viewModel.sessionManager.disconnect() }
                         .onFailure { it.printStackTrace() }
@@ -207,11 +210,8 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             }
 
             WebRTCSessionState.Impossible -> {
-                if(prevState != WebRTCSessionState.Offline)
+                if(prevState == WebRTCSessionState.Active)
                     renderInitWhenImpossible()
-
-                if (!args.isTeacher)
-                    binding.tvState.text = WAIT_BROADCAST
             }
 
             WebRTCSessionState.Ready -> {
@@ -290,6 +290,16 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         animatorSet.start()
     }
 
+    private fun onBuffering(isEnabled: Boolean) {
+        if(isEnabled) {
+            binding.lav.playAnimation()
+            binding.lav.isVisible = true
+        } else {
+            binding.lav.pauseAnimation()
+            binding.lav.isVisible = false
+        }
+    }
+
     private fun observeCallMediaState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -339,44 +349,28 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                collectLocalVideoTrack()
-                collectRemoteVideoTrack()
+                collectVideoTrack(viewModel.sessionManager.localVideoTrackFlow, localRenderer)
+                collectVideoTrack(viewModel.sessionManager.remoteVideoTrackFlow, remoteRenderer)
             }
         }
     }
 
-    private fun CoroutineScope.collectLocalVideoTrack() = launch {
-        viewModel.sessionManager.localVideoTrackFlow.collectLatest { videoTrack ->
+    private fun CoroutineScope.collectVideoTrack(flow: Flow<VideoTrack?>, renderer: VideoTextureViewRenderer) = launch {
+        flow.collectLatest { videoTrack ->
             runCatching {
-                cleanLocalTrack(videoTrack)
-                setupLocalVideo(videoTrack)
+                setupVideoTrack(videoTrack, renderer)
             }
         }
     }
 
-    private fun CoroutineScope.collectRemoteVideoTrack() = launch {
-        viewModel.sessionManager.remoteVideoTrackFlow.collectLatest { videoTrack ->
-            runCatching {
-                cleanRemoteTrack(videoTrack)
-                setupRemoteVideo(videoTrack)
-            }
-        }
+    private fun cleanVideoTrack(videoTrack: VideoTrack?, renderer: VideoTextureViewRenderer) {
+        videoTrack?.removeSink(renderer)
     }
 
-    private fun setupLocalVideo(videoTrack: VideoTrack?) {
-        videoTrack?.addSink(localRenderer)
-    }
+    private fun setupVideoTrack(videoTrack: VideoTrack?, renderer: VideoTextureViewRenderer) {
+        cleanVideoTrack(videoTrack, renderer)
 
-    private fun setupRemoteVideo(videoTrack: VideoTrack?) {
-        videoTrack?.addSink(remoteRenderer)
-    }
-
-    private fun cleanLocalTrack(videoTrack: VideoTrack?) {
-        videoTrack?.removeSink(localRenderer)
-    }
-
-    private fun cleanRemoteTrack(videoTrack: VideoTrack?) {
-        videoTrack?.removeSink(remoteRenderer)
+        videoTrack?.addSink(renderer)
     }
 
     private fun setFullscreen() = with(requireActivity() as MainActivity) {

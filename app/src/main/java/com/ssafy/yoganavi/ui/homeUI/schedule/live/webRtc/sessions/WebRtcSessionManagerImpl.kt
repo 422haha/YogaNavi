@@ -178,8 +178,11 @@ class WebRtcSessionManagerImpl(
     override fun onSessionReady() {
         runCatching {
             setupAudio()
-            peerConnection.connection.addTrack(localVideoTrack)
             peerConnection.connection.addTrack(localAudioTrack)
+        }
+
+        runCatching {
+            peerConnection.connection.addTrack(localVideoTrack)
         }
 
         runCatching {
@@ -271,19 +274,8 @@ class WebRtcSessionManagerImpl(
     }
 
     private fun handleOffer(sdp: String) {
-        runCatching {
-            Timber.d("[SDP] handle offer: $sdp")
-            offer = sdp
-
-            sessionManagerScope.launch {
-                if (offer != null) {
-                    sendAnswer()
-                } else {
-                    sendOffer()
-                }
-            }
-        }
-
+        Timber.d("[SDP] handle offer: $sdp")
+        offer = sdp
     }
 
     private suspend fun handleAnswer(sdp: String) {
