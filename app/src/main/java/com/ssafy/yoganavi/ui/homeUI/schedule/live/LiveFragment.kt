@@ -29,9 +29,7 @@ import com.ssafy.yoganavi.databinding.FragmentLiveBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.core.MainActivity
 import com.ssafy.yoganavi.ui.homeUI.schedule.live.webRtc.WebRTCSessionState
-import com.ssafy.yoganavi.ui.utils.NO_CONNECT_SERVER
 import com.ssafy.yoganavi.ui.utils.PermissionHelper
-import com.ssafy.yoganavi.ui.utils.WAIT_BROADCAST
 import dagger.hilt.android.AndroidEntryPoint
 import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
 import kotlinx.coroutines.CoroutineScope
@@ -63,6 +61,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         initPermission()
 
         viewModel.sessionManager.signalingClient.updateLiveId(args.getLiveId)
+        viewModel.sessionManager.signalingClient.updateIsMyClass(if(args.isTeacher) 1 else 0)
 
         setToolbar(false, "", false)
 
@@ -122,30 +121,6 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
             }
 
             ibtnCancel.setOnClickListener { popBack() }
-        }
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun initOutMoveLocalView() {
-        draggableContainer = binding.draggableContainer
-        draggableContainer.setOnTouchListener { view, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    viewModel.updateOffset(view.x - event.rawX, view.y - event.rawY)
-                    true
-                }
-
-                MotionEvent.ACTION_MOVE -> {
-                    view.animate()
-                        .x(event.rawX + viewModel.offsetX.value)
-                        .y(event.rawY + viewModel.offsetY.value)
-                        .setDuration(0)
-                        .start()
-                    true
-                }
-
-                else -> false
-            }
         }
     }
 

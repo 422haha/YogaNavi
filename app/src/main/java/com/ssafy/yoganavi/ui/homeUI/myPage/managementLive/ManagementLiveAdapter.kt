@@ -15,6 +15,7 @@ import com.ssafy.yoganavi.ui.utils.formatDotDate
 import com.ssafy.yoganavi.ui.utils.formatTime
 import com.ssafy.yoganavi.ui.utils.startTildeEnd
 import com.ssafy.yoganavi.ui.utils.startVerticalEnd
+import timber.log.Timber
 
 class ManagementLiveAdapter(
     private val navigateToLiveFragment: (Int, Boolean) -> Unit,
@@ -35,6 +36,10 @@ class ManagementLiveAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(currentList[position])
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return position
     }
 
     class ViewHolder(
@@ -60,7 +65,9 @@ class ManagementLiveAdapter(
 
                 tvLectureTime.text = startVerticalEnd(weekData, timeData)
 
-                if (item.endDate < System.currentTimeMillis()) {
+                val addTime = item.endTime + if(item.startTime > item.endTime) (24 * 3600 * 1000) else 0
+
+                if (item.endDate + addTime < System.currentTimeMillis()) {
                     vEnterBtn.isClickable = false
                     vEnterBtn.setBackgroundColor(Color.LTGRAY)
                     vEnterBtn.setOnClickListener { showSnackBar(CLOSE_LIVE) }

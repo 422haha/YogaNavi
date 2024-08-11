@@ -134,6 +134,9 @@ dependencies {
     implementation(libs.firebase.analytics);
 
     // Web RTC
-    implementation("io.getstream:stream-webrtc-android:1.1.3")
-    implementation ("io.getstream:stream-webrtc-android-ui:1.1.3")
+    implementation(libs.stream.webrtc.android)
+    implementation (libs.stream.webrtc.android.ui)
+
+    // Swipe Refresh Layout
+    implementation (libs.androidx.swiperefreshlayout)
 }

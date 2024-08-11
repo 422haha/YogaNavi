@@ -20,32 +20,51 @@ class SignalingClient {
   private val signalingScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
   private val client = OkHttpClient()
 
-    private val _liveIdFlow = MutableStateFlow(-1)
-    private val liveIdFlow: StateFlow<Int> = _liveIdFlow
+    private var liveId: Int = -1
+        set(value) {
+            if (value != -1) {
+                field = value
 
-    init {
-        signalingScope.launch {
-            liveIdFlow.collect { liveId ->
-                if (liveId != -1)
-                    connectToSignalingServer(liveId)
+                checkAndConnect()
+            }
+        }
+
+    private var isMyClass: Int = -1
+        set(value) {
+            if (value != -1) {
+                field = value
+
+                checkAndConnect()
+            }
+        }
+
+    fun updateLiveId(id: Int) {
+        liveId = id
+    }
+
+    fun updateIsMyClass(state: Int) {
+        isMyClass = state
+    }
+
+    private fun checkAndConnect() {
+        if (liveId != -1 && isMyClass != -1) {
+            signalingScope.launch {
+                connectToSignalingServer(liveId, isMyClass)
             }
         }
     }
 
-    private fun connectToSignalingServer(liveId: Int) {
+    private fun connectToSignalingServer(liveId: Int, isMyClass: Int) {
         val request = Request.Builder()
             .url(BuildConfig.SIGNALING_SERVER_IP_ADDRESS + "/rtc")
             .addHeader("liveId", liveId.toString())
+            .addHeader("isMyClass", isMyClass.toString())
             .build()
 
         runCatching {
             ws?.cancel()
             ws = client.newWebSocket(request, SignalingWebSocketListener())
         }
-    }
-
-    fun updateLiveId(liveId: Int) {
-        _liveIdFlow.value = liveId
     }
 
     private var ws: WebSocket? = null
