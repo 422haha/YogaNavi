@@ -204,7 +204,7 @@ public class NotificationService {
             List<LiveLectureDto> todayLectures = getLecturesFromRedis(redisKey);
 
             if (todayLectures.isEmpty()) {
-                log.warn("redis에서 오늘의 강의 목록 조회 불가. DB에서 조회.");
+//                log.warn("redis에서 오늘의 강의 목록 조회 불가. DB에서 조회.");
                 todayLectures = liveLectureRepository.findLecturesForToday(todayKorea,
                         dayAbbreviation)
                     .stream()
@@ -220,7 +220,7 @@ public class NotificationService {
 
             // 10분 후에 시작하는 강의 찾기
             LocalDateTime tenMinutesLater = nowKorea.plusMinutes(10);
-            log.info("tenMinutesLater: " + tenMinutesLater);
+
             List<LiveLectureDto> upcomingLectures = todayLectures.stream()
                 .filter(lecture -> {
                     LocalDate lectureDate = lecture.getStartDate().atZone(ZoneOffset.UTC)
@@ -230,8 +230,8 @@ public class NotificationService {
                     LocalDateTime lectureStartDateTime = LocalDateTime.of(lectureDate,
                         lectureStartTime);
 
-                    log.info("강의 ID: {}, 시작 날짜: {}, 시작 시간: {}, 계산된 시작 일시: {}",
-                        lecture.getLiveId(), lectureDate, lectureStartTime, lectureStartDateTime);
+//                    log.info("강의 ID: {}, 시작 날짜: {}, 시작 시간: {}, 계산된 시작 일시: {}",
+//                        lecture.getLiveId(), lectureDate, lectureStartTime, lectureStartDateTime);
 
                     return lectureStartDateTime.isAfter(nowKorea) &&
                         lectureStartDateTime.isBefore(tenMinutesLater.plusSeconds(30)) &&
@@ -239,7 +239,7 @@ public class NotificationService {
                 })
                 .collect(Collectors.toList());
 
-            log.info("알림을 보낼 강의 수: {}", upcomingLectures.size());
+//            log.info("알림을 보낼 강의 수: {}", upcomingLectures.size());
 
             // 곧 시작할 강의가 있다면 FCM 전송
             if (!upcomingLectures.isEmpty()) {
