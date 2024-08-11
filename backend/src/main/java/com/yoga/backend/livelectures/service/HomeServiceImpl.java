@@ -49,14 +49,21 @@ public class HomeServiceImpl implements HomeService {
      * @param userId 사용자 ID
      * @return 강의 이력 DTO 리스트
      */
+    @Override
     @Transactional(readOnly = true)
-    public List<HomeResponseDto> getHomeData(int userId) {
+    public List<HomeResponseDto> getHomeData(int userId, int page, int size) {
         ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE);
         List<HomeResponseDto> result = new ArrayList<>();
 
         result.addAll(getUserLectures(userId, nowKorea));
         result.addAll(getStudentLectures(userId, nowKorea));
-        return sortHomeData(result);
+        List<HomeResponseDto> sortedResult = sortHomeData(result);
+
+        // 페이지네이션
+        int start = page * size;
+        int end = Math.min((start + size), sortedResult.size());
+
+        return sortedResult.subList(start, end);
     }
 
     /**

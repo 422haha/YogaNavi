@@ -10,18 +10,14 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 홈 컨트롤러 클래스. 홈 관련 요청 처리
- * <p>
- * todo getHomeData, getHistoryData 에러처리 하기
- */
+
 @RestController
 @RequestMapping("/home")
 public class HomeController {
@@ -38,15 +34,17 @@ public class HomeController {
      * 홈 페이지 요청 처리
      *
      * @param token JWT 토큰
-     * @return 홈 페이지에 대한 응답 DTO를 포함한 ResponseEntity 객체
+     * @return 홈 페이지에 대한 응답
      */
     @GetMapping
     public ResponseEntity<Map<String, Object>> getHomeData(
-        @RequestHeader("Authorization") String token) {
+        @RequestHeader("Authorization") String token,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "30") int size) {
         int userId = jwtUtil.getUserIdFromToken(token);
         Map<String, Object> response = new HashMap<>();
         try {
-            List<HomeResponseDto> homeData = homeService.getHomeData(userId);
+            List<HomeResponseDto> homeData = homeService.getHomeData(userId, page, size);
 
             response.put("message", "내 화상 강의 할 일 조회 성공");
             response.put("data", homeData);
@@ -58,12 +56,15 @@ public class HomeController {
         }
     }
 
+    /**
+     * 시그널링 서버 상태 업데이트
+     *
+     * @param setIsOnAirDto 시그널링 서버 상태 담은 dto
+     * @return 업데이트 성공 여부
+     */
     @PutMapping("/update")
     public ResponseEntity<Map<String, Object>> updateLiveStatus(
         @RequestBody SetIsOnAirDto setIsOnAirDto) {
-
-        System.out.println(
-            "setIsOnAirDto: " + setIsOnAirDto.getLiveId() + "  " + setIsOnAirDto.getOnAir());
 
         Map<String, Object> response = new HashMap<>();
         try {
