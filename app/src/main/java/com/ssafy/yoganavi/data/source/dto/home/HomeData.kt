@@ -20,4 +20,5 @@ data class HomeData(
     var startTime: Long = 0L,
     var endTime: Long = 0L,
     var regDate: Long = 0L,
+    var maxLiveNum: Int = 0
 )

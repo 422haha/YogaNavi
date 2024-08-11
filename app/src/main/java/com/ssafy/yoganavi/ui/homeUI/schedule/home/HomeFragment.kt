@@ -8,6 +8,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
+import androidx.recyclerview.widget.RecyclerView
+import com.ssafy.yoganavi.data.source.dto.home.EmptyData
 import com.ssafy.yoganavi.databinding.FragmentHomeBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.schedule.home.dialog.EnterDialog
@@ -26,16 +29,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.rvMyList.adapter = homeAdapter
-
-        binding.srl.setOnRefreshListener {
-            viewModel.getHomeList()
-            binding.srl.isRefreshing = false
-        }
+        initAdapter()
 
         initCollect()
-
-        viewModel.getHomeList()
     }
 
     override fun onStart() {
@@ -47,11 +43,37 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         )
     }
 
+    private fun initAdapter() = with(binding.rvMyList) {
+        binding.rvMyList.adapter = homeAdapter
+
+        binding.srl.setOnRefreshListener {
+            homeAdapter.refresh()
+
+            binding.srl.isRefreshing = false
+        }
+
+        adapter = homeAdapter.apply {
+            registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                    scrollToPosition(positionStart)
+                    super.onItemRangeChanged(positionStart, itemCount)
+                }
+            })
+
+            addLoadStateListener { loadState ->
+                val isListEmpty = loadState.refresh is LoadState.NotLoading &&
+                        this.itemCount == 0 && loadState.append.endOfPaginationReached
+
+                if (isListEmpty) setEmptyView(EmptyData(true, EMPTY_LIVE))
+                else setEmptyView(EmptyData(false))
+            }
+        }
+    }
+
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.homeList.collectLatest { list ->
-                checkEmptyList(list, EMPTY_LIVE)
-                homeAdapter.submitList(list)
+            viewModel.homeList2.collectLatest { pagingData ->
+                homeAdapter.submitData(pagingData)
             }
         }
     }
@@ -64,7 +86,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         content: String,
         isTeacher: Boolean,
     ) {
-
         EnterDialog(
             context = requireContext(),
             smallImageUri = smallImageUri,

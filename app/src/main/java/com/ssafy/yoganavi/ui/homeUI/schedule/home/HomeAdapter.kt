@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.isVisible
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.yoganavi.R
 import com.ssafy.yoganavi.data.source.dto.home.HomeData
@@ -19,17 +19,17 @@ import com.ssafy.yoganavi.ui.utils.startTildeEnd
 class HomeAdapter(
     private val alertLiveDetailDialog: (id: Int, smallImageUri: String?, imageUri: String?, title: String, content: String, isTeacher: Boolean) -> Unit,
     private val loadS3Image: (ImageView, String) -> Unit
-) : ListAdapter<HomeData, HomeAdapter.ViewHolder>(HomeDiffCallback()) {
+) : PagingDataAdapter<HomeData, HomeAdapter.ViewHolder>(HomeDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent, alertLiveDetailDialog, loadS3Image)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (position != 0)
-            holder.bind(currentList[position], currentList[position - 1].lectureDate)
+        return if (position != 0)
+            getItem(position)?.let { holder.bind(it, getItem(position - 1)?.lectureDate ?: 0L) } ?: Unit
         else
-            holder.bind(currentList[position], currentList[position].lectureDate)
+            getItem(position)?.let { holder.bind(it, getItem(position)?.lectureDate ?: 0L) } ?: Unit
     }
 
     class ViewHolder(
