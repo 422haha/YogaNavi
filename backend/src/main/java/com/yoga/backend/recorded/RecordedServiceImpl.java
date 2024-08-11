@@ -28,8 +28,7 @@ import java.util.List;
 
 
 /**
- *  녹화 강의
- *  강의 목록 조회, 강의 생성, 수정, 삭제 및 좋아요
+ * 녹화 강의 강의 목록 조회, 강의 생성, 수정, 삭제 및 좋아요
  */
 @Slf4j
 @Service
@@ -179,7 +178,7 @@ public class RecordedServiceImpl implements RecordedService {
             recordedLectureRepository.save(lecture);
             return true;
         } catch (Exception e) {
-            log.error("강의 수정 중 오류 발생: {}", e.getMessage(), e);
+//            log.error("강의 수정 중 오류 발생: {}", e.getMessage(), e);
             return false;
         }
     }
@@ -194,7 +193,7 @@ public class RecordedServiceImpl implements RecordedService {
         // 강의 제목 업데이트 (변경된 경우)
         if (!lecture.getTitle().equals(lectureDto.getRecordTitle())) {
             lecture.setTitle(lectureDto.getRecordTitle());
-            log.info("강의 제목 업데이트: {}", lectureDto.getRecordTitle());
+//            log.info("강의 제목 업데이트: {}", lectureDto.getRecordTitle());
         }
 
         // 강의 내용 업데이트 (변경된 경우)
@@ -209,7 +208,7 @@ public class RecordedServiceImpl implements RecordedService {
             s3Service.deleteFile(lecture.getThumbnail());
             // 새 썸네일 설정
             lecture.setThumbnail(lectureDto.getRecordThumbnail());
-            log.info("강의 썸네일 업데이트: {}", lectureDto.getRecordThumbnail());
+//            log.info("강의 썸네일 업데이트: {}", lectureDto.getRecordThumbnail());
         }
 
         // 작은 썸네일 업데이트 (변경된 경우)
@@ -218,7 +217,7 @@ public class RecordedServiceImpl implements RecordedService {
             s3Service.deleteFile(lecture.getThumbnailSmall());
             // 새 저용량 썸네일 설정
             lecture.setThumbnailSmall(lectureDto.getRecordThumbnailSmall());
-            log.info("강의 소형 썸네일 업데이트: {}", lectureDto.getRecordThumbnail());
+//            log.info("강의 소형 썸네일 업데이트: {}", lectureDto.getRecordThumbnail());
         }
     }
 
@@ -256,7 +255,7 @@ public class RecordedServiceImpl implements RecordedService {
                     s3Service.deleteFile(chapter.getVideoUrl());
                 }
                 iterator.remove();
-                log.info("챕터 삭제: {}", chapter.getId());
+//                log.info("챕터 삭제: {}", chapter.getId());
             }
         }
 
@@ -278,7 +277,7 @@ public class RecordedServiceImpl implements RecordedService {
                 // 새 챕터 추가
                 RecordedLectureChapter newChapter = createChapter(chapterDto, lecture);
                 lecture.getChapters().add(newChapter);
-                log.info("새 챕터 추가: {}", newChapter.getTitle());
+//                log.info("새 챕터 추가: {}", newChapter.getTitle());
             }
         }
     }
@@ -293,19 +292,19 @@ public class RecordedServiceImpl implements RecordedService {
         // 챕터 제목 업데이트 (변경된 경우에만)
         if (!Objects.equals(chapter.getTitle(), chapterDto.getChapterTitle())) {
             chapter.setTitle(chapterDto.getChapterTitle());
-            log.info("챕터 제목 업데이트: {}", chapter.getId());
+//            log.info("챕터 제목 업데이트: {}", chapter.getId());
         }
 
         // 챕터 설명 업데이트 (변경된 경우에만)
         if (!Objects.equals(chapter.getDescription(), chapterDto.getChapterDescription())) {
             chapter.setDescription(chapterDto.getChapterDescription());
-            log.info("챕터 설명 업데이트: {}", chapter.getId());
+//            log.info("챕터 설명 업데이트: {}", chapter.getId());
         }
 
         // 챕터 번호 업데이트 (변경된 경우에만)
         if (chapter.getChapterNumber() != chapterDto.getChapterNumber()) {
             chapter.setChapterNumber(chapterDto.getChapterNumber());
-            log.info("챕터 번호 업데이트: {}", chapter.getId());
+//            log.info("챕터 번호 업데이트: {}", chapter.getId());
         }
 
         // 비디오 URL 업데이트
@@ -319,12 +318,12 @@ public class RecordedServiceImpl implements RecordedService {
                     s3Service.deleteFile(existingUrl);
                 }
                 chapter.setVideoUrl(newUrl);
-                log.info("챕터 비디오 URL 업데이트: {} -> {}", chapter.getId(), newUrl);
+//                log.info("챕터 비디오 URL 업데이트: {} -> {}", chapter.getId(), newUrl);
             } else if (existingUrl != null && !existingUrl.isEmpty()) {
                 // 새 URL이 없고 기존 URL이 있는 경우 (비디오 삭제)
                 s3Service.deleteFile(existingUrl);
                 chapter.setVideoUrl(null);
-                log.info("챕터 비디오 삭제: {}", chapter.getId());
+//                log.info("챕터 비디오 삭제: {}", chapter.getId());
             }
         }
     }
@@ -348,10 +347,10 @@ public class RecordedServiceImpl implements RecordedService {
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void deleteLectures(DeleteDto deleteDto, int userId) {
-        log.info("이 id를 가진 강의들을 삭제: {}", deleteDto);
+//        log.info("이 id를 가진 강의들을 삭제: {}", deleteDto);
 
         if (deleteDto.getLectureIds() == null || deleteDto.getLectureIds().isEmpty()) {
-            log.warn("삭제를 위해서는 강의 id가 필요함. 강의 id가 존재하지 않음");
+//            log.warn("삭제를 위해서는 강의 id가 필요함. 강의 id가 존재하지 않음");
             throw new RuntimeException("삭제할 강의가 지정되지 않았습니다.");
         }
 
@@ -360,7 +359,7 @@ public class RecordedServiceImpl implements RecordedService {
                 deleteDto.getLectureIds());
 
             if (lectures.isEmpty()) {
-                log.warn("삭제할 강의가 존재하지 않음");
+//                log.warn("삭제할 강의가 존재하지 않음");
                 throw new RuntimeException("삭제할 강의를 찾을 수 없습니다.");
             }
 
@@ -369,26 +368,26 @@ public class RecordedServiceImpl implements RecordedService {
 
             for (RecordedLecture lecture : lectures) {
                 if (lecture.getUser().getId() != userId) {
-                    log.error("사용자 {} 는 이 강의를 삭제할 권한이 없음 {}", userId, lecture.getId());
+//                    log.error("사용자 {} 는 이 강의를 삭제할 권한이 없음 {}", userId, lecture.getId());
                     throw new RuntimeException("강의 ID " + lecture.getId() + "에 대한 삭제 권한이 없습니다.");
                 }
 
-                log.info("강의의 s3파일 삭제중: {}", lecture.getId());
+//                log.info("강의의 s3파일 삭제중: {}", lecture.getId());
                 deleteS3Files(lecture);
 
-                log.info("db에서 강의 삭제중: {}", lecture.getId());
+//                log.info("db에서 강의 삭제중: {}", lecture.getId());
                 recordedLectureRepository.delete(lecture);
 
                 deletedLectureIds.add(lecture.getId());
                 notFoundLectureIds.remove(lecture.getId());
             }
 
-            log.info("강의 삭제 완료: {}", deletedLectureIds);
+//            log.info("강의 삭제 완료: {}", deletedLectureIds);
             if (!notFoundLectureIds.isEmpty()) {
-                log.warn("강의를 찾을 수 없음: {}", notFoundLectureIds);
+//                log.warn("강의를 찾을 수 없음: {}", notFoundLectureIds);
             }
         } catch (Exception e) {
-            log.error("강의 삭제중 에러 발생", e);
+//            log.error("강의 삭제중 에러 발생", e);
             throw new RuntimeException("강의 삭제 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
@@ -396,7 +395,7 @@ public class RecordedServiceImpl implements RecordedService {
     private void deleteS3Files(RecordedLecture lecture) {
         try {
             if (lecture.getThumbnail() != null && !lecture.getThumbnail().isEmpty()) {
-                log.info("강의 썸네일 삭제 {}: {}", lecture.getId(), lecture.getThumbnail());
+//                log.info("강의 썸네일 삭제 {}: {}", lecture.getId(), lecture.getThumbnail());
                 s3Service.deleteFile(lecture.getThumbnail());
             }
 
@@ -406,13 +405,12 @@ public class RecordedServiceImpl implements RecordedService {
 
             for (RecordedLectureChapter chapter : lecture.getChapters()) {
                 if (chapter.getVideoUrl() != null && !chapter.getVideoUrl().isEmpty()) {
-                    log.info("챕터의 비디오 삭제 {} 강의 번호 {}: {}",
-                        chapter.getId(), lecture.getId(), chapter.getVideoUrl());
+//                    log.info("챕터의 비디오 삭제 {} 강의 번호 {}: {}", chapter.getId(), lecture.getId(), chapter.getVideoUrl());
                     s3Service.deleteFile(chapter.getVideoUrl());
                 }
             }
         } catch (Exception e) {
-            log.error("강의의 s3파일 삭제중 에러 발생: {}", lecture.getId(), e);
+//            log.error("강의의 s3파일 삭제중 에러 발생: {}", lecture.getId(), e);
         }
     }
 
@@ -435,7 +433,7 @@ public class RecordedServiceImpl implements RecordedService {
         if (exists) {
             lectureLikeRepository.deleteByLectureAndUser(lecture, user);
             lecture.decrementLikeCount();
-            log.info("강의 {}의 좋아요가 사용자 {}에 의해 취소됨", recordedId, userId);
+//            log.info("강의 {}의 좋아요가 사용자 {}에 의해 취소됨", recordedId, userId);
             return false;
         } else {
             RecordedLectureLike like = new RecordedLectureLike();
@@ -443,7 +441,7 @@ public class RecordedServiceImpl implements RecordedService {
             like.setUser(user);
             lectureLikeRepository.save(like);
             lecture.incrementLikeCount();
-            log.info("강의 {}의 좋아요가 사용자 {}에 의해 추가됨", recordedId, userId);
+//            log.info("강의 {}의 좋아요가 사용자 {}에 의해 추가됨", recordedId, userId);
             return true;
         }
     }
@@ -486,14 +484,4 @@ public class RecordedServiceImpl implements RecordedService {
         return dto;
     }
 
-    private List<LectureDto> setNickname(List<LectureDto> lectures) {
-        for (LectureDto lecture : lectures) {
-            int teacherId = lecture.getUserId();
-            Users teacher = usersRepository.findById(teacherId)
-                .orElseThrow(() -> new RuntimeException("선생님을 찾을 수 없습니다."));
-            String nickname = teacher.getNickname();
-            lecture.setNickname(nickname);
-        }
-        return lectures;
-    }
 }

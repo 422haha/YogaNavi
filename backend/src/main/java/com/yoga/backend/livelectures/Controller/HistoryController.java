@@ -37,12 +37,17 @@ public class HistoryController {
     public ResponseEntity<Map<String, Object>> getHomeData(
         @RequestHeader("Authorization") String token) {
         int userId = jwtUtil.getUserIdFromToken(token);
-        List<LectureHistoryDto> history = hsitoryService.getHistory(userId);
-
         Map<String, Object> response = new HashMap<>();
-        response.put("message", "내 화상 강의 할 일 조회 성공");
-        response.put("data", history);
+        try {
+            List<LectureHistoryDto> history = hsitoryService.getHistory(userId);
+            response.put("message", "내 수강내역 조회 성공");
+            response.put("data", history);
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            response.put("message", "내 수강내역 조회 실패");
+            response.put("data", new Object[]{});
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 }

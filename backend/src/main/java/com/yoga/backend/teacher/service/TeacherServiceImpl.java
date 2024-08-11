@@ -43,7 +43,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     /**
-     * 모든 강사 정보를 조회합니다.
+     * 모든 강사 정보 조회
      *
      * @param filter  필터 조건
      * @param sorting 정렬 기준 (0: 최신순, 1: 인기순)
@@ -89,7 +89,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     /**
-     * 정렬된 강사 정보를 조회합니다.
+     * 정렬된 강사 정보 조회
      *
      * @param sorting 정렬 기준 (0: 최신순, 1: 인기순)
      * @param userId  사용자 ID
@@ -125,7 +125,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     /**
-     * 특정 강사 정보를 ID로 조회합니다.
+     * 특정 강사 정보를 ID로 조회
      *
      * @param teacherId 강사 ID
      * @param userId    사용자 ID
@@ -190,7 +190,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     /**
-     * 좋아요 상태를 토글합니다.
+     * 좋아요 상태를 토글
      *
      * @param teacherId 강사 ID
      * @param userId    사용자 ID
@@ -218,7 +218,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     /**
-     * 검색 조건에 맞는 강사 정보를 조회합니다.
+     * 검색 조건에 맞는 강사 정보를 조회
      *
      * @param filter  필터 조건
      * @param userId  사용자 ID
@@ -242,7 +242,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     /**
-     * 해시태그로 강사 정보를 조회합니다.
+     * 해시태그로 강사 정보를 조회
      *
      * @param hashtag 해시태그
      * @param userId  사용자 ID
@@ -255,7 +255,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     /**
-     * 사용자가 좋아요한 강사 목록을 조회합니다.
+     * 사용자가 좋아요한 강사 목록 조회
      *
      * @param userId 사용자 ID
      * @return 강사 정보 리스트
@@ -270,7 +270,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     /**
-     * 사용자 ID로 사용자 정보를 조회합니다.
+     * 사용자 ID로 사용자 정보 조회
      *
      * @param userId 사용자 ID
      * @return 사용자 정보
@@ -281,7 +281,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     /**
-     * Users 객체를 TeacherDto 객체로 변환합니다.
+     * Users 객체를 TeacherDto 객체로 변환
      *
      * @param user   Users 객체
      * @param userId 사용자 ID

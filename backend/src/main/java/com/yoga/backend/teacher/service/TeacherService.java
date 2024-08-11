@@ -13,7 +13,7 @@ import java.util.List;
 public interface TeacherService {
 
     /**
-     * 모든 강사 정보를 조회합니다.
+     * 모든 강사 정보 조회
      *
      * @param filter  필터 조건
      * @param sorting 정렬 기준 (0: 최신순, 1: 인기순)
@@ -23,7 +23,7 @@ public interface TeacherService {
     List<TeacherDto> getAllTeachers(TeacherFilter filter, int sorting, int userId);
 
     /**
-     * 정렬된 강사 정보를 조회합니다.
+     * 정렬된 강사 정보를 조회
      *
      * @param sorting 정렬 기준 (0: 최신순, 1: 인기순)
      * @param userId  사용자 ID
@@ -33,7 +33,7 @@ public interface TeacherService {
     List<TeacherDto> getSortedTeachers(int sorting, int userId, String keyword);
 
     /**
-     * ID로 특정 강사 정보를 조회합니다.
+     * ID로 특정 강사 정보를 조회
      *
      * @param id     강사 ID
      * @param userId 사용자 ID
@@ -42,7 +42,7 @@ public interface TeacherService {
     DetailedTeacherDto getTeacherById(int id, int userId);
 
     /**
-     * 강사 좋아요 상태를 토글합니다.
+     * 강사 좋아요 상태 토글
      *
      * @param teacherId 강사 ID
      * @param userId    사용자 ID
@@ -51,7 +51,7 @@ public interface TeacherService {
     boolean toggleLike(int teacherId, int userId);
 
     /**
-     * 검색 조건에 맞는 강사 정보를 조회합니다.
+     * 검색 조건에 맞는 강사 정보 조회
      *
      * @param filter  필터 조건
      * @param userId  사용자 ID
@@ -61,7 +61,7 @@ public interface TeacherService {
     List<Users> searchTeachers(TeacherFilter filter, int userId, String keyword);
 
     /**
-     * 해시태그로 강사 정보를 조회합니다.
+     * 해시태그로 강사 정보 조회
      *
      * @param hashtag 해시태그
      * @param userId  사용자 ID

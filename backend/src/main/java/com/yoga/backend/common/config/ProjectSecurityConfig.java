@@ -122,7 +122,7 @@ public class ProjectSecurityConfig {
 
             // 모두에게 열려있다!
             .requestMatchers("/members/**",
-                "/is-on").permitAll()
+                "/is-on", "/home/update").permitAll()
 
             // 그 외의 경우
             .anyRequest().hasAnyRole("TEACHER", "STUDENT")

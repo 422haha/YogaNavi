@@ -101,7 +101,7 @@ public class UsersServiceImpl implements UsersService {
 
         usersRepository.save(managedUser);
 
-        log.info("사용자 계정 복구 성공. 사용자 ID: {}, 이메일: {}", managedUser.getId(), managedUser.getEmail());
+//        log.info("사용자 계정 복구 성공. 사용자 ID: {}, 이메일: {}", managedUser.getId(), managedUser.getEmail());
     }
 
     /**
@@ -325,7 +325,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public Users updateUser(UpdateDto updateDto, int userId) {
-        log.info("사용자 {}의 정보 변경", userId);
+//        log.info("사용자 {}의 정보 변경", userId);
 
         Optional<Users> users = usersRepository.findById(userId);
 
@@ -461,17 +461,16 @@ public class UsersServiceImpl implements UsersService {
 
         ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE_ID);
         ZonedDateTime deletionTimeKorea = nowKorea.plus(DELETE_DELAY);
-        System.out.println("deletionTimeSeoul : "+deletionTimeKorea.toInstant());
+
         user.setDeletedAt(deletionTimeKorea.toInstant());
         usersRepository.save(user);
-        log.info("사용자 {} 삭제 예정: {}", userId, deletionTimeKorea);
+//        log.info("사용자 {} 삭제 예정: {}", userId, deletionTimeKorea);
     }
 
     @Override
     @Transactional
     public void processDeletedUsers() {
         ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE_ID);
-        System.out.println("nowKorea : "+nowKorea.toInstant());
 
         List<Users> usersToDelete = usersRepository.findByDeletedAtBeforeAndIsDeletedFalse(
             nowKorea.toInstant());
@@ -479,7 +478,7 @@ public class UsersServiceImpl implements UsersService {
             try {
                 userDeletionService.processDeletedUser(user);
             } catch (Exception e) {
-                log.error("사용자 {} 삭제중 에러 발생: {}", user.getId(), e);
+//                log.error("사용자 {} 삭제중 에러 발생: {}", user.getId(), e);
             }
         }
     }
@@ -496,7 +495,7 @@ public class UsersServiceImpl implements UsersService {
                 return false;
             }
         } catch (Exception e) {
-            log.error("비밀번호 확인 중 에러 발생", e);
+//            log.error("비밀번호 확인 중 에러 발생", e);
             return false;
         }
     }

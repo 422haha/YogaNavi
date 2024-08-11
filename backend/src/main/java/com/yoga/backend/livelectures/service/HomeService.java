@@ -8,4 +8,5 @@ public interface HomeService {
 
     List<HomeResponseDto> getHomeData(int userId);
 
+    boolean updateLiveState(Long liveId, Boolean isOnAir);
 }

@@ -6,5 +6,4 @@ import java.util.List;
 public interface HistoryService {
 
     List<LectureHistoryDto> getHistory(int userId);
-
 }

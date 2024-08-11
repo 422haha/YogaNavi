@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 예약 컨트롤러 클래스 강의 예약 생성 및 조회에 대한 API 엔드포인트를 제공
+ * 예약 컨트롤러. 강의 예약 생성 및 조회
  */
 @RestController
 @RequestMapping("/teacher/reserve")
@@ -33,7 +33,7 @@ public class ReservationController {
     }
 
     /**
-     * 예약 생성 메서드
+     * 예약 생성
      *
      * @param reservationRequest 예약 요청 DTO
      * @param token              인증 토큰
@@ -62,7 +62,7 @@ public class ReservationController {
     }
 
     /**
-     * 실시간 강의 조회 메서드
+     * 실시간 강의 조회
      *
      * @param token  인증 토큰
      * @param method 조회 방법
@@ -89,7 +89,7 @@ public class ReservationController {
     }
 
     /**
-     * 강사별 실시간 강의 조회 메서드
+     * 강사별 실시간 강의 조회
      *
      * @param teacherId 강사 ID
      * @param method    조회 방법
@@ -116,7 +116,7 @@ public class ReservationController {
     }
 
     /**
-     * LiveLectureDto를 Map 형태로 변환하는 메서드
+     * LiveLectureDto를 Map 형태로 변환
      *
      * @param dto LiveLectureDto 객체
      * @return 변환된 Map 객체
@@ -128,8 +128,12 @@ public class ReservationController {
         response.put("availableDay", dto.getAvailableDay()); // 실시간 강의 가능한 요일
         response.put("startDate", dto.getStartDate().toEpochMilli()); // 실시간 강의 시작 날짜
         response.put("endDate", dto.getEndDate().toEpochMilli()); // 실시간 강의 종료 날짜
-        response.put("startTime", ZonedDateTime.ofInstant(dto.getStartTime(), ZoneId.of("UTC")).toLocalTime().toNanoOfDay() / 1_000_000); // 실시간 강의 시작 시간
-        response.put("endTime", ZonedDateTime.ofInstant(dto.getEndTime(), ZoneId.of("UTC")).toLocalTime().toNanoOfDay() / 1_000_000); // 실시간 강의 종료 시간
+        response.put("startTime",
+            ZonedDateTime.ofInstant(dto.getStartTime(), ZoneId.of("UTC")).toLocalTime()
+                .toNanoOfDay() / 1_000_000); // 실시간 강의 시작 시간
+        response.put("endTime",
+            ZonedDateTime.ofInstant(dto.getEndTime(), ZoneId.of("UTC")).toLocalTime().toNanoOfDay()
+                / 1_000_000); // 실시간 강의 종료 시간
         return response;
     }
 }

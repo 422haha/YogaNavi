@@ -68,7 +68,7 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
                     user = usersRepository.findById(user.getId())
                         .orElseThrow(() -> new RuntimeException("User not found after recovery"));
                     // 로그 추가
-                    log.info("사용자 계정이 복구됨. 사용자 email: {}", user.getEmail());
+//                    log.info("사용자 계정이 복구됨. 사용자 email: {}", user.getEmail());
                 } else {
                     throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
                 }
