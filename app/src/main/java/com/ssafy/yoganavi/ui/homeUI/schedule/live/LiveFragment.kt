@@ -61,6 +61,7 @@ class LiveFragment : BaseFragment<FragmentLiveBinding>(FragmentLiveBinding::infl
         initPermission()
 
         viewModel.sessionManager.signalingClient.updateLiveId(args.getLiveId)
+        viewModel.sessionManager.signalingClient.updateIsMyClass(if(args.isTeacher) 1 else 0)
 
         setToolbar(false, "", false)
 
