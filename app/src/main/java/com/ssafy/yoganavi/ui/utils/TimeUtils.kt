@@ -1,7 +1,11 @@
 package com.ssafy.yoganavi.ui.utils
 
 import android.icu.text.SimpleDateFormat
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.prolificinteractive.materialcalendarview.CalendarDay
+import java.time.Duration
+import java.time.LocalTime
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -103,4 +107,19 @@ fun Long.msToDuration(): String {
     val minutes = (this / 1000) / 60
     val seconds = (this / 1000) % 60
     return String.format(Locale.KOREA, "%d:%02d", minutes, seconds)
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun subTime() {
+    val startTime = LocalTime.of(23, 0) // 23:00
+    val endTime = LocalTime.of(2, 0) // 02:00
+
+    val duration = if (endTime.isBefore(startTime)) {
+        Duration.between(startTime, endTime.plusHours(24)) // 자정을 넘긴 시간 계산
+    } else {
+        Duration.between(startTime, endTime)
+    }
+
+    val hours = duration.toHours()
+    val minutes = duration.toMinutes() % 60
 }
