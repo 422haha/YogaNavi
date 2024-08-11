@@ -21,5 +21,6 @@ data class LiveLectureData(
     var endDate: Long = 0L,
     var startTime: Long = 0L,
     var endTime: Long = 0L,
-    var regDate: Long = 0L
-    )
+    var regDate: Long = 0L,
+    var maxLiveNum: Int = 0
+)

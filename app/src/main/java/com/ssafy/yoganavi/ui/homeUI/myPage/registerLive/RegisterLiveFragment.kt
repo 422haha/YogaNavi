@@ -151,6 +151,8 @@ class RegisterLiveFragment :
                     }
 
                     availableDay = viewModel.dayStatusMap.filter { it.value }.keys.joinToString(",")
+
+                    maxLiveNum = 1
                 }
             }
 
