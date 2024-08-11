@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class HomeServiceImpl implements HomeService {
 
     private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
-
     private final LiveLectureRepository liveLectureRepository;
     private final MyLiveLectureRepository myLiveLectureRepository;
     private final UsersRepository usersRepository;
@@ -54,15 +54,17 @@ public class HomeServiceImpl implements HomeService {
     public List<HomeResponseDto> getHomeData(int userId, int page, int size) {
         ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE);
         List<HomeResponseDto> result = new ArrayList<>();
-
         result.addAll(getUserLectures(userId, nowKorea));
         result.addAll(getStudentLectures(userId, nowKorea));
         List<HomeResponseDto> sortedResult = sortHomeData(result);
-
         // 페이지네이션
         int start = page * size;
+        if (start >= sortedResult.size()) {
+            log.warn("사용자 ID: {}, 페이지: {} - 요청된 페이지가 데이터 범위를 벗어남. 빈 리스트 반환", userId, page);
+            return Collections.emptyList();
+        }
         int end = Math.min((start + size), sortedResult.size());
-
+        log.info("사용자 ID: {}, 페이지: {}, 크기: {} - 데이터 부분 집합 반환: {} ~ {}", userId, page, size, start, end);
         return sortedResult.subList(start, end);
     }
 
@@ -72,7 +74,6 @@ public class HomeServiceImpl implements HomeService {
     @Transactional(readOnly = true)
     protected List<HomeResponseDto> getStudentLectures(int userId, ZonedDateTime nowKorea) {
         LocalDate currentDate = nowKorea.toLocalDate();
-
         List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findCurrentMyLectures(
             userId, currentDate);
 
@@ -99,7 +100,6 @@ public class HomeServiceImpl implements HomeService {
         LocalDate currentDate = nowKorea.toLocalDate();
         List<LiveLectures> lectures = liveLectureRepository.findLecturesByUserAndDateRange(userId,
             currentDate);
-
         Users user = usersRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
         List<HomeResponseDto> result = new ArrayList<>();
@@ -121,7 +121,6 @@ public class HomeServiceImpl implements HomeService {
      */
     private List<HomeResponseDto> convertToHomeResponseDto(LiveLectures lecture,
         MyLiveLecture myLiveLecture, ZonedDateTime nowKorea, boolean isTeacher) {
-
         List<HomeResponseDto> dtos = new ArrayList<>();
         LocalDate startDate;
         LocalDate endDate;
@@ -136,6 +135,8 @@ public class HomeServiceImpl implements HomeService {
             endDate = lecture.getEndDate().atZone(ZoneOffset.UTC)
                 .withZoneSameInstant(KOREA_ZONE).toLocalDate();
         }
+
+
         LocalTime startTime = ZonedDateTime.ofInstant(lecture.getStartTime(), ZoneId.of("UTC"))
             .toLocalTime();
         LocalTime endTime = ZonedDateTime.ofInstant(lecture.getEndTime(), ZoneId.of("UTC"))
@@ -214,7 +215,6 @@ public class HomeServiceImpl implements HomeService {
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public boolean updateLiveState(Long liveId, Boolean isOnAir) {
-
         if (liveId == null) {
             throw new IllegalArgumentException("liveId가 null입니다.");
         }

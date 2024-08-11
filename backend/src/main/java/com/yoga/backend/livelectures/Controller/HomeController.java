@@ -41,8 +41,10 @@ public class HomeController {
         @RequestHeader("Authorization") String token,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "30") int size) {
+
         int userId = jwtUtil.getUserIdFromToken(token);
         Map<String, Object> response = new HashMap<>();
+
         try {
             List<HomeResponseDto> homeData = homeService.getHomeData(userId, page, size);
 
@@ -50,6 +52,7 @@ public class HomeController {
             response.put("data", homeData);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
+
             response.put("message", "내 화상강의 할 일 조회 실패");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
