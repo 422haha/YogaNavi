@@ -73,11 +73,12 @@ public interface MyLiveLectureRepository extends JpaRepository<MyLiveLecture, Lo
     );
 
     // home 학생을 위한 쿼리
-    @Query("SELECT ml FROM MyLiveLecture ml JOIN FETCH ml.liveLecture l " +
+    @Query("SELECT ml FROM MyLiveLecture ml JOIN FETCH ml.liveLecture l JOIN FETCH l.user u " +
         "WHERE ml.user.id = :userId " +
         "AND (DATE(ml.startDate) <= DATE(:currentDate) " +
         "     AND DATE(ml.endDate) >= DATE(:currentDate) " +
-        "     OR DATE(ml.endDate) > DATE(:currentDate))")
+        "     OR DATE(ml.endDate) > DATE(:currentDate))" +
+        "     AND u.isDeleted = false  ")
     List<MyLiveLecture> findCurrentMyLectures(
         @Param("userId") int userId,
         @Param("currentDate") LocalDate currentDate

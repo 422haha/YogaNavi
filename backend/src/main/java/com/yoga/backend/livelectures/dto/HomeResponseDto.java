@@ -11,7 +11,6 @@ import lombok.Setter;
 public class HomeResponseDto {
 
     private Long liveId;
-    private Integer userId;
     private String nickname;
     private String profileImageUrl;
     private String profileImageUrlSmall;
@@ -20,7 +19,6 @@ public class HomeResponseDto {
     private Long startTime;
     private Long endTime;
     private Long lectureDate;
-    private Long regDate;
     private String lectureDay;
     private Integer maxLiveNum;
     private Boolean teacher;

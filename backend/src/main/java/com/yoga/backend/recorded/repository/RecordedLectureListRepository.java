@@ -77,7 +77,7 @@ public class RecordedLectureListRepository {
                     .exists().as("myLike")
             ))
             .from(lecture)
-            .where(keywordCondition);
+            .where(keywordCondition).where(lecture.user.isDeleted.eq(false));
 
         // 정렬 조건
         if ("fame".equals(sort)) {

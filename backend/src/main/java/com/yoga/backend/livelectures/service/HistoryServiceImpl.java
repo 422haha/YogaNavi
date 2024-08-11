@@ -80,7 +80,6 @@ public class HistoryServiceImpl implements HistoryService {
             for (LectureHistoryDto dto : dtos) {
                 Users teacher = lecture.getUser();
 
-                dto.setProfileImageUrl(teacher.getProfile_image_url());
                 dto.setProfileImageUrlSmall(teacher.getProfile_image_url_small());
                 result.add(dto);
             }
@@ -111,7 +110,6 @@ public class HistoryServiceImpl implements HistoryService {
 
             for (LectureHistoryDto dto : dtos) {
                 // 강사의 프로필 이미지 URL 설정
-                dto.setProfileImageUrl(user.getProfile_image_url());
                 dto.setProfileImageUrlSmall(user.getProfile_image_url_small());
                 result.add(dto);
             }
@@ -191,10 +189,8 @@ public class HistoryServiceImpl implements HistoryService {
         LectureHistoryDto dto = new LectureHistoryDto();
 
         dto.setLiveId(lecture.getLiveId());
-        dto.setUserId(lecture.getUser().getId());
         dto.setNickname(lecture.getUser().getNickname());
         dto.setLiveTitle(lecture.getLiveTitle());
-        dto.setLiveContent(lecture.getLiveContent());
 
         ZonedDateTime lectureDateTime = date.atStartOfDay(KOREA_ZONE);
         ZonedDateTime gmtLectureDateTime = lectureDateTime.withZoneSameInstant(ZoneOffset.UTC);
@@ -208,16 +204,7 @@ public class HistoryServiceImpl implements HistoryService {
         dto.setEndTime(endDateTime.withZoneSameInstant(ZoneOffset.UTC).toLocalTime().toNanoOfDay()
             / 1_000_000);
 
-        dto.setRegDate(
-            lecture.getRegDate().atZone(ZoneOffset.UTC).withZoneSameInstant(KOREA_ZONE).toInstant()
-                .toEpochMilli());
         dto.setLectureDay(date.getDayOfWeek().toString().substring(0, 3));
-        dto.setMaxLiveNum(lecture.getMaxLiveNum());
-
-        dto.setProfileImageUrl(lecture.getUser().getProfile_image_url());
-        dto.setProfileImageUrlSmall(lecture.getUser().getProfile_image_url_small());
-
-        dto.setTeacher(isTeacher);
 
         return dto;
     }

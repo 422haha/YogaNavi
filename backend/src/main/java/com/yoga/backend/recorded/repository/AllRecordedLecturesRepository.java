@@ -41,7 +41,7 @@ public class AllRecordedLecturesRepository {
                     .where(like.lecture.eq(lecture).and(like.user.id.eq(userId)))
                     .exists()
             ))
-            .from(lecture);
+            .from(lecture).where(lecture.user.isDeleted.eq(false));
 
         // 정렬 적용
         if ("fame".equals(sort)) {

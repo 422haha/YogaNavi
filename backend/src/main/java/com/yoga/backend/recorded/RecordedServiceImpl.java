@@ -484,14 +484,4 @@ public class RecordedServiceImpl implements RecordedService {
         return dto;
     }
 
-    private List<LectureDto> setNickname(List<LectureDto> lectures) {
-        for (LectureDto lecture : lectures) {
-            int teacherId = lecture.getUserId();
-            Users teacher = usersRepository.findById(teacherId)
-                .orElseThrow(() -> new RuntimeException("선생님을 찾을 수 없습니다."));
-            String nickname = teacher.getNickname();
-            lecture.setNickname(nickname);
-        }
-        return lectures;
-    }
 }

@@ -14,24 +14,24 @@ import java.util.List;
 public interface TeacherRepository extends JpaRepository<Users, Integer> {
 
     /**
-     * 모든 강사 정보를 조회합니다.
+     * 모든 강사 정보 조회
      *
      * @return 강사 리스트
      */
-    @Query("SELECT u FROM Users u WHERE u.role = 'TEACHER'")
+    @Query("SELECT u FROM Users u WHERE u.role = 'TEACHER' and u.isDeleted = false")
     List<Users> findAllTeachers();
 
     /**
-     * 해시태그로 강사 정보를 조회합니다.
+     * 해시태그로 강사 정보 조회
      *
      * @param hashtag 해시태그
      * @return 강사 리스트
      */
-    @Query("SELECT u FROM Users u JOIN u.hashtags h WHERE h.name = :hashtag AND u.role = 'TEACHER'")
+    @Query("SELECT u FROM Users u JOIN u.hashtags h WHERE h.name = :hashtag AND u.role = 'TEACHER' and u.isDeleted =false")
     List<Users> findTeachersByHashtag(@Param("hashtag") String hashtag);
 
     /**
-     * 필터 조건에 맞는 강사 정보를 조회합니다.
+     * 필터 조건에 맞는 강사 정보 조회
      *
      * @param startTime  강의 시작 시간 (Instant)
      * @param endTime    강의 종료 시간 (Instant)

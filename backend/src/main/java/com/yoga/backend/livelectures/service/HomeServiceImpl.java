@@ -170,7 +170,6 @@ public class HomeServiceImpl implements HomeService {
         LocalTime startTime, LocalTime endTime, boolean isTeacher, boolean isOnAir) {
         HomeResponseDto dto = new HomeResponseDto();
         dto.setLiveId(lecture.getLiveId());
-        dto.setUserId(lecture.getUser().getId());
         dto.setNickname(lecture.getUser().getNickname());
         dto.setLiveTitle(lecture.getLiveTitle());
         dto.setLiveContent(lecture.getLiveContent());
@@ -184,9 +183,6 @@ public class HomeServiceImpl implements HomeService {
                 / 1_000_000);
         dto.setEndTime(endDateTime.withZoneSameInstant(ZoneOffset.UTC).toLocalTime().toNanoOfDay()
             / 1_000_000);
-        dto.setRegDate(
-            lecture.getRegDate().atZone(ZoneOffset.UTC).withZoneSameInstant(KOREA_ZONE).toInstant()
-                .toEpochMilli());
         dto.setLectureDay(date.getDayOfWeek().toString().substring(0, 3));
         dto.setMaxLiveNum(lecture.getMaxLiveNum());
         dto.setProfileImageUrl(lecture.getUser().getProfile_image_url());
