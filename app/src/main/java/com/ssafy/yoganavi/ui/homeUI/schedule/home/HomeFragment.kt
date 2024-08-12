@@ -8,13 +8,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.paging.LoadState
-import androidx.recyclerview.widget.RecyclerView
-import com.ssafy.yoganavi.data.source.dto.home.EmptyData
 import com.ssafy.yoganavi.databinding.FragmentHomeBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.schedule.home.dialog.EnterDialog
-import com.ssafy.yoganavi.ui.utils.EMPTY_LIVE
 import com.ssafy.yoganavi.ui.utils.HOME
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -52,27 +48,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             binding.srl.isRefreshing = false
         }
 
-        adapter = homeAdapter.apply {
-            registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-                override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-                    scrollToPosition(positionStart)
-                    super.onItemRangeChanged(positionStart, itemCount)
-                }
-            })
-
-            addLoadStateListener { loadState ->
-                val isListEmpty = loadState.refresh is LoadState.NotLoading &&
-                        this.itemCount == 0 && loadState.append.endOfPaginationReached
-
-                if (isListEmpty) setEmptyView(EmptyData(true, EMPTY_LIVE))
-                else setEmptyView(EmptyData(false))
-            }
-        }
+        adapter = homeAdapter
     }
 
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.homeList2.collectLatest { pagingData ->
+            viewModel.homeList.collectLatest { pagingData ->
                 homeAdapter.submitData(pagingData)
             }
         }

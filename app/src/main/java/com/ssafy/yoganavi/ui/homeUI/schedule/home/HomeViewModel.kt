@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.amazonaws.services.s3.AmazonS3Client
-import com.ssafy.yoganavi.data.source.dto.home.HomeData
 import com.ssafy.yoganavi.data.repository.home.HomePagingRepo
+import com.ssafy.yoganavi.data.source.dto.home.HomeData
 import com.ssafy.yoganavi.ui.utils.loadS3Image
 import com.ssafy.yoganavi.ui.utils.loadS3ImageSequentially
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,11 +16,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val homePagingRepo: HomePagingRepo,
+    homePagingRepo: HomePagingRepo,
     private val s3Client: AmazonS3Client
 ) : ViewModel() {
 
-    var homeList2: Flow<PagingData<HomeData>> =
+    val homeList: Flow<PagingData<HomeData>> =
         homePagingRepo.getHomeList()
             .cachedIn(viewModelScope)
 
