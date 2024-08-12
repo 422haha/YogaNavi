@@ -14,6 +14,8 @@ import com.ssafy.yoganavi.data.source.info.InfoDataSource
 import com.ssafy.yoganavi.data.source.info.InfoDataSourceImpl
 import com.ssafy.yoganavi.data.source.user.UserDataSource
 import com.ssafy.yoganavi.data.source.user.UserDataSourceImpl
+import com.ssafy.yoganavi.data.repository.home.HomePagingRepo
+import com.ssafy.yoganavi.data.repository.home.HomePagingRepoImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -35,6 +37,10 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindLectureRepository(lectureRepositoryImpl: LectureRepositoryImpl): LectureRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindHomeRepository(homePagingRepoImpl: HomePagingRepoImpl): HomePagingRepo
 
     @Singleton
     @Binds

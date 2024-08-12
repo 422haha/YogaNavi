@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import com.ssafy.yoganavi.databinding.FragmentHomeBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.schedule.home.dialog.EnterDialog
-import com.ssafy.yoganavi.ui.utils.EMPTY_LIVE
 import com.ssafy.yoganavi.ui.utils.HOME
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -26,16 +25,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.rvMyList.adapter = homeAdapter
-
-        binding.srl.setOnRefreshListener {
-            viewModel.getHomeList()
-            binding.srl.isRefreshing = false
-        }
+        initAdapter()
 
         initCollect()
-
-        viewModel.getHomeList()
     }
 
     override fun onStart() {
@@ -47,11 +39,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         )
     }
 
+    private fun initAdapter() = with(binding.rvMyList) {
+        binding.rvMyList.adapter = homeAdapter
+
+        binding.srl.setOnRefreshListener {
+            homeAdapter.refresh()
+
+            binding.srl.isRefreshing = false
+        }
+
+        adapter = homeAdapter
+    }
+
     private fun initCollect() = viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.homeList.collectLatest { list ->
-                checkEmptyList(list, EMPTY_LIVE)
-                homeAdapter.submitList(list)
+            viewModel.homeList.collectLatest { pagingData ->
+                homeAdapter.submitData(pagingData)
             }
         }
     }
@@ -64,7 +67,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         content: String,
         isTeacher: Boolean,
     ) {
-
         EnterDialog(
             context = requireContext(),
             smallImageUri = smallImageUri,
