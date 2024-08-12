@@ -25,8 +25,6 @@ import java.util.stream.Collectors;
 
 /**
  * 예약 서비스 구현. 예약 생성 및 조회 등의 비즈니스 로직 구현
- * <p>
- * todo 오늘~오늘 + 강의 시작시간 10분전인 경우 신청 불가
  */
 @Service
 public class ReservationServiceImpl implements ReservationService {
@@ -73,17 +71,21 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         // 시간 겹침 체크
-        ZonedDateTime newStartDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(reservationRequest.getStartDate()), ZoneId.of("UTC"));
-        ZonedDateTime newEndDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(reservationRequest.getEndDate()), ZoneId.of("UTC"));
+        ZonedDateTime newStartDateTime = ZonedDateTime.ofInstant(
+            Instant.ofEpochMilli(reservationRequest.getStartDate()), ZoneId.of("UTC"));
+        ZonedDateTime newEndDateTime = ZonedDateTime.ofInstant(
+            Instant.ofEpochMilli(reservationRequest.getEndDate()), ZoneId.of("UTC"));
 
         List<MyLiveLecture> userReservations = myLiveLectureRepository.findByUserId(userId);
 
-
         for (MyLiveLecture existingReservation : userReservations) {
-            ZonedDateTime existingStartDateTime = existingReservation.getStartDate().atZone(ZoneId.of("UTC"));
-            ZonedDateTime existingEndDateTime = existingReservation.getEndDate().atZone(ZoneId.of("UTC"));
+            ZonedDateTime existingStartDateTime = existingReservation.getStartDate()
+                .atZone(ZoneId.of("UTC"));
+            ZonedDateTime existingEndDateTime = existingReservation.getEndDate()
+                .atZone(ZoneId.of("UTC"));
 
-            if (isDateOverlap(newStartDateTime, newEndDateTime, existingStartDateTime, existingEndDateTime) &&
+            if (isDateOverlap(newStartDateTime, newEndDateTime, existingStartDateTime,
+                existingEndDateTime) &&
                 isTimeOverlap(newLiveLecture, existingReservation.getLiveLecture())) {
                 throw new RuntimeException("시간이 겹치는 강의가 이미 존재합니다.");
             }
@@ -107,7 +109,8 @@ public class ReservationServiceImpl implements ReservationService {
      * @param end2   두 번째 기간의 종료 시간
      * @return 날짜가 겹치는지 여부
      */
-    private boolean isDateOverlap(ZonedDateTime start1, ZonedDateTime end1, ZonedDateTime start2, ZonedDateTime end2) {
+    private boolean isDateOverlap(ZonedDateTime start1, ZonedDateTime end1, ZonedDateTime start2,
+        ZonedDateTime end2) {
         return (start1.isBefore(end2) && end1.isAfter(start2)) ||
             start1.equals(start2) || end1.equals(end2);
     }
@@ -126,9 +129,11 @@ public class ReservationServiceImpl implements ReservationService {
         // 요일이 겹치는지 확인
         for (String day : days1) {
             if (days2.contains(day)) {
-                LocalTime start1 = LocalTime.ofInstant(lecture1.getStartTime(), ZoneId.systemDefault());
+                LocalTime start1 = LocalTime.ofInstant(lecture1.getStartTime(),
+                    ZoneId.systemDefault());
                 LocalTime end1 = LocalTime.ofInstant(lecture1.getEndTime(), ZoneId.systemDefault());
-                LocalTime start2 = LocalTime.ofInstant(lecture2.getStartTime(), ZoneId.systemDefault());
+                LocalTime start2 = LocalTime.ofInstant(lecture2.getStartTime(),
+                    ZoneId.systemDefault());
                 LocalTime end2 = LocalTime.ofInstant(lecture2.getEndTime(), ZoneId.systemDefault());
 
                 if ((start1.isBefore(end2) && end1.isAfter(start2)) ||
