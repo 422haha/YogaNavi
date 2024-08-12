@@ -80,7 +80,7 @@ interface InfoAPI {
     suspend fun getLecture(@Path("recorded_id") id: Long): Response<YogaDetailResponse<LectureDetailData>>
 
 
-    @PUT("mypage/recorded-lecture/update/{recordedId}")
+    @PUT("mypage/recorded-lecture/update/{recorded_id}")
     suspend fun updateLecture(
         @Path("recorded_id") id: Long,
         @Body lecture: LectureDetailData
