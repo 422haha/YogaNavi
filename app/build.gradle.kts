@@ -29,6 +29,7 @@ android {
         buildConfigField("String", "ACCESS_KEY", properties.getProperty("accessKey"))
         buildConfigField("String", "SECRET_KEY", properties.getProperty("secretKey"))
         buildConfigField("String", "SIGNALING_SERVER_IP_ADDRESS", properties.getProperty("signalingServerIp"))
+        buildConfigField("String", "BASE_URL", properties.getProperty("baseUrl"))
     }
 
     buildTypes {
