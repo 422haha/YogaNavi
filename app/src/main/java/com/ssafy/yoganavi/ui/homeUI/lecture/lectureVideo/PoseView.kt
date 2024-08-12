@@ -25,7 +25,7 @@ import kotlin.math.atan2
 
 class PoseView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private val size = KEYPOINT_NUM / 3
-    private val angleThreshold = 25f
+    private val angleThreshold = 45f
     private val keyPointsThreshold = 0.4f
     private val radius = 15f
     private var userKeyPoints: List<KeyPoint> = List(size) { KeyPoint(0, 0f, 0f, 0f) }

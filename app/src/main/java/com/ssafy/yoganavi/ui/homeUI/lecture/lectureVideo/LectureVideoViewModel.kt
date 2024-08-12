@@ -23,7 +23,6 @@ class LectureVideoViewModel @Inject constructor(
 
     private val retriever = MediaMetadataRetriever()
     private var isVideoInfer: Boolean = false
-    private var averageInferTime: Float = 0f
 
     private val _userKeyPoints: MutableStateFlow<List<KeyPoint>> =
         MutableStateFlow(emptyList())
@@ -63,14 +62,9 @@ class LectureVideoViewModel @Inject constructor(
                 return@launch
             }
 
-            val startTime = System.currentTimeMillis()
             retriever.setDataSource(uri)
-            val bitmap = retriever.getFrameAtTime(
-                (position + averageInferTime.toLong()) * 1000,
-                MediaMetadataRetriever.OPTION_CLOSEST_SYNC
-            )
-            val endTime = System.currentTimeMillis()
-            averageInferTime = ((endTime - startTime) + averageInferTime) / 2f
+            val option = MediaMetadataRetriever.OPTION_CLOSEST_SYNC
+            val bitmap = retriever.getFrameAtTime((position * 1000), option)
 
             bitmap?.let {
                 val results = poseRepository.infer(bitmap, bitmap.width, bitmap.height)
