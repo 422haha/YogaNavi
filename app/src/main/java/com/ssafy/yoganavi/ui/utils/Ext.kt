@@ -18,6 +18,7 @@ const val REFRESH_TOKEN = "Refresh-Token"
 const val NEED_REFRESH_TOKEN = "세션이 만료되었습니다."
 const val TOKEN_REQUIRED = "Refresh-Token-Request"
 const val PAGE_SIZE = 30
+const val HOME_PAGE_SIZE = 8
 const val END_TIME = "00:00"
 const val REPEAT_TIME = 5000L
 const val NINE_HOUR = 32_400_000
