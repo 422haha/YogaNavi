@@ -8,9 +8,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
+import com.ssafy.yoganavi.data.source.dto.home.EmptyData
 import com.ssafy.yoganavi.databinding.FragmentHomeBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.schedule.home.dialog.EnterDialog
+import com.ssafy.yoganavi.ui.utils.EMPTY_LECTURE
 import com.ssafy.yoganavi.ui.utils.HOME
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -41,6 +44,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private fun initAdapter() = with(binding.rvMyList) {
         binding.rvMyList.adapter = homeAdapter
+
+        homeAdapter.addLoadStateListener { loadState ->
+            if (loadState.source.refresh is LoadState.NotLoading) {
+                val isListEmpty = homeAdapter.itemCount == 0
+                if (isListEmpty)
+                    setEmptyView(EmptyData(true, EMPTY_LECTURE))
+                else
+                    setEmptyView(EmptyData(false))
+            }
+        }
 
         binding.srl.setOnRefreshListener {
             homeAdapter.refresh()
