@@ -3,19 +3,23 @@ package com.yoga.backend.common.util;
 import com.yoga.backend.common.constants.SecurityConstants;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.members.repository.UsersRepository;
+import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -43,8 +47,24 @@ public class JwtUtil {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    private final SecretKey key = Keys.hmacShaKeyFor(
-        SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
+    private long accessTokenExpiration;
+    private long refreshTokenExpiration;
+    private SecretKey key;
+
+    @PostConstruct
+    public void init() {
+        Dotenv dotenv = Dotenv.load();
+        String jwtSecret = dotenv.get("JWT_SECRET");
+
+        this.accessTokenExpiration = Long.parseLong(
+            Objects.requireNonNull(dotenv.get("ACCESS_TOKEN_EXPIRATION")));
+
+        this.refreshTokenExpiration = Long.parseLong(
+            Objects.requireNonNull(dotenv.get("REFRESH_TOKEN_EXPIRATION")));
+
+        assert jwtSecret != null;
+        this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    }
 
     // refresh token 생성
     public String generateRefreshToken(String email) {
@@ -54,7 +74,7 @@ public class JwtUtil {
             .claim("email", email)
             .issuedAt(new Date())
             .expiration(
-                new Date(System.currentTimeMillis() + SecurityConstants.REFRESH_TOKEN_EXPIRATION))
+                new Date(System.currentTimeMillis() + refreshTokenExpiration))
             .signWith(key)
             .compact();
     }
@@ -118,7 +138,7 @@ public class JwtUtil {
             .claim("role", role)
             .issuedAt(new Date())
             .expiration(
-                new Date(System.currentTimeMillis() + SecurityConstants.ACCESS_TOKEN_EXPIRATION))
+                new Date(System.currentTimeMillis() + accessTokenExpiration))
             .signWith(key)
             .compact();
 
@@ -128,7 +148,7 @@ public class JwtUtil {
             public Object execute(RedisOperations operations) throws DataAccessException {
                 operations.multi();
                 operations.opsForValue()
-                    .set(email, token, SecurityConstants.ACCESS_TOKEN_EXPIRATION,
+                    .set(email, token, accessTokenExpiration,
                         TimeUnit.MILLISECONDS);
                 return operations.exec();
             }
