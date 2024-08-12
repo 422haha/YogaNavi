@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * 예약 요청 DTO 클래스 실시간 강의 예약 요청에 사용됩니다.
+ * 예약 요청 DTO 클래스 실시간 강의 예약 요청에 사용
  */
 @Data
 @Builder

@@ -42,9 +42,10 @@ public interface TeacherRepository extends JpaRepository<Users, Integer> {
      */
     @Query(value = "SELECT DISTINCT u.* FROM users u " +
         "JOIN live_lectures l ON u.user_id = l.user_id " +
-        "WHERE l.start_time >= :startTime " +
+        "WHERE u.is_deleted = false " +
+        "AND l.start_time >= :startTime " +
         "AND l.end_time <= :endTime " +
-        "AND l.end_date > CURRENT_TIMESTAMP " + // end_date가 현재 시점 이후인 조건 추가
+        "AND l.end_date > CURRENT_TIMESTAMP " +
         "AND NOT EXISTS (" +
         "  SELECT 1 FROM (" +
         "    SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(l.available_day, ',', numbers.n), ',', -1) AS available_day "
