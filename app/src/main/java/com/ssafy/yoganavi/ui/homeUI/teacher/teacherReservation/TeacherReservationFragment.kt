@@ -21,6 +21,7 @@ import com.ssafy.yoganavi.ui.utils.ONE_TO_ONE
 import com.ssafy.yoganavi.ui.utils.PICK_DATE
 import com.ssafy.yoganavi.ui.utils.RESERVATION
 import com.ssafy.yoganavi.ui.utils.RESERVE
+import com.ssafy.yoganavi.ui.utils.SELECT_CAN_CLASS
 import com.ssafy.yoganavi.ui.utils.START
 import com.ssafy.yoganavi.ui.utils.toCalendarDay
 import com.ssafy.yoganavi.ui.utils.toLong
@@ -59,6 +60,8 @@ class TeacherReservationFragment :
             menuListener = {
                 if (binding.tvNothing.isVisible) {
                     showSnackBar(NOTHING)
+                } else if (!binding.tvSelectTerm.isVisible) {
+                    showSnackBar(SELECT_CAN_CLASS)
                 } else if (saveStartDate == null || saveEndDate == null) {
                     showSnackBar(PICK_DATE)
                 } else {
