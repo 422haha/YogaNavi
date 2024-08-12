@@ -55,15 +55,25 @@ public class JwtUtil {
     public void init() {
         Dotenv dotenv = Dotenv.load();
         String jwtSecret = dotenv.get("JWT_SECRET");
-
-        this.accessTokenExpiration = Long.parseLong(
-            Objects.requireNonNull(dotenv.get("ACCESS_TOKEN_EXPIRATION")));
-
-        this.refreshTokenExpiration = Long.parseLong(
-            Objects.requireNonNull(dotenv.get("REFRESH_TOKEN_EXPIRATION")));
-
-        assert jwtSecret != null;
+        if (jwtSecret == null || jwtSecret.isEmpty()) {
+            throw new IllegalStateException("JWT_SECRET가 환경 변수에 설정되지 않았음.");
+        }
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+
+        String accessTokenExpirationStr = dotenv.get("ACCESS_TOKEN_EXPIRATION");
+        if (accessTokenExpirationStr == null || accessTokenExpirationStr.isEmpty()) {
+            throw new IllegalStateException("ACCESS_TOKEN_EXPIRATION이 환경 변수에 설정되지 않았음.");
+        }
+        this.accessTokenExpiration = Long.parseLong(accessTokenExpirationStr);
+
+        String refreshTokenExpirationStr = dotenv.get("REFRESH_TOKEN_EXPIRATION");
+        if (refreshTokenExpirationStr == null || refreshTokenExpirationStr.isEmpty()) {
+            throw new IllegalStateException("REFRESH_TOKEN_EXPIRATION이 환경 변수에 설정되지 않았음.");
+        }
+        this.refreshTokenExpiration = Long.parseLong(refreshTokenExpirationStr);
+
+        log.info("JWT 액세스 토큰 만료 시간: {}ms, 리프레시 토큰 만료 시간: {}ms",
+            this.accessTokenExpiration, this.refreshTokenExpiration);
     }
 
     // refresh token 생성
