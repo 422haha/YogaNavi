@@ -1,5 +1,7 @@
 package com.ssafy.yoganavi.ui.homeUI.schedule.home
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -27,7 +29,8 @@ class HomeAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         return if (position != 0)
-            getItem(position)?.let { holder.bind(it, getItem(position - 1)?.lectureDate ?: 0L) } ?: Unit
+            getItem(position)?.let { holder.bind(it, getItem(position - 1)?.lectureDate ?: 0L) }
+                ?: Unit
         else
             getItem(position)?.let { holder.bind(it, getItem(position)?.lectureDate ?: 0L) } ?: Unit
     }
@@ -43,6 +46,8 @@ class HomeAdapter(
                     loadS3Image(ivProfile, item.teacherSmallProfile)
                 } else {
                     ivProfile.setImageResource(R.drawable.profilenull)
+                    ivProfile.strokeWidth = 1f;
+                    ivProfile.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#808080")));
                 }
 
                 if (item.lectureDate != preDay) {
@@ -54,7 +59,9 @@ class HomeAdapter(
                     tvDivider.isVisible = false
                 }
 
-                if (item.isOnAir) onAir.setBackgroundResource(R.color.green) else onAir.setBackgroundResource(R.color.gray_20)
+                if (item.isOnAir) onAir.setBackgroundResource(R.color.green) else onAir.setBackgroundResource(
+                    R.color.gray_20
+                )
 
                 tvTeacherNickname.text = item.teacherName
 
@@ -83,7 +90,7 @@ class HomeAdapter(
             val start = formatTime(this)
             var end = formatTime(endTime)
 
-            if(this > endTime) end = "익일 $end"
+            if (this > endTime) end = "익일 $end"
             return startTildeEnd(start, end)
         }
 

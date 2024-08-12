@@ -52,12 +52,14 @@
             android:id="@+id/iv_profile"
             android:layout_width="@dimen/icon_mini"
             android:layout_height="@dimen/icon_mini"
+            android:padding="1dp"
             android:layout_gravity="center"
-            android:background="@color/black"
+            android:background="@color/white"
             app:layout_constraintEnd_toStartOf="@id/tv_teacher_nickname"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/Circle" />
+            app:shapeAppearanceOverlay="@style/Circle"
+            />
 
         <TextView
             android:id="@+id/tv_teacher_nickname"
@@ -87,6 +89,7 @@
             android:id="@+id/v_connect"
             android:layout_width="1dp"
             android:layout_height="@dimen/padding_medium"
+            android:layout_marginTop="-1dp"
             android:background="@color/gray_20"
             app:layout_constraintBottom_toTopOf="@id/cv_content"
             app:layout_constraintEnd_toEndOf="@id/iv_profile"

@@ -11,13 +11,15 @@
         android:id="@+id/cv_content"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/padding_extra_small"
-        app:cardCornerRadius="10dp"
+        android:layout_margin="1dp"
+        app:cardCornerRadius="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="3:4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="@android:color/transparent"
+        app:strokeWidth="0dp">
 
         <ImageView
             android:id="@+id/iv_thumbnail"
@@ -42,7 +44,7 @@
     <!-- TODO 만약 999보다 크면 999+ 이런식으로 해야할듯 -->
     <TextView
         android:id="@+id/tv_count"
-        style="@style/commonText"
+        style="@style/BorderedText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxLength="4"
@@ -64,14 +66,14 @@
 
     <TextView
         android:id="@+id/tv_title"
-        style="@style/commonText"
+        style="@style/BorderedText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/padding_small"
         android:ellipsize="end"
         android:gravity="center"
-        android:maxLines="1"
-        android:singleLine="true"
+        android:maxLines="3"
+        android:singleLine="false"
         app:layout_constraintBottom_toBottomOf="@id/cv_content"
         app:layout_constraintEnd_toEndOf="@id/cv_content"
         app:layout_constraintStart_toStartOf="@id/cv_content"
