@@ -2,13 +2,17 @@ package com.yoga.backend.teacher.dto;
 
 import java.util.List;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 
 /**
  * 상세 강사 DTO 클래스
  */
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Builder
 public class DetailedTeacherDto {
 
@@ -59,7 +63,8 @@ public class DetailedTeacherDto {
     /**
      * 강의 DTO 클래스
      */
-    @Data
+    @Getter
+    @Setter
     @Builder
     public static class LectureDto {
 
@@ -97,7 +102,8 @@ public class DetailedTeacherDto {
     /**
      * 공지 DTO 클래스
      */
-    @Data
+    @Getter
+    @Setter
     @Builder
     public static class NoticeDto {
 

@@ -1,11 +1,13 @@
 package com.yoga.backend.article;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 게시글(공지사항) DTO
  */
-@Data
+@Getter
+@Setter
 public class ArticleDto {
 
     private Long articleId;
@@ -17,5 +19,4 @@ public class ArticleDto {
     private String profileImageSmallUrl;
     private Long createdAt;
     private Long updatedAt;
-
 }
