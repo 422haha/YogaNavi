@@ -2,6 +2,7 @@ package com.yoga.backend.common.config;
 
 import com.yoga.backend.common.constants.FcmConstants;
 import com.yoga.backend.common.constants.SecurityConstants;
+import com.yoga.backend.common.filter.ApiKeyAuthFilter;
 import com.yoga.backend.common.handler.CustomAuthenticationSuccessHandler;
 import com.yoga.backend.common.filter.JWTTokenValidatorFilter;
 import com.yoga.backend.common.handler.CustomLoginFailureHandler;
@@ -10,6 +11,7 @@ import com.yoga.backend.members.repository.UsersRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collections;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -25,6 +27,9 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 public class ProjectSecurityConfig {
+
+    @Value("${api.key}")
+    private String apiKey;
 
     private final JwtUtil jwtUtil;
     private final UsersRepository userRepository;
@@ -43,6 +48,11 @@ public class ProjectSecurityConfig {
     @Bean
     public JWTTokenValidatorFilter jwtTokenValidatorFilter() {
         return new JWTTokenValidatorFilter(jwtUtil, userRepository);
+    }
+
+    @Bean
+    public ApiKeyAuthFilter apiKeyAuthFilter() {
+        return new ApiKeyAuthFilter(apiKey);
     }
 
     /**
@@ -73,6 +83,7 @@ public class ProjectSecurityConfig {
                         SecurityConstants.JWT_HEADER,
                         SecurityConstants.REFRESH_TOKEN_HEADER,
                         FcmConstants.FCM_HEADER,
+                        "SIGNALING-API-KEY",
                         "Content-Type"
                     ));
                     config.setExposedHeaders(Arrays.asList(
@@ -89,6 +100,7 @@ public class ProjectSecurityConfig {
 
         // JWT 토큰 검증 필터 추가
         http.addFilterBefore(jwtTokenValidatorFilter(), BasicAuthenticationFilter.class);
+        http.addFilterBefore(apiKeyAuthFilter(), BasicAuthenticationFilter.class);
 
         // URL 기반 권한 부여 설정
         http.authorizeHttpRequests((requests) -> requests
@@ -122,7 +134,9 @@ public class ProjectSecurityConfig {
 
             // 모두에게 열려있다!
             .requestMatchers("/members/**",
-                "/is-on", "/home/update").permitAll()
+                "/is-on").permitAll()
+
+            .requestMatchers("/home/update").hasRole("SIGNAL")
 
             // 그 외의 경우
             .anyRequest().hasAnyRole("TEACHER", "STUDENT")

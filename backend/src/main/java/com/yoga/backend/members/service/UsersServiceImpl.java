@@ -33,8 +33,7 @@ public class UsersServiceImpl implements UsersService {
 
     private static final Duration TOKEN_VALIDITY_DURATION = Duration.ofMinutes(5);
     private static final ZoneId KOREA_ZONE_ID = ZoneId.of("Asia/Seoul");
-    //    private static final Duration DELETE_DELAY = Duration.ofDays(7);
-    private static final Duration DELETE_DELAY = Duration.ofMinutes(1); // 테스트용. 1분 뒤에 삭제
+    private static final Duration DELETE_DELAY = Duration.ofDays(7);
 
     private final S3Service s3Service;
     private final UserDeletionService userDeletionService;
