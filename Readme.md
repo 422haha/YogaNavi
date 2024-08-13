@@ -40,8 +40,8 @@
 - 협업 툴 : Matter Most, Discord, Notion
 - 서비스 배포 환경 : AWS EC2, Docker, Jenkins
 - 디자인 : [Figma](https://www.figma.com/design/sMLjgI5OwHFt8tIS5ZyDBD/Yoga-Navi?node-id=0-1&t=nj03qnrp0J5vai0o-0)
-- [커밋 컨벤션]()
-- [코드 컨벤션]()
+- [커밋 컨벤션](https://aluminum-timpani-a63.notion.site/Git-3e8c00d26c7e4ef99fc79b9ad8dbe543?pvs=4)
+- [코드 컨벤션](https://google.github.io/styleguide/javaguide.html)
 - [주석 컨벤션](https://aluminum-timpani-a63.notion.site/Style-Guide-258f44c30eb44bddb34b892f0fcc6252?pvs=4)
 <br>
 
@@ -520,10 +520,13 @@
 - [S3 이미지 최적화](https://aluminum-timpani-a63.notion.site/S3-3bf3cca347524974845e58189a61bc5e?pvs=4)
 
 
+
 ## 6. 개선사항
+## 6. 성능 개선한 목록
 
 - [S3 Presigned URL과 비동기 처리](https://aluminum-timpani-a63.notion.site/S3-Presigned-URL-86196204428742c38dbb7c2280d80881?pvs=4)
 
 - [Pagination 성능 개선](https://aluminum-timpani-a63.notion.site/68053f4bf4334e4495ca7ad3a468e9ed?pvs=4)
+- [Pagination 응답 성능 개선](https://aluminum-timpani-a63.notion.site/68053f4bf4334e4495ca7ad3a468e9ed?pvs=4)
 
 - [Recycler View + Nested ScrollView의 비효율성](https://aluminum-timpani-a63.notion.site/Nested-ScrollView-Recycler-View-7963951e4d594a5e8e49181d0d7963df?pvs=4)
