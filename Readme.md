@@ -1,4 +1,3 @@
-
 # 🧘‍♀️ YogaNavi
 
 ![logo-1.png](./logo-1.png)
@@ -11,11 +10,11 @@
 
 ## 프로젝트 소개 및 핵심 기능
 
-🤸‍♀️ <b>요가 강사와 수강생을 연결하는 모바일 요가 플랫폼입니다.
+🧘 <b> 요가 강사와 수강생을 연결하는 모바일 요가 플랫폼입니다.
 
 🔔 <b> FCM을 사용하여 화상강의 시작 10분 전에 알람을 받을 수 있습니다.
 
-📱 <b>WebRTC를 사용하여 실시간 화상강의가 가능합니다.
+📱 <b> WebRTC를 사용하여 실시간 화상강의가 가능합니다.
 
 🏆 <b> Yolo v8 pose estimation 모델을 사용하여 녹화강의에서 강사와 수강생의 자세를 비교하며 보여줍니다.
 
@@ -37,12 +36,14 @@
 
 - Front-end: Android Studio, Kotlin, MVVM
 - Back-end : IntelliJ, Spring boot
+- Signaling Server: Kotlin, ktor
 - 버전 및 이슈관리 : Gitlab, Jira
 - 협업 툴 : Matter Most, Discord, Notion
 - 서비스 배포 환경 : AWS EC2, Docker, Jenkins
 - 디자인 : [Figma](https://www.figma.com/design/sMLjgI5OwHFt8tIS5ZyDBD/Yoga-Navi?node-id=0-1&t=nj03qnrp0J5vai0o-0)
 - [커밋 컨벤션]()
 - [코드 컨벤션]()
+- [주석 컨벤션](https://aluminum-timpani-a63.notion.site/Style-Guide-258f44c30eb44bddb34b892f0fcc6252?pvs=4)
 <br>
 
 ## 2. 채택한 개발 기술과 브랜치 전략
@@ -91,3 +92,313 @@
     - **Feat** 브랜치는 기능 단위로 독립적인 개발 환경을 위하여 사용하고 merge 후 각 브랜치를 삭제해주었습니다.
 
 <br>
+
+
+## 3. 프로젝트 구조
+
+### Android
+<details>
+<summary>접기/펼치기</summary>
+
+```
+├─java
+│  └─com
+│      └─ssafy
+│          └─yoganavi
+│              ├─data
+│              │  ├─auth
+│              │  ├─repository
+│              │  │  ├─ai
+│              │  │  ├─dataStore
+│              │  │  ├─home
+│              │  │  ├─info
+│              │  │  ├─lecture
+│              │  │  ├─response
+│              │  │  └─user
+│              │  └─source
+│              │      ├─ai
+│              │      ├─dto
+│              │      │  ├─home
+│              │      │  ├─lecture
+│              │      │  ├─live
+│              │      │  ├─mypage
+│              │      │  ├─notice
+│              │      │  ├─schedule
+│              │      │  └─teacher
+│              │      ├─home
+│              │      ├─info
+│              │      ├─lecture
+│              │      ├─response
+│              │      └─user
+│              ├─di
+│              └─ui
+│                  ├─core
+│                  ├─homeUI
+│                  │  ├─lecture
+│                  │  │  ├─lectureDetail
+│                  │  │  │  └─lecture
+│                  │  │  ├─lectureList
+│                  │  │  │  └─lecture
+│                  │  │  └─lectureVideo
+│                  │  ├─myPage
+│                  │  │  ├─courseHistory
+│                  │  │  ├─likeLecture
+│                  │  │  ├─likeTeacher
+│                  │  │  ├─managementLive
+│                  │  │  ├─managementVideo
+│                  │  │  │  └─lecture
+│                  │  │  ├─modify
+│                  │  │  │  └─hashtag
+│                  │  │  ├─notice
+│                  │  │  │  └─notices
+│                  │  │  ├─profile
+│                  │  │  │  └─dialog
+│                  │  │  ├─registerLive
+│                  │  │  ├─registerNotice
+│                  │  │  └─registerVideo
+│                  │  │      └─chapter
+│                  │  │          ├─adapter
+│                  │  │          ├─data
+│                  │  │          └─viewHolder
+│                  │  ├─schedule
+│                  │  │  ├─home
+│                  │  │  │  └─dialog
+│                  │  │  └─live
+│                  │  │      └─webRtc
+│                  │  │          ├─audio
+│                  │  │          ├─peer
+│                  │  │          ├─renderer
+│                  │  │          ├─sessions
+│                  │  │          └─utils
+│                  │  └─teacher
+│                  │      ├─filter
+│                  │      ├─teacherDetail
+│                  │      │  └─teacherDetail
+│                  │      │      └─lecture
+│                  │      ├─teacherList
+│                  │      │  └─teacher
+│                  │      └─teacherReservation
+│                  │          └─availableList
+│                  ├─loginUI
+│                  │  ├─find
+│                  │  ├─join
+│                  │  └─login
+│                  └─utils
+└─res
+    ├─anim
+    ├─drawable
+    ├─layout
+    ├─menu
+    ├─mipmap-anydpi-v26
+    ├─mipmap-hdpi
+    ├─mipmap-mdpi
+    ├─mipmap-xhdpi
+    ├─mipmap-xxhdpi
+    ├─mipmap-xxxhdpi
+    ├─navigation
+    ├─raw
+    ├─values
+    ├─values-night
+    └─xml
+```
+</details>
+
+### Backend
+
+<details>
+<summary>접기/펼치기</summary>
+
+```
+├─main
+│  ├─java
+│  │  └─com
+│  │      └─yoga
+│  │          └─backend
+│  │              │  BackendApplication.java
+│  │              │
+│  │              ├─article
+│  │              │      ArticleController.java
+│  │              │      ArticleDto.java
+│  │              │      ArticleRepository.java
+│  │              │      ArticleService.java
+│  │              │      ArticleServiceImpl.java
+│  │              │
+│  │              ├─common
+│  │              │  ├─config
+│  │              │  │      AwsConfig.java
+│  │              │  │      FirebaseConfig.java
+│  │              │  │      ProjectSecurityConfig.java
+│  │              │  │      QueryDslConfig.java
+│  │              │  │      RedisConfig.java
+│  │              │  │      TransactionConfig.java
+│  │              │  │      UsernamePwdAuthenticationProvider.java
+│  │              │  │
+│  │              │  ├─constants
+│  │              │  │      FcmConstants.java
+│  │              │  │      SecurityConstants.java
+│  │              │  │
+│  │              │  ├─converter
+│  │              │  │      InstantToSqlDateConverter.java
+│  │              │  │      InstantToSqlTimeConverter.java
+│  │              │  │
+│  │              │  ├─entity
+│  │              │  │  │  Article.java
+│  │              │  │  │  Hashtag.java
+│  │              │  │  │  LiveLectures.java
+│  │              │  │  │  MyLiveLecture.java
+│  │              │  │  │  TeacherLike.java
+│  │              │  │  │  TempAuthInfo.java
+│  │              │  │  │  Users.java
+│  │              │  │  │
+│  │              │  │  └─RecordedLectures
+│  │              │  │          RecordedLecture.java
+│  │              │  │          RecordedLectureChapter.java
+│  │              │  │          RecordedLectureLike.java
+│  │              │  │
+│  │              │  ├─exeption
+│  │              │  │      GlobalExceptionHandler.java
+│  │              │  │
+│  │              │  ├─filter
+│  │              │  │      ApiKeyAuthFilter.java
+│  │              │  │      CsrfCookieFilter.java
+│  │              │  │      JWTTokenValidatorFilter.java
+│  │              │  │
+│  │              │  ├─handler
+│  │              │  │      CustomAuthenticationSuccessHandler.java
+│  │              │  │      CustomLoginFailureHandler.java
+│  │              │  │
+│  │              │  ├─service
+│  │              │  │      RedisService.java
+│  │              │  │      S3Service.java
+│  │              │  │
+│  │              │  └─util
+│  │              │          JwtUtil.java
+│  │              │
+│  │              ├─fcm
+│  │              │      FcmController.java
+│  │              │      FCMService.java
+│  │              │      NotificationService.java
+│  │              │
+│  │              ├─livelectures
+│  │              │  ├─Controller
+│  │              │  │      HistoryController.java
+│  │              │  │      HomeController.java
+│  │              │  │      LiveLectureController.java
+│  │              │  │
+│  │              │  ├─dto
+│  │              │  │      HomeResponseDto.java
+│  │              │  │      LectureHistoryDto.java
+│  │              │  │      LiveLectureCreateDto.java
+│  │              │  │      LiveLectureCreateResponseDto.java
+│  │              │  │      LiveLectureDto.java
+│  │              │  │      LiveLectureResponseDto.java
+│  │              │  │      SetIsOnAirDto.java
+│  │              │  │
+│  │              │  ├─repository
+│  │              │  │      LiveLectureRepository.java
+│  │              │  │      MyLiveLectureRepository.java
+│  │              │  │
+│  │              │  └─service
+│  │              │          HistoryService.java
+│  │              │          HistoryServiceImpl.java
+│  │              │          HomeService.java
+│  │              │          HomeServiceImpl.java
+│  │              │          LiveLectureService.java
+│  │              │          LiveLectureServiceImpl.java
+│  │              │
+│  │              ├─members
+│  │              │  │  UserController.java
+│  │              │  │  UserScheduler.java
+│  │              │  │
+│  │              │  ├─dto
+│  │              │  │      RegisterDto.java
+│  │              │  │      UpdateDto.java
+│  │              │  │
+│  │              │  ├─repository
+│  │              │  │      HashtagRepository.java
+│  │              │  │      TempAuthInfoRepository.java
+│  │              │  │      UsersRepository.java
+│  │              │  │
+│  │              │  └─service
+│  │              │          UserDeletionService.java
+│  │              │          UsersService.java
+│  │              │          UsersServiceImpl.java
+│  │              │
+│  │              ├─recorded
+│  │              │  │  RecordedController.java
+│  │              │  │  RecordedService.java
+│  │              │  │  RecordedServiceImpl.java
+│  │              │  │
+│  │              │  ├─dto
+│  │              │  │      ChapterDto.java
+│  │              │  │      DeleteDto.java
+│  │              │  │      LectureDto.java
+│  │              │  │
+│  │              │  └─repository
+│  │              │          AllRecordedLecturesRepository.java
+│  │              │          MyLikeLectureListRepository.java
+│  │              │          RecordedLectureLikeRepository.java
+│  │              │          RecordedLectureListRepository.java
+│  │              │          RecordedLectureRepository.java
+│  │              │
+│  │              ├─redirect
+│  │              │      RedirectController.java
+│  │              │
+│  │              └─teacher
+│  │                  │  TeacherFilter.java
+│  │                  │
+│  │                  ├─controller
+│  │                  │      ReservationController.java
+│  │                  │      TeacherController.java
+│  │                  │
+│  │                  ├─dto
+│  │                  │      DetailedTeacherDto.java
+│  │                  │      ReservationRequestDto.java
+│  │                  │      TeacherDto.java
+│  │                  │
+│  │                  ├─repository
+│  │                  │      TeacherLikeRepository.java
+│  │                  │      TeacherRepository.java
+│  │                  │
+│  │                  └─service
+│  │                          ReservationService.java
+│  │                          ReservationServiceImpl.java
+│  │                          TeacherService.java
+│  │                          TeacherServiceImpl.java
+│  │
+│  └─resources
+│      │  .env
+│      │  .gitkeep
+│      │  application.properties
+│      │  firebase-service-account.json
+│      │
+│      └─firebase
+└─test
+    └─java
+        └─com
+            └─yoga
+                └─backend
+                        BackendApplicationTests.java
+```
+</details>
+
+## 4. 기능
+
+
+
+## 5. 트러블 슈팅
+
+- [WebRTC](https://aluminum-timpani-a63.notion.site/WebRTC-5f46b9a822fc41c4a2317f6771b0b3c2?pvs=4)
+
+- [Redis 직렬화/역직렬화](https://aluminum-timpani-a63.notion.site/Redis-fb4b7550cd894b279847e62c765527c1?pvs=4)
+
+- [S3 이미지 최적화](https://aluminum-timpani-a63.notion.site/S3-3bf3cca347524974845e58189a61bc5e?pvs=4)
+
+
+## 6. 개선사항
+
+- [S3 Presigned URL과 비동기 처리](https://aluminum-timpani-a63.notion.site/S3-Presigned-URL-86196204428742c38dbb7c2280d80881?pvs=4)
+
+- [Pagination 성능 개선](https://aluminum-timpani-a63.notion.site/68053f4bf4334e4495ca7ad3a468e9ed?pvs=4)
+
+- [Recycler View + Nested ScrollView의 비효율성](https://aluminum-timpani-a63.notion.site/Nested-ScrollView-Recycler-View-7963951e4d594a5e8e49181d0d7963df?pvs=4)
