@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ly_divider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/ly_schedule"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/date_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="@dimen/padding_medium"
+            app:dividerColor="@color/gray_10"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_divider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:paddingHorizontal="@dimen/padding_small"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="MON" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ly_schedule"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_medium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ly_divider">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/iv_profile"
+            android:layout_width="@dimen/icon_mini"
+            android:layout_height="@dimen/icon_mini"
+            android:padding="1dp"
+            android:layout_gravity="center"
+            android:background="@color/white"
+            app:layout_constraintEnd_toStartOf="@id/tv_teacher_nickname"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/Circle"
+            />
+
+        <TextView
+            android:id="@+id/tv_teacher_nickname"
+            style="@style/SingleLineText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_medium"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/tv_date"
+            app:layout_constraintStart_toEndOf="@id/iv_profile"
+            app:layout_constraintTop_toTopOf="@id/iv_profile"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="요구르트 강사" />
+
+        <TextView
+            android:id="@+id/tv_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/iv_profile"
+            app:layout_constraintStart_toStartOf="@id/tv_teacher_nickname"
+            app:layout_constraintTop_toBottomOf="@id/tv_teacher_nickname"
+            tools:text="2024-07-11 목" />
+
+        <View
+            android:id="@+id/v_connect"
+            android:layout_width="1dp"
+            android:layout_height="@dimen/padding_medium"
+            android:layout_marginTop="-1dp"
+            android:background="@color/gray_20"
+            app:layout_constraintBottom_toTopOf="@id/cv_content"
+            app:layout_constraintEnd_toEndOf="@id/iv_profile"
+            app:layout_constraintStart_toStartOf="@id/iv_profile"
+            app:layout_constraintTop_toBottomOf="@id/iv_profile" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/on_air"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_marginEnd="@dimen/padding_small"
+            android:background="@color/gray_20"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/Circle" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cv_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_date"
+            app:strokeColor="@color/gray_20"
+            app:strokeWidth="1dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dp"
+                android:padding="@dimen/padding_medium">
+
+                <TextView
+                    android:id="@+id/tv_lecture_title"
+                    style="@style/SingleLineText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/padding_small"
+                    app:layout_constraintBottom_toTopOf="@+id/tv_lecture_time"
+                    app:layout_constraintEnd_toStartOf="@id/btn_go_detail"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed"
+                    tools:text="초보자도 쉽게 배우는 요가초보자도 쉽게 배우는 요가" />
+
+                <TextView
+                    android:id="@+id/tv_lecture_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/tv_lecture_title"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_lecture_title"
+                    tools:text="19:00~20:00" />
+
+                <ImageButton
+                    android:id="@+id/btn_go_detail"
+                    android:layout_width="@dimen/padding_extra_extra_large"
+                    android:layout_height="@dimen/padding_extra_extra_large"
+                    android:background="@android:color/transparent"
+                    android:clickable="false"
+                    android:src="@drawable/baseline_arrow_forward_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

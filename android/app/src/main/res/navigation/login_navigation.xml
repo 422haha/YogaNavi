@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login_navigation"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.ssafy.yoganavi.ui.loginUI.login.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_findFragment"
+            app:destination="@id/findFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_loginFragment_to_joinFragment"
+            app:destination="@id/joinFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/findFragment"
+        android:name="com.ssafy.yoganavi.ui.loginUI.find.FindFragment"
+        android:label="fragment_find"
+        tools:layout="@layout/fragment_find" />
+    <fragment
+        android:id="@+id/joinFragment"
+        android:name="com.ssafy.yoganavi.ui.loginUI.join.JoinFragment"
+        android:label="fragment_join"
+        tools:layout="@layout/fragment_join" />
+</navigation>

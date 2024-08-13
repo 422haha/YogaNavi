@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/padding_medium"
+    tools:context=".ui.homeUI.teacher.teacherList.TeacherListFragment">
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/sv_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_medium"
+        android:background="@drawable/background_stroke"
+        android:focusable="true"
+        android:queryHint="찾으시는 강사님이 있으신가요?"
+        app:iconifiedByDefault="false"
+        app:layout_constraintBottom_toTopOf="@+id/ly_filter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:queryBackground="@drawable/no_underline" />
+
+    <RadioGroup
+        android:id="@+id/rg_align"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_medium"
+        android:gravity="start"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/rv_teacher_list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sv_search">
+
+        <RadioButton
+            android:id="@+id/rb_popular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_medium"
+            android:text="@string/popular" />
+
+        <RadioButton
+            android:id="@+id/rb_recent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/recent" />
+
+    </RadioGroup>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ly_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/rv_teacher_list"
+        app:layout_constraintEnd_toEndOf="@id/sv_search"
+        app:layout_constraintTop_toBottomOf="@id/sv_search">
+
+        <ImageView
+            android:id="@+id/iv_filter"
+            android:layout_width="@dimen/icon_small"
+            android:layout_height="@dimen/icon_small"
+            android:layout_marginVertical="@dimen/padding_small"
+            android:src="@drawable/baseline_filter_empty_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_filter_set"
+            android:layout_width="@dimen/icon_medium40"
+            android:layout_height="@dimen/icon_medium40"
+            android:layout_marginEnd="-4dp"
+            android:src="@drawable/baseline_filter_alt_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_teacher_list"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ly_filter"
+        tools:listitem="@layout/list_item_teacher" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
