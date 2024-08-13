@@ -25,7 +25,7 @@
 
 | **강미연** | **김은섭** | **서장원** | **여창민** | **정다혜** | **최승준** |
 | :------: |  :------: | :------: | :------: | :------: | :------: |
-| <b>백앤드 | <b>백앤드 | <b>백앤드 | <b>안드로이드 | <b>안드로이드 | <b>안드로이드 |
+| <b>백엔드 | <b>백엔드 | <b>백엔드 | <b>안드로이드 | <b>안드로이드 | <b>안드로이드 |
 | [GitHub](https://github.com/422haha) | [Github](https://github.com/subway9852) | [Github](https://github.com/Seo-Jangwon) | [Github](https://github.com/yeolife) | [Github](https://github.com/JeongDaH) | [Github](https://github.com/Aloe-droid) |
 </div>
 
