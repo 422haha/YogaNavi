@@ -91,6 +91,7 @@ public class RecordedServiceImpl implements RecordedService {
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void saveLecture(LectureDto lectureDto) {
+        log.info("새 강의 저장 시작: 사용자 ID {}", lectureDto.getUserId());
         Users user = usersRepository.findById(lectureDto.getUserId())
             .orElseThrow(() -> new RuntimeException("사용자 찾을 수 없음"));
 
@@ -115,6 +116,7 @@ public class RecordedServiceImpl implements RecordedService {
         }
         lecture.setChapters(chapters);
         recordedLectureRepository.save(lecture);
+        log.info("새 강의 저장 완료: 강의 ID {}", lecture.getId());
     }
 
     /**
@@ -127,6 +129,7 @@ public class RecordedServiceImpl implements RecordedService {
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
     public LectureDto getLectureDetails(Long recordedId, int userId) {
+        log.info("강의 상세 정보 조회, 강의 id {}, 사용자 id {}", recordedId, userId);
         // 강의 정보 가져오기
         RecordedLecture lecture = recordedLectureRepository.findById(recordedId)
             .orElseThrow(() -> new RuntimeException("강의 찾을 수 없음"));
@@ -146,6 +149,7 @@ public class RecordedServiceImpl implements RecordedService {
         dto.setLikeCount(lecture.getLikeCount());
         dto.setMyLike(lectureLikeRepository.existsByLectureAndUser(lecture, user));
 
+        log.info("강의 상세 정보 조회 성공");
         return dto;
     }
 
@@ -158,6 +162,7 @@ public class RecordedServiceImpl implements RecordedService {
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public boolean updateLecture(LectureDto lectureDto) {
+        log.info("강의 수정 시작: 강의 ID {}", lectureDto.getRecordedId());
         try {
             // 데이터베이스에서 강의 정보를 조회
             RecordedLecture lecture = recordedLectureRepository.findById(lectureDto.getRecordedId())
@@ -176,9 +181,10 @@ public class RecordedServiceImpl implements RecordedService {
 
             // 변경된 강의 정보를 데이터베이스에 저장
             recordedLectureRepository.save(lecture);
+            log.info("강의 수정 성공: 강의 ID {}", lectureDto.getRecordedId());
             return true;
         } catch (Exception e) {
-//            log.error("강의 수정 중 오류 발생: {}", e.getMessage(), e);
+            log.error("강의 수정 중 오류 발생: {}", e.getMessage(), e);
             return false;
         }
     }
@@ -347,11 +353,11 @@ public class RecordedServiceImpl implements RecordedService {
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void deleteLectures(DeleteDto deleteDto, int userId) {
-//        log.info("이 id를 가진 강의들을 삭제: {}", deleteDto);
+        log.info("녹화 강의들을 삭제: {}", deleteDto);
 
         if (deleteDto.getLectureIds() == null || deleteDto.getLectureIds().isEmpty()) {
-//            log.warn("삭제를 위해서는 강의 id가 필요함. 강의 id가 존재하지 않음");
-            throw new RuntimeException("삭제할 강의가 지정되지 않았습니다.");
+            log.warn("녹화 강의 id가 존재하지 않음");
+            throw new RuntimeException("삭제할 녹화 강의가 지정되지 않았습니다.");
         }
 
         try {
@@ -359,7 +365,7 @@ public class RecordedServiceImpl implements RecordedService {
                 deleteDto.getLectureIds());
 
             if (lectures.isEmpty()) {
-//                log.warn("삭제할 강의가 존재하지 않음");
+                log.warn("삭제할 녹화 강의가 존재하지 않음");
                 throw new RuntimeException("삭제할 강의를 찾을 수 없습니다.");
             }
 
@@ -368,26 +374,24 @@ public class RecordedServiceImpl implements RecordedService {
 
             for (RecordedLecture lecture : lectures) {
                 if (lecture.getUser().getId() != userId) {
-//                    log.error("사용자 {} 는 이 강의를 삭제할 권한이 없음 {}", userId, lecture.getId());
+                    log.error("이 강의를 삭제할 권한이 없음, 사용자 {}, 강의 id {}", userId, lecture.getId());
                     throw new RuntimeException("강의 ID " + lecture.getId() + "에 대한 삭제 권한이 없습니다.");
                 }
 
-//                log.info("강의의 s3파일 삭제중: {}", lecture.getId());
                 deleteS3Files(lecture);
 
-//                log.info("db에서 강의 삭제중: {}", lecture.getId());
                 recordedLectureRepository.delete(lecture);
 
                 deletedLectureIds.add(lecture.getId());
                 notFoundLectureIds.remove(lecture.getId());
             }
 
-//            log.info("강의 삭제 완료: {}", deletedLectureIds);
+            log.info("녹화 강의 삭제 완료: {}", deletedLectureIds);
             if (!notFoundLectureIds.isEmpty()) {
-//                log.warn("강의를 찾을 수 없음: {}", notFoundLectureIds);
+                log.warn("녹화 강의를 찾을 수 없음: {}", notFoundLectureIds);
             }
         } catch (Exception e) {
-//            log.error("강의 삭제중 에러 발생", e);
+            log.error("녹화 강의 삭제중 에러 발생", e);
             throw new RuntimeException("강의 삭제 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
@@ -395,7 +399,6 @@ public class RecordedServiceImpl implements RecordedService {
     private void deleteS3Files(RecordedLecture lecture) {
         try {
             if (lecture.getThumbnail() != null && !lecture.getThumbnail().isEmpty()) {
-//                log.info("강의 썸네일 삭제 {}: {}", lecture.getId(), lecture.getThumbnail());
                 s3Service.deleteFile(lecture.getThumbnail());
             }
 
@@ -405,12 +408,11 @@ public class RecordedServiceImpl implements RecordedService {
 
             for (RecordedLectureChapter chapter : lecture.getChapters()) {
                 if (chapter.getVideoUrl() != null && !chapter.getVideoUrl().isEmpty()) {
-//                    log.info("챕터의 비디오 삭제 {} 강의 번호 {}: {}", chapter.getId(), lecture.getId(), chapter.getVideoUrl());
                     s3Service.deleteFile(chapter.getVideoUrl());
                 }
             }
         } catch (Exception e) {
-//            log.error("강의의 s3파일 삭제중 에러 발생: {}", lecture.getId(), e);
+            log.error("녹화 강의의 s3파일 삭제중 에러 발생: {}", lecture.getId(), e);
         }
     }
 
@@ -433,7 +435,7 @@ public class RecordedServiceImpl implements RecordedService {
         if (exists) {
             lectureLikeRepository.deleteByLectureAndUser(lecture, user);
             lecture.decrementLikeCount();
-//            log.info("강의 {}의 좋아요가 사용자 {}에 의해 취소됨", recordedId, userId);
+            log.info("강의 {}의 좋아요가 사용자 {}에 의해 취소됨", recordedId, userId);
             return false;
         } else {
             RecordedLectureLike like = new RecordedLectureLike();
@@ -441,7 +443,7 @@ public class RecordedServiceImpl implements RecordedService {
             like.setUser(user);
             lectureLikeRepository.save(like);
             lecture.incrementLikeCount();
-//            log.info("강의 {}의 좋아요가 사용자 {}에 의해 추가됨", recordedId, userId);
+            log.info("강의 {}의 좋아요가 사용자 {}에 의해 추가됨", recordedId, userId);
             return true;
         }
     }

@@ -1,9 +1,9 @@
 package com.yoga.backend.members.service;
 
-import com.yoga.backend.common.service.S3Service;
 import com.yoga.backend.common.entity.Hashtag;
 import com.yoga.backend.common.entity.TempAuthInfo;
 import com.yoga.backend.common.entity.Users;
+import com.yoga.backend.common.service.S3Service;
 import com.yoga.backend.members.dto.RegisterDto;
 import com.yoga.backend.members.dto.UpdateDto;
 import com.yoga.backend.members.repository.HashtagRepository;
@@ -21,9 +21,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,8 +68,9 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public Users registerUser(RegisterDto registerDto) {
-        String hashPwd = passwordEncoder.encode(registerDto.getPassword());
+        log.info("사용자 등록 시작: 이메일 {}", registerDto.getEmail());
 
+        String hashPwd = passwordEncoder.encode(registerDto.getPassword());
         Users user = new Users();
         user.setEmail(registerDto.getEmail());
         user.setPwd(hashPwd);
@@ -77,7 +78,9 @@ public class UsersServiceImpl implements UsersService {
         user.setIsDeleted(false);
         user.setRole(registerDto.isTeacher() ? "TEACHER" : "STUDENT");
 
-        return usersRepository.save(user);
+        Users savedUser = usersRepository.save(user);
+        log.info("사용자 등록 완료: 사용자 ID {}", savedUser.getId());
+        return savedUser;
     }
 
     /**
@@ -88,19 +91,20 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void recoverAccount(Users user) {
+        log.info("계정 복구 시작: 사용자 ID {}", user.getId());
         if (user == null) {
-            throw new IllegalArgumentException("User cannot be null");
+            throw new IllegalArgumentException("User는 null이 될 수 없습니다.");
         }
 
         Users managedUser = usersRepository.findById(user.getId())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new RuntimeException("User를 찾을 수 없습니다."));
 
         managedUser.setDeletedAt(null);
         managedUser.setIsDeleted(false);
 
         usersRepository.save(managedUser);
 
-//        log.info("사용자 계정 복구 성공. 사용자 ID: {}, 이메일: {}", managedUser.getId(), managedUser.getEmail());
+        log.info("사용자 계정 복구 성공. 사용자 ID: {}, 이메일: {}", managedUser.getId(), managedUser.getEmail());
     }
 
     /**
@@ -168,6 +172,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public String sendEmailVerificationToken(String email) {
+        log.info("이메일 인증 토큰 전송 시작: {}", email);
         if (checkUser(email)) {
             try {
                 String token = generateToken();
@@ -189,6 +194,8 @@ public class UsersServiceImpl implements UsersService {
 
                 sendSimpleMessage(email, "Yoga Navi 회원가입 인증번호",
                     "회원가입 인증번호 : " + token + "\n이 인증번호는 5분 동안 유효합니다.");
+
+                log.info("이메일 인증 토큰 전송 완료: {}", email);
 
                 return "인증 번호 전송";
             } catch (Exception e) {
@@ -324,7 +331,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public Users updateUser(UpdateDto updateDto, int userId) {
-//        log.info("사용자 {}의 정보 변경", userId);
+        log.info("사용자 정보 업데이트 시작: 사용자 ID {}", userId);
 
         Optional<Users> users = usersRepository.findById(userId);
 
@@ -383,7 +390,7 @@ public class UsersServiceImpl implements UsersService {
             }
 
             Users updatedUser = usersRepository.save(user);
-            log.info("사용자 {}의 정보 수정", userId);
+            log.info("사용자 정보 업데이트 완료: 사용자 ID {}", userId);
             return updatedUser;
         }
 
@@ -455,6 +462,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void requestDeleteUser(int userId) {
+        log.info("사용자 삭제 요청: 사용자 ID {}", userId);
         Users user = usersRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
@@ -463,12 +471,13 @@ public class UsersServiceImpl implements UsersService {
 
         user.setDeletedAt(deletionTimeKorea.toInstant());
         usersRepository.save(user);
-//        log.info("사용자 {} 삭제 예정: {}", userId, deletionTimeKorea);
+        log.info("사용자 {} 삭제 예정: {}", userId, deletionTimeKorea);
     }
 
     @Override
     @Transactional
     public void processDeletedUsers() {
+        log.info("삭제 예정 사용자 처리 시작");
         ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE_ID);
 
         List<Users> usersToDelete = usersRepository.findByDeletedAtBeforeAndIsDeletedFalse(
@@ -477,9 +486,10 @@ public class UsersServiceImpl implements UsersService {
             try {
                 userDeletionService.processDeletedUser(user);
             } catch (Exception e) {
-//                log.error("사용자 {} 삭제중 에러 발생: {}", user.getId(), e);
+                log.error("사용자 {} 삭제중 에러 발생: {}", user.getId(), e.getMessage());
             }
         }
+        log.info("삭제 예정 사용자 처리 완료: 처리된 사용자 수 {}", usersToDelete.size());
     }
 
     @Override

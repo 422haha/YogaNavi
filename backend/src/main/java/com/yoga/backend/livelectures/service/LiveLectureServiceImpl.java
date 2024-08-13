@@ -13,10 +13,12 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 public class LiveLectureServiceImpl implements LiveLectureService {
 
@@ -44,6 +46,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public LiveLectureCreateResponseDto createLiveLecture(
         LiveLectureCreateDto liveLectureCreateDto) {
+        log.info("라이브 강의 생성 시작: 사용자 ID {}", liveLectureCreateDto.getUserId());
 
         LiveLectures liveLecture = new LiveLectures();
         liveLecture.setLiveTitle(liveLectureCreateDto.getLiveTitle());
@@ -64,6 +67,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
                 liveLecture.setUser(user);
 
                 LiveLectures savedLiveLecture = liveLecturesRepository.save(liveLecture);
+                log.info("라이브 강의 저장 완료: 강의 ID {}", savedLiveLecture.getLiveId());
                 notificationService.handleLectureUpdate(savedLiveLecture);
 
                 LiveLectureCreateResponseDto responseDto = new LiveLectureCreateResponseDto();
@@ -88,7 +92,10 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     @Override
     @Transactional(readOnly = true)
     public List<LiveLectures> getLiveLecturesByUserId(int userId) {
-        return liveLecturesRepository.findByUserId(userId);
+        log.info("사용자의 라이브 강의 목록 조회 시작: 사용자 ID {}", userId);
+        List<LiveLectures> lectures = liveLecturesRepository.findByUserId(userId);
+        log.info("사용자의 라이브 강의 목록 조회 완료: 사용자 ID {}, 조회된 강의 수 {}", userId, lectures.size());
+        return lectures;
     }
 
     /**
@@ -99,6 +106,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void updateLiveLecture(LiveLectureCreateDto liveLectureCreateDto) {
+        log.info("라이브 강의 수정 시작: 강의 ID {}", liveLectureCreateDto.getLiveId());
 
         LiveLectures liveLecture = liveLecturesRepository.findById(liveLectureCreateDto.getLiveId())
             .orElseThrow(() -> new IllegalArgumentException("Invalid lecture ID"));
@@ -129,6 +137,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
         }
 
         LiveLectures updatedLecture = liveLecturesRepository.save(liveLecture);
+        log.info("라이브 강의 수정 완료: 강의 ID {}", updatedLecture.getLiveId());
         notificationService.handleLectureUpdate(updatedLecture);
 
         notificationService.sendLectureUpdateNotification(updatedLecture);
@@ -144,6 +153,7 @@ public class LiveLectureServiceImpl implements LiveLectureService {
     @Override
     @Transactional(readOnly = true)
     public LiveLectures getLiveLectureById(Long liveId) {
+        log.info("단일 라이브 강의 조회: 강의 ID {}", liveId);
         return liveLecturesRepository.findById(liveId).orElse(null);
     }
 
@@ -188,21 +198,5 @@ public class LiveLectureServiceImpl implements LiveLectureService {
         }
     }
 
-    /**
-     * 실시간 강의의 OnAir 상태를 업데이트
-     *
-     * @param liveId 업데이트할 강의의 ID
-     * @param isOnAir 강의가 OnAir 상태인지 여부
-     */
-    @Override
-    public void updateIsOnAir(Long liveId, boolean isOnAir) {
-        // liveId로 강의를 검색하고, 존재하지 않으면 예외를 발생
-        LiveLectures lecture = liveLecturesRepository.findById(liveId)
-            .orElseThrow(() -> new IllegalArgumentException("Invalid liveId: " + liveId));
-
-        // OnAir 상태 설절하고 저장
-        lecture.setIsOnAir(isOnAir);
-        liveLecturesRepository.save(lecture);
-    }
 }
 

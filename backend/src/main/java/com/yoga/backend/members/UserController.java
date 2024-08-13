@@ -40,6 +40,8 @@ public class UserController {
      */
     @PostMapping("/members/register")
     public ResponseEntity<Map<String, Object>> registerUser(@RequestBody RegisterDto registerDto) {
+        log.info("회원 가입 요청: 이메일 {}", registerDto.getEmail());
+
         Map<String, Object> response = new HashMap<>();
         boolean check = usersService.checkNickname(registerDto.getNickname());
         if (check) {
@@ -52,7 +54,7 @@ public class UserController {
                     return ResponseEntity.status(HttpStatus.CREATED).body(response);
                 }
             } catch (Exception ex) {
-                log.info("회원가입 불가={}", ex.getMessage());
+                log.info("회원가입 불가 {}", ex.getMessage());
                 response.put("message", "회원가입 불가" + ex.getMessage());
                 response.put("data", new Object[]{});
 
@@ -80,6 +82,8 @@ public class UserController {
     @PostMapping("/members/register/email")
     public ResponseEntity<Map<String, Object>> registerUserEmail(
         @RequestBody RegisterDto registerDto) {
+        log.info("회원가입 이메일 인증 요청: 이메일 {}", registerDto.getEmail());
+
         Map<String, Object> response = new HashMap<>();
         String result = usersService.sendEmailVerificationToken(registerDto.getEmail());
         response.put("message", result);
@@ -174,6 +178,8 @@ public class UserController {
     @GetMapping("/mypage/info")
     public ResponseEntity<Map<String, Object>> getMyInfo(
         @RequestHeader("Authorization") String token) {
+        log.info("사용자 정보 조회 요청");
+
         Map<String, Object> response = new HashMap<>();
         try {
             int userId = jwtUtil.getUserIdFromToken(token);
@@ -221,7 +227,6 @@ public class UserController {
         Map<String, Object> response = new HashMap<>();
 
         int userId = jwtUtil.getUserIdFromToken(token);
-
         boolean result = usersService.checkPwd(userId,
             updateDto.getPassword());
         if (result) {
@@ -244,10 +249,13 @@ public class UserController {
     @PostMapping("/mypage/update")
     public ResponseEntity<Map<String, Object>> updateUserInfo(
         @RequestHeader("Authorization") String token, @RequestBody UpdateDto updateDto) {
+
         Map<String, Object> response = new HashMap<>();
         try {
             int userId = jwtUtil.getUserIdFromToken(token);
             Users user = usersService.updateUser(updateDto, userId);
+
+            log.info("사용자 정보 수정 요청 :  사용자 {}", userId);
             if (user != null) {
                 UpdateDto responseDto = new UpdateDto();
                 boolean isTeacher = jwtUtil.getRoleFromToken(token).equals("TEACHER");
@@ -286,9 +294,10 @@ public class UserController {
     @PostMapping("/mylogout")
     public ResponseEntity<Map<String, Object>> logout(
         @RequestHeader("Authorization") String token) {
+        log.info("로그아웃 요청 : 사용자 {}", jwtUtil.getUserIdFromToken(token));
+
         Map<String, Object> response = new HashMap<>();
         try {
-            log.info("로그아웃 요청");
             boolean logoutSuccess = jwtUtil.logout(token);
             if (logoutSuccess) {
                 log.info("로그아웃 성공");
@@ -321,6 +330,7 @@ public class UserController {
         Map<String, Object> response = new HashMap<>();
         try {
             int userId = jwtUtil.getUserIdFromToken(token);
+            log.info("회원 탈퇴 요청 :  사용자 {}", userId);
             usersService.requestDeleteUser(userId);
             jwtUtil.logout(token);  // 회원 탈퇴 시 로그아웃 처리
             response.put("message",

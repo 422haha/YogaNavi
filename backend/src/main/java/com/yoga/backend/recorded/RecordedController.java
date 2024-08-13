@@ -37,17 +37,26 @@ public class RecordedController {
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
         int userId = jwtUtil.getUserIdFromToken(token);
-        log.info("사용자 ID: {}", userId);
-        List<LectureDto> lectureList = recordedService.getMyLectures(userId);
+        log.info("사용자 ID: {}의 녹화 강의 목록 조회 요청", userId);
+        try {
+            List<LectureDto> lectureList = recordedService.getMyLectures(userId);
 
-        if (!lectureList.isEmpty()) {
-            response.put("message", "녹화강의 조회 성공");
-            response.put("data", lectureList);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } else {
-            response.put("message", "녹화강의 없음");
+            if (!lectureList.isEmpty()) {
+                log.info("사용자 ID: {}의 녹화 강의 {}개 조회 성공", userId, lectureList.size());
+                response.put("message", "녹화강의 조회 성공");
+                response.put("data", lectureList);
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            } else {
+                log.info("사용자 ID: {}의 녹화 강의 없음", userId);
+                response.put("message", "녹화강의 없음");
+                response.put("data", new Object[]{});
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            log.info("사용자 ID: {}의 녹화 강의 조회 실패", userId);
+            response.put("message", "녹화강의 조회 실패");
             response.put("data", new Object[]{});
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
@@ -61,19 +70,24 @@ public class RecordedController {
     public ResponseEntity<Map<String, Object>> getLikeLectures(
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
-        int userId = jwtUtil.getUserIdFromToken(token);
-        List<LectureDto> lectureList = recordedService.getLikeLectures(userId);
+        try {
+            int userId = jwtUtil.getUserIdFromToken(token);
+            List<LectureDto> lectureList = recordedService.getLikeLectures(userId);
 
-        if (!lectureList.isEmpty()) {
-            response.put("message", "녹화강의 조회 성공");
-            response.put("data", lectureList);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } else {
-            response.put("message", "녹화강의 없음");
+            if (!lectureList.isEmpty()) {
+                response.put("message", "좋아요한 녹화강의 조회 성공");
+                response.put("data", lectureList);
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            } else {
+                response.put("message", "녹화강의 없음");
+                response.put("data", new Object[]{});
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            response.put("message", "좋아요한 녹화강의 조회 실패");
             response.put("data", new Object[]{});
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-
     }
 
     /**
@@ -90,12 +104,17 @@ public class RecordedController {
         Map<String, Object> response = new HashMap<>();
         try {
             int userId = jwtUtil.getUserIdFromToken(token);
+            log.info("사용자 ID: {}의 녹화 강의 생성 요청", userId);
+
             lectureDto.setUserId(userId);
             recordedService.saveLecture(lectureDto);
+            log.info("사용자 ID: {}의 녹화 강의 생성 성공", userId);
+
             response.put("message", "강의가 성공적으로 생성되었습니다.");
             response.put("data", true);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
+            log.error("사용자 ID: {}의 녹화 강의 생성 실패: {}", lectureDto.getUserId(), e.getMessage());
             response.put("message", "강의 생성 실패: " + e.getMessage());
             response.put("data", false);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -142,11 +161,9 @@ public class RecordedController {
         Map<String, Object> response = new HashMap<>();
         lectureDto.setRecordedId(recordedId);
 
-        log.info("강의 수정 ID: {}", recordedId);
-        log.debug("LectureDto: {}", lectureDto);
-
         try {
             int userId = jwtUtil.getUserIdFromToken(token);
+            log.info("강의 수정 요청: 강의 ID {}, 사용자 ID {}", recordedId, userId);
             lectureDto.setUserId(userId);
             boolean updateResult = recordedService.updateLecture(lectureDto);
 
@@ -181,14 +198,10 @@ public class RecordedController {
         @RequestHeader("Authorization") String token,
         @RequestBody DeleteDto deleteDto) {
 
-        for (Long l : deleteDto.getLectureIds()) {
-            log.debug("삭제할 강의 ID: {}", l); // 삭제할 강의 ID를 로그에 기록
-        }
-
         Map<String, Object> response = new HashMap<>();
         try {
             int userId = jwtUtil.getUserIdFromToken(token);
-            log.info("사용자 {}가 강의 삭제 시도: {}", userId, deleteDto);
+            log.info("사용자 {}의 강의 삭제 요청: {}", userId, deleteDto.getLectureIds());
 
             recordedService.deleteLectures(deleteDto, userId);
 

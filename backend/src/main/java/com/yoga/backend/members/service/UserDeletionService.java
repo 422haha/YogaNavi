@@ -19,12 +19,15 @@ public class UserDeletionService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void processDeletedUser(Users user) {
+        log.info("사용자 삭제 처리 시작: 사용자 ID {}", user.getId());
         user.setIsDeleted(true);
         anonymizeUserData(user);
         usersRepository.save(user);
+        log.info("사용자 삭제 처리 완료: 사용자 ID {}", user.getId());
     }
 
     private void anonymizeUserData(Users user) {
+        log.debug("사용자 데이터 익명화 시작: 사용자 ID {}", user.getId());
         user.setEmail("deleted_" + user.getId() + "@yoganavi.com");
         user.setNickname("삭제된 사용자" + user.getId());
         user.setProfile_image_url(null);

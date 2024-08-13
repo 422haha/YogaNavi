@@ -44,11 +44,11 @@ public class RecordedLecture {
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdDate; // redis, spring scheduler를 사용하지 않으므로 LocalDateTime
+    private LocalDateTime createdDate = LocalDateTime.now(); // 기본값 설정
 
     @LastModifiedDate
     @Column(name = "last_modified_at", nullable = false)
-    private LocalDateTime lastModifiedDate;
+    private LocalDateTime lastModifiedDate = LocalDateTime.now(); // 기본값 설정
 
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<RecordedLectureLike> likes = new ArrayList<>();
@@ -136,27 +136,18 @@ public class RecordedLecture {
         this.likeCount = likeCount;
     }
 
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
+    @PrePersist
+    public void prePersist() {
+        if (this.createdDate == null) {
+            this.createdDate = LocalDateTime.now();
+        }
+        if (this.lastModifiedDate == null) {
+            this.lastModifiedDate = LocalDateTime.now();
+        }
     }
 
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public LocalDateTime getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public Long getCreatedDateAsLong() {
-        return createdDate.toEpochSecond(ZoneOffset.UTC) * 1000;
-    }
-
-    public Long getLastModifiedDateAsLong() {
-        return lastModifiedDate.toEpochSecond(ZoneOffset.UTC) * 1000;
+    @PreUpdate
+    public void preUpdate() {
+        this.lastModifiedDate = LocalDateTime.now();
     }
 }

@@ -64,7 +64,8 @@ public class HomeServiceImpl implements HomeService {
             return Collections.emptyList();
         }
         int end = Math.min((start + size), sortedResult.size());
-        log.info("사용자 ID: {}, 페이지: {}, 크기: {} - 데이터 부분 집합 반환: {} ~ {}", userId, page, size, start, end);
+        log.info("사용자 ID: {}, 페이지: {}, 크기: {} - 데이터 부분 집합 반환: {} ~ {}", userId, page, size, start,
+            end);
         return sortedResult.subList(start, end);
     }
 
@@ -73,6 +74,7 @@ public class HomeServiceImpl implements HomeService {
      */
     @Transactional(readOnly = true)
     protected List<HomeResponseDto> getStudentLectures(int userId, ZonedDateTime nowKorea) {
+        log.debug("학생 강의 조회 시작: 사용자 ID {}", userId);
         LocalDate currentDate = nowKorea.toLocalDate();
         List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findCurrentMyLectures(
             userId, currentDate);
@@ -89,6 +91,7 @@ public class HomeServiceImpl implements HomeService {
                 result.add(dto);
             }
         }
+        log.debug("학생 강의 변환 완료: 사용자 ID {}, 강의 수 {}", userId, result.size());
         return result;
     }
 
@@ -97,6 +100,7 @@ public class HomeServiceImpl implements HomeService {
      */
     @Transactional(readOnly = true)
     protected List<HomeResponseDto> getUserLectures(int userId, ZonedDateTime nowKorea) {
+        log.debug("강사 강의 조회 시작: 사용자 ID {}", userId);
         LocalDate currentDate = nowKorea.toLocalDate();
         List<LiveLectures> lectures = liveLectureRepository.findLecturesByUserAndDateRange(userId,
             currentDate);
@@ -113,6 +117,7 @@ public class HomeServiceImpl implements HomeService {
                 result.add(dto);
             }
         }
+        log.debug("강사 강의 변환 완료: 사용자 ID {}, 강의 수 {}", userId, result.size());
         return result;
     }
 
@@ -135,7 +140,6 @@ public class HomeServiceImpl implements HomeService {
             endDate = lecture.getEndDate().atZone(ZoneOffset.UTC)
                 .withZoneSameInstant(KOREA_ZONE).toLocalDate();
         }
-
 
         LocalTime startTime = ZonedDateTime.ofInstant(lecture.getStartTime(), ZoneId.of("UTC"))
             .toLocalTime();

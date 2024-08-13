@@ -16,12 +16,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 수강 내역
  */
+@Slf4j
 @Service
 public class HistoryServiceImpl implements HistoryService {
 
@@ -49,6 +51,8 @@ public class HistoryServiceImpl implements HistoryService {
     @Override
     @Transactional(readOnly = true)
     public List<LectureHistoryDto> getHistory(int userId) {
+        log.info("사용자 강의 이력 조회 시작: 사용자 ID {}", userId);
+
         ZonedDateTime nowKorea = ZonedDateTime.now(KOREA_ZONE);
 
         List<LectureHistoryDto> result = new ArrayList<>();
@@ -56,7 +60,9 @@ public class HistoryServiceImpl implements HistoryService {
         result.addAll(getPastUserLectures(userId, nowKorea));
         result.addAll(getPastStudentLectures(userId, nowKorea));
 
-        return sortHistoryData(result);
+        List<LectureHistoryDto> sortedResult = sortHistoryData(result);
+        log.info("사용자 강의 이력 조회 완료: 사용자 ID {}, 총 강의 수 {}", userId, sortedResult.size());
+        return sortedResult;
     }
 
     /**
@@ -64,6 +70,8 @@ public class HistoryServiceImpl implements HistoryService {
      */
     @Transactional(readOnly = true)
     public List<LectureHistoryDto> getPastStudentLectures(int userId, ZonedDateTime nowKorea) {
+        log.info("학생의 과거 수강 이력 조회 시작: 사용자 ID {}", userId);
+
         LocalDate currentDate = nowKorea.toLocalDate();
 
         List<MyLiveLecture> myLiveLectures = myLiveLectureRepository.findPastAndOngoingLecturesByUserId(
@@ -85,6 +93,7 @@ public class HistoryServiceImpl implements HistoryService {
             }
         }
 
+        log.info("학생의 과거 수강 이력 조회 완료: 사용자 ID {}, 강의 수 {}", userId, result.size());
         return result;
     }
 
@@ -93,6 +102,8 @@ public class HistoryServiceImpl implements HistoryService {
      */
     @Transactional(readOnly = true)
     public List<LectureHistoryDto> getPastUserLectures(int userId, ZonedDateTime nowKorea) {
+        log.info("강사의 강의 이력 조회 시작: 사용자 ID {}", userId);
+
         LocalDate currentDate = nowKorea.toLocalDate();
 
         List<LiveLectures> lectures = liveLectureRepository.findPastAndOngoingLecturesByUser(userId,
@@ -115,6 +126,7 @@ public class HistoryServiceImpl implements HistoryService {
             }
         }
 
+        log.info("강사의 강의 이력 조회 완료: 사용자 ID {}, 강의 수 {}", userId, result.size());
         return result;
     }
 
