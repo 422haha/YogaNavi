@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/padding_medium">
+
+    <!-- 3, 3-1, 3-3, 5-1 -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/iv_profile"
+        android:layout_width="84dp"
+        android:layout_height="84dp"
+        android:background="@color/gray_10"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/Circle" />
+
+    <TextView
+        android:id="@+id/tv_teacher_nickname"
+        style="@style/SingleLineText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_large"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/tv_hashtag"
+        app:layout_constraintEnd_toStartOf="@id/cv_favorite"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/iv_profile"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="요구르드" />
+
+    <TextView
+        android:id="@+id/tv_hashtag"
+        style="@style/SingleLineText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/tv_teacher_nickname"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@id/tv_teacher_nickname"
+        app:layout_constraintTop_toBottomOf="@+id/tv_teacher_nickname"
+        tools:text="#힐링 요가 #요가 마스터 #유연성" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cv_favorite"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="@dimen/padding_small"
+        app:layout_constraintBottom_toTopOf="@id/tv_count"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/iv_favorite"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/favorite" />
+
+        <ImageView
+            android:id="@+id/iv_favorite_color"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/favorite_color" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/tv_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLength="4"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/cv_favorite"
+        app:layout_constraintStart_toStartOf="@id/cv_favorite"
+        app:layout_constraintTop_toBottomOf="@id/cv_favorite"
+        tools:text="0" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
