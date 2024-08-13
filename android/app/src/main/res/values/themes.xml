@@ -1,0 +1,17 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.YogaNavi" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorSurfaceContainer">@color/surface_container</item>
+        <item name="colorSecondaryContainer">@color/second_primary</item>
+        <item name="android:windowBackground">@color/white</item>
+    </style>
+
+    <style name="Theme.YogaNavi" parent="Base.Theme.YogaNavi" />
+    
+    <style name="Circle">
+        <item name="cornerSize">50%</item>
+    </style>
+</resources>
