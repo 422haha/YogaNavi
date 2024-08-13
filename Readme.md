@@ -593,6 +593,5 @@
 - [S3 Presigned URL과 비동기 처리](https://aluminum-timpani-a63.notion.site/S3-Presigned-URL-86196204428742c38dbb7c2280d80881?pvs=4)
 
 - [Pagination 성능 개선](https://aluminum-timpani-a63.notion.site/68053f4bf4334e4495ca7ad3a468e9ed?pvs=4)
-- [Pagination 응답 성능 개선](https://aluminum-timpani-a63.notion.site/68053f4bf4334e4495ca7ad3a468e9ed?pvs=4)
 
 - [Recycler View + Nested ScrollView의 비효율성](https://aluminum-timpani-a63.notion.site/Nested-ScrollView-Recycler-View-7963951e4d594a5e8e49181d0d7963df?pvs=4)
