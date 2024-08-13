@@ -7,6 +7,7 @@ import com.yoga.backend.livelectures.service.HomeService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/home")
 public class HomeController {
@@ -68,25 +69,31 @@ public class HomeController {
     @PutMapping("/update")
     public ResponseEntity<Map<String, Object>> updateLiveStatus(
         @RequestBody SetIsOnAirDto setIsOnAirDto) {
-
+        log.info("라이브 상태 업데이트 요청: 강의 ID {}, 상태 {}", setIsOnAirDto.getLiveId(),
+            setIsOnAirDto.getOnAir());
         Map<String, Object> response = new HashMap<>();
         try {
             boolean result = homeService.updateLiveState(setIsOnAirDto.getLiveId(),
                 setIsOnAirDto.getOnAir());
             if (result) {
+                log.info("라이브 상태 업데이트 성공: 강의 ID {}", setIsOnAirDto.getLiveId());
                 response.put("message", "success");
                 response.put("data", new Object[]{});
                 return ResponseEntity.status(HttpStatus.OK).body(response);
             } else {
+                log.warn("라이브 상태 업데이트 실패: 강의 ID {}", setIsOnAirDto.getLiveId());
                 response.put("message", "fail");
                 response.put("data", new Object[]{});
                 return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(response);
             }
         } catch (NullPointerException e) {
+            log.error("라이브 상태 업데이트 실패 (강의를 찾지 못함): 강의 ID {}", setIsOnAirDto.getLiveId());
             response.put("message", "fail");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } catch (Exception e) {
+            log.error("라이브 상태 업데이트 중 오류 발생: 강의 ID {}, 오류 메시지: {}", setIsOnAirDto.getLiveId(),
+                e.getMessage());
             response.put("message", "fail");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

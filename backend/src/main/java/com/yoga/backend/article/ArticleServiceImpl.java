@@ -4,6 +4,7 @@ import com.yoga.backend.common.entity.Article;
 import com.yoga.backend.common.entity.Users;
 import com.yoga.backend.common.service.S3Service;
 import com.yoga.backend.members.repository.UsersRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 /**
  * 게시글(공지사항) 서비스 구현 클래스
  */
+@Slf4j
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
@@ -51,6 +53,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional
     public ArticleDto saveArticle(int userId, ArticleDto articleDto) {
+        log.info("게시글 저장 시작: 사용자 ID {}", userId);
         Optional<Users> optionalUser = usersRepository.findById(userId);
         if (optionalUser.isPresent()) {
             Users user = optionalUser.get();
@@ -63,8 +66,10 @@ public class ArticleServiceImpl implements ArticleService {
             article.setUpdatedAt(LocalDateTime.now());
 
             Article savedArticle = articleRepository.save(article);
+            log.info("게시글 저장 완료: 게시글 ID {}", savedArticle.getArticleId());
             return convertArticleToDto(savedArticle);
         }
+        log.error("게시글 저장 실패: 유효하지 않은 사용자 ID {}", userId);
         throw new RuntimeException("유효하지 않은 사용자 ID입니다.");
     }
 
@@ -108,11 +113,16 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ArticleDto updateArticle(int userId, Long articleId, ArticleDto articleDto) {
+        log.info("게시글 수정 시작: 게시글 ID {}, 사용자 ID {}", articleId, userId);
         try {
             Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다. ID: " + articleId));
+                .orElseThrow(() -> {
+                    log.error("게시글을 찾을 수 없음: 게시글 ID {}", articleId);
+                    return new RuntimeException("게시글을 찾을 수 없습니다. ID: " + articleId);
+                });
 
             if (article.getUser().getId() != userId) {
+                log.error("게시글 수정 권한 없음: 게시글 ID {}, 시도한 사용자 ID {}", articleId, userId);
                 throw new RuntimeException("권한이 없습니다.");
             }
 
@@ -137,10 +147,13 @@ public class ArticleServiceImpl implements ArticleService {
             }
 
             Article updatedArticle = articleRepository.save(article);
+            log.info("게시글 수정 완료: 게시글 ID {}", articleId);
             return convertArticleToDto(updatedArticle);
         } catch (OptimisticLockingFailureException e) {
+            log.error("게시글 수정 중 충돌 발생: 게시글 ID {}", articleId);
             throw new RuntimeException("게시글 업데이트 중 충돌이 발생했습니다. 다시 시도해 주세요.", e);
         } catch (Exception e) {
+            log.error("게시글 수정 중 오류 발생: 게시글 ID {}, 오류 메시지 {}", articleId, e.getMessage());
             throw new RuntimeException("게시글 업데이트 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
     }

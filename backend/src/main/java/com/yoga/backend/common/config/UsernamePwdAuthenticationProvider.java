@@ -56,6 +56,7 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
             Users user = userOpt.get();
 
             if (user.getIsDeleted()) {
+                log.warn("삭제된 계정으로 로그인 시도: {}", username);
                 throw new BadCredentialsException("계정이 삭제되었습니다.");
             }
 
@@ -67,20 +68,24 @@ public class UsernamePwdAuthenticationProvider implements AuthenticationProvider
 
                     user = usersRepository.findById(user.getId())
                         .orElseThrow(() -> new RuntimeException("User not found after recovery"));
-                    // 로그 추가
-//                    log.info("사용자 계정이 복구됨. 사용자 email: {}", user.getEmail());
+
+                    log.info("사용자 계정이 복구됨. 사용자 email: {}", user.getEmail());
                 } else {
+                    log.warn("탈퇴 진행 중인 계정 비밀번호 불일치: {}", username);
                     throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
                 }
             }
 
             if (passwordEncoder.matches(pwd, user.getPwd())) {
+                log.info("사용자 인증 성공: {}", username);
                 return new UsernamePasswordAuthenticationToken(username, pwd,
                     getGrantedAuthorities(user.getRole()));
             } else {
+                log.warn("비밀번호 불일치: {}", username);
                 throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
             }
         } else {
+            log.warn("존재하지 않는 사용자로 로그인 시도: {}", username);
             throw new BadCredentialsException("사용자가 존재하지 않습니다.");
         }
     }

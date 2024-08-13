@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 실시간 강의 컨트롤러.
  */
+@Slf4j
 @RestController
 @RequestMapping("/mypage/live-lecture-manage")
 public class LiveLectureController {
@@ -53,6 +55,8 @@ public class LiveLectureController {
         int userId = jwtUtil.getUserIdFromToken(token);
         liveLectureCreateDto.setUserId(userId);
 
+        log.info("라이브 강의 생성 요청: 사용자 ID {}", userId);
+
         String userRole = usersRepository.findById(liveLectureCreateDto.getUserId())
             .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.")).getRole();
 
@@ -65,6 +69,7 @@ public class LiveLectureController {
 
         LiveLectureCreateResponseDto responseDto = liveLectureService.createLiveLecture(
             liveLectureCreateDto);
+        log.info("라이브 강의 생성 완료: 사용자 ID {}", userId);
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", responseDto.getMessage());
@@ -78,6 +83,7 @@ public class LiveLectureController {
         String token = request.getHeader("Authorization");
         Map<String, Object> response = new HashMap<>();
         int userId = jwtUtil.getUserIdFromToken(token);
+        log.info("라이브 강의 목록 조회 요청: 사용자 ID {}", userId);
 
         List<LiveLectures> lectureList = liveLectureService.getLiveLecturesByUserId(userId);
 
@@ -88,6 +94,7 @@ public class LiveLectureController {
         response.put("message", "화상 강의 조회 성공");
         response.put("data", responseList);
 
+        log.info("라이브 강의 목록 조회 완료: 사용자 ID {}, 조회된 강의 수 {}", userId, responseList.size());
         return ResponseEntity.ok(response);
     }
 
@@ -97,21 +104,27 @@ public class LiveLectureController {
         @RequestBody @Valid LiveLectureCreateDto liveLectureCreateDto,
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
+        int userId = jwtUtil.getUserIdFromToken(token);
+        log.info("라이브 강의 수정 요청: 강의 ID {}, 사용자 ID {}", liveId, userId);
+
         try {
-            int userId = jwtUtil.getUserIdFromToken(token);
             liveLectureCreateDto.setLiveId(liveId);
 
             if (!liveLectureService.isLectureOwner(liveId, userId)) {
-                response.put("message", "권한이 없습니다");
+                log.warn("수정 권한이 없습니다. 강의 ID {}, 사용자 ID {}", liveId, userId);
+                response.put("message", "수정 권한이 없습니다");
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
             }
 
             liveLectureService.updateLiveLecture(liveLectureCreateDto);
+            log.info("라이브 강의 수정 완료: 강의 ID {}", liveId);
+
             response.put("message", "화상강의 수정 성공");
             response.put("data", null);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response.put("message", "강의 수정 중 오류가 발생했습니다: " + e.getMessage());
+            log.error("라이브 강의 수정 중 오류 발생: 강의 ID {}, 오류 메시지 {}", liveId, e.getMessage());
+            response.put("message", "강의 수정 중 오류가 발생했습니다: ");
             response.put("data", null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
@@ -122,8 +135,10 @@ public class LiveLectureController {
         @PathVariable("live_id") Long liveId,
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
+        int userId = jwtUtil.getUserIdFromToken(token);
+        log.info("단일 라이브 강의 조회 요청: 강의 ID {}, 사용자 ID {}", liveId, userId);
+
         try {
-            int userId = jwtUtil.getUserIdFromToken(token);
             LiveLectures lecture = liveLectureService.getLiveLectureById(liveId);
 
             if (lecture == null) {
@@ -138,12 +153,14 @@ public class LiveLectureController {
 
             LiveLectureResponseDto dto = convertToDto(lecture);
 
+            log.info("단일 라이브 강의 조회 완료: 강의 ID {}", liveId);
             response.put("message", "조회에 성공했습니다");
             response.put("data", dto);
 
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
-            response.put("message", "강의 조회 중 오류가 발생했습니다: " + e.getMessage());
+            log.error("단일 라이브 강의 조회 중 오류 발생: 강의 ID {}, 오류 메시지 {}", liveId, e.getMessage());
+            response.put("message", "강의 조회 중 오류가 발생했습니다: ");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -153,8 +170,10 @@ public class LiveLectureController {
         @PathVariable("live_id") Long liveId,
         @RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
+        int userId = jwtUtil.getUserIdFromToken(token);
+        log.info("라이브 강의 삭제 요청: 강의 ID {}, 사용자 ID {}", liveId, userId);
+
         try {
-            int userId = jwtUtil.getUserIdFromToken(token);
             LiveLectures lecture = liveLectureService.getLiveLectureById(liveId);
 
             if (lecture == null) {
@@ -170,10 +189,13 @@ public class LiveLectureController {
             }
 
             liveLectureService.deleteLiveLectureById(liveId);
+            log.info("라이브 강의 삭제 완료: 강의 ID {}", liveId);
+
             response.put("message", "강의 삭제 성공");
             response.put("data", null);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            log.error("라이브 강의 삭제 중 오류 발생: 강의 ID {}, 오류 메시지 {}", liveId, e.getMessage());
             response.put("message", "강의 삭제 중 오류가 발생했습니다: " + e.getMessage());
             response.put("data", null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

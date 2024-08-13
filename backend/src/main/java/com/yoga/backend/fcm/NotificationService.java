@@ -57,7 +57,7 @@ public class NotificationService {
         LocalTime lectureStartTime = extractTimeFromInstant(lectureDTO.getStartTime());
         Set<DayOfWeek> availableDays = parseAvailableDays(lectureDTO.getAvailableDay());
 
-        log.info("강의 업데이트 시작 - ID: {}, 제목: {}, 시작일: {}, 종료일: {}, 요일: {}",
+        log.info("강의 업데이트 시작, Redis 캐시의 강의 업데이트 - ID: {}, 제목: {}, 시작일: {}, 종료일: {}, 요일: {}",
             lectureDTO.getLiveId(), lectureDTO.getLiveTitle(), startDate, endDate,
             lectureDTO.getAvailableDay());
 
@@ -76,13 +76,13 @@ public class NotificationService {
                     if (lectures.get(i).getLiveId().equals(lectureDTO.getLiveId())) {
                         lectures.set(i, lectureDTO);
                         found = true;
-                        log.info("기존 강의 업데이트 - 날짜: {}, 강의 ID: {}", date, lectureDTO.getLiveId());
+                        log.info("기존 강의 업데이트, Redis 캐시의 강의 업데이트 - 날짜: {}, 강의 ID: {}", date, lectureDTO.getLiveId());
                         break;
                     }
                 }
                 if (!found) {
                     lectures.add(lectureDTO);
-                    log.info("새 강의 추가 - 날짜: {}, 강의 ID: {}", date, lectureDTO.getLiveId());
+                    log.info("새 강의 추가, Redis 캐시에 강의 추가 - 날짜: {}, 강의 ID: {}", date, lectureDTO.getLiveId());
                 }
 
                 // redis에 강의 정보 저장
@@ -230,9 +230,6 @@ public class NotificationService {
                     LocalDateTime lectureStartDateTime = LocalDateTime.of(lectureDate,
                         lectureStartTime);
 
-//                    log.info("강의 ID: {}, 시작 날짜: {}, 시작 시간: {}, 계산된 시작 일시: {}",
-//                        lecture.getLiveId(), lectureDate, lectureStartTime, lectureStartDateTime);
-
                     return lectureStartDateTime.isAfter(nowKorea) &&
                         lectureStartDateTime.isBefore(tenMinutesLater.plusSeconds(30)) &&
                         lectureStartDateTime.isAfter(tenMinutesLater.minusSeconds(30));
@@ -292,7 +289,7 @@ public class NotificationService {
                 log.info("총 {} 명에게 알림 전송 완료", notifications.size());
             }
         } catch (FirebaseMessagingException e) {
-            log.error("배치 알림 전송 중 오류 발생", e);
+            log.error("알림 전송 중 오류 발생", e);
         }
     }
 
@@ -310,7 +307,7 @@ public class NotificationService {
                 } else if (obj instanceof LiveLectureDto) {
                     return (LiveLectureDto) obj;
                 } else {
-                    throw new IllegalArgumentException("Unknown object type: " + obj.getClass());
+                    throw new IllegalArgumentException("알 수 없는 Object 타입 : " + obj.getClass());
                 }
             })
             .collect(Collectors.toList());

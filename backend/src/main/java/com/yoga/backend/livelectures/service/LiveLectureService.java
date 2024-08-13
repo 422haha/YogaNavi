@@ -19,6 +19,4 @@ public interface LiveLectureService {
 
     void deleteLiveLectureById(Long liveId);
 
-    void updateIsOnAir(Long liveId, boolean isOnAir);
-
 }

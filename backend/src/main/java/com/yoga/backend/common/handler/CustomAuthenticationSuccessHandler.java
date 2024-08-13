@@ -39,6 +39,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         String fcmToken = request.getHeader("FCM-TOKEN");
         String email = authentication.getName();
+        log.info("사용자 인증 성공: {}", email);
+
         String role = authentication.getAuthorities().stream()
             .findFirst()
             .map(a -> a.getAuthority().replace("ROLE_", ""))
@@ -52,6 +54,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             usersRepository.save(user);
         }
 
+        log.info("JWT 토큰 생성 완료: {}", email);
         String accessToken = jwtUtil.generateAccessToken(email, role);
         String refreshToken = jwtUtil.generateRefreshToken(email);
 

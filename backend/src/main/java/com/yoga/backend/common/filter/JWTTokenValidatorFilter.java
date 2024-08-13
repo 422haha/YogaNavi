@@ -48,6 +48,7 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
             jwt = jwtUtil.extractToken(jwt);
             try {
                 JwtUtil.TokenStatus tokenStatus = jwtUtil.isTokenValid(jwt);
+                log.info("토큰 검증 결과: {}", tokenStatus);
                 switch (tokenStatus) {
                     case VALID:
                         String email = jwtUtil.getEmailFromToken(jwt);
@@ -55,34 +56,41 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                         Authentication auth = new UsernamePasswordAuthenticationToken(email, null,
                             AuthorityUtils.createAuthorityList("ROLE_" + role.toUpperCase()));
                         SecurityContextHolder.getContext().setAuthentication(auth);
+                        log.info("유효한 토큰으로 인증 성공: {}", email);
                         filterChain.doFilter(request, response);
                         break;
                     case INVALID:
+                        log.warn("유효하지 않은 토큰 감지");
                         sendUnauthorizedResponse(response, "유효하지 않은 토큰입니다.");
                         break;
                     case NOT_FOUND:
+                        log.warn("세션을 찾을 수 없음");
                         sendUnauthorizedResponse(response, "세션을 찾을 수 없습니다. 다시 로그인해주세요.");
                         break;
                     case EXPIRED:
+                        log.info("만료된 토큰 감지, 리프레시 토큰 처리 시도");
                         if (null == refreshToken) {
+                            log.info("리프레시 토큰 요청");
                             sendUnauthorizedResponse(response, "Refresh-Token-Request");
                         } else {
-                            handleRefreshToken(request, response, filterChain, refreshToken);
+                            log.info("리프레시 토큰 존재. 새로운 토큰 발급");
+                            handleRefreshToken(response, refreshToken);
                         }
                         break;
                 }
 
             } catch (Exception e) {
-//                log.error("액세스 토큰 처리 불가 {}", e);
+                log.error("액세스 토큰 처리 불가 {}", e.getMessage());
                 sendUnauthorizedResponse(response, "액세스 토큰 처리 불가");
             }
         } else {
+            log.debug("토큰 없음, 필터 체인 계속 진행");
             filterChain.doFilter(request, response);
         }
     }
 
-    private void handleRefreshToken(HttpServletRequest request, HttpServletResponse response,
-        FilterChain filterChain, String refreshToken) throws IOException, ServletException {
+    private void handleRefreshToken(HttpServletResponse response, String refreshToken)
+        throws IOException {
         if (refreshToken != null) {
             try {
                 Claims refreshClaims = jwtUtil.validateToken(refreshToken);
@@ -97,6 +105,7 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
 
                     String newAccessToken = jwtUtil.generateAccessToken(email, role);
 
+                    log.info("리프레시 토큰으로 새 액세스 토큰 생성 성공: {}", email);
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     response.setHeader(SecurityConstants.JWT_HEADER, newAccessToken);
                     response.getWriter().flush();
@@ -105,11 +114,14 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                 }
 
             } catch (ExpiredJwtException e) {
+                log.warn("만료된 리프레시 토큰 감지: {}", e.getMessage());
                 sendRefreshTokenExpired(response, "리프레시 토큰 만료. 재로그인 필요");
             } catch (JwtException e) {
+                log.error("리프레시 토큰 처리 중 예외 발생: {}", e.getMessage());
                 sendUnauthorizedResponse(response, "리프레시 토큰 처리 실패");
             }
         } else {
+            log.warn("리프레시 토큰 없음");
             sendUnauthorizedResponse(response, "리프레시 토큰 없음");
         }
     }

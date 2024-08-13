@@ -1,6 +1,7 @@
 package com.yoga.backend.article;
 
 import com.yoga.backend.common.util.JwtUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import java.util.*;
 /**
  * 게시글(공지사항) 관련 요청을 처리하는 컨트롤러
  */
+@Slf4j
 @RestController
 @RequestMapping("/mypage/notification")
 public class ArticleController {
@@ -33,14 +35,17 @@ public class ArticleController {
     @PostMapping("/write")
     public ResponseEntity<Map<String, Object>> saveArticle(
         @RequestHeader("Authorization") String token, @RequestBody ArticleDto articleDto) {
+        log.info("게시글 저장 시도");
         Map<String, Object> response = new HashMap<>();
         try {
             int userId = jwtUtil.getUserIdFromToken(token);
             ArticleDto saveArticle = articleService.saveArticle(userId, articleDto);
+            log.info("게시글 저장 성공: 사용자 ID {}", userId);
             response.put("message", "게시글 작성 성공");
             response.put("data", saveArticle);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
+            log.error("게시글 저장 중 오류 발생: {}", e.getMessage());
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -56,14 +61,17 @@ public class ArticleController {
     @GetMapping("/list")
     public ResponseEntity<Map<String, Object>> getArticlesByUserId(
         @RequestHeader("Authorization") String token) {
+        log.info("사용자 게시글 목록 조회 시도");
         Map<String, Object> response = new HashMap<>();
         try {
             int userId = jwtUtil.getUserIdFromToken(token);
             List<ArticleDto> articleDtos = articleService.getArticlesByUserId(userId);
+            log.info("게시글 목록 조회 성공: 사용자 ID {}, 게시글 수 {}", userId, articleDtos.size());
             response.put("message", "success");
             response.put("data", articleDtos);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            log.error("게시글 목록 조회 중 오류 발생: {}", e.getMessage());
             response.put("message", "서버 내부 오류가 발생했습니다");
             response.put("data", new Object[]{});
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
