@@ -520,8 +520,6 @@
 - [S3 이미지 최적화](https://aluminum-timpani-a63.notion.site/S3-3bf3cca347524974845e58189a61bc5e?pvs=4)
 
 
-
-## 6. 개선사항
 ## 6. 성능 개선한 목록
 
 - [S3 Presigned URL과 비동기 처리](https://aluminum-timpani-a63.notion.site/S3-Presigned-URL-86196204428742c38dbb7c2280d80881?pvs=4)
