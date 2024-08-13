@@ -75,7 +75,7 @@ class ManagementLiveAdapter(
                     vEnterBtn.setOnClickListener {
                         navigateToLiveFragment(
                             item.liveId,
-                            item.isMyClass
+                            true
                         )
                     }
                 }
