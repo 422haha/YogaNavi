@@ -1,7 +1,7 @@
 
-# 🧘‍♀️ YogaNavi README
+# 🧘‍♀️ YogaNavi
 
-![readme_logo](./logo.png)
+![logo-1.png](./logo-1.png)
 
 - 배포 URL: [여기를 클릭!](https://drive.google.com/file/d/195UohXwyjYp07eXYUQKVgrAC9LLTJkKY/view)
 - Test ID: 1@example.com
