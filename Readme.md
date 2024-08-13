@@ -1,5 +1,5 @@
 # 🧘‍♀️ YogaNavi
-<img src="./logo-1.png" alt="Logo" width="500" height="400"/>
+<img src="./logo.png" alt="Logo" width="500" height="400"/>
 
 - 배포 URL: [여기를 클릭!](https://drive.google.com/file/d/195UohXwyjYp07eXYUQKVgrAC9LLTJkKY/view)
 - Test ID: 1@example.com
