@@ -55,18 +55,6 @@ services:
     volumes:
       - ./app:/app
 
-  jenkins:
-    image: jenkins/jenkins:jdk17
-    container_name: jenkins
-    ports:
-      - "9090:8080"
-      - "50000:50000"
-    volumes:
-      - /var/jenkins_home:/var/jenkins_home
-      - /home/ubuntu/yoganavi:/home/ubuntu/yoganavi
-    depends_on:
-      - app
-
 volumes:
   mysql_data:
   redis_data:
