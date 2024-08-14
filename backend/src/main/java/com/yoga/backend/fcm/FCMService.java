@@ -1,5 +1,6 @@
 package com.yoga.backend.fcm;
 
+import com.google.firebase.messaging.AndroidConfig;
 import com.google.firebase.messaging.BatchResponse;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -48,6 +49,9 @@ public class FCMService {
                 .setNotification(notification)
                 .putData("liveId", data.get("liveId"))
                 .setToken(token)
+                .setAndroidConfig(AndroidConfig.builder()
+                    .setPriority(AndroidConfig.Priority.HIGH)
+                    .build())
                 .build();
 
             messages.add(message);
