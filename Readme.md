@@ -395,27 +395,27 @@
 + 로그인에 성공한 경우, 메인 화면으로 이동합니다.
 + 로그인에 실패한 경우, 로그인 화면으로 이동합니다.
 
-![Splash 화면](./video/init/splash.gif)
+![Splash 화면](./gif/init/splash.gif)
 
 #### [로그인]
 + 이메일과 비밀번호를 입력할 수 있습니다.
 + 로그인에 성공한 경우, 메인 화면으로 이동합니다.
 
-![로그인 화면](./video/init/signin.gif)
+![로그인 화면](./gif/init/signin.gif)
 
 #### [회원 가입]
 + 이메일을 작성하여 인증을 요청합니다.
 + 인증번호로 인증을 시도합니다.
 + 비밀번호와 닉네임, 요가 강사 유무를 작성합니다.
 
-![회원가입 화면](./video/init/signup.gif)
+![회원가입 화면](./gif/init/signup.gif)
 
 #### [비밀번호 재설정]
 + 이메일을 작성하여 인증을 요청합니다.
 + 인증번호로 인증을 시도합니다.
 + 새로운 비밀번호를 작성합니다.
 
-![비밀번호 재설정 화면](./video/init/re_pw.gif)
+![비밀번호 재설정 화면](./gif/init/re_pw.gif)
 
 
 </details>
@@ -429,21 +429,21 @@
 +  화상 강의가 시작되면 초록색 불빛이 나옵니다.
 +  강의 10분전에 알람이 울립니다.
 
-![요가 할 일 화면](./video/home/home.gif)
-![요가 알람 화면](./video/home/home_alarm.gif)
-![요가 할 일 온에어 화면](./video/home/green.gif)
+![요가 할 일 화면](./gif/home/home.gif)
+![요가 알람 화면](./gif/home/home_alarm.gif)
+![요가 할 일 온에어 화면](./gif/home/green.gif)
 
 #### [화상 강의 다이얼로그]
 + 신청한 화상 강의에 대한 정보가 표출됩니다.
 + 입장하기 버튼을 통해 실시간 화상 통화가 진행됩니다.
 
-![화상 강의 다이얼로그 화면](./video/home/home_dialog.gif)
+![화상 강의 다이얼로그 화면](./gif/home/home_dialog.gif)
 
 #### [실시간 화상 강의]
 + WebRTC를 통해서 강사님과 수강생이 1:1 화상 통화를 진행합니다.
 + 마이크 on/off, 카메라 on/off 및 카메라 전환, 전화 끊기 기능을 제공합니다.
 
-![실시간 화상 강의 화면](./video/home/cam.gif)
+![실시간 화상 강의 화면](./gif/home/cam.gif)
 
 </details>
 
@@ -455,19 +455,19 @@
 + 현재 등록된 요가 강사들에 대한 정보를 제공받을 수 있습니다.
 + 검색 기능과 인기순 및 최신순에 대해 필터링 및 정렬 기능을 사용할 수 있습니다.
 
-![요가 강사 화면](./video/teacher/teacher.gif)
+![요가 강사 화면](./gif/teacher/teacher.gif)
 
 #### [요가 강사 필터]
 + 화상 강의에 대한 필터를 제공합니다.
 + 원하는 시간, 요일, 기간을 선택하면 그에 맞는 요가 강사 탭이 갱신됩니다.
 
-![요가 강사 필터 화면](./video/teacher/teacher_filter.gif)
+![요가 강사 필터 화면](./gif/teacher/teacher_filter.gif)
 
 #### [요가 강사 상세]
 + 강사에 대한 정보를 확인할 수 있습니다.
 + 실시간 화상강의 신청하기 버튼을 통해서 화상 강의를 신청할 수 있습니다.
 
-![요가 강사 상세 화면](./video/teacher/teacher_detail.gif)
+![요가 강사 상세 화면](./gif/teacher/teacher_detail.gif)
 
 </details>
 
@@ -480,20 +480,20 @@
 + 오프라인 녹화 강의들에 대한 정보를 제공받을 수 있습니다.
 + 제목, 내용에 대한 검색 기능과 인기순, 최신순 정렬 기능을 제공합니다.
 
-![녹화 강의 찾기 화면](./video/lecture/lecture.gif)
+![녹화 강의 찾기 화면](./gif/lecture/lecture.gif)
 
 #### [녹화 강의 상세]
 + 녹화 강의에 대한 정보가 제공됩니다.
 + 영상을 선택하면 비디오 탭으로 이동합니다.
 
-![녹화 강의 상세 화면](./video/lecture/lecture_detail.gif)
+![녹화 강의 상세 화면](./gif/lecture/lecture_detail.gif)
 
 #### [녹화 강의 비디오]
 + 영상들에 대한 비디오가 재생됩니다.
 + 수강생의 자세가 화면에 보이게 됩니다.
 + 수강생의 자세와 강사의 자세를 비교/판단합니다.
 
-![녹화 강의 비디오 화면](./video/lecture/lecture_video.gif)
+![녹화 강의 비디오 화면](./gif/lecture/lecture_gif.gif)
 
 </details>
 
@@ -504,42 +504,42 @@
 #### [마이 페이지]
 + 좋아요한 강사,강의 및 정보 수정 등 다양한 기능을 제공합니다.
 
-![마이 페이지 화면](./video/mypage/mypage.gif)
+![마이 페이지 화면](./gif/mypage/mypage.gif)
 
 #### [좋아요한 강사 목록]
 + 좋아요한 강사들을 확인할 수 있습니다.
 + 강사를 선택하면 [요가 강사 상세] 탭으로 이동합니다.
 
-![좋아요한 강사 화면](./video/mypage/like_teacher.gif)
+![좋아요한 강사 화면](./gif/mypage/like_teacher.gif)
 
 
 #### [좋아요한 강의 목록]
 + 좋아요한 녹화 강의들을 확인할 수 있습니다.
 + 강의를 선택하면 [녹화 강의 상세] 탭으로 이동합니다.
 
-![좋아요한 강의 화면](./video/mypage/like_lecture.gif)
+![좋아요한 강의 화면](./gif/mypage/like_lecture.gif)
 
 #### [수강 내역]
 + 이전에 수강했던 화상 강의들을 확인할 수 있습니다.
 
-![수강 내역 화면](./video/mypage/prev.gif)
+![수강 내역 화면](./gif/mypage/prev.gif)
 
 #### [내 정보 수정]
 + 비밀번호를 입력해야 접근할 수 있습니다.
 + 닉네임, 비밀번호를 수정할 수 있습니다.
 + 강사님은 강사 소개글 및 해시태그를 수정할 수 있습니다.
 
-![내 정보 수정 화면](./video/mypage/modify.gif)
+![내 정보 수정 화면](./gif/mypage/modify.gif)
 
 #### [로그 아웃]
 + 로그 아웃과 함께 앱에 저장되어 있는 계정 정보를 삭제합니다.
 
-![로그 아웃 화면](./video/mypage/logout.gif)
+![로그 아웃 화면](./gif/mypage/logout.gif)
 
 #### [회원 탈퇴]
 + 로그 아웃과 함께 서버에 저장되어 있는 계정 정보를 삭제합니다.
 
-![회원 탈퇴 화면](./video/mypage/bye.gif)
+![회원 탈퇴 화면](./gif/mypage/bye.gif)
 
 ----
 
@@ -549,34 +549,34 @@
 + 작성한 녹화 강의들을 확인할 수 있습니다.
 + 녹화 강의에 대한 글을 삭제할 수 있습니다.
 
-![녹화 강의 관리 화면](./video/mypage/lecture_list.gif)
+![녹화 강의 관리 화면](./gif/mypage/lecture_list.gif)
 
 #### [녹화 강의 생성/수정]
 + 녹화 강의에 대한 제목 및 내용(영상)을 수정/생성 할 수 있습니다.
 
-![녹화 강의 생성 화면](./video/mypage/make_lecture.gif)
+![녹화 강의 생성 화면](./gif/mypage/make_lecture.gif)
 
 #### [화상 강의 관리]
 + 작성한 화상 강의들을 확인할 수 있습니다.
 + 화상 강의를 삭제할 수 있습니다.
 
-![화상 강의 관리 화면](./video/mypage/live_list.gif)
+![화상 강의 관리 화면](./gif/mypage/live_list.gif)
 
 #### [화상 강의 생성/수정]
 + 화상 강의에 대한 정보(날짜, 시간...)들을 수정/생성 할 수 있습니다.
 
-![화상 강의 생성 화면](./video/mypage/make_live.gif)
+![화상 강의 생성 화면](./gif/mypage/make_live.gif)
 
 #### [공지 사항 관리]
 + 작성한 공지 사항들을  확인할 수 있습니다.
 + 공지 사항을 삭제할 수 있습니다.
 
-![공지 사항 관리 화면](./video/mypage/notice_list.gif)
+![공지 사항 관리 화면](./gif/mypage/notice_list.gif)
 
 #### [공지 사항 생성/수정]
 + 공지 사항들을 수정/생성 할 수 있습니다.
 
-![공지 사항 생성 화면](./video/mypage/make_notice.gif)
+![공지 사항 생성 화면](./gif/mypage/make_notice.gif)
 
 </details>
 
