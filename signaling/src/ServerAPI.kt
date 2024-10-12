@@ -14,25 +14,18 @@ interface InfoAPI {
 }
 
 object RetrofitClient {
-    private lateinit var API_KEY: String
-    private lateinit var BASE_URL: String
-
-    fun initialize(apiKey: String, baseUrl: String) {
-        API_KEY = apiKey
-        BASE_URL = baseUrl
-        println("SERVER_KEY: $API_KEY")
-        println("BASE_URL: $BASE_URL")
-    }
+    val serverKey = myLocalSecret.getProperty("SERVER_KEY") ?: ""
+    val baseUrl = myLocalSecret.getProperty("BASE_URL") ?: ""
 
     val instance: InfoAPI by lazy {
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(InfoAPI::class.java)
     }
 
-    fun getApiKey(): String = API_KEY
+    fun getApiKey(): String = serverKey
 }
 
 class ServerApI {

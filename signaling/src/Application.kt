@@ -1,3 +1,5 @@
+import RetrofitClient.baseUrl
+import RetrofitClient.serverKey
 import io.ktor.application.*
 import io.ktor.http.cio.websocket.*
 import io.ktor.request.header
@@ -5,6 +7,8 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import java.time.Duration
+import java.util.*
 
 /**
  * Originally written by Artem Bagritsevich.
@@ -13,11 +17,9 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
  */
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-
 @Suppress("unused") // Referenced in application.conf
 @JvmOverloads
 fun Application.module(testing: Boolean = false) {
-
     install(WebSockets) {
         pingPeriod = Duration.ofSeconds(15)
         timeout = Duration.ofSeconds(15)
@@ -28,7 +30,6 @@ fun Application.module(testing: Boolean = false) {
     val serverApI = ServerApI()
 
     routing {
-
         get("/") {
             call.respond("Hello from WebRTC signaling server")
         }
@@ -71,5 +72,4 @@ fun Application.module(testing: Boolean = false) {
         }
     }
 }
-
 

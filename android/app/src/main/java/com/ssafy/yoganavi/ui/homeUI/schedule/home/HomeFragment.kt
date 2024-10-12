@@ -13,7 +13,7 @@ import com.ssafy.yoganavi.data.source.dto.home.EmptyData
 import com.ssafy.yoganavi.databinding.FragmentHomeBinding
 import com.ssafy.yoganavi.ui.core.BaseFragment
 import com.ssafy.yoganavi.ui.homeUI.schedule.home.dialog.EnterDialog
-import com.ssafy.yoganavi.ui.utils.EMPTY_LIVE
+import com.ssafy.yoganavi.ui.utils.EMPTY_LECTURE
 import com.ssafy.yoganavi.ui.utils.HOME
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -49,7 +49,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             if (loadState.source.refresh is LoadState.NotLoading) {
                 val isListEmpty = homeAdapter.itemCount == 0
                 if (isListEmpty)
-                    setEmptyView(EmptyData(true, EMPTY_LIVE))
+                    setEmptyView(EmptyData(true, EMPTY_LECTURE))
                 else
                     setEmptyView(EmptyData(false))
             }
