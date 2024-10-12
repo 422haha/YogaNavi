@@ -1,0 +1,96 @@
+<resources>
+    <string name="app_name">YogaNavi</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="password">비밀번호</string>
+    <string name="change_password">비밀번호 변경</string>
+    <string name="id">ID</string>
+    <string name="login">로그인</string>
+    <string name="forgot_password">비밀번호를 잊으셨습니까?</string>
+    <string name="email">이메일</string>
+    <string name="certification_number">인증번호</string>
+    <string name="check">확인</string>
+    <string name="check_password">비밀번호 확인</string>
+    <string name="nickname">닉네임</string>
+    <string name="is_teacher">강사입니다</string>
+    <string name="reset">재설정</string>
+    <string name="signup">회원가입</string>
+    <string name="home">홈</string>
+    <string name="teacher">강사</string>
+    <string name="lecture">강의</string>
+    <string name="my_page">마이 페이지</string>
+    <string name="like_teacher_list">좋아요한 강사 목록</string>
+    <string name="like_lecture_list">좋아요한 강의 목록</string>
+    <string name="my_list">수강 내역</string>
+    <string name="modify">내 정보 수정</string>
+    <string name="management_video">녹화 강의 관리</string>
+    <string name="management_live">화상 강의 관리</string>
+    <string name="register_notice">공지 관리</string>
+    <string name="enter">입장하기</string>
+    <string name="edit">수정</string>
+    <string name="delete">삭제</string>
+    <string name="register">등록</string>
+    <string name="popular">인기순</string>
+    <string name="recent">최신순</string>
+    <string name="title">제목</string>
+    <string name="content">내용</string>
+    <string name="chapter">순서</string>
+    <string name="add_photo"> 사진 추가하기</string>
+    <string name="delete_photo"> 사진 삭제하기</string>
+    <string name="write_info">글을 작성하는 공간입니다.</string>
+    <string name="logout">로그아웃</string>
+    <string name="quit">회원 탈퇴</string>
+    <string name="save">저장</string>
+    <string name="hash_tag">해시 태그</string>
+    <string name="teacher_content">강사 50자 소개글</string>
+
+    <string name="choose_week">가능 요일 선택</string>
+    <string name="choose_date">날짜 선택</string>
+    <string name="start_date">시작 날짜</string>
+    <string name="end_date">종료 날짜</string>
+    <string name="input_content">강의 내용을 입력하세요.</string>
+    <string name="lecture_title">강의 제목</string>
+    <string name="title_info">제목을 작성하세요.</string>
+    <string name="lecture_info">강의소개를 작성하세요.</string>
+    <string name="small_title_info">소제목을 작성하세요.</string>
+    <string name="chapter_info">챕터의 소개를 작성하세요.</string>
+    <string name="add_chapter">+챕터 추가+</string>
+    <string name="click_thumbnail_info">클릭해서 썸네일을 추가하세요</string>
+    <string name="click_video_info">클릭해서 영상을 추가하세요</string>
+    <string name="notice_info">공지를 입력하세요</string>
+    <string name="password_info">비밀번호를 입력하세요</string>
+    <string name="start_lecture">곧 강의가 시작됩니다\n준비하세요!</string>
+
+    <!-- 필터 시작 -->
+    <string name="align">정렬</string>
+    <string name="time">시간</string>
+    <string name="init_time">00:00</string>
+    <string name="from">~</string>
+    <string name="monday">월</string>
+    <string name="tuesday">화</string>
+    <string name="wednesday">수</string>
+    <string name="thursday">목</string>
+    <string name="friday">금</string>
+    <string name="saturday">토</string>
+    <string name="sunday">일</string>
+    <string name="select_term">기간 선택</string>
+    <string name="week">일주일</string>
+    <string name="month">한 달</string>
+    <string name="three_months">세 달</string>
+    <string name="year">일 년</string>
+    <string name="total">전체</string>
+    <string name="send">전송</string>
+    <string name="notice">공지사항</string>
+    <string name="available_class">수강 가능한 수업</string>
+    <string name="proceeding_live">진행중인 강의</string>
+    <string name="emptyMessage">리스트가 비어있습니다 :)</string>
+    <string name="live_delete_msg">화상강의 일정이 삭제되었습니다.</string>
+    <string name="end_unlimit">종료일을 시작일로부터 1년으로 하시겠습니까?</string>
+    <!-- 필터 끝 -->
+
+    <string-array name="maxnum_array">
+        <item>1 명</item>
+        <item>2 명</item>
+        <item>3 명</item>
+    </string-array>
+</resources>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 간격 -->
+    <dimen name="padding_extra_extra_small">2dp</dimen>
+    <dimen name="padding_extra_small">4dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
+    <dimen name="padding_large">20dp</dimen>
+    <dimen name="padding_extra_large">32dp</dimen>
+    <dimen name="padding_extra_extra_large">48dp</dimen>
+
+    <dimen name="dialog_padding_medium">40dp</dimen>
+    <dimen name="live_padding">150dp</dimen>
+    <dimen name="bottom_button_padding">70dp</dimen>
+
+
+    <!-- EditText -->
+    <dimen name="ti_extra_large_width">300dp</dimen>
+    <dimen name="ti_height">60dp</dimen>
+    <dimen name="ti_multi_height">100dp</dimen>
+
+    <dimen name="text_size_semi_large">22sp</dimen>
+
+    <!-- Icon -->
+    <dimen name="icon_mini">34dp</dimen>
+    <dimen name="icon_extra_small">24dp</dimen>
+    <dimen name="icon_small">30dp</dimen>
+    <dimen name="icon_little_medium">36dp</dimen>
+    <dimen name="icon_medium40">40dp</dimen>
+    <dimen name="icon_medium">48dp</dimen>
+    <dimen name="icon_large">100dp</dimen>
+    <dimen name="icon_little_large">120dp</dimen>
+    <dimen name="icon_extra_large">150dp</dimen>
+    <dimen name="icon_extra_extra_large">300dp</dimen>
+
+    <!-- TextSize -->
+    <dimen name="text_small">14sp</dimen>
+    <dimen name="text_medium">16sp</dimen>
+    <dimen name="text_medium_large">18sp</dimen>
+    <dimen name="text_medium_large20">20sp</dimen>
+    <dimen name="text_large">24sp</dimen>
+    <dimen name="text_extra_large30">30sp</dimen>
+    <dimen name="text_extra_large">36sp</dimen>
+    <dimen name="text_extra_large150">150sp</dimen>
+</resources>
